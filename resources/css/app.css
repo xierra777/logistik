@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* Custom Tailwind scrollbar */
+.scrollbar-custom::-webkit-scrollbar {
+    @apply w-1.5 h-0.5; 
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+    @apply bg-gray-200 rounded-lg;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+    @apply bg-gray-500 rounded-lg hover:bg-gray-700;
+}
+
+.img-flag {
+    width: 20px;
+    height: auto;
+    margin-right: 4px;
+    vertical-align: middle;
+  }
+  /* Ensure Select2 takes full width */
+  .select2-container {
+    width: 100% !important;
+  }

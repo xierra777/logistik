@@ -14,20 +14,7 @@ class Users extends Component
     use WithFileUploads, WithPagination;
 
     public $name, $email, $password, $profile_photo;
-    public $isOpen = false; // Modal state
     public $perPage = 5;
-
-    public function openModal()
-    {
-        $this->isOpen = true;
-        $this->resetForm();
-    }
-
-    public function closeModal()
-    {
-        $this->isOpen = false;
-        $this->resetForm();
-    }
 
     public function save()
     {
@@ -55,7 +42,6 @@ class Users extends Component
 
         // Refresh data users in table
         session()->flash('message', 'User created successfully.');
-        $this->closeModal();
     }
 
     public function resetForm()

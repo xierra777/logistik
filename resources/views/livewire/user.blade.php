@@ -10,96 +10,40 @@
             Add Users
         </button>
     </div>
-
-    @if($isOpen)
-    <div class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50 transition-all duration-300 ease-in-out"
-        x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0"
-        x-transition:enter-end="opacity-100"
-        x-transition:leave="transition ease-in duration-200"
-        x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0">
-        <div class="bg-white p-6 rounded-lg w-1/3 transform transition-all duration-300 ease-in-out"
-            x-transition:enter="transform transition duration-500"
-            x-transition:enter-start="translate-y-10 opacity-0"
-            x-transition:enter-end="translate-y-0 opacity-100"
-            x-transition:leave="transform transition duration-300"
-            x-transition:leave-start="translate-y-0 opacity-100"
-            x-transition:leave-end="translate-y-10 opacity-0">
-
-            <h2 class="text-xl mb-4">Tambah User</h2>
-            <form wire:submit.prevent="save">
-
-                <!-- Name -->
-                <div class="mb-4">
-                    <label class="block font-medium">Name</label>
-                    <input type="text" wire:model="name" class="w-full border p-2 rounded" placeholder="Masukkan nama">
-                    @error('name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+    <button type="button" class="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none" aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-scale-animation-modal" data-hs-overlay="#hs-scale-animation-modal">
+        Open modal
+    </button>
+    <div id="hs-scale-animation-modal" class="hs-overlay hidden size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog" tabindex="-1" aria-labelledby="hs-scale-animation-modal-label">
+        <div class="hs-overlay-animation-target hs-overlay-open:scale-100 hs-overlay-open:opacity-100 scale-95 opacity-0 ease-in-out transition-all duration-200 sm:max-w-lg sm:w-full m-3 sm:mx-auto min-h-[calc(100%-3.5rem)] flex items-center">
+            <div class="w-full flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70">
+                <div class="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-700">
+                    <h3 id="hs-scale-animation-modal-label" class="font-bold text-gray-800 dark:text-white">
+                        Modal title
+                    </h3>
+                    <button type="button" class="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" aria-label="Close" data-hs-overlay="#hs-scale-animation-modal">
+                        <span class="sr-only">Close</span>
+                        <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 6 6 18"></path>
+                            <path d="m6 6 12 12"></path>
+                        </svg>
+                    </button>
                 </div>
-
-                <!-- Email -->
-                <div class="mb-4">
-                    <label class="block font-medium">Email</label>
-                    <input type="email" wire:model="email" class="w-full border p-2 rounded" placeholder="Masukkan email">
-                    @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                <div class="p-4 overflow-y-auto">
+                    <p class="mt-1 text-gray-800 dark:text-neutral-400">
+                        This is a wider card with supporting text below as a natural lead-in to additional content.
+                    </p>
                 </div>
-
-                <!-- Password -->
-                <div class="mb-4">
-                    <label class="block font-medium">Password</label>
-                    <input type="password" wire:model="password" class="w-full border p-2 rounded" placeholder="Masukkan password">
-                    @error('password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                <div class="flex justify-end items-center gap-x-2 py-3 px-4 border-t dark:border-neutral-700">
+                    <button type="button" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700" data-hs-overlay="#hs-scale-animation-modal">
+                        Close
+                    </button>
+                    <button type="button" class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                        Save changes
+                    </button>
                 </div>
-
-                <!-- Profile Picture -->
-                <div data-hs-file-upload='{
-  "url": "/upload",
-  "acceptedFiles": "image/*",
-  "maxFiles": 1,
-  "singleton": true
-}'>
-                    <template data-hs-file-upload-preview="">
-                        <div class="size-20">
-                            <img class="w-full object-contain rounded-full" data-dz-thumbnail="">
-                        </div>
-                    </template>
-
-                    <div class="flex flex-wrap items-center gap-3 sm:gap-5">
-                        <div class="group" data-hs-file-upload-previews="" data-hs-file-upload-pseudo-trigger="">
-                            <span class="group-has-[div]:hidden flex shrink-0 justify-center items-center size-20 border-2 border-dotted border-gray-300 text-gray-400 cursor-pointer rounded-full hover:bg-gray-50 dark:border-neutral-700 dark:text-neutral-600 dark:hover:bg-neutral-700/50">
-                                <svg class="shrink-0 size-7" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <circle cx="12" cy="10" r="3"></circle>
-                                    <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"></path>
-                                </svg>
-                            </span>
-                        </div>
-
-                        <div class="grow">
-                            <div class="flex items-center gap-x-2">
-                                <button type="button" class="py-2 px-3 inline-flex items-center gap-x-2 text-xs font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none" data-hs-file-upload-trigger="">
-                                    <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                        <polyline points="17 8 12 3 7 8"></polyline>
-                                        <line x1="12" x2="12" y1="3" y2="15"></line>
-                                    </svg>
-                                    Upload photo
-                                </button>
-                                <button type="button" class="py-2 px-3 inline-flex items-center gap-x-2 text-xs font-semibold rounded-lg border border-gray-200 bg-white text-gray-500 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:focus:bg-neutral-800" data-hs-file-upload-clear="">Delete</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Buttons -->
-                <div class="flex justify-end">
-                    <button type="button" wire:click="closeModal" class="mr-2 bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
-                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
-    @endif
     <br>
     <div class="p-1.5 min-w-full inline-block align-middle">
         <div class="flex items-center gap-3">

@@ -16,6 +16,7 @@
         "vite": "^6.0"
     },
     "dependencies": {
+        "@preline/overlay": "^2.5.2",
         "@preline/select": "^2.5.2",
         "@tailwindcss/vite": "^4.0.6",
         "preline": "^2.7.0",

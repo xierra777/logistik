@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 
 
 Route::view('/', 'welcome');
+Route::view('preline', 'preline');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

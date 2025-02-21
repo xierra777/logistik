@@ -30,6 +30,7 @@ Route::view('shipment', 'shipments.create',)
     ->name('shipment');
 
 
+    
 Route::get('create-shipments', CreateShipments::class)->middleware([
     'auth', 'verified'
 ]);
@@ -49,7 +50,7 @@ Route::get('/customers', ListCustomer::class)
     ->middleware(['auth', 'verified'])
     ->name('customers.list');
 
-Route::get('/user', users::class)
+Route::get('users', users::class)
     ->middleware(['auth', 'verified'])
     ->name('user.list');
 

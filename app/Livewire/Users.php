@@ -6,14 +6,13 @@ use App\Models\User;
 use Livewire\WithFileUploads;
 use Livewire\Component;
 use Livewire\WithPagination;
-
 use Illuminate\Support\Facades\Hash;
 
 class Users extends Component
 {
     use WithFileUploads, WithPagination;
 
-    public $name, $email, $password, $profile_photo;
+    public $name, $email, $password, $profile_photo, $role;
     public $perPage = 5;
 
     public function save()
@@ -22,26 +21,27 @@ class Users extends Component
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
+            'role' => 'required',
             'profile_photo' => 'nullable|image|max:2048',
         ]);
 
         // Handle profile photo upload if exists
         if ($this->profile_photo) {
-            $profilePhotoPath = $this->profile_photo->store('profile_photos', 'public');
-        } else {
-            $profilePhotoPath = null;
+            $path = $this->profile_photo->store('profile_photos', 'public');
+            // Save $path to the database, etc.
         }
-
         // Create the new user
         User::create([
             'name' => $this->name,
             'email' => $this->email,
             'password' => Hash::make($this->password),
-            'profile_photo' => $profilePhotoPath,
+            'role' => $this->role,
+            'profile_photo' => $this->profile_photo,
         ]);
 
         // Refresh data users in table
         session()->flash('message', 'User created successfully.');
+        $this->resetForm();
     }
 
     public function resetForm()
@@ -57,7 +57,7 @@ class Users extends Component
         // Fetch paginated users within the render method
         $users = User::latest()->paginate($this->perPage);
 
-        return view('livewire.user', [
+        return view('livewire.users', [
             'users' => $users
         ]);
     }

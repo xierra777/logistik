@@ -14,8 +14,16 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased overflow-x-auto max-h-5 scrollbar-custom">
-    <!-- <input type="hidden" name="_token" value="{{ csrf_token() }}"> -->
+
+<body class="font-sans antialiased overflow-x-auto max-h-3 max-h overflow-y-auto
+  [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:rounded-full
+  [&::-webkit-scrollbar-track]:bg-gray-100
+  [&::-webkit-scrollbar-thumb]:bg-gray-300
+    [&::-webkit-scrollbar-thumb]:rounded-full
+  dark:[&::-webkit-scrollbar-track]:bg-neutral-700
+  dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+    <input type="hidden" name="_token" value="{{ csrf_token() }}">
     @csrf
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
         <livewire:layout.navigation />

@@ -25,23 +25,28 @@ class Users extends Component
             'profile_photo' => 'nullable|image|max:2048',
         ]);
 
-        // Handle profile photo upload if exists
         if ($this->profile_photo) {
-            $path = $this->profile_photo->store('profile_photos', 'public');
-            // Save $path to the database, etc.
+            // This will store the file in "storage/app/public/profile_photos" 
+            // and return a relative path like "profile_photos/abc.png"
+            $photoPath = $this->profile_photo->store('profile_photos', 'public');
+        } else {
+            $photoPath = null;
         }
         // Create the new user
         User::create([
-            'name' => $this->name,
-            'email' => $this->email,
-            'password' => Hash::make($this->password),
-            'role' => $this->role,
-            'profile_photo' => $this->profile_photo,
+            'name'          => $this->name,
+            'email'         => $this->email,
+            'password'      => Hash::make($this->password),
+            'role'          => $this->role,
+            'profile_photo' => $photoPath,
         ]);
+
+        // dd($photoPath);
 
         // Refresh data users in table
         session()->flash('message', 'User created successfully.');
         $this->resetForm();
+        $this->dispatch('close-modal');
     }
 
     public function resetForm()
@@ -60,5 +65,15 @@ class Users extends Component
         return view('livewire.users', [
             'users' => $users
         ]);
+    }
+
+    public function confirmDelete($get_id)
+    {
+        try {
+            User::destroy($get_id);
+            session()->flash('message', 'Shipment deleted successfully!');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error deleting shipment: ' . $e->getMessage());
+        }
     }
 }

@@ -30,19 +30,23 @@ Route::view('shipment', 'shipments.create',)
     ->name('shipment');
 
 
-    
+
 Route::get('create-shipments', CreateShipments::class)->middleware([
-    'auth', 'verified'
+    'auth',
+    'verified'
 ]);
 
 Route::get('shipmment', Shipmment::class)->middleware([
-    'auth', 'verified'
+    'auth',
+    'verified'
 ]);
 Route::get('/view-shipments/{id}', ViewShipments::class)->middleware([
-    'auth', 'verified'
+    'auth',
+    'verified'
 ]);
 Route::get('/edit-shipments/{id}', EditShipments::class)->middleware([
-    'auth', 'verified'
+    'auth',
+    'verified'
 ]);
 Route::get('/customers/create', CreateCustomer::class)->middleware(['auth', 'verified'])->name('customers.create');
 
@@ -55,8 +59,10 @@ Route::get('users', users::class)
     ->name('user.list');
 
 Route::get('/csrf-token', function (Request $request) {
-return response()->json(['csrf_token' => csrf_token()]);
-    })->name('csrf-token');
+    return response()->json(['csrf_token' => csrf_token()]);
+})->name('csrf-token');
 
-
-require __DIR__.'/auth.php';
+Route::get('/test-404', function () {
+    abort(404); // or throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
+});
+require __DIR__ . '/auth.php';

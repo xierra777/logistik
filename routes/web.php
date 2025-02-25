@@ -5,6 +5,9 @@ use App\Livewire\CreateShipments;
 use App\Livewire\ViewShipments;
 use App\Livewire\EditShipments;
 use App\Livewire\Shipmment;
+use App\Livewire\Accounting\accountant;
+use App\Livewire\Accounting\Sell;
+use App\Livewire\Accounting\cost;
 use App\Livewire\users;
 use App\Livewire\Customers\CreateCustomer;
 use App\Livewire\Customers\ListCustomer;
@@ -58,11 +61,23 @@ Route::get('users', users::class)
     ->middleware(['auth', 'verified'])
     ->name('user.list');
 
+Route::get('accountant', accountant::class)
+    ->middleware(['auth', 'verified'])
+    ->name('accountant.list');
+
+Route::get('cost', cost::class)
+    ->middleware(['auth', 'verified'])
+    ->name('cost');
+
+Route::get('sell', sell::class)
+    ->middleware(['auth', 'verified'])
+    ->name('sell');
+
 Route::get('/csrf-token', function (Request $request) {
     return response()->json(['csrf_token' => csrf_token()]);
 })->name('csrf-token');
 
-Route::get('/test-404', function () {
-    abort(404); // or throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
+Route::fallback(function () {
+    return view('livewire/errors.404');
 });
 require __DIR__ . '/auth.php';

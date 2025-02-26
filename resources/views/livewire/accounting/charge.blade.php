@@ -1,114 +1,70 @@
 <!-- Container (adjust max-w to control overall width) -->
-<div class="max-w-7xl mx-auto p-4 bg-white">
+<div class="bg-white">
     <!-- Heading Bar (Optional) -->
-    <div class="bg-green-400 p-3 mb-4">
+    <div class="bg-green-600 p-3 rounded-t-xl">
         <h2 class="text-white text-lg font-semibold">Charge</h2>
     </div>
 
     <!-- Form -->
-    <form class="space-y-4">
+    <div class="space-y-4 p-5 border border-gray-200 rounded-b-md shadow-lg">
         <!-- Row 1 -->
-        <div class="grid grid-cols-4 gap-4">
+        <div class="grid grid-cols-3 gap-3">
             <!-- Client -->
             <div>
-                <label for="client" class="block text-sm font-medium text-gray-700">Client</label>
-                <select id="client" name="client"
+                <label for="charge" class="block text-sm font-medium text-gray-700">Charge<span class="text-red-500">*</span></label>
+                <select id="charge" name="charge"
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="PT-SALIM-INDOFOOD">PT.SALIM INDOFOOD - PT.SAMSUNG SDS</option>
-                    <!-- More options... -->
+                    <option value="FCL">FCL</option>
                 </select>
             </div>
-
-            <!-- Amount / Qty -->
-            <div>
-                <label for="amountQty" class="block text-sm font-medium text-gray-700">Amount / Qty</label>
-                <input type="number" id="amountQty" name="amountQty" placeholder="1100"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-
-            <!-- D/T or G/F -->
-            <div>
-                <label for="dtgf" class="block text-sm font-medium text-gray-700">D/T or G/F</label>
-                <input type="text" id="dtgf" name="dtgf" placeholder="G/F?"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-
             <!-- VAT / GST Amount -->
             <div>
-                <label for="vatAmount" class="block text-sm font-medium text-gray-700">VAT / GST Amount</label>
-                <input type="number" id="vatAmount" name="vatAmount" placeholder="2856000"
+                <label for="description" class="block text-sm font-medium text-gray-700">Description / Name<span class="text-red-500">*</span></label>
+                <input type="text" id="description" name="description" placeholder=""
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            </div>
+
+            <!-- Freight -->
+            <div>
+                <label for="freight" class="block text-sm font-medium text-gray-700">Freight<span class="text-red-500">*</span></label>
+                <input type="number" id="freight" name="freight" placeholder=""
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             </div>
         </div>
 
         <!-- Row 2 -->
-        <div class="grid grid-cols-4 gap-4">
-            <!-- Remarks -->
+        <div class="grid grid-cols-3 gap-4">
+            <!-- Unit -->
             <div>
-                <label for="remarks" class="block text-sm font-medium text-gray-700">Remarks</label>
-                <input type="text" id="remarks" name="remarks" placeholder="Additional details..."
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <label for="unit" class="block text-sm font-medium text-gray-700">Unit<span class="text-red-500">*</span></label>
+                <select name="" id="" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="">PER CONTAINER</option>
+                    <option value=""></option>
+                </select>
             </div>
 
             <!-- Currency -->
             <div>
-                <label for="currency" class="block text-sm font-medium text-gray-700">Currency</label>
-                <select id="currency" name="currency"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="USD">USD</option>
-                    <option value="IDR">IDR</option>
-                    <!-- More options... -->
-                </select>
-            </div>
-
-            <!-- FOB Amount -->
-            <div>
-                <label for="fobAmount" class="block text-sm font-medium text-gray-700">FOB Amount</label>
-                <input type="number" id="fobAmount" name="fobAmount" placeholder="1100"
+                <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+                <input type="text" name="quantity" id="quantity" placeholder="" value="0"
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             </div>
 
-            <!-- VAT / GST Type -->
+            <!-- OFD Type -->
             <div>
-                <label for="vatType" class="block text-sm font-medium text-gray-700">VAT / GST Type</label>
-                <select id="vatType" name="vatType"
+                <label for="cofdtype" class="block text-sm font-medium text-gray-700">OFD Type</label>
+                <input type="number" id="cofdtype" name="cofdtype" placeholder="1100"
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="gst">GST</option>
-                    <option value="vat">VAT</option>
-                    <!-- More options... -->
-                </select>
             </div>
         </div>
 
         <!-- Row 3 -->
-        <div class="grid grid-cols-4 gap-4">
-            <!-- Ex Rate -->
-            <div>
-                <label for="exRate" class="block text-sm font-medium text-gray-700">Ex Rate</label>
-                <input type="number" id="exRate" name="exRate" placeholder="6500"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-
-            <!-- Amount (IDR) -->
-            <div>
-                <label for="amountIdr" class="block text-sm font-medium text-gray-700">Amount (IDR)</label>
-                <input type="number" id="amountIdr" name="amountIdr" placeholder="2866000"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-
-            <!-- Balance Amount -->
-            <div>
-                <label for="balanceAmount" class="block text-sm font-medium text-gray-700">Balance Amount</label>
-                <input type="number" id="balanceAmount" name="balanceAmount" placeholder="..."
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-
-            <!-- Gross Profit -->
-            <div>
-                <label for="grossProfit" class="block text-sm font-medium text-gray-700">Gross Profit</label>
-                <input type="number" id="grossProfit" name="grossProfit" placeholder="2866000"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+        <div class="w-full gap-4">
+            <!-- Remarks -->
+            <div class="max-w-lg">
+                <label for="textarea-label" class="block text-sm font-medium mb-2 dark:text-white">Remarks</label>
+                <textarea id="textarea-label" class="py-3 px-4 block w-full border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600 " rows="3" placeholder="Say hi..."></textarea>
             </div>
         </div>
-    </form>
+    </div>
 </div>

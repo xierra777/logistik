@@ -1,10 +1,10 @@
-<div>
+<div paddingClass="p-0">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Data Shipments') }}
         </h2>
     </x-slot>
-    <div class="max-w-full mx-auto">
+    <div class="max-w-full mx-auto p-4">
         <div class="grid grid-cols-4 border-1border-gray-200">
             <!-- First Row (Labels) -->
             <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Shipment ID</div>
@@ -57,7 +57,7 @@
     </div>
     <div x-data="{ open: false }">
         <!-- Button to open modal -->
-        <div class="flex justify-start mb-4">
+        <div class="flex justify-start mb-4 p-4">
             <button @click="open = true" class="py-3 px-4 bg-blue-600 text-white rounded-lg">
                 Open Modal
             </button>
@@ -79,14 +79,7 @@
             x-transition:leave-start="scale-100 opacity-100"
             x-transition:leave-end="scale-90 opacity-0"
             class="fixed inset-0 flex items-center justify-center z-50 pointer-events-auto px-4">
-            <div class="bg-white rounded-lg shadow-lg w-full max-w-6xl max-h-[80vh] overflow-y-auto
-                [&::-webkit-scrollbar]:w-2
-                [&::-webkit-scrollbar-track]:rounded-full
-                [&::-webkit-scrollbar-track]:bg-gray-100
-                [&::-webkit-scrollbar-thumb]:rounded-full
-                [&::-webkit-scrollbar-thumb]:bg-gray-300
-                dark:[&::-webkit-scrollbar-track]:bg-neutral-700
-                dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-7,5sxl ">
                 <!-- Modal Header -->
                 <div class="flex justify-between items-center p-4 border-b">
                     <h2 class="text-lg font-semibold text-gray-800">Costing</h2>
@@ -99,21 +92,26 @@
                 </div>
 
                 <!-- Modal Content -->
-                <form action="POST" class="p-2">
+                <form action="POST" class="px-4 max-h-[80vh] overflow-y-auto
+                [&::-webkit-scrollbar]:w-2
+                [&::-webkit-scrollbar]:hidden">
+                    <div class="flex justify-center m-2 rounded p-3">
+                        <label for="" class="text-gray-500"> " this Modal Is Scrollable ;D"</label>
+                    </div>
                     <div class="space-y-4 rounded">
                         <div class="flex flex-col">
                             <livewire:accounting.charge />
                         </div>
                         <div class="flex flex-col">
-                            <livewire:accounting.cost />
+                            <livewire:accounting.sell />
                         </div>
                         <div class="flex flex-col">
-                            <livewire:accounting.sell />
+                            <livewire:accounting.cost />
                         </div>
                     </div>
 
                     <!-- Modal Footer -->
-                    <div class="flex justify-end mt-4 gap-2 p-4 border-t">
+                    <div class="flex justify-end mt-4 gap-2 p-4 border-t color-gray-200">
                         <button type="button" @click="open = false"
                             class="px-4 py-2 bg-gray-500 text-white rounded-lg">
                             Cancel
@@ -126,34 +124,57 @@
             </div>
         </div>
     </div>
-    <div class="flex flex-col p-1">
-        <div class="-m-1.5 overflow-x-auto">
-            <div class="p-1.5 min-w-full inline-block align-middle">
-                <div class="border rounded-lg overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-                        <thead>
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Name</th>
-                                <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Age</th>
-                                <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Address</th>
-                                <th scope="col" class="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 dark:divide-neutral-700">
-                            <tr class="hover:bg-gray-100 dark:hover:bg-neutral-700">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">John Brown</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">45</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-200">New York No. 1 Lake Park</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                                    <button type="button" class="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-500 dark:hover:text-blue-400 dark:focus:text-blue-400">Delete</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+    <div class="border rounded-lg overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
+                <thead class="divide-y divide-gray-200 dark:divide-neutral-700">
+                    <tr class="divide-x divide-gray-200 dark:divide-neutral-700">
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Edit
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Line No</th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Description</th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Unit</th>
+                        <th scope="col" class="px-6 py-3 bg-orange-500 text-start text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Client</th>
+                        <th scope="col" class="px-6 py-3 bg-orange-500 text-start text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Sale</th>
+                        <th scope="col" class="px-6 py-3 bg-orange-500 text-start text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Amount (IDR)</th>
+                        <th scope="col" class="px-6 py-3 bg-orange-500 text-start text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Dr/Cr</th>
+                        <th scope="col" class="px-6 py-3 bg-blue-500 text-start text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Vendor</th>
+                        <th scope="col" class="px-6 py-3 bg-blue-500 text-start text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Cost</th>
+                        <th scope="col" class="px-6 py-3 bg-blue-500 text-start text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Amount (IDR)</th>
+                        <th scope="col" class="px-6 py-3 bg-blue-500 text-start text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Dr/Cr</th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Freight</th>
+                        <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Gross Profit</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-neutral-700">
+                    <tr class="hover:bg-gray-100 dark:hover:bg-neutral-700 divide-x divide-gray-200 dark:divide-neutral-700">
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            <button class="flex items-center gap-x-2 text-sm font-medium rounded-lg bg-blue-300 text-blue-800 hover:bg-blue-200 focus:outline-none disabled:opacity-50 disabled:pointer-events-none">
+                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 4a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2h-6v6a1 1 0 1 1-2 0v-6H5a1 1 0 1 1 0-2h6V5a1 1 0 0 1 1-1z">
+                                    </path>
+                                </svg>
+                            </button>
+                        </td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800 dark:text-neutral-200">John Brown</td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800 dark:text-neutral-200">Sample Desc</td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800 dark:text-neutral-200">Unit</td>
+                        <td class="px-6 py-4 text-sm font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">Client</td>
+                        <td class="px-6 py-4 text-sm font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">Sale</td>
+                        <td class="px-6 py-4 text-sm font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">1234567</td>
+                        <td class="px-6 py-4 text-sm font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">Dr</td>
+                        <td class="px-6 py-4 text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">Vendor</td>
+                        <td class="px-6 py-4 text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">Cr</td>
+                        <td class="px-6 py-4 text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">Dr</td>
+                        <td class="px-6 py-4 text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">Cr</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
+
+
     <!-- SIGMA Button -->
     <div class="pt-4 flex justify-end">
         <a href="/shipments"

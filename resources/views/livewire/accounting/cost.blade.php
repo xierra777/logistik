@@ -1,114 +1,150 @@
 <!-- Container (adjust max-w to control overall width) -->
-<div class="max-w-7xl mx-auto p-4 bg-white">
+<div class="bg-white">
     <!-- Heading Bar (Optional) -->
-    <div class="bg-orange-500 p-3 mb-4">
-        <h2 class="text-white text-lg font-semibold">Sale</h2>
+    <div class="bg-blue-500 p-3 rounded-t-xl">
+        <h2 class="text-white text-lg font-semibold">Cost</h2>
     </div>
 
     <!-- Form -->
-    <form class="space-y-4">
+    <div class="space-y-1.5 p-4 border border-gray-200 rounded-b-md shadow-lg">
         <!-- Row 1 -->
-        <div class="grid grid-cols-4 gap-4">
+        <div class="grid grid-cols-3 gap-4">
             <!-- Client -->
             <div>
-                <label for="client" class="block text-sm font-medium text-gray-700">Client</label>
-                <select id="client" name="client"
+                <label for="cvendor" class="block text-sm font-medium text-gray-700">Vendor</label>
+                <select id="cvendor" name="cvendor"
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="PT-SALIM-INDOFOOD">PT.SALIM INDOFOOD - PT.SAMSUNG SDS</option>
                     <!-- More options... -->
                 </select>
             </div>
 
-            <!-- Amount / Qty -->
+            <!-- Reference No. -->
             <div>
-                <label for="amountQty" class="block text-sm font-medium text-gray-700">Amount / Qty</label>
-                <input type="number" id="amountQty" name="amountQty" placeholder="1100"
+                <label for="creferenceno" class="block text-sm font-medium text-gray-700">No Invoice</label>
+                <input type="text" id="creferenceno" name="creferenceno"
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             </div>
 
-            <!-- D/T or G/F -->
             <div>
-                <label for="dtgf" class="block text-sm font-medium text-gray-700">D/T or G/F</label>
-                <input type="text" id="dtgf" name="dtgf" placeholder="G/F?"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-
-            <!-- VAT / GST Amount -->
-            <div>
-                <label for="vatAmount" class="block text-sm font-medium text-gray-700">VAT / GST Amount</label>
-                <input type="number" id="vatAmount" name="vatAmount" placeholder="2856000"
+                <!-- Date -->
+                <label for="cdate" class="block text-sm font-medium text-gray-700">Date</label>
+                <input type="date" id="cdate" name="cdate"
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             </div>
         </div>
 
         <!-- Row 2 -->
-        <div class="grid grid-cols-4 gap-4">
-            <!-- Remarks -->
+        <div class="grid grid-cols-3 gap-4">
+            <!-- Debit/Credit -->
             <div>
-                <label for="remarks" class="block text-sm font-medium text-gray-700">Remarks</label>
-                <input type="text" id="remarks" name="remarks" placeholder="Additional details..."
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <label for="cdrcr" class="block text-sm font-medium text-gray-700">Dr / Cr</label>
+                <select name="cdrcr" id="cdrcr" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    <option value="dr">Dr(+)</option>
+                    <option value="cr">Cr(-)</option>
+                </select>
             </div>
-
             <!-- Currency -->
             <div>
-                <label for="currency" class="block text-sm font-medium text-gray-700">Currency</label>
-                <select id="currency" name="currency"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <label for="ccurrency" class="block text-sm font-medium text-gray-700">Currency</label>
+                <select name="ccurrency" id="ccurrency" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                     <option value="USD">USD</option>
                     <option value="IDR">IDR</option>
-                    <!-- More options... -->
                 </select>
             </div>
-
-            <!-- FOB Amount -->
+            <!-- Rate -->
             <div>
-                <label for="fobAmount" class="block text-sm font-medium text-gray-700">FOB Amount</label>
-                <input type="number" id="fobAmount" name="fobAmount" placeholder="1100"
+                <label for="crate" class="block text-sm font-medium text-gray-700">Ex.rate</label>
+                <input type="text" id="crate" name="crate"
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-
-            <!-- VAT / GST Type -->
-            <div>
-                <label for="vatType" class="block text-sm font-medium text-gray-700">VAT / GST Type</label>
-                <select id="vatType" name="vatType"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                    <option value="gst">GST</option>
-                    <option value="vat">VAT</option>
-                    <!-- More options... -->
-                </select>
             </div>
         </div>
 
         <!-- Row 3 -->
-        <div class="grid grid-cols-4 gap-4">
-            <!-- Ex Rate -->
+        <div class="grid grid-cols-3 gap-4">
+            <!-- Amount / Qty & Included Tax -->
+            <div class="flex space-x-4">
+                <!-- First Field: Amount / Qty -->
+                <div class="flex-1">
+                    <label for="camount_qty" class="block text-sm font-medium text-gray-700">Amount / Qty</label>
+                    <input type="text" id="camount_qty" name="camount_qty" placeholder=""
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                <!-- Second Field: includedtax -->
+                <div class="flex-1">
+                    <label for="cincludedtax" class="block text-sm font-medium text-gray-700"> Included Tax?
+                    </label>
+                    <select id="cincludedtax" name="cincludedtax"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value="">No</option>
+                        <option value="">Yes</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- FCY Amount -->
             <div>
-                <label for="exRate" class="block text-sm font-medium text-gray-700">Ex Rate</label>
-                <input type="number" id="exRate" name="exRate" placeholder="6500"
+                <label for="cfcyamount" class="block text-sm font-medium text-gray-700">FCY Amount</label>
+                <input type="text" id="cfcyamount" name="cfcyamount"
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             </div>
 
             <!-- Amount (IDR) -->
             <div>
-                <label for="amountIdr" class="block text-sm font-medium text-gray-700">Amount (IDR)</label>
-                <input type="number" id="amountIdr" name="amountIdr" placeholder="2866000"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-
-            <!-- Balance Amount -->
-            <div>
-                <label for="balanceAmount" class="block text-sm font-medium text-gray-700">Balance Amount</label>
-                <input type="number" id="balanceAmount" name="balanceAmount" placeholder="..."
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            </div>
-
-            <!-- Gross Profit -->
-            <div>
-                <label for="grossProfit" class="block text-sm font-medium text-gray-700">Gross Profit</label>
-                <input type="number" id="grossProfit" name="grossProfit" placeholder="2866000"
+                <label for="camountidr" class="block text-sm font-medium text-gray-700">Amount (IDR)</label>
+                <input type="text" id="camountidr" name="camountidr" placeholder=""
                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             </div>
         </div>
-    </form>
+
+        <!-- Row 4 -->
+        <div class="grid grid-cols-3 gap-4">
+            <!-- VAT -->
+            <div>
+                <label for="cvatgst" class="block text-sm font-medium text-gray-700">VAT / GST Type </label>
+                <select name="cvatgst" id="cvatgst" class="w-full rounded-md border-gray-300 shadow-sm">
+                    <option value="vat">VAT</option>
+                    <option value="gst">GST</option>
+                </select>
+            </div>
+
+            <!-- VAT/GST AMOUNT -->
+            <div>
+                <label for="cvatgstamount" class="block text-sm font-medium text-gray-700">VAT/GST Amount</label>
+                <input type="text" id="cvatgstamount" name="cvatgstamount"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="0">
+            </div>
+
+            <!-- Taxavle Amount -->
+            <div>
+                <label for="ctaxableamount" class="block text-sm font-medium text-gray-700">Taxable Amount</label>
+                <input type="text" id="ctaxableamount" name="ctaxableamount" value=""
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            </div>
+        </div>
+
+        <!-- Row 5 -->
+        <div class="grid grid-cols-3 gap-4">
+            <!-- Remarks -->
+            <div class="max-w-lg">
+                <label for="cremarks" class="block text-sm font-medium mb-2 dark:text-white">Remarks</label>
+                <textarea id="cremarks" class="py-3 px-4 block w-full border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600 " rows="3" placeholder="Say hi..."></textarea>
+            </div>
+
+            <!-- W/H TAX RATE -->
+            <div>
+                <label for="cwhtaxrate" class="block text-sm font-medium text-gray-700">W/H Tax Rate</label>
+                <select name="cwhtaxrate" id="cwhtaxrate" class="block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <option value="5%">5%</option>
+                    <option value="10%">10%</option>
+                </select>
+            </div>
+            <!-- W/H TAX AMOUNT -->
+            <div>
+                <label for="cwhtaxamount" class="block text-sm font-medium text-gray-700">W/H Tax Amount</label>
+                <input type="text" id="cwhtaxamount" name="cwhtaxamount"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="0">
+            </div>
+        </div>
+    </div>
 </div>

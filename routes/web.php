@@ -8,6 +8,7 @@ use App\Livewire\Shipmment;
 use App\Livewire\Accounting\accountant;
 use App\Livewire\Accounting\Sell;
 use App\Livewire\Accounting\cost;
+use App\Livewire\Accounting\charge;
 use App\Livewire\users;
 use App\Livewire\Customers\CreateCustomer;
 use App\Livewire\Customers\ListCustomer;
@@ -72,6 +73,10 @@ Route::get('cost', cost::class)
 Route::get('sell', sell::class)
     ->middleware(['auth', 'verified'])
     ->name('sell');
+
+Route::get('charge', charge::class)
+    ->middleware(['auth', 'verified'])
+    ->name('charge');
 
 Route::get('/csrf-token', function (Request $request) {
     return response()->json(['csrf_token' => csrf_token()]);

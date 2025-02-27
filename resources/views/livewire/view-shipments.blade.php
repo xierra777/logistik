@@ -1,4 +1,4 @@
-<div paddingClass="p-0">
+<div class="p-1">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Data Shipments') }}
@@ -79,7 +79,7 @@
             x-transition:leave-start="scale-100 opacity-100"
             x-transition:leave-end="scale-90 opacity-0"
             class="fixed inset-0 flex items-center justify-center z-50 pointer-events-auto px-4">
-            <div class="bg-white rounded-lg shadow-lg w-full max-w-7,5sxl ">
+            <div class="bg-white rounded-lg shadow-md w-full max-w-7,5sxl ">
                 <!-- Modal Header -->
                 <div class="flex justify-between items-center p-4 border-b">
                     <h2 class="text-lg font-semibold text-gray-800">Costing</h2>
@@ -90,37 +90,9 @@
                         </svg>
                     </button>
                 </div>
-
-                <!-- Modal Content -->
-                <form action="POST" class="px-4 max-h-[80vh] overflow-y-auto
-                [&::-webkit-scrollbar]:w-2
-                [&::-webkit-scrollbar]:hidden">
-                    <div class="flex justify-center m-2 rounded p-3">
-                        <label for="" class="text-gray-500"> " this Modal Is Scrollable ;D"</label>
-                    </div>
-                    <div class="space-y-4 rounded">
-                        <div class="flex flex-col">
-                            <livewire:accounting.charge />
-                        </div>
-                        <div class="flex flex-col">
-                            <livewire:accounting.sell />
-                        </div>
-                        <div class="flex flex-col">
-                            <livewire:accounting.cost />
-                        </div>
-                    </div>
-
-                    <!-- Modal Footer -->
-                    <div class="flex justify-end mt-4 gap-2 p-4 border-t color-gray-200">
-                        <button type="button" @click="open = false"
-                            class="px-4 py-2 bg-gray-500 text-white rounded-lg">
-                            Cancel
-                        </button>
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">
-                            Add
-                        </button>
-                    </div>
-                </form>
+                <!-- Form -->
+                <livewire:accounting.tranksaksi />
+                <!-- End Form -->
             </div>
         </div>
     </div>
@@ -129,45 +101,42 @@
             <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
                 <thead class="divide-y divide-gray-200 dark:divide-neutral-700">
                     <tr class="divide-x divide-gray-200 dark:divide-neutral-700">
-                        <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Edit
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Line No</th>
-                        <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Description</th>
-                        <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Unit</th>
-                        <th scope="col" class="px-6 py-3 bg-orange-500 text-start text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Client</th>
-                        <th scope="col" class="px-6 py-3 bg-orange-500 text-start text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Sale</th>
-                        <th scope="col" class="px-6 py-3 bg-orange-500 text-start text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Amount (IDR)</th>
-                        <th scope="col" class="px-6 py-3 bg-orange-500 text-start text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Dr/Cr</th>
-                        <th scope="col" class="px-6 py-3 bg-blue-500 text-start text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Vendor</th>
-                        <th scope="col" class="px-6 py-3 bg-blue-500 text-start text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Cost</th>
-                        <th scope="col" class="px-6 py-3 bg-blue-500 text-start text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Amount (IDR)</th>
-                        <th scope="col" class="px-6 py-3 bg-blue-500 text-start text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Dr/Cr</th>
-                        <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Freight</th>
-                        <th scope="col" class="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Gross Profit</th>
+                        <th scope="col" class="p-3 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Edit</th>
+                        <th scope="col" class="p-4 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Line No</th>
+                        <th scope="col" class="p-6 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Description</th>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Unit</th>
+                        <th scope="col" class="px-6 py-3 bg-orange-500 text-center text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Client</th>
+                        <th scope="col" class="px-6 py-3 bg-orange-500 text-center text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Sale</th>
+                        <th scope="col" class="px-6 py-3 bg-orange-500 text-center text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Amount (IDR)</th>
+                        <th scope="col" class="px-6 py-3 bg-orange-500 text-center text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Dr/Cr</th>
+                        <th scope="col" class="px-6 py-3 bg-blue-500 text-center text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Vendor</th>
+                        <th scope="col" class="px-6 py-3 bg-blue-500 text-center text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Cost</th>
+                        <th scope="col" class="px-6 py-3 bg-blue-500 text-center text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Amount (IDR)</th>
+                        <th scope="col" class="px-6 py-3 bg-blue-500 text-center text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Dr/Cr</th>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Freight</th>
+                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Gross Profit</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-neutral-700">
                     <tr class="hover:bg-gray-100 dark:hover:bg-neutral-700 divide-x divide-gray-200 dark:divide-neutral-700">
-                        <td class="px-6 py-4 text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            <button class="flex items-center gap-x-2 text-sm font-medium rounded-lg bg-blue-300 text-blue-800 hover:bg-blue-200 focus:outline-none disabled:opacity-50 disabled:pointer-events-none">
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                    <path
-                                        d="M12 4a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2h-6v6a1 1 0 1 1-2 0v-6H5a1 1 0 1 1 0-2h6V5a1 1 0 0 1 1-1z">
-                                    </path>
-                                </svg>
+                        <td class="px-6 py-4 text-center text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            <button class="w-10 h-10 rounded-xl bg-blue-500">
+                                <i class="fa-solid fa-pen-to-square" style="color: #ffffff;"></i>
                             </button>
                         </td>
-                        <td class="px-6 py-4 text-sm font-medium text-gray-800 dark:text-neutral-200">John Brown</td>
-                        <td class="px-6 py-4 text-sm font-medium text-gray-800 dark:text-neutral-200">Sample Desc</td>
-                        <td class="px-6 py-4 text-sm font-medium text-gray-800 dark:text-neutral-200">Unit</td>
-                        <td class="px-6 py-4 text-sm font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">Client</td>
-                        <td class="px-6 py-4 text-sm font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">Sale</td>
-                        <td class="px-6 py-4 text-sm font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">1234567</td>
-                        <td class="px-6 py-4 text-sm font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">Dr</td>
-                        <td class="px-6 py-4 text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">Vendor</td>
-                        <td class="px-6 py-4 text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">Cr</td>
-                        <td class="px-6 py-4 text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">Dr</td>
-                        <td class="px-6 py-4 text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">Cr</td>
+                        <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">10</td>
+                        <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">Sample Desc</td>
+                        <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">Unit</td>
+                        <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">PT. SAMSUNG EDIO LOGAS 201 CGA</td>
+                        <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">Sale</td>
+                        <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">1234567</td>
+                        <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">Dr</td>
+                        <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">Vendor</td>
+                        <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">2888</td>
+                        <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">Rp.1000</td>
+                        <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">Cr</td>
+                        <td class="px-6 py-4 text-center text-sm font-medium text-gray-800 dark:text-neutral-200">FCL</td>
+                        <td class="px-6 py-4 text-center text-sm font-medium text-gray-800 dark:text-neutral-200">$ 100.000</td>
                     </tr>
                 </tbody>
             </table>
@@ -175,8 +144,9 @@
     </div>
 
 
+
     <!-- SIGMA Button -->
-    <div class="pt-4 flex justify-end">
+    <div class="p-4 flex justify-end">
         <a href="/shipments"
             class="py-3 px-9 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg bg-blue-300 text-blue-800 hover:bg-blue-200 focus:outline-none disabled:opacity-50 disabled:pointer-events-none">
             SIGMA

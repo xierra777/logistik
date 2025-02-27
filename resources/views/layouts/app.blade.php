@@ -40,13 +40,11 @@
         <!-- Page Content -->
 
         <main>
-            <div class="p-12">
-                <div class="max-w-7xl mx-auto sm:px-0 lg:px-0">
+            <div class="py-12">
+                <div class="max-w-8xl mx-auto sm:px-4 lg:px-4">
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                            <div class="{{ $paddingClass ?? 'p-6' }} text-dark-900 dark:text-gray-100">
-                                {{ $slot ?? 'No content available' }}
-                            </div>
+                            {{ $slot ?? 'No content available' }}
                         </div>
                     </div>
                 </div>

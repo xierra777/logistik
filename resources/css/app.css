@@ -3,18 +3,6 @@
 @tailwind utilities;
 
 
-/* Custom Tailwind scrollbar */
-.scrollbar-custom::-webkit-scrollbar {
-    @apply w-1.5 h-0.5; 
-}
-
-.scrollbar-custom::-webkit-scrollbar-track {
-    @apply bg-gray-200 rounded-lg;
-}
-
-.scrollbar-custom::-webkit-scrollbar-thumb {
-    @apply bg-gray-500 rounded-lg hover:bg-gray-700;
-}
 
 .img-flag {
     width: 20px;

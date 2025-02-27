@@ -5,6 +5,10 @@ use App\Livewire\CreateShipments;
 use App\Livewire\ViewShipments;
 use App\Livewire\EditShipments;
 use App\Livewire\Shipmment;
+use App\Livewire\Accounting\accountant;
+use App\Livewire\Accounting\Sell;
+use App\Livewire\Accounting\cost;
+use App\Livewire\Accounting\charge;
 use App\Livewire\users;
 use App\Livewire\Customers\CreateCustomer;
 use App\Livewire\Customers\ListCustomer;
@@ -12,6 +16,7 @@ use Illuminate\Http\Request;
 
 
 Route::view('/', 'welcome');
+Route::view('preline', 'preline');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
@@ -29,18 +34,23 @@ Route::view('shipment', 'shipments.create',)
     ->name('shipment');
 
 
+
 Route::get('create-shipments', CreateShipments::class)->middleware([
-    'auth', 'verified'
+    'auth',
+    'verified'
 ]);
 
 Route::get('shipmment', Shipmment::class)->middleware([
-    'auth', 'verified'
+    'auth',
+    'verified'
 ]);
 Route::get('/view-shipments/{id}', ViewShipments::class)->middleware([
-    'auth', 'verified'
+    'auth',
+    'verified'
 ]);
 Route::get('/edit-shipments/{id}', EditShipments::class)->middleware([
-    'auth', 'verified'
+    'auth',
+    'verified'
 ]);
 Route::get('/customers/create', CreateCustomer::class)->middleware(['auth', 'verified'])->name('customers.create');
 
@@ -48,13 +58,31 @@ Route::get('/customers', ListCustomer::class)
     ->middleware(['auth', 'verified'])
     ->name('customers.list');
 
-Route::get('/user', users::class)
+Route::get('users', users::class)
     ->middleware(['auth', 'verified'])
     ->name('user.list');
 
+Route::get('accountant', accountant::class)
+    ->middleware(['auth', 'verified'])
+    ->name('accountant.list');
+
+Route::get('cost', cost::class)
+    ->middleware(['auth', 'verified'])
+    ->name('cost');
+
+Route::get('sell', sell::class)
+    ->middleware(['auth', 'verified'])
+    ->name('sell');
+
+Route::get('charge', charge::class)
+    ->middleware(['auth', 'verified'])
+    ->name('charge');
+
 Route::get('/csrf-token', function (Request $request) {
-return response()->json(['csrf_token' => csrf_token()]);
-    })->name('csrf-token');
+    return response()->json(['csrf_token' => csrf_token()]);
+})->name('csrf-token');
 
-
-require __DIR__.'/auth.php';
+Route::fallback(function () {
+    return view('livewire/errors.404');
+});
+require __DIR__ . '/auth.php';

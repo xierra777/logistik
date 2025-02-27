@@ -16,8 +16,12 @@
         "vite": "^6.0"
     },
     "dependencies": {
+        "@preline/file-upload": "^2.5.2",
+        "@preline/overlay": "^2.5.2",
         "@preline/select": "^2.5.2",
         "@tailwindcss/vite": "^4.0.6",
+        "dropzone": "^6.0.0-beta.2",
+        "lodash": "^4.17.21",
         "preline": "^2.7.0",
         "select2-tailwindcss-theme": "^1.2.4",
         "sweetalert2": "^11.6.13",

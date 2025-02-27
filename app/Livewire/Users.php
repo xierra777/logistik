@@ -6,28 +6,14 @@ use App\Models\User;
 use Livewire\WithFileUploads;
 use Livewire\Component;
 use Livewire\WithPagination;
-
 use Illuminate\Support\Facades\Hash;
 
 class Users extends Component
 {
     use WithFileUploads, WithPagination;
 
-    public $name, $email, $password, $profile_photo;
-    public $isOpen = false; // Modal state
+    public $name, $email, $password, $profile_photo, $role;
     public $perPage = 5;
-
-    public function openModal()
-    {
-        $this->isOpen = true;
-        $this->resetForm();
-    }
-
-    public function closeModal()
-    {
-        $this->isOpen = false;
-        $this->resetForm();
-    }
 
     public function save()
     {
@@ -35,27 +21,32 @@ class Users extends Component
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
+            'role' => 'required',
             'profile_photo' => 'nullable|image|max:2048',
         ]);
 
-        // Handle profile photo upload if exists
         if ($this->profile_photo) {
-            $profilePhotoPath = $this->profile_photo->store('profile_photos', 'public');
+            // This will store the file in "storage/app/public/profile_photos" 
+            // and return a relative path like "profile_photos/abc.png"
+            $photoPath = $this->profile_photo->store('profile_photos', 'public');
         } else {
-            $profilePhotoPath = null;
+            $photoPath = null;
         }
-
         // Create the new user
         User::create([
-            'name' => $this->name,
-            'email' => $this->email,
-            'password' => Hash::make($this->password),
-            'profile_photo' => $profilePhotoPath,
+            'name'          => $this->name,
+            'email'         => $this->email,
+            'password'      => Hash::make($this->password),
+            'role'          => $this->role,
+            'profile_photo' => $photoPath,
         ]);
+
+        // dd($photoPath);
 
         // Refresh data users in table
         session()->flash('message', 'User created successfully.');
-        $this->closeModal();
+        $this->resetForm();
+        $this->dispatch('close-modal');
     }
 
     public function resetForm()
@@ -71,8 +62,18 @@ class Users extends Component
         // Fetch paginated users within the render method
         $users = User::latest()->paginate($this->perPage);
 
-        return view('livewire.user', [
+        return view('livewire.users', [
             'users' => $users
         ]);
+    }
+
+    public function confirmDelete($get_id)
+    {
+        try {
+            User::destroy($get_id);
+            session()->flash('message', 'Shipment deleted successfully!');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error deleting shipment: ' . $e->getMessage());
+        }
     }
 }

@@ -35,8 +35,8 @@
         // SweetAlert Toast
         Swal.fire({
             toast: true,
-            position: 'top-end', 
-            icon: successData.icon, 
+            position: 'top-end',
+            icon: successData.icon,
             title: successData.title,
             showConfirmButton: false,
             timer: 5000,
@@ -54,6 +54,12 @@
     });
 </script>
 @endif
+
+<!-- Add Lodash -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+<!-- Add Dropzone -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

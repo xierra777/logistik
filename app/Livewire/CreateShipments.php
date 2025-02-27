@@ -9,26 +9,26 @@ use App\Models\Customer;
 
 class CreateShipments extends Component
 {
-    public $shipment_id='';
-    public $container_id='';
-    public $container_type='';
-    public $shipper='';
-    public $consignee='';
-    public $notify='';
-    public $ocean_vessel_feeder='';
-    public $ocean_vessel_mother='';
-    public $port_of_discharge='';
-    public $combined_transport='';
-    public $port_of_loading='';
-    public $packages='';
-    public $description='';
-    public $gross_weight='';
-    public $measurement='';
-    
+    public $shipment_id = '';
+    public $container_id = '';
+    public $container_type = '';
+    public $shipper = '';
+    public $consignee = '';
+    public $notify = '';
+    public $ocean_vessel_feeder = '';
+    public $ocean_vessel_mother = '';
+    public $port_of_discharge = '';
+    public $combined_transport = '';
+    public $port_of_loading = '';
+    public $packages = '';
+    public $description = '';
+    public $gross_weight = '';
+    public $measurement = '';
+
 
     public $customers; // Variable to hold the customer data
 
-    
+
 
     public function mount()
     {
@@ -62,33 +62,33 @@ class CreateShipments extends Component
             'description' => 'nullable|string',  // Allowing it to be empty
             'gross_weight' => 'string',  // Allowing it to be empty
             'measurement' => 'string'
-        ]);     
+        ]);
 
 
-            // If everything looks correct, proceed to create the shipment
-            shipments::create([
-                'shipment_id' => $this->shipment_id,
-                'container_id' => $this->container_id,
-                'container_type' => $this->container_type,
-                'shipper' => $this->shipper,
-                'consignee' => $this->consignee,
-                'notify' => $this->notify,
-                'port_of_loading' => $this->port_of_loading,
-                'description' => $this->description,
-                'gross_weight' => $this->gross_weight,
-                'measurement' => $this->measurement,
-            ]);
-    
-            // dd($this->shipper, $this->consignee, $this->notify);
-            // dd(session('success'));
+        // If everything looks correct, proceed to create the shipment
+        shipments::create([
+            'shipment_id' => $this->shipment_id,
+            'container_id' => $this->container_id,
+            'container_type' => $this->container_type,
+            'shipper' => $this->shipper,
+            'consignee' => $this->consignee,
+            'notify' => $this->notify,
+            'port_of_loading' => $this->port_of_loading,
+            'description' => $this->description,
+            'gross_weight' => $this->gross_weight,
+            'measurement' => $this->measurement,
+        ]);
 
-    
-            // dd(session('success')); // This will dump the session and stop execution
-        
-            return redirect()->route('shipments')->with('success', [
-                'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.
-                'title' => 'Success!', // Toast title
-            
-            ]);
-        }
+        // dd($this->shipper, $this->consignee, $this->notify);
+        // dd(session('success'));
+
+
+        // dd(session('success')); // This will dump the session and stop execution
+
+        return redirect()->route('shipments')->with('success', [
+            'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.
+            'title' => 'Success!', // Toast title
+
+        ]);
+    }
 }

@@ -6,7 +6,7 @@ use App\Livewire\ViewShipments;
 use App\Livewire\EditShipments;
 use App\Livewire\Shipmment;
 use App\Livewire\Accounting\accountant;
-use App\Livewire\Accounting\tranksaksi;
+use App\Livewire\Accounting\Tranksaksi;
 use App\Livewire\users;
 use App\Livewire\Customers\CreateCustomer;
 use App\Livewire\Customers\ListCustomer;
@@ -30,7 +30,6 @@ Route::view('shipments', 'shipments.index',)
 Route::view('shipment', 'shipments.create',)
     ->middleware(['auth'])
     ->name('shipment');
-
 
 
 Route::get('create-shipments', CreateShipments::class)->middleware([
@@ -64,9 +63,9 @@ Route::get('accountant', accountant::class)
     ->middleware(['auth', 'verified'])
     ->name('accountant.list');
 
-Route::get('transaksi', tranksaksi::class)
+Route::get('/accounting/tranksaksi', Tranksaksi::class)
     ->middleware(['auth', 'verified'])
-    ->name('transaksi');
+    ->name('Tranksaksi');
 
 Route::get('/csrf-token', function (Request $request) {
     return response()->json(['csrf_token' => csrf_token()]);

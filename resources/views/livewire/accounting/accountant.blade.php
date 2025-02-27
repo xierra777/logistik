@@ -42,5 +42,4 @@
             </div>
         </a>
     </div>
-    <livewire:accounting.cost />
 </div>

@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
 
             // Charge section
-            $table->string('charge');
-            $table->string('description');
-            $table->string('freight');
+            $table->string('charge')->nullable();
+            $table->string('description')->nullable();
+            $table->string('freight')->nullable();
             $table->string('unit')->nullable();
             $table->string('quantity')->default("0");
             $table->string('ofdtype')->nullable();

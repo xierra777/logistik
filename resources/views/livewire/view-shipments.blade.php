@@ -147,9 +147,9 @@
 
     <!-- SIGMA Button -->
     <div class="p-4 flex justify-end">
-        <a href="/shipments"
+        <a href="{{ url ('/shipments') }}"
             class="py-3 px-9 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg bg-blue-300 text-blue-800 hover:bg-blue-200 focus:outline-none disabled:opacity-50 disabled:pointer-events-none">
-            SIGMA
+            Back
         </a>
     </div>
 </div>

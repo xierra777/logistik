@@ -25,7 +25,7 @@ class Tranksaksi extends Component
     public $sfcyamount = "0";       // Amount per unit (FCY) untuk sale
     public $samountidr = "0";       // Hasil perhitungan sale (IDR)
     public $sdrcr;
-    public $svatgst;
+    public $svatgst = "0";
     public $staxableamount = "0";
     public $svatgstamount = "0";
     public $swhtaxrate;
@@ -112,51 +112,9 @@ class Tranksaksi extends Component
      * 3. Menampilkan pesan sukses.
      * 4. Mereset form.
      */
-    public function submit()
+    public function save()
     {
 
-        $this->validate([
-            'charge'       => 'required|string',
-            'description'  => 'required|string',
-            'freight'      => 'required|string',
-            'unit'         => 'nullable|string',
-            'quantity'     => 'nullable|string',
-            'ofdtype'      => 'nullable|string',
-            'remarks'      => 'nullable|string',
-
-            'sclient'         => 'nullable|string',
-            'scurrency'       => 'nullable|string',
-            'srate'           => 'nullable|numeric',
-            'samount_qty'     => 'nullable|numeric',
-            'sincludedtax'    => 'nullable|string',
-            'sfcyamount'      => 'nullable|numeric',
-            'samountidr'      => 'nullable|numeric',
-            'sdrcr'           => 'nullable|string',
-            'svatgst'         => 'nullable|string',
-            'staxableamount'  => 'nullable|numeric',
-            'svatgstamount'   => 'nullable|numeric',
-            'swhtaxrate'      => 'nullable|string',
-            'swhtaxamount'    => 'nullable|numeric',
-            'sremarks'        => 'nullable|string',
-            'sgrossprofit'    => 'nullable|numeric',
-
-            'cvendor'         => 'nullable|string',
-            'creferenceno'    => 'nullable|string',
-            'cdate'           => 'nullable|date',
-            'cdrcr'           => 'nullable|string',
-            'ccurrency'       => 'nullable|string',
-            'crate'           => 'nullable|numeric',
-            'camount_qty'     => 'nullable|numeric',
-            'cincludedtax'    => 'nullable|string',
-            'cfcyamount'      => 'nullable|numeric',
-            'camountidr'      => 'nullable|numeric',
-            'cvatgst'         => 'nullable|string',
-            'cvatgstamount'   => 'nullable|numeric',
-            'ctaxableamount'  => 'nullable|numeric',
-            'cremarks'        => 'nullable|string',
-            'cwhtaxrate'      => 'nullable|string',
-            'cwhtaxamount'    => 'nullable|numeric',
-        ]);
         // Simpan data ke database
         transaction::create([
             // Bagian Charge

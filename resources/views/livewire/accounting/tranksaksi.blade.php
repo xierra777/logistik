@@ -12,15 +12,18 @@
          get fcyAmount() {
              return this.amount;
          },
-         // Computed Amount (IDR) = Exchange Rate × Amount (which is same as FCY Amount)
          get samountidr() {
              return this.srate * this.amount;
          },
          // Tax-related properties
          taxable: @entangle('staxableamount'),
          svatgst: @entangle('svatgst'),
-         get taxAmount() {
-             return this.taxable * this.svatgst;
+         get taxable() {
+           let rate = parseFloat(this.svatgst);
+            return this.samountidr * (rate / 100);
+         },
+          get taxAmount() {
+             return this.taxable;
          },
          // Initialization: fetch exchange rate when currency changes
          init() {
@@ -31,7 +34,7 @@
          },
          fetchExchangeRate(currency) {
              if (!currency || currency.trim().length < 3) {
-                 this.srate = 0;
+                 this.srate = 0;    
                  return;
              }
              let curr = currency.trim().toUpperCase();
@@ -69,12 +72,12 @@
                 <div>
                     <label for="scurrency" class="block text-sm font-medium text-gray-700">Currency</label>
                     <!-- Input field for currency; both wire:model and x-model keep it in sync -->
-                    <input type="text" name="scurrency" id="scurrency" wire:model="scurrency" x-model="scurrency"
+                    <input type="text" name="scurrency" id="scurrency" wire:model="scurrency" x-model="scurrency" autocomplete="off"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <div>
                     <label for="srate" class="block text-sm font-medium text-gray-700">Ex.rate</label>
-                    <input type="number" id="srate" name="srate" x-model.number="srate" wire:model="srate" readonly
+                    <input type="text" id="srate" name="srate" x-model="srate" wire:model="srate"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
             </div>
@@ -123,18 +126,18 @@
                 </div>
                 <div>
                     <label for="svatgst" class="block text-sm font-medium text-gray-700">VAT / GST Type</label>
-                    <select id="svatgst" name="svatgst" x-model.number="svatgst" wire:model="svatgst"
+                    <select id="svatgst" name="svatgst" x-model="svatgst" wire:model="svatgst"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                         <option value="0">Select Tax</option>
-                        <option value="1.1">1.1</option>
-                        <option value="11">11</option>
-                        <option value="12">12</option>
-                        <option value="1">1</option>
+                        <option value="1,1%">1.1%</option>
+                        <option value="11%">11%</option>
+                        <option value="12%">12%</option>
+                        <option value="1%">1%</option>
                     </select>
                 </div>
                 <div>
                     <label for="staxableamount" class="block text-sm font-medium text-gray-700">Taxable Amount</label>
-                    <input type="number" id="staxableamount" name="staxableamount" x-model.number="taxable" wire:model="staxableamount"
+                    <input type="text" id="staxableamount" name="staxableamount" x-model.number="taxable" wire:model="staxableamount"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
             </div>
@@ -151,8 +154,9 @@
                     <label for="swhtaxrate" class="block text-sm font-medium text-gray-700">W/H Tax Rate</label>
                     <select id="swhtaxrate" name="swhtaxrate" wire:model="swhtaxrate"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="5%">5%</option>
-                        <option value="10%">10%</option>
+                        <option value="2%">2%</option>
+                        <option value="2.5%">2,5%</option>
+                        <option value="7.5%">7,5%</option>
                     </select>
                 </div>
                 <div>

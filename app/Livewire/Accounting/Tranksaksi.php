@@ -21,7 +21,7 @@ class Tranksaksi extends Component
     public $scurrency;
     public $srate = "0";            // Exchange Rate untuk sale
     public $samount_qty = "0";      // Jumlah (Qty) untuk sale (perhitungan)
-    public $sincludedtax;
+    public $sincludedtax = "No";
     public $sfcyamount = "0";       // Amount per unit (FCY) untuk sale
     public $samountidr = "0";       // Hasil perhitungan sale (IDR)
     public $sdrcr;
@@ -51,70 +51,10 @@ class Tranksaksi extends Component
     public $cwhtaxrate;
     public $cwhtaxamount = "0";
 
-    // === Update hooks untuk perhitungan Sale ===
-    public function updatedSamount_qty($value)
-    {
-        $this->recalcTotals();
-    }
-    public function updatedSfcyamount($value)
-    {
-        $this->recalcTotals();
-    }
-    public function updatedSrate($value)
-    {
-        $this->recalcTotals();
-    }
-
-    // === Update hooks untuk perhitungan Cost ===
-    public function updatedCamount_qty($value)
-    {
-        $this->recalcTotals();
-    }
-    public function updatedCfcyamount($value)
-    {
-        $this->recalcTotals();
-    }
-    public function updatedCrate($value)
-    {
-        $this->recalcTotals();
-    }
-
-    /**
-     * recalcTotals() menghitung:
-     * - Sale Amount (samountidr) = samount_qty x sfcyamount x srate
-     * - Cost Amount (camountidr) = camount_qty x cfcyamount x crate
-     * - Gross Profit (sgrossprofit) = Sale Amount - Cost Amount
-     */
-    public function recalcTotals()
-    {
-        // Perhitungan Sale
-        $saleQty     = floatval($this->samount_qty);
-        $salePerUnit = floatval($this->sfcyamount);
-        $saleExRate  = floatval($this->srate);
-        $computedSale = $saleQty * $salePerUnit * $saleExRate;
-        $this->samountidr = (string)$computedSale;
-
-        // Perhitungan Cost
-        $costQty     = floatval($this->camount_qty);
-        $costPerUnit = floatval($this->cfcyamount);
-        $costExRate  = floatval($this->crate);
-        $computedCost = $costQty * $costPerUnit * $costExRate;
-        $this->camountidr = (string)$computedCost;
-
-        // Gross Profit
-        $this->sgrossprofit = (string)($computedSale - $computedCost);
-    }
-
-    /**
-     * Method submit() akan:
-     * 1. Memvalidasi data.
-     * 2. Menyimpan data ke database.
-     * 3. Menampilkan pesan sukses.
-     * 4. Mereset form.
-     */
     public function save()
     {
 
+        
         // Simpan data ke database
         transaction::create([
             // Bagian Charge
@@ -160,8 +100,10 @@ class Tranksaksi extends Component
             'cremarks'        => $this->cremarks,
             'cwhtaxrate'      => $this->cwhtaxrate,
             'cwhtaxamount'    => $this->cwhtaxamount,
+            
         ]);
-        dd(get_object_vars($this));
+        
+        // dd($this->sclient,$this->srate,$this->scurrency,$this->samount_qty,$this->sincludedtax,$this->sfcyamount,$this->samountidr,$this->sdrcr,$this->svatgst,$this->staxableamount,$this->svatgstamount,$this->swhtaxrate,$this->swhtaxamount,$this->sremarks,$this->sgrossprofit);
 
         session()->flash('message', 'Transaction saved successfully!');
         $this->reset();

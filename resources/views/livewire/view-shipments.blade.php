@@ -58,7 +58,7 @@
     <div x-data="{ open: false }">
         <!-- Button to open modal -->
         <div class="flex justify-start mb-4 p-4">
-            <button @click="open = true" class="py-3 px-4 bg-blue-600 text-white rounded-lg">
+            <button @click=" open = true " class="py-3 px-4 bg-blue-600 text-white rounded-lg">
                 Open Modal
             </button>
         </div>
@@ -125,7 +125,7 @@
                             </button>
                         </td>
                         <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">10</td>
-                        <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">Sample Desc</td>
+                        <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200 "></td>
                         <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">Unit</td>
                         <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">PT. SAMSUNG EDIO LOGAS 201 CGA</td>
                         <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">Sale</td>

@@ -10,12 +10,13 @@ class ViewShipments extends Component
 {
     public $shipment = [];
     public $transaction = [];
-    
-    public function mount($id){
+
+    public function mount($id)
+    {
         $this->shipment = shipments::find($id);
         $this->transaction = transaction::find($id);
     }
-        public function render()
+    public function render()
     {
         return view('livewire.view-shipments');
     }

@@ -120,12 +120,12 @@
                 <tbody class="divide-y divide-gray-200 dark:divide-neutral-700">
                     <tr class="hover:bg-gray-100 dark:hover:bg-neutral-700 divide-x divide-gray-200 dark:divide-neutral-700">
                         <td class="px-6 py-4 text-center text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            <button class="w-10 h-10 rounded-xl bg-blue-500">
-                                <i class="fa-solid fa-pen-to-square" style="color: #ffffff;"></i>
+                            <button class="w-10 h-10 rounded-xl">
+                                <i class="fa-solid fa-pen-to-square"></i>
                             </button>
                         </td>
                         <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">10</td>
-                        <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200 "></td>
+                        <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200 ">{{ $transaction->description ?? 'No Data'}}</td>
                         <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">Unit</td>
                         <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">PT. SAMSUNG EDIO LOGAS 201 CGA</td>
                         <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">Sale</td>

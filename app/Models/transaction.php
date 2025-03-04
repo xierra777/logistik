@@ -9,6 +9,8 @@ class transaction extends Model
     protected $table = 'transactions';
 
     protected $fillable = [
+        'shipment_id',
+
         // Charge section
         'charge',
         'description',
@@ -53,4 +55,9 @@ class transaction extends Model
         'cwhtaxrate',
         'cwhtaxamount',
     ];
+
+    public function shipment()
+    {
+        return $this->belongsTo(Shipments::class, 'shipment_id');
+    }
 }

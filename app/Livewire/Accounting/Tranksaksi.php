@@ -7,6 +7,9 @@ use App\Models\transaction;
 
 class Tranksaksi extends Component
 {
+
+    public $shipmentId;
+
     // === Bagian Charge ===
     public $charge;
     public $description;
@@ -51,6 +54,11 @@ class Tranksaksi extends Component
     public $cwhtaxrate;
     public $cwhtaxamount = "0";
 
+
+    public function mount($shipmentId)
+    {
+        $this->shipmentId = $shipmentId;
+    }
     public function save()
     {
 
@@ -58,53 +66,7 @@ class Tranksaksi extends Component
         // Simpan data ke database
         transaction::create([
             // Bagian Charge
-            'charge'       => $this->charge,
-            'description'  => $this->description,
-            'freight'      => $this->freight,
-            'unit'         => $this->unit,
-            'quantity'     => $this->quantity,
-            'ofdtype'      => $this->ofdtype,
-            'remarks'      => $this->remarks,
-
-            // Bagian Sale
-            'sclient'         => $this->sclient,
-            'scurrency'       => $this->scurrency,
-            'srate'           => $this->srate,
-            'samount_qty'     => $this->samount_qty,
-            'sincludedtax'    => $this->sincludedtax,
-            'sfcyamount'      => $this->sfcyamount,
-            'samountidr'      => $this->samountidr,
-            'sdrcr'           => $this->sdrcr,
-            'svatgst'         => $this->svatgst,
-            'staxableamount'  => $this->staxableamount,
-            'svatgstamount'   => $this->svatgstamount,
-            'swhtaxrate'      => $this->swhtaxrate,
-            'swhtaxamount'    => $this->swhtaxamount,
-            'sremarks'        => $this->sremarks,
-            'sgrossprofit'    => $this->sgrossprofit,
-
-            // Bagian Cost
-            'cvendor'         => $this->cvendor,
-            'creferenceno'    => $this->creferenceno,
-            'cdate'           => $this->cdate,
-            'cdrcr'           => $this->cdrcr,
-            'ccurrency'       => $this->ccurrency,
-            'crate'           => $this->crate,
-            'camount_qty'     => $this->camount_qty,
-            'cincludedtax'    => $this->cincludedtax,
-            'cfcyamount'      => $this->cfcyamount,
-            'camountidr'      => $this->camountidr,
-            'cvatgst'         => $this->cvatgst,
-            'cvatgstamount'   => $this->cvatgstamount,
-            'ctaxableamount'  => $this->ctaxableamount,
-            'cremarks'        => $this->cremarks,
-            'cwhtaxrate'      => $this->cwhtaxrate,
-            'cwhtaxamount'    => $this->cwhtaxamount,
-
-        ]);
-
-        dd([
-            // Bagian Charge
+            'shipment_id' => $this->shipmentId,  // Pastikan nilainya tidak null
             'charge'       => $this->charge,
             'description'  => $this->description,
             'freight'      => $this->freight,
@@ -148,6 +110,7 @@ class Tranksaksi extends Component
             'cwhtaxrate'      => $this->cwhtaxrate,
             'cwhtaxamount'    => $this->cwhtaxamount,
         ]);
+
 
         session()->flash('message', 'Transaction saved successfully!');
         $this->reset();

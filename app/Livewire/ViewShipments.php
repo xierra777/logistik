@@ -8,13 +8,12 @@ use App\Models\transaction;
 
 class ViewShipments extends Component
 {
-    public $shipment = [];
-    public $transaction = [];
-
+    public $shipment;
+    public $transaction;
     public function mount($id)
     {
-        $this->shipment = shipments::find($id);
-        $this->transaction = transaction::find($id);
+        // Pastikan nama modelnya konsisten (Shipment, bukan shipments)
+        $this->shipment = Shipments::with('transactions')->findOrFail($id);
     }
     public function render()
     {

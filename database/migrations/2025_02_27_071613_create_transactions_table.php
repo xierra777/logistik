@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-
+            $table->foreignId('shipment_id')->constrained()->onDelete('cascade');
             // Charge section
             $table->string('charge')->nullable();
             $table->string('description')->nullable();
             $table->string('freight')->nullable();
             $table->string('unit')->nullable();
-            $table->string('quantity')->default("0");
+            $table->string('quantity')->nullable();
             $table->string('ofdtype')->nullable();
             $table->text('remarks')->nullable();
 
@@ -33,12 +33,12 @@ return new class extends Migration
             $table->string('samountidr')->nullable();
             $table->string('sdrcr')->nullable();
             $table->string('svatgst')->nullable();
-            $table->string('staxableamount')->default("0");
-            $table->string('svatgstamount')->default("0");
+            $table->string('staxableamount')->nullable();
+            $table->string('svatgstamount')->nullable();
             $table->string('swhtaxrate')->nullable();
-            $table->string('swhtaxamount')->default("0");
+            $table->string('swhtaxamount')->nullable();
             $table->text('sremarks')->nullable();
-            $table->string('sgrossprofit')->default("20000");
+            $table->string('sgrossprofit')->nullable();
 
             // Cost section
             $table->string('cvendor')->nullable();
@@ -52,11 +52,11 @@ return new class extends Migration
             $table->string('cfcyamount')->nullable();
             $table->string('camountidr')->nullable();
             $table->string('cvatgst')->nullable();
-            $table->string('cvatgstamount')->default("0");
+            $table->string('cvatgstamount')->nullable();
             $table->string('ctaxableamount')->nullable();
             $table->text('cremarks')->nullable();
             $table->string('cwhtaxrate')->nullable();
-            $table->string('cwhtaxamount')->default("0");
+            $table->string('cwhtaxamount')->nullable();
 
             $table->timestamps();
         });

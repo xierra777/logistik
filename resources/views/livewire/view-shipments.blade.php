@@ -91,7 +91,7 @@
                     </button>
                 </div>
                 <!-- Form -->
-                <livewire:accounting.tranksaksi />
+                @livewire('accounting.tranksaksi', ['shipmentId' => $shipment->id])
                 <!-- End Form -->
             </div>
         </div>
@@ -118,30 +118,63 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-neutral-700">
+                    @forelse($shipment->transactions as $transaction)
                     <tr class="hover:bg-gray-100 dark:hover:bg-neutral-700 divide-x divide-gray-200 dark:divide-neutral-700">
                         <td class="px-6 py-4 text-center text-sm font-medium text-gray-800 dark:text-neutral-200">
                             <button class="w-10 h-10 rounded-xl">
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </button>
                         </td>
-                        <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">10</td>
-                        <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200 ">{{ $transaction->description ?? 'No Data'}}</td>
-                        <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">Unit</td>
-                        <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">PT. SAMSUNG EDIO LOGAS 201 CGA</td>
-                        <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">Sale</td>
-                        <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">1234567</td>
-                        <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">Dr</td>
-                        <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">Vendor</td>
-                        <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">2888</td>
-                        <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">Rp.1000</td>
-                        <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">Cr</td>
-                        <td class="px-6 py-4 text-center text-sm font-medium text-gray-800 dark:text-neutral-200">FCL</td>
-                        <td class="px-6 py-4 text-center text-sm font-medium text-gray-800 dark:text-neutral-200">$ 100.000</td>
+                        <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $transaction->line_no ?? 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $transaction->description ?? 'No Data' }}
+                        </td>
+                        <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $transaction->unit ?? 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">
+                            {{ $transaction->sclient ?? 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">
+                            {{ $transaction->sale ?? 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">
+                            {{ $transaction->samountidr ?? 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">
+                            {{ $transaction->sdrcr ?? 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">
+                            {{ $transaction->cvendor ?? 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">
+                            {{ $transaction->cost ?? 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">
+                            {{ $transaction->camountidr ?? 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">
+                            {{ $transaction->cdrcr ?? 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 text-center text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $transaction->freight ?? 'N/A' }}
+                        </td>
+                        <td class="px-6 py-4 text-center text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $transaction->gross_profit ?? 'N/A' }}
+                        </td>
                     </tr>
+                    @empty
+                    <tr>
+                        <td colspan="14" class="bg-blue-500 text-white p-4 justify-center">Tidak ada transaksi.</td>
+                    </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
     </div>
+
 
 
 

@@ -31,4 +31,13 @@ class shipments extends Model
     {
         return $this->belongsTo(Customer::class);
     }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'shipment_id');
+    }
+    public function containers()
+    {
+        return $this->hasMany(Container::class, 'shipment_id');
+    }
 }

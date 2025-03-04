@@ -5,14 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class shipments extends Model
+class shipment extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'shipment_id',
-        'container_id',
-        'container_type',
         'shipper',
         'consignee',
         'notify',

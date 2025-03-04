@@ -14,8 +14,6 @@ return new class extends Migration
         Schema::create('shipments', function (Blueprint $table) {
             $table->id();
             $table->string('shipment_id')->unique();
-            $table->string('container_id')->unique();
-            $table->string('container_type');
             $table->string('shipper')->nullable();
             $table->string('consignee')->nullable();
             $table->string('notify')->nullable();

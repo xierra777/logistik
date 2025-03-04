@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\shipments;
+use App\Models\Shipment;
 
 class EditShipments extends Component
 {
@@ -24,7 +24,7 @@ class EditShipments extends Component
     public $gross_weight;
     public $measurement;
 
-    public function mount(Shipments $id)
+    public function mount(Shipment $id)
     {
         $this->shipments = $id;
         $this->shipment_id = $id->shipment_id;

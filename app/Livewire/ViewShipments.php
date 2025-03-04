@@ -3,8 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\shipments;
-use App\Models\transaction;
+use App\Models\Shipment;
 
 class ViewShipments extends Component
 {
@@ -13,7 +12,7 @@ class ViewShipments extends Component
     public function mount($id)
     {
         // Pastikan nama modelnya konsisten (Shipment, bukan shipments)
-        $this->shipment = Shipments::with('transactions')->findOrFail($id);
+        $this->shipment = Shipment::with('transactions')->findOrFail($id);
     }
     public function render()
     {

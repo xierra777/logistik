@@ -4,16 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class container extends Model
+class Container extends Model
 {
-    protected $fillable = [
-        'shipment_id',
-        'container_id',
-        'container_type',
-    ];
+    protected $fillable = ['shipment_id', 'container_id', 'container_type'];
 
     public function shipment()
     {
-        return $this->belongsTo(shipments::class, 'shipment_id');
+        return $this->belongsTo(Shipment::class);
     }
 }

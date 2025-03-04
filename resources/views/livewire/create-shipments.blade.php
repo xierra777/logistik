@@ -18,44 +18,40 @@
         <span class="text-sm text-red-500">{{ $message }}</span>
         @enderror
       </div>
-
-      <!-- Container ID -->
-      <div class="relative w-full mb-4 bg">
-        <label for="container_id" class="block text-sm font-medium text-gray-700">
-          Container ID <span class="text-red-500">*</span>
-        </label>
-        <input
-          wire:model="container_id"
-          type="text"
-          id="container_id"
-          name="container_id"
-          required
-          class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        @error('container_id')
-        <span class="text-sm text-red-500">{{ $message }}</span>
-        @enderror
+      <!-- Container -->
+      <div class="bg-white rounded-md border-gray-300 border p-4">
+        <h3 class="text-lg font-semibold">Containers</h3>
+        @foreach($containers as $index => $container)
+        <div class="mb-4 p-4 border rounded-md">
+          <div class="flex gap-4">
+            <div class="w-1/3">
+              <label class="block text-sm font-medium text-gray-700">Container ID:</label>
+              <input type="text" wire:model="containers.{{ $index }}.container_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+              @error("containers.$index.container_id")
+              <span class="text-red-500 text-sm">{{ $message }}</span>
+              @enderror
+            </div>
+            <div class="w-1/3">
+              <label class="block text-sm font-medium text-gray-700">Container Type:</label>
+              <input type="text" wire:model="containers.{{ $index }}.container_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+              @error("containers.$index.container_type")
+              <span class="text-red-500 text-sm">{{ $message }}</span>
+              @enderror
+            </div>
+          </div>
+          <!-- Tombol Hapus Container -->
+          <button type="button" wire:click="removeContainer({{ $index }})" class="mt-2 text-red-500 hover:underline">Hapus Container</button>
+        </div>
+        @endforeach
+        <!-- Tombol Tambah Container -->
+        <button type="button" wire:click="addContainer()" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+          + Tambah Container
+        </button>
       </div>
 
-
-      <!-- Container Type -->
-      <div class="relative w-full mb-4 bg">
-        <label for="container_type" class="block text-sm font-medium text-gray-700">
-          Container Type <span class="text-red-500">*</span>
-        </label>
-        <input
-          wire:model="container_type"
-          type="text"
-          id="container_type"
-          name="container_type"
-          required
-          class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        @error('container_type')
-        <span class="text-sm text-red-500">{{ $message }}</span>
-        @enderror
-      </div>
 
       <!-- Shipper -->
-      <div class="mb-4">
+      <div class="mt-4 mb-4">
         <label for="shipper">Shipper</label>
         <select wire:model="shipper" id="shipper" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
           <option value="">Select Shipper</option>

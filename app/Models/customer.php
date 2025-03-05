@@ -10,15 +10,21 @@ class Customer extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'country', 'roles', 'address', 'contact','web','email'
+        'name',
+        'country',
+        'roles',
+        'address',
+        'contact',
+        'web',
+        'email'
     ];
 
     protected $casts = [
-        'roles' => 'array', 
+        'roles' => 'array',
     ];
 
     public function shipments()
     {
-        return $this->hasMany(Shipments::class);
+        return $this->hasMany(Shipment::class);
     }
 }

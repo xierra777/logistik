@@ -58,6 +58,6 @@ class transaction extends Model
 
     public function shipment()
     {
-        return $this->belongsTo(Shipments::class, 'shipment_id');
+        return $this->belongsTo(Shipment::class, 'shipment_id');
     }
 }

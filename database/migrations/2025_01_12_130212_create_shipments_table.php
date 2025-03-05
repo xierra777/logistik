@@ -22,10 +22,7 @@ return new class extends Migration
             $table->string('port_of_discharge')->nullable();
             $table->string('combined_transport')->nullable();
             $table->string('port_of_loading')->nullable();
-            $table->string('packages')->nullable();
             $table->text('description')->nullable();
-            $table->string('gross_weight')->nullable();
-            $table->string('measurement')->nullable();
             $table->timestamps();
         });
     }

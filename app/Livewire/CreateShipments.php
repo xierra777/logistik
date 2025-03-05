@@ -19,7 +19,6 @@ class CreateShipments extends Component
     public $port_of_discharge = '';
     public $combined_transport = '';
     public $port_of_loading = '';
-    public $packages = '';
     public $description = '';
     public $gross_weight = '';
     public $measurement = '';
@@ -33,13 +32,13 @@ class CreateShipments extends Component
         $this->customers = Customer::all();
         // Inisialisasi minimal dengan satu baris container
         $this->containers = [
-            ['container_id' => '', 'container_type' => '']
+            ['container_id' => '', 'container_type' => '', 'container_seal' => '', 'gross_weight' => '', 'pack_type' => '', 'measurement' => '',]
         ];
     }
 
     public function addContainer()
     {
-        $this->containers[] = ['container_id' => '', 'container_type' => ''];
+        $this->containers[] = ['container_id' => '', 'container_type' => '', 'container_seal' => '', 'gross_weight' => '', 'pack_type' => '', 'measurement' => '',];
     }
 
     public function removeContainer($index)
@@ -58,21 +57,21 @@ class CreateShipments extends Component
     {
         // Validasi data shipment (tanpa container_id dan container_type karena data container dikelola secara terpisah)
         // Buat shipment baru
-        $shipment = shipment::create([
-            'shipment_id'         => $this->shipment_id,
-            'shipper'             => $this->shipper,
-            'consignee'           => $this->consignee,
-            'notify'              => $this->notify,
-            'ocean_vessel_feeder' => $this->ocean_vessel_feeder,
-            'ocean_vessel_mother' => $this->ocean_vessel_mother,
-            'port_of_discharge'   => $this->port_of_discharge,
-            'combined_transport'  => $this->combined_transport,
-            'port_of_loading'     => $this->port_of_loading,
-            'packages'            => $this->packages,
-            'description'         => $this->description,
-            'gross_weight'        => $this->gross_weight,
-            'measurement'         => $this->measurement,
+        $validatedData = $this->validate([
+            'shipment_id'           => 'required|max:255|unique:shipments,shipment_id',
+            'shipper'               => 'nullable|string|max:255',
+            'consignee'             => 'nullable|string|max:255',
+            'notify'                => 'nullable|string|max:255',
+            'ocean_vessel_feeder'   => 'nullable|string|max:255',
+            'ocean_vessel_mother'   => 'nullable|string|max:255',
+            'port_of_discharge'     => 'nullable|string|max:255',
+            'combined_transport'    => 'nullable|string|max:255',
+            'port_of_loading'       => 'nullable|string|max:255',
+            'description'           => 'nullable|string',
         ]);
+
+        $shipment = Shipment::create($validatedData);
+
 
         // Looping dan simpan setiap container yang dimasukkan
         foreach ($this->containers as $index => $container) {
@@ -80,12 +79,19 @@ class CreateShipments extends Component
             $this->validate([
                 "containers.$index.container_id"   => 'required|max:255|unique:containers,container_id',
                 "containers.$index.container_type" => 'required|max:255',
+                "containers.$index.container_seal" => 'required|max:255',
+                "containers.$index.gross_weight" => 'required|max:255',
+                "containers.$index.pack_type" => 'required|max:255',
+                "containers.$index.measurement" => 'max:255',
             ]);
 
             Container::create([
                 'shipment_id'    => $shipment->id,
                 'container_id'   => $container['container_id'],
                 'container_type' => $container['container_type'],
+                'container_seal' => $container['container_seal'],
+                'gross_weight' => $container['gross_weight'],
+                'pack_type' => $container['pack_type'],
             ]);
         }
 

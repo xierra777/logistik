@@ -19,28 +19,66 @@
         @enderror
       </div>
       <!-- Container -->
-      <div class="bg-white rounded-md border-gray-300 border p-4">
-        <h3 class="text-lg font-semibold">Containers</h3>
+      <div class="bg-white rounded-md border border-gray-300 p-4">
+        <h3 class="text-lg font-semibold mb-4">Containers</h3>
         @foreach($containers as $index => $container)
         <div class="mb-4 p-4 border rounded-md">
-          <div class="flex gap-4">
-            <div class="w-1/3">
+          <div class="grid grid-cols-3 gap-4">
+            <!-- Kolom 1: Container ID -->
+            <div>
               <label class="block text-sm font-medium text-gray-700">Container ID:</label>
-              <input type="text" wire:model="containers.{{ $index }}.container_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+              <input type="text" name="container_id"
+                wire:model="containers.{{ $index }}.container_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
               @error("containers.$index.container_id")
               <span class="text-red-500 text-sm">{{ $message }}</span>
               @enderror
             </div>
-            <div class="w-1/3">
+            <!-- Kolom 2: Container Type -->
+            <div>
               <label class="block text-sm font-medium text-gray-700">Container Type:</label>
-              <input type="text" wire:model="containers.{{ $index }}.container_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+              <input type="text" name="container_type" wire:model="containers.{{ $index }}.container_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
               @error("containers.$index.container_type")
+              <span class="text-red-500 text-sm">{{ $message }}</span>
+              @enderror
+            </div>
+            <!-- Kolom 3: Seal No -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Seal No:</label>
+              <input type="text" name="container_seal" wire:model="containers.{{ $index }}.container_seal" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+              @error("containers.$index.container_seal")
+              <span class="text-red-500 text-sm">{{ $message }}</span>
+              @enderror
+            </div>
+            <!-- Baris kedua -->
+            <!-- Kolom 1: Gross Weight -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Gross Weight:</label>
+              <input type="text" name="gross_weight" wire:model="containers.{{ $index }}.gross_weight" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+              @error("containers.$index.gross_weight")
+              <span class="text-red-500 text-sm">{{ $message }}</span>
+              @enderror
+            </div>
+            <!-- Kolom 2: Packtype -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Packtype:</label>
+              <input type="text" name="pack_type" wire:model="containers.{{ $index }}.pack_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+              @error("containers.$index.pack_type")
+              <span class="text-red-500 text-sm">{{ $message }}</span>
+              @enderror
+            </div>
+            <!-- Kolom 3: Measurement -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Measurement:</label>
+              <input type="text" name="measurement" wire:model="containers.{{ $index }}.measurement" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+              @error("containers.$index.measurement")
               <span class="text-red-500 text-sm">{{ $message }}</span>
               @enderror
             </div>
           </div>
           <!-- Tombol Hapus Container -->
-          <button type="button" wire:click="removeContainer({{ $index }})" class="mt-2 text-red-500 hover:underline">Hapus Container</button>
+          <button type="button" wire:click="removeContainer({{ $index }})" class="mt-2 text-red-500 hover:underline">
+            Hapus Container
+          </button>
         </div>
         @endforeach
         <!-- Tombol Tambah Container -->
@@ -50,8 +88,10 @@
       </div>
 
 
+
+
       <!-- Shipper -->
-      <div class="mt-4 mb-4">
+      <div class="mt-4 mb-4" wire:ignore>
         <label for="shipper">Shipper</label>
         <select wire:model="shipper" id="shipper" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
           <option value="">Select Shipper</option>
@@ -63,7 +103,7 @@
         </select>
       </div>
       <!-- Consignee Dropdown -->
-      <div class="mb-4">
+      <div class="mb-4" wire:ignore>
         <label for="consignee">Consignee</label>
         <select wire:model="consignee" id="consignee" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
           <option value="">Select Consignee</option>
@@ -76,7 +116,7 @@
       </div>
 
       <!-- Notify Dropdown -->
-      <div>
+      <div wire:ignore>
         <label for="notify">Notify</label>
         <select wire:model="notify" id="notify" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
           <option value="">Select Notify</option>
@@ -87,21 +127,7 @@
           @endforeach
         </select>
       </div>
-      <!-- Packages -->
-      <div class="mb-4">
-        <label for="packages" class="block text-sm font-medium text-gray-700">
-          Packages
-        </label>
-        <input
-          wire:model="packages"
-          type="text"
-          id="packages"
-          class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        @error('packages')
-        <span class="text-sm text-red-500">{{ $message }}</span>
-        @enderror
-      </div>
-      <div class="flex flex-col">
+      <div class="flex flex-col" wire:ignore>
         <!-- Toggle between Input and Select -->
         <div>
           <label for="portSelect" class="block text-sm font-medium text-gray-700">Select or Input Port</label>
@@ -143,37 +169,9 @@
         <span class="text-sm text-red-500">{{ $message }}</span>
         @enderror
       </div>
-
-      <!-- Gross Weight -->
-      <div class="mb-4>
-      <label for=" gross_weight" class="block text-sm font-medium text-gray-700">
-        Gross Weight <span class="text-red-500">*</span>
-        </label>
-        <input
-          wire:model="gross_weight"
-          type="text"
-          id="gross_weight"
-          class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        @error('gross_weight')
-        <span class="text-sm text-red-500">{{ $message }}</span>
-        @enderror
-      </div>
-
-      <!-- Measurement -->
-      <div class="mb-4">
-        <label for="measurement" class="block text-sm font-medium text-gray-700">
-          Measurement <span class="text-red-500">*</span>
-        </label>
-        <input
-          wire:model="measurement"
-          type="text"
-          id="measurement"
-          class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        @error('measurement')
-        <span class="text-sm text-red-500">{{ $message }}</span>
-        @enderror
-      </div>
     </div>
+
+
     <!-- Buttons -->
     <div class="mt-6 flex items-center justify-end gap-x-6">
       <a wire:navigate href="{{route ('shipments')}}" class="text-sm/6 font-semibold text-gray-900 bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">
@@ -188,15 +186,21 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-    fetch('/data/ports.json') // Adjust to the correct path of your JSON file
+    fetch('/data/ports.json') // Sesuaikan path JSON sesuai kebutuhan
       .then(response => response.json())
       .then(data => {
         const select = document.getElementById('portSelect');
         data.forEach(port => {
           const option = document.createElement('option');
-          option.value = port.code; // Assign the port code as the value
-          option.textContent = `${port.name} - ${port.code}`; // Combine name and code for display
+          option.value = port.code; // Nilai option
+          option.textContent = `${port.name} - ${port.code}`; // Tampilan option
           select.appendChild(option);
+        });
+        // Setelah option ditambahkan, inisialisasi select2
+        $('#portSelect').select2({
+          placeholder: 'Select a port',
+          allowClear: true,
+          theme: 'tailwindcss-3' // Ubah tema jika diperlukan, misal 'tailwindcss'
         });
       })
       .catch(error => console.error('Error loading ports:', error));

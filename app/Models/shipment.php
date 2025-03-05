@@ -19,10 +19,7 @@ class shipment extends Model
         'port_of_discharge',
         'combined_transport',
         'port_of_loading',
-        'packages',
         'description',
-        'gross_weight',
-        'measurement',
     ];
 
     public function customer()

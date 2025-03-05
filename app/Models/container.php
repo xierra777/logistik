@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Container extends Model
 {
-    protected $fillable = ['shipment_id', 'container_id', 'container_type'];
+    protected $fillable = ['shipment_id', 'container_id', 'container_type', 'container_seal', 'pack_type', 'gross_weight', 'measurement'];
 
     public function shipment()
     {

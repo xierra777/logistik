@@ -93,6 +93,7 @@
 
           <!-- Role Field -->
           <!-- Select -->
+          <div wire:ignore>
             <select data-hs-select='{
               "placeholder": "Select option...",
               "toggleTag": "<button type=\"button\" aria-expanded=\"false\"></button>",
@@ -108,6 +109,8 @@
               <option>Description</option>
               <option>User ID</option>
             </select>
+          </div>
+
           <!-- End Select -->
           <!-- Modal Footer -->
           <div class="flex justify-end gap-2">

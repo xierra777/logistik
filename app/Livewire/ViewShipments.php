@@ -9,64 +9,83 @@ use App\Models\Container;
 class ViewShipments extends Component
 {
     public $shipment;
+
+    // For editing an existing container
     public $editingContainerId = null;
-    public $editContainer = [];
-    public $newContainer = [];
-
-
-    public $editingContainer = null, $editContainerData = [
-        'container_id' => '',
+    public $editContainerData = [
+        'container_id'   => '',
         'container_type' => '',
         'container_seal' => '',
-        'pack_type' => '',
-        'gross_weight' => '',
-        'measurement' => '',
+        'pack_type'      => '',
+        'gross_weight'   => '',
+        'measurement'    => '',
     ];
 
-    public function editContainer($id)
+    // For creating a new container
+    public $newContainer = [
+        'container_id'   => '',
+        'container_type' => '',
+        'container_seal' => '',
+        'gross_weight'   => '',
+        'pack_type'      => '',
+        'measurement'    => '',
+    ];
+
+    public function mount($id)
     {
-        $container = Container::findOrFail($id);
-        $this->editingContainer = $id;
+        $this->shipment = Shipment::with(['transactions', 'containers'])->findOrFail($id);
+    }
+
+    // When "Edit" is clicked, load container data for editing
+    public function editContainer($containerId)
+    {
+        $container = Container::findOrFail($containerId);
+        $this->editingContainerId = $containerId;
         $this->editContainerData = $container->toArray();
     }
 
     public function updateContainer()
     {
         $this->validate([
-            'editContainerData.container_id' => 'required',
-            'editContainerData.container_type' => 'required',
-            'editContainerData.container_seal' => 'nullable',
-            'editContainerData.pack_type' => 'nullable',
-            'editContainerData.gross_weight' => 'nullable|numeric',
-            'editContainerData.measurement' => 'nullable',
+            'editContainerData.container_id'   => 'required|max:255|unique:containers,container_id,' . $this->editingContainerId,
+            'editContainerData.container_type' => 'required|max:255',
+            'editContainerData.container_seal' => 'nullable|max:255',
+            'editContainerData.pack_type'      => 'nullable|max:255',
+            'editContainerData.gross_weight'   => 'nullable|max:255',
+            'editContainerData.measurement'    => 'nullable|max:255',
         ]);
 
-        Container::where('id', $this->editingContainer)->update($this->editContainerData);
-
-        $this->editingContainer = null;
-        $this->editContainerData = [];
-        $this->dispatch('swal', ['title' => 'Updated!', 'icon' => 'success']);
-    }
-    public function mount($id)
-    {
-        $this->shipment = Shipment::with(['transactions', 'containers'])->findOrFail($id);
-    }
-
-    private function refreshShipment()
-    {
+        Container::findOrFail($this->editingContainerId)->update($this->editContainerData);
+        $this->editingContainerId = null;
+        $this->editContainerData = [
+            'container_id'   => '',
+            'container_type' => '',
+            'container_seal' => '',
+            'pack_type'      => '',
+            'gross_weight'   => '',
+            'measurement'    => '',
+        ];
         $this->shipment->load('containers');
+        session()->flash('success', 'Container updated successfully.');
     }
 
-    public function resetEditing()
+    public function cancelEdit()
     {
         $this->editingContainerId = null;
-        $this->editContainer = [];
+        $this->editContainerData = [
+            'container_id'   => '',
+            'container_type' => '',
+            'container_seal' => '',
+            'pack_type'      => '',
+            'gross_weight'   => '',
+            'measurement'    => '',
+        ];
     }
 
     public function deleteContainer($containerId)
     {
         Container::findOrFail($containerId)->delete();
-        $this->refreshShipment();
+        $this->shipment->load('containers');
         session()->flash('success', 'Container deleted successfully.');
     }
 
@@ -82,8 +101,8 @@ class ViewShipments extends Component
         ]);
 
         Container::create(array_merge(['shipment_id' => $this->shipment->id], $this->newContainer));
-
         $this->resetNewContainer();
+        $this->shipment->load('containers');
         session()->flash('success', 'Container created successfully.');
     }
 

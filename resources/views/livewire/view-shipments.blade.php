@@ -4,55 +4,46 @@
             {{ __('Data Shipments') }}
         </h2>
     </x-slot>
-    <div class="max-w-full mx-auto p-4">
-        <div class="grid grid-cols-4 border-1border-gray-200">
+    <div class="max-w-full mx-auto p-4 shadow-md shadow-cyan-100 rounded-md mb-8">
+        <div class="grid grid-cols-4 border-1border-gray-200 ">
             <!-- First Row (Labels) -->
             <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Shipment ID</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Container ID</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Container Type</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Shipper</div>
+            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Consignee</div>
+            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Notify</div>
 
             <!-- First Row (Data) -->
             <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->shipment_id ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->container_id ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->container_type ?? 'N/A' }}</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->shipper ?? 'N/A' }}</div>
-
-            <!-- Second Row (Labels) -->
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Consignee</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Notify</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Ocean Vessel Feeder</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Ocean Vessel Mother</div>
-
-            <!-- Second Row (Data) -->
             <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->consignee ?? 'N/A' }}</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->notify ?? 'N/A' }}</div>
+
+            <!-- Second Row (Labels) -->
+            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Ocean Vessel Feeder</div>
+            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Ocean Vessel Mother</div>
+            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Port of Discharge</div>
+            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Port of Loading</div>
+            <!-- Second Row (Data) -->
+
             <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->ocean_vessel_feeder ?? 'N/A' }}</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->ocean_vessel_mother ?? 'N/A' }}</div>
+            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->port_of_discharge ?? 'N/A' }}</div>
+            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->port_of_loading ?? 'N/A' }}</div>
+
+
 
             <!-- Third Row (Labels) -->
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Port of Discharge</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Combined Transport</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Port of Loading</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Packages</div>
-
-            <!-- Third Row (Data) -->
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->port_of_discharge ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->combined_transport ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->port_of_loading ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->packages ?? 'N/A' }}</div>
-
-            <!-- Fourth Row (Labels) -->
             <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Description</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Gross Weight</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Measurement</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Other Info</div>
 
-            <!-- Fourth Row (Data) -->
+
+            <!-- Third Row (Data) -->
+            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->combined_transport ?? 'N/A' }}</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->description ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->gross_weight ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->measurement ?? 'N/A' }}</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ 'N/A' }}</div> <!-- Assuming no other info, replace as needed -->
+
+
         </div>
     </div>
 
@@ -294,7 +285,7 @@
     </div>
 
 
-    <hr class="border-gray-500 dark:border-neutral-500">
+    <hr class="border-gray-300 dark:border-neutral-200 mt-4 ">
 
 
     <!-- SIGMA Button -->
@@ -304,4 +295,52 @@
             Back
         </a>
     </div>
+    @if($editingContainerId)
+    <div wire:transition.scale.origin.opacity class="fixed inset-0 flex items-center justify-center z-50 bg-gray-900 bg-opacity-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold">Edit Container</h2>
+                <button wire:click="cancelEdit" class="text-gray-500 hover:text-gray-700">&times;</button>
+            </div>
+            <form wire:submit.prevent="updateContainer">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Container ID</label>
+                        <input type="text" wire:model.defer="editContainerData.container_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                        @error('editContainerData.container_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Container Type</label>
+                        <input type="text" wire:model.defer="editContainerData.container_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                        @error('editContainerData.container_type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Container Seal</label>
+                        <input type="text" wire:model.defer="editContainerData.container_seal" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Gross Weight</label>
+                        <input type="text" wire:model.defer="editContainerData.gross_weight" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Pack Type</label>
+                        <input type="text" wire:model.defer="editContainerData.pack_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Measurement</label>
+                        <input type="text" wire:model.defer="editContainerData.measurement" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end gap-2">
+                    <button type="button" wire:click="cancelEdit" class="px-4 py-2 bg-gray-300 text-gray-800 rounded">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">
+                        Update Container
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
 </div>

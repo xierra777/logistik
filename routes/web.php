@@ -7,7 +7,9 @@ use App\Livewire\EditShipments;
 use App\Livewire\Shipmment;
 use App\Livewire\Accounting\accountant;
 use App\Livewire\Accounting\Tranksaksi;
+use App\Livewire\ChartOfAccounts;
 use App\Livewire\users;
+use App\Livewire\JournalEntries;
 use App\Livewire\Customers\CreateCustomer;
 use App\Livewire\Customers\ListCustomer;
 use Illuminate\Http\Request;
@@ -31,6 +33,15 @@ Route::view('shipment', 'shipments.create',)
     ->middleware(['auth'])
     ->name('shipment');
 
+Route::get('/chart-of-accounts', ChartOfAccounts::class)->middleware([
+    'auth',
+    'verified'
+]);
+
+Route::get('/journal-entries', JournalEntries::class)->middleware([
+    'auth',
+    'verified'
+]);
 
 Route::get('create-shipments', CreateShipments::class)->middleware([
     'auth',

@@ -170,9 +170,11 @@
 
 
     <div class="border rounded-lg overflow-hidden">
-        <div x-data="{ open: false }">
+        <div x-data="{ open: false }"
+            @close-modal.window="open = false">
             <!-- Button to open modal -->
             <div class="flex justify-end mb-4 p-4">
+                <button class="p-4 bg-red-500 text-white rounded-lg mr-4">Print PI </button>
                 <button @click=" open = true " class="py-3 px-4 bg-blue-600 text-white rounded-lg">
                     Add Cost
                 </button>

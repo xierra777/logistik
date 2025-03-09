@@ -4,13 +4,15 @@ namespace App\Livewire\Customers;
 
 use Livewire\Component;
 use App\Models\Customer;
+use App\Models\ChartOfAccount;
 
 class CreateCustomer extends Component
 {
-    public $name, $email, $contact, $address, $web;
+    public $name, $email, $contact, $address, $web, $coa_id;
     public $roles = [];
     public $country;
-
+    public $customer_id;
+    public $chartOfAccounts;
 
 
     protected $rules = [
@@ -19,8 +21,15 @@ class CreateCustomer extends Component
         'roles'   => 'min:1|array',
         'contact' => 'required',
         'address' => 'required',
+        'coa_id'  => 'required|exists:chart_of_accounts,id',
+
     ];
- 
+
+    public function mount()
+    {
+        $this->chartOfAccounts = ChartOfAccount::orderBy('account_code')->get();
+    }
+
     public function save()
     {
         $this->validate();
@@ -34,12 +43,13 @@ class CreateCustomer extends Component
             'address' => $this->address,
             'web'     => $this->web,
             'roles'   => $this->roles,
+            'coa_id'  => $this->coa_id,
         ]);
 
         return redirect()->route('customers.list')->with('success', [
             'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.
             'title' => 'Success!', // Toast title
-        
+
         ]);
         $this->resetForm();
     }
@@ -48,5 +58,4 @@ class CreateCustomer extends Component
     {
         return view('livewire.customers.create-customer');
     }
-    
 }

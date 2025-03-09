@@ -54,7 +54,7 @@
                     <label for="quantity" class="block text-sm font-medium text-gray-700">
                         Quantity
                     </label>
-                    <input type="number" name="quantity" id="quantity" wire:model="quantity" placeholder="" value="0"
+                    <input type="text" name="quantity" id="quantity" wire:model="quantity" placeholder=""
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <!-- OFD Type -->
@@ -80,7 +80,7 @@
     <!-- Sell Section -->
     <div class="bg-white" x-data="{
                 scurrency: @entangle('scurrency'),
-                srate: @entangle('srate'),
+                // srate: @entangle('srate'),
                 amount: @entangle('samount_qty'),
                 sincludedtax: @entangle('sincludedtax'),
                 svatgst: @entangle('svatgst'),
@@ -99,8 +99,8 @@
                     return this.amount;
                 },
                 get samountidr() {
-                    return parseFloat(this.srate || 0) * parseFloat(this.amount || 0);
-                },
+                    return parseFloat((this.srate || 0).toString().replace(',', '')) * 
+                    parseFloat((this.fcyAmount || 0).toString().replace(',', ''));                },
                 get gp() {
                     const isTaxIncluded = (this.sincludedtax || 'No').toString().trim() === 'Yes';
                     return isTaxIncluded ? this.samountidr - this.taxAmount : this.samountidr;
@@ -156,12 +156,15 @@
         <div class="space-y-1.5 p-4 border border-gray-200 rounded-b-md shadow-xl">
             <!-- Row 1: Client, Currency, Exchange Rate -->
             <div class="grid grid-cols-3 gap-4">
-                <div>
-                    <label for="sclient" class="block text-sm font-medium text-gray-700">Client</label>
-                    <select id="sclient" name="sclient" wire:model="sclient"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="PT-SALIM-INDOFOOD">PT.SALIM INDOFOOD - PT.SAMSUNG SDS</option>
+                <div class="mb-4">
+                    <label class="block font-medium">Pilih Client</label>
+                    <select wire:model="sclient" class="w-full border rounded-md border-gray-300 p-2">
+                        <option value="">-- Pilih Client --</option>
+                        @foreach($clients ?? [] as $client)
+                        <option value="{{ $client->id }}">{{ $client->name }}</option>
+                        @endforeach
                     </select>
+                    @error('sclient') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
                 <div>
                     <label for="scurrency" class="block text-sm font-medium text-gray-700">Currency</label>
@@ -173,7 +176,7 @@
                 </div>
                 <div>
                     <label for="srate" class="block text-sm font-medium text-gray-700">Ex.rate</label>
-                    <input type="text" id="srate" name="srate" x-model="formatNumber(srate)" wire:model="srate"
+                    <input type="text" id="srate" name="srate" :value="formatNumber(srate)" wire:model="srate"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
             </div>
@@ -367,13 +370,15 @@
             <!-- Row 1 -->
             <div class="grid grid-cols-3 gap-4">
                 <!-- Vendor -->
-                <div>
-                    <label for="cvendor" class="block text-sm font-medium text-gray-700">Vendor</label>
-                    <select id="cvendor" name="cvendor" wire:model="cvendor"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="PT-SALIM-INDOFOOD">PT.SALIM INDOFOOD - PT.SAMSUNG SDS</option>
-                        <option value="PT-SALIM-KARDUS">PT.SALIM INDOFOOD - PT.SAMSUNG SDS</option>
+                <div class="mb-4">
+                    <label class="block font-medium">Pilih Vendor</label>
+                    <select wire:model="cvendor" class="w-full border rounded-md border-gray-300 p-2">
+                        <option value="">-- Pilih Vendor --</option>
+                        @foreach($vendors ?? [] as $vendor)
+                        <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
+                        @endforeach
                     </select>
+                    @error('vendor') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
                 <!-- No Invoice -->
                 <div>

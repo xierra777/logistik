@@ -4,18 +4,20 @@ namespace App\Livewire\Accounting;
 
 use Livewire\Component;
 use App\Models\transaction;
+use App\Models\Customer;
 
 class Tranksaksi extends Component
 {
 
     public $shipmentId;
+    public $customer_id; // Tambahkan properti ini
 
     // === Bagian Charge ===
     public $charge;
     public $description;
     public $freight;
     public $unit;
-    public $quantity = "0";
+    public $quantity;
     public $ofdtype;
     public $remarks;
 
@@ -44,7 +46,7 @@ class Tranksaksi extends Component
     public $ccurrency;
     public $crate = "0";            // Exchange Rate untuk cost
     public $camount_qty = "0";      // Jumlah (Qty) untuk cost (perhitungan)
-    public $cincludedtax;
+    public $cincludedtax = "No";
     public $cfcyamount = "0";       // Amount per unit (FCY) untuk cost
     public $camountidr = "0";       // Hasil perhitungan cost (IDR)
     public $cvatgst;
@@ -54,70 +56,92 @@ class Tranksaksi extends Component
     public $cwhtaxrate;
     public $cwhtaxamount = "0";
 
+    public $vendor_id;
+    public $client_id;
+    public $vendors;
+    public $clients;
 
     public function mount($shipmentId)
     {
         $this->shipmentId = $shipmentId;
+        $customers = Customer::orderBy('name')->get();
+
+        // Filter customers berdasarkan kategori
+        $this->vendors = $customers->where('category', 'CR');
+        $this->clients = $customers->where('category', 'DR');
     }
+
     public function save()
     {
+        // Cari data vendor & client berdasarkan ID
+        $vendor = Customer::find($this->cvendor);
+        $client = Customer::find($this->sclient);
 
-
-        // Simpan data ke database
+        // Simpan ke database
         transaction::create([
-            // Bagian Charge
-            'shipment_id' => $this->shipmentId,  // Pastikan nilainya tidak null
-            'charge'       => $this->charge,
-            'description'  => $this->description,
-            'freight'      => $this->freight,
-            'unit'         => $this->unit,
-            'quantity'     => $this->quantity,
-            'ofdtype'      => $this->ofdtype,
-            'remarks'      => $this->remarks,
+            'shipment_id' => $this->shipmentId,
+            'charge' => $this->charge,
+            'description' => $this->description,
+            'freight' => $this->freight,
+            'unit' => $this->unit,
+            'quantity' => $this->quantity,
+            'ofdtype' => $this->ofdtype,
+            'remarks' => $this->remarks,
 
-            // Bagian Sale
-            'sclient'         => $this->sclient,
-            'scurrency'       => $this->scurrency,
-            'srate'           => $this->srate,
-            'samount_qty'     => $this->samount_qty,
-            'sincludedtax'    => $this->sincludedtax,
-            'sfcyamount'      => $this->sfcyamount,
-            'samountidr'      => $this->samountidr,
-            'sdrcr'           => $this->sdrcr,
-            'svatgst'         => $this->svatgst,
-            'staxableamount'  => $this->staxableamount,
-            'svatgstamount'   => $this->svatgstamount,
-            'swhtaxrate'      => $this->swhtaxrate,
-            'swhtaxamount'    => $this->swhtaxamount,
-            'sremarks'        => $this->sremarks,
-            'sgrossprofit'    => $this->sgrossprofit,
+            // Sale
+            'sclient' => $client ? $client->name : null,
+            'scurrency' => $this->scurrency,
+            'srate' => $this->srate,
+            'samount_qty' => $this->samount_qty,
+            'sincludedtax' => $this->sincludedtax,
+            'sfcyamount' => $this->sfcyamount,
+            'samountidr' => $this->samountidr,
+            'sdrcr' => $this->sdrcr,
+            'svatgst' => $this->svatgst,
+            'staxableamount' => $this->staxableamount,
+            'svatgstamount' => $this->svatgstamount,
+            'swhtaxrate' => $this->swhtaxrate,
+            'swhtaxamount' => $this->swhtaxamount,
+            'sremarks' => $this->sremarks,
+            'sgrossprofit' => $this->sgrossprofit,
 
-            // Bagian Cost
-            'cvendor'         => $this->cvendor,
-            'creferenceno'    => $this->creferenceno,
-            'cdate'           => $this->cdate,
-            'cdrcr'           => $this->cdrcr,
-            'ccurrency'       => $this->ccurrency,
-            'crate'           => $this->crate,
-            'camount_qty'     => $this->camount_qty,
-            'cincludedtax'    => $this->cincludedtax,
-            'cfcyamount'      => $this->cfcyamount,
-            'camountidr'      => $this->camountidr,
-            'cvatgst'         => $this->cvatgst,
-            'cvatgstamount'   => $this->cvatgstamount,
-            'ctaxableamount'  => $this->ctaxableamount,
-            'cremarks'        => $this->cremarks,
-            'cwhtaxrate'      => $this->cwhtaxrate,
-            'cwhtaxamount'    => $this->cwhtaxamount,
+            // Cost
+            'cvendor' => $vendor ? $vendor->name : null,
+            'creferenceno' => $this->creferenceno,
+            'cdate' => $this->cdate,
+            'cdrcr' => $this->cdrcr,
+            'ccurrency' => $this->ccurrency,
+            'crate' => $this->crate,
+            'camount_qty' => $this->camount_qty,
+            'cincludedtax' => $this->cincludedtax,
+            'cfcyamount' => $this->cfcyamount,
+            'camountidr' => $this->camountidr,
+            'cvatgst' => $this->cvatgst,
+            'cvatgstamount' => $this->cvatgstamount,
+            'ctaxableamount' => $this->ctaxableamount,
+            'cremarks' => $this->cremarks,
+            'cwhtaxrate' => $this->cwhtaxrate,
+            'cwhtaxamount' => $this->cwhtaxamount,
+
+
         ]);
+        $this->resetExcept(['clients', 'vendors']);
+        // dd($client);
 
 
-        session()->flash('message', 'Transaction saved successfully!');
         $this->reset();
+        $this->dispatch('transactionSaved');
+        $this->dispatch('close-modal');
     }
-
     public function render()
     {
-        return view('livewire.accounting.tranksaksi');
+        $customers = Customer::orderBy('name')->get();
+        $vendors = $customers->where('category', 'CR');
+        $clients = $customers->where('category', 'DR');
+
+        return view('livewire.accounting.tranksaksi', [
+            'clients' => $clients,
+            'vendors' => $vendors,
+        ]);
     }
 }

@@ -29,7 +29,14 @@ class ViewShipments extends Component
         $this->editingContainer = $id;
         $this->editContainerData = $container->toArray();
     }
+    protected $listeners = ['transactionSaved' => 'refreshShipment'];
 
+
+    public function refreshShipment()
+    {
+        $this->shipment = Shipment::with(['transactions', 'containers'])
+            ->findOrFail($this->shipment->id);
+    }
     public function updateContainer()
     {
         $this->validate([
@@ -50,11 +57,6 @@ class ViewShipments extends Component
     public function mount($id)
     {
         $this->shipment = Shipment::with(['transactions', 'containers'])->findOrFail($id);
-    }
-
-    private function refreshShipment()
-    {
-        $this->shipment->load('containers');
     }
 
     public function resetEditing()

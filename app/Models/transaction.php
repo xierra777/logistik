@@ -10,6 +10,7 @@ class transaction extends Model
 
     protected $fillable = [
         'shipment_id',
+        'customer_id',  // Tambahkan field ini
 
         // Charge section
         'charge',
@@ -19,7 +20,6 @@ class transaction extends Model
         'quantity',
         'ofdtype',
         'remarks',
-
         // Sale section
         'sclient',
         'scurrency',
@@ -36,7 +36,6 @@ class transaction extends Model
         'swhtaxamount',
         'sremarks',
         'sgrossprofit',
-
         // Cost section
         'cvendor',
         'creferenceno',
@@ -54,10 +53,25 @@ class transaction extends Model
         'cremarks',
         'cwhtaxrate',
         'cwhtaxamount',
+        // COA columns
+        'coa_sale_id',
+        'coa_cost_id'
     ];
 
+    public function coaSale()
+    {
+        return $this->belongsTo(ChartOfAccount::class, 'coa_sale_id');
+    }
+    public function coaCost()
+    {
+        return $this->belongsTo(ChartOfAccount::class, 'coa_cost_id');
+    }
     public function shipment()
     {
         return $this->belongsTo(Shipment::class, 'shipment_id');
+    }
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
 }

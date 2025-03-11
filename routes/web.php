@@ -7,6 +7,7 @@ use App\Livewire\EditShipments;
 use App\Livewire\Shipmment;
 use App\Livewire\Accounting\accountant;
 use App\Livewire\Accounting\Tranksaksi;
+use App\Livewire\Accounting\SaleInvoice;
 use App\Livewire\ChartOfAccounts;
 use App\Livewire\users;
 use App\Livewire\JournalEntries;
@@ -37,6 +38,7 @@ Route::get('/chart-of-accounts', ChartOfAccounts::class)->middleware([
     'auth',
     'verified'
 ]);
+
 
 Route::get('/journal-entries', JournalEntries::class)->middleware([
     'auth',
@@ -78,6 +80,9 @@ Route::get('/accounting/tranksaksi', Tranksaksi::class)
     ->middleware(['auth', 'verified'])
     ->name('Tranksaksi');
 
+Route::get('/sale-invoice/{shipmentId}', SaleInvoice::class)
+    ->middleware(['auth', 'verified'])
+    ->name('sale-invoice');
 Route::get('/csrf-token', function (Request $request) {
     return response()->json(['csrf_token' => csrf_token()]);
 })->name('csrf-token');

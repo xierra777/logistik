@@ -11,7 +11,8 @@ class transaction extends Model
     protected $fillable = [
         'shipment_id',
         'customer_id',  // Tambahkan field ini
-
+        'vendor_id',  // Tambahkan field ini
+        'invoice_id',
         // Charge section
         'charge',
         'description',
@@ -72,6 +73,15 @@ class transaction extends Model
     }
     public function customer()
     {
-        return $this->belongsTo(Customer::class, 'customer_id');
+        return $this->belongsTo(Customer::class);
+    }
+    public function vendor()
+    {
+        return $this->belongsTo(Customer::class, 'vendor_id');
+    }
+
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class);
     }
 }

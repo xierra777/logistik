@@ -90,6 +90,7 @@ class Tranksaksi extends Component
 
             // Sale
             'sclient' => $client ? $client->name : null,
+            'customer_id'   => $client ? $client->id : null,
             'scurrency' => $this->scurrency,
             'srate' => $this->srate,
             'samount_qty' => $this->samount_qty,
@@ -107,6 +108,7 @@ class Tranksaksi extends Component
 
             // Cost
             'cvendor' => $vendor ? $vendor->name : null,
+            'vendor_id'     => $vendor ? $vendor->id : null,
             'creferenceno' => $this->creferenceno,
             'cdate' => $this->cdate,
             'cdrcr' => $this->cdrcr,
@@ -125,7 +127,6 @@ class Tranksaksi extends Component
 
 
         ]);
-        $this->resetExcept(['clients', 'vendors']);
         // dd($client);
 
 

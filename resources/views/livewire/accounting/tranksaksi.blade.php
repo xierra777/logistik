@@ -1,4 +1,5 @@
 <form wire:submit.prevent="save" class="py-5 px-3 max-h-[80vh] overflow-y-auto space-y-3  [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:hidden">
+    @csrf
     <!-- Charge Section -->
     <div class="bg-white">
         <!-- Heading Bar -->
@@ -25,7 +26,7 @@
                         Description / Name<span class="text-red-500">*</span>
                     </label>
                     <input type="text" id="description" name="description" wire:model="description" placeholder=""
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
                 </div>
                 <!-- Freight -->
                 <div>
@@ -55,7 +56,7 @@
                         Quantity
                     </label>
                     <input type="text" name="quantity" id="quantity" wire:model="quantity" placeholder=""
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
                 </div>
                 <!-- OFD Type -->
                 <div>
@@ -103,7 +104,7 @@
                     parseFloat((this.fcyAmount || 0).toString().replace(',', ''));                },
                 get gp() {
                     const isTaxIncluded = (this.sincludedtax || 'No').toString().trim() === 'Yes';
-                    return isTaxIncluded ? this.samountidr - this.taxAmount : this.samountidr;
+                    return isTaxIncluded ? this.samountidr + this.taxAmount : this.samountidr;
                 },
                 get taxable() {
                     // Clean tax rate (handle values like '1,1%')
@@ -128,6 +129,7 @@
                     this.$watch('formatNumber(taxAmount)', value => @this.set('svatgstamount', value));
                     this.$watch('formatNumber(taxable)', value => @this.set('staxableamount', value));
                     this.$watch('formatNumber(samountidr)', value => @this.set('samountidr', value));
+                    this.$watch('formatNumber(gp)', value => @this.set('sgrossprofit', value));
                     this.$watch('scurrency', value => this.fetchExchangeRate(value));
                     this.fetchExchangeRate(this.scurrency);
                 },

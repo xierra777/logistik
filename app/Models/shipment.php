@@ -35,4 +35,9 @@ class shipment extends Model
     {
         return $this->hasMany(Container::class, 'shipment_id');
     }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
+    }
 }

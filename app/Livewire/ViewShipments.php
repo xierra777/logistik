@@ -29,12 +29,12 @@ class ViewShipments extends Component
         $this->editingContainer = $id;
         $this->editContainerData = $container->toArray();
     }
-    protected $listeners = ['transactionSaved' => 'refreshShipment'];
+    protected $listeners = ['invoiceGenerated', 'transactionSaved' => 'refreshShipment'];
 
 
     public function refreshShipment()
     {
-        $this->shipment = Shipment::with(['transactions', 'containers'])
+        $this->shipment = Shipment::with(['transactions', 'containers', 'invoices'])
             ->findOrFail($this->shipment->id);
     }
     public function updateContainer()

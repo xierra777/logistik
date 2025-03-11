@@ -122,7 +122,7 @@
 
   <!-- Buttons -->
   <div class="mt-6 flex items-center justify-end gap-x-6">
-    <a wire:navigate href="{{route ('shipments')}}" class="text-sm/6 font-semibold text-gray-900 bg-gray-200 px-4 py-3 rounded-md hover:bg-gray-300">
+    <a wire:navigate href="{{route ('customers.list')}}" class="text-sm/6 font-semibold text-gray-900 bg-gray-200 px-4 py-3 rounded-md hover:bg-gray-300">
       Back
     </a>
 

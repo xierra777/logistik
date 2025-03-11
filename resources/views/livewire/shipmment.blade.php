@@ -2,7 +2,7 @@
     <div class="-m-1.5 overflow-x-auto">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 px-1.5">
             <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                <a href="/shipment" wire:navigate
+                <a href="/shipment"
                     class="py-3 px-9 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-400 dark:hover:bg-blue-900 dark:focus:bg-blue-900">
                     Tambah data
                 </a>

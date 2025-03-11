@@ -32,13 +32,13 @@ class CreateShipments extends Component
         $this->customers = Customer::all();
         // Inisialisasi minimal dengan satu baris container
         $this->containers = [
-            ['container_id' => '', 'container_type' => '', 'container_seal' => '', 'gross_weight' => '', 'pack_type' => '', 'measurement' => '',]
+            ['container_id' => '', 'container_type' => '', 'container_seal' => '', 'gross_weight' => '', 'pack_type' => '', 'measurement' => '', 'pcs' => '', 'unit' => '',]
         ];
     }
 
     public function addContainer()
     {
-        $this->containers[] = ['container_id' => '', 'container_type' => '', 'container_seal' => '', 'gross_weight' => '', 'pack_type' => '', 'measurement' => '',];
+        $this->containers[] = ['container_id' => '', 'container_type' => '', 'container_seal' => '', 'gross_weight' => '', 'pack_type' => '', 'measurement' => '', 'pcs' => '', 'unit' => '',];
     }
 
     public function removeContainer($index)
@@ -81,6 +81,8 @@ class CreateShipments extends Component
                 "containers.$index.container_type" => 'required|max:255',
                 "containers.$index.container_seal" => 'required|max:255',
                 "containers.$index.gross_weight" => 'required|max:255',
+                "containers.$index.pcs" => 'required|max:255',
+                "containers.$index.unit" => 'required|max:255',
                 "containers.$index.pack_type" => 'required|max:255',
                 "containers.$index.measurement" => 'max:255',
             ]);
@@ -90,6 +92,8 @@ class CreateShipments extends Component
                 'container_id'   => $container['container_id'],
                 'container_type' => $container['container_type'],
                 'container_seal' => $container['container_seal'],
+                'pcs' => $container['pcs'],
+                'unit' => $container['unit'],
                 'gross_weight' => $container['gross_weight'],
                 'pack_type' => $container['pack_type'],
             ]);

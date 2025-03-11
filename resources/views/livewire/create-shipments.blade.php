@@ -23,7 +23,7 @@
         <h3 class="text-lg font-semibold mb-4">Containers</h3>
         @foreach($containers as $index => $container)
         <div class="mb-4 p-4 border rounded-md">
-          <div class="grid grid-cols-3 gap-4">
+          <div class="grid grid-cols-4 gap-4">
             <!-- Kolom 1: Container ID -->
             <div>
               <label class="block text-sm font-medium text-gray-700">Container ID:</label>
@@ -71,6 +71,22 @@
               <label class="block text-sm font-medium text-gray-700">Measurement:</label>
               <input type="text" name="measurement" wire:model="containers.{{ $index }}.measurement" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
               @error("containers.$index.measurement")
+              <span class="text-red-500 text-sm">{{ $message }}</span>
+              @enderror
+            </div>
+            <!-- Kolom 3: Total Pcs -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">No of Pcs:</label>
+              <input type="text" name="measurement" wire:model="containers.{{ $index }}.pcs" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+              @error("containers.$index.pcs")
+              <span class="text-red-500 text-sm">{{ $message }}</span>
+              @enderror
+            </div>
+            <!-- Kolom 3: Measurement -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">unit:</label>
+              <input type="text" name="unit" wire:model="containers.{{ $index }}.unit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+              @error("containers.$index.unit")
               <span class="text-red-500 text-sm">{{ $message }}</span>
               @enderror
             </div>

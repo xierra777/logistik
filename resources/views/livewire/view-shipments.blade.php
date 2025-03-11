@@ -8,51 +8,33 @@
         <div class="grid grid-cols-4 border-1border-gray-200">
             <!-- First Row (Labels) -->
             <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Shipment ID</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Container ID</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Container Type</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Shipper</div>
-
-            <!-- First Row (Data) -->
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->shipment_id ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->container_id ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->container_type ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->shipper ?? 'N/A' }}</div>
-
-            <!-- Second Row (Labels) -->
             <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Consignee</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Notify</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Ocean Vessel Feeder</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Ocean Vessel Mother</div>
-
-            <!-- Second Row (Data) -->
+            <!-- First Row (Data) -->
+            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->shipment_id ?? 'N/A' }}</div>
+            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->shipper ?? 'N/A' }}</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->consignee ?? 'N/A' }}</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->notify ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->ocean_vessel_feeder ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->ocean_vessel_mother ?? 'N/A' }}</div>
-
-            <!-- Third Row (Labels) -->
+            <!-- Second Row (Labels) -->
+            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Ocean Vessel Feeder</div>
+            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Ocean Vessel Mother</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Port of Discharge</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Combined Transport</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Port of Loading</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Packages</div>
-
-            <!-- Third Row (Data) -->
+            <!-- Second Row (Data) -->
+            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->ocean_vessel_feeder ?? 'N/A' }}</div>
+            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->ocean_vessel_mother ?? 'N/A' }}</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->port_of_discharge ?? 'N/A' }}</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->combined_transport ?? 'N/A' }}</div>
+            <!-- Third Row (Labels) -->
+            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Port of Loading</div>
+            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Packages</div>
+            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Description</div>
+            <!-- Third Row (Data) -->
             <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->port_of_loading ?? 'N/A' }}</div>
             <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->packages ?? 'N/A' }}</div>
-
-            <!-- Fourth Row (Labels) -->
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Description</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Gross Weight</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Measurement</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Other Info</div>
-
-            <!-- Fourth Row (Data) -->
             <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->description ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->gross_weight ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->measurement ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ 'N/A' }}</div> <!-- Assuming no other info, replace as needed -->
+
         </div>
     </div>
 
@@ -242,43 +224,43 @@
                             </button>
                         </td>
                         <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->line_no ?? 'N/A' }}
+                            {{ $loop->iteration * 10 }}
                         </td>
                         <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->description ?? 'No Data' }}
+                            {{ $transaction->description ?? '' }}
                         </td>
                         <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->unit ?? 'N/A' }}
+                            {{ $transaction->unit ?? '' }}
                         </td>
                         <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">
-                            {{ $transaction->sclient ?? 'N/A' }}
+                            {{ $transaction->sclient ?? '' }}
                         </td>
                         <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">
-                            {{ $transaction->sale ?? 'N/A' }}
+                            {{ $transaction->sale ?? '' }}
                         </td>
                         <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">
-                            {{ $transaction->samountidr ?? 'N/A' }}
+                            {{ $transaction->samountidr ?? '' }}
                         </td>
                         <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">
-                            {{ $transaction->sdrcr ?? 'N/A' }}
+                            {{ $transaction->sdrcr ?? '' }}
                         </td>
                         <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">
-                            {{ $transaction->cvendor ?? 'N/A' }}
+                            {{ $transaction->cvendor ?? '' }}
                         </td>
                         <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">
-                            {{ $transaction->cost ?? 'N/A' }}
+                            {{ $transaction->cost ?? '' }}
                         </td>
                         <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">
-                            {{ $transaction->camountidr ?? 'N/A' }}
+                            {{ $transaction->camountidr ?? '' }}
                         </td>
                         <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">
-                            {{ $transaction->cdrcr ?? 'N/A' }}
+                            {{ $transaction->cdrcr ?? '' }}
                         </td>
                         <td class="px-6 py-4 text-center text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->freight ?? 'N/A' }}
+                            {{ $transaction->freight ?? '' }}
                         </td>
                         <td class="px-6 py-4 text-center text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->gross_profit ?? 'N/A' }}
+                            {{ $transaction->sgrossprofit ?? '' }}
                         </td>
                     </tr>
                     @empty
@@ -294,6 +276,9 @@
             </table>
         </div>
     </div>
+    <a href="{{ route('sale-invoice', ['shipmentId' => $shipment->id]) }}" class="px-4 py-2 bg-blue-500 text-white rounded">
+        Buat Sale Invoice
+    </a>
 
 
     <hr class="border-gray-500 dark:border-neutral-500">

@@ -4,37 +4,51 @@
             {{ __('Data Shipments') }}
         </h2>
     </x-slot>
-    <div class="max-w-full mx-auto p-4">
-        <div class="grid grid-cols-4 border-1border-gray-200">
-            <!-- First Row (Labels) -->
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Shipment ID</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Shipper</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Consignee</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Notify</div>
-            <!-- First Row (Data) -->
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->shipment_id ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->shipper ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->consignee ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->notify ?? 'N/A' }}</div>
-            <!-- Second Row (Labels) -->
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Ocean Vessel Feeder</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Ocean Vessel Mother</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Port of Discharge</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Combined Transport</div>
-            <!-- Second Row (Data) -->
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->ocean_vessel_feeder ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->ocean_vessel_mother ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->port_of_discharge ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->combined_transport ?? 'N/A' }}</div>
-            <!-- Third Row (Labels) -->
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Port of Loading</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Packages</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-gray-200 font-bold">Description</div>
-            <!-- Third Row (Data) -->
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->port_of_loading ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->packages ?? 'N/A' }}</div>
-            <div class="border-1border-gray-200 px-4 py-2 bg-white">{{ $shipment->description ?? 'N/A' }}</div>
+    <div class="mb-4 text-center grid grid-cols-1">
+        <span class="font-bold bg-gray-200 px-4 py-2">MAWB/MBL No. :</span>
+        <span class="bg-white px-4 py-2">{{ $shipment->shipment_id ?? 'N/A' }}</span>
+    </div>
 
+    <!-- Grid data dengan 3 kolom (total 9 item) -->
+    <div class="grid grid-cols-3">
+        <!-- Baris 1 -->
+        <div class="flex flex-col">
+            <span class="font-bold bg-gray-200 px-4 py-2">Shipper</span>
+            <span class="bg-white px-4 py-2">{{ $shipment->shipper ?? 'N/A' }}</span>
+        </div>
+        <div class="flex flex-col">
+            <span class="font-bold bg-gray-200 px-4 py-2">Consignee</span>
+            <span class="bg-white px-4 py-2">{{ $shipment->consignee ?? 'N/A' }}</span>
+        </div>
+        <div class="flex flex-col">
+            <span class="font-bold bg-gray-200 px-4 py-2">Notify</span>
+            <span class="bg-white px-4 py-2">{{ $shipment->notify ?? 'N/A' }}</span>
+        </div>
+        <!-- Baris 2 -->
+        <div class="flex flex-col">
+            <span class="font-bold bg-gray-200 px-4 py-2">Ocean Vessel Feeder</span>
+            <span class="bg-white px-4 py-2">{{ $shipment->ocean_vessel_feeder ?? 'N/A' }}</span>
+        </div>
+        <div class="flex flex-col">
+            <span class="font-bold bg-gray-200 px-4 py-2">Ocean Vessel Mother</span>
+            <span class="bg-white px-4 py-2">{{ $shipment->ocean_vessel_mother ?? 'N/A' }}</span>
+        </div>
+        <div class="flex flex-col">
+            <span class="font-bold bg-gray-200 px-4 py-2">Port of Discharge</span>
+            <span class="bg-white px-4 py-2">{{ $shipment->port_of_discharge ?? 'N/A' }}</span>
+        </div>
+        <!-- Baris 3 -->
+        <div class="flex flex-col">
+            <span class="font-bold bg-gray-200 px-4 py-2">Combined Transport</span>
+            <span class="bg-white px-4 py-2">{{ $shipment->combined_transport ?? 'N/A' }}</span>
+        </div>
+        <div class="flex flex-col">
+            <span class="font-bold bg-gray-200 px-4 py-2">Port of Loading</span>
+            <span class="bg-white px-4 py-2">{{ $shipment->port_of_loading ?? 'N/A' }}</span>
+        </div>
+        <div class="flex flex-col">
+            <span class="font-bold bg-gray-200 px-4 py-2">Description</span>
+            <span class="bg-white px-4 py-2">{{ $shipment->description ?? 'N/A' }}</span>
         </div>
     </div>
 
@@ -154,12 +168,15 @@
     <div class="border rounded-lg overflow-hidden">
         <div x-data="{ open: false }"
             @close-modal.window="open = false">
-            <!-- Button to open modal -->
             <div class="flex justify-end mb-4 p-4">
-                <button class="p-4 bg-red-500 text-white rounded-lg mr-4">Print PI </button>
-                <button @click=" open = true " class="py-3 px-4 bg-blue-600 text-white rounded-lg">
+                <a href="{{ route('sale-invoice', ['shipmentId' => $shipment->id]) }}" class="py-3 px-4 mr-4 bg-green-500 text-white rounded ">
+                    Invoice
+                </a>
+                <a href="{{ route('purchase-invoice', ['shipmentId' => $shipment->id]) }}" class="p-4 bg-red-500 text-white rounded-lg mr-4">Print PI </a>
+                <button @click=" open = true " class="py-3 px-4 bg-blue-600 text-white rounded-lg" @open-transaction-modal.window="open = true; Livewire.dispatch('reloadTransactionData', { shipmentId: '{{ $shipment->id }}' })">
                     Add Cost
                 </button>
+
             </div>
 
             <!-- Background Overlay -->
@@ -190,7 +207,7 @@
                         </button>
                     </div>
                     <!-- Form -->
-                    @livewire('accounting.tranksaksi', ['shipmentId' => $shipment->id])
+                    @livewire('accounting.tranksaksi', ['shipmentId' => $shipment->id], key('tranksaksi-' . $shipment->id))
                     <!-- End Form -->
                 </div>
             </div>
@@ -276,12 +293,10 @@
             </table>
         </div>
     </div>
-    <a href="{{ route('sale-invoice', ['shipmentId' => $shipment->id]) }}" class="px-4 py-2 bg-blue-500 text-white rounded">
-        Buat Sale Invoice
-    </a>
 
 
-    <hr class="border-gray-500 dark:border-neutral-500">
+
+    <hr class="border-gray-500 dark:border-neutral-500 mt-5">
 
 
     <!-- SIGMA Button -->

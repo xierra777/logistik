@@ -5,6 +5,7 @@ namespace App\Livewire\Accounting;
 use Livewire\Component;
 use App\Models\transaction;
 use App\Models\Customer;
+use Illuminate\Foundation\Exceptions\Renderer\Listener;
 
 class Tranksaksi extends Component
 {
@@ -60,7 +61,12 @@ class Tranksaksi extends Component
     public $client_id;
     public $vendors;
     public $clients;
+    protected $listeners = ['transactionSaved' => 'loadTransactions', 'reloadTransactionData' => 'setShipmentId'];
 
+    public function setShipmentId($shipmentId)
+    {
+        $this->shipmentId = $shipmentId;
+    }
     public function mount($shipmentId)
     {
         $this->shipmentId = $shipmentId;
@@ -73,6 +79,11 @@ class Tranksaksi extends Component
 
     public function save()
     {
+
+        if (!$this->shipmentId) {
+            session()->flash('error', 'Shipment ID tidak ditemukan!');
+            return;
+        }
         // Cari data vendor & client berdasarkan ID
         $vendor = Customer::find($this->cvendor);
         $client = Customer::find($this->sclient);
@@ -133,6 +144,11 @@ class Tranksaksi extends Component
         $this->reset();
         $this->dispatch('transactionSaved');
         $this->dispatch('close-modal');
+        $this->dispatch('updateTransactions');
+        $this->resetExcept('shipmentId');
+        $this->shipmentId = request()->query('shipmentId', $this->shipmentId) ?? $this->shipmentId;
+
+        session()->flash('message', 'Transaksi berhasil disimpan!');
     }
     public function render()
     {

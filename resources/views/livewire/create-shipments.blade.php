@@ -102,10 +102,6 @@
           + Tambah Container
         </button>
       </div>
-
-
-
-
       <!-- Shipper -->
       <div class="mt-4 mb-4" wire:ignore>
         <label for="shipper">Shipper</label>
@@ -143,32 +139,58 @@
           @endforeach
         </select>
       </div>
-      <div class="flex flex-col" wire:ignore>
-        <!-- Toggle between Input and Select -->
+      <div class="port-container" data-model="port_of_loading" data-radio-name="inputTypeLoading" wire:ignore>
+        <h2>Port Of Loading</h2>
         <div>
-          <label for="portSelect" class="block text-sm font-medium text-gray-700">Select or Input Port</label>
+          <label class="block text-sm font-medium text-gray-700">Select or Input Port</label>
           <div class="flex items-center gap-4">
-            <label for="selectOption" class="cursor-pointer">
-              <input type="radio" id="selectOption" name="inputType" value="select" checked> Select from List
-              <label for="inputOption" class="cursor-pointer">
-                <input type="radio" id="inputOption" name="inputType" value="input"> Enter Port Manually
-              </label>
+            <label class="cursor-pointer">
+              <input type="radio" value="select" name="inputTypeLoading" checked> Select from List
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" value="input" name="inputTypeLoading"> Enter Port Manually
             </label>
           </div>
         </div>
-
-        <!-- Select Dropdown (hidden initially) -->
-        <div id="selectContainer">
-          <label for="portSelect" class="block text-sm font-medium text-gray-700">Port</label>
-          <select wire:model="port_of_loading" id="portSelect" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+        <!-- Select Dropdown -->
+        <div class="select-container">
+          <label class="block text-sm font-medium text-gray-700">Port</label>
+          <select wire:model="port_of_loading" class="port-select block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
             <option value="" disabled selected>Select a port...</option>
           </select>
         </div>
+        <!-- Input Field -->
+        <div class="input-container hidden">
+          <label class="block text-sm font-medium text-gray-700">Port</label>
+          <input wire:model="port_of_loading" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200" placeholder="Enter port name">
+        </div>
+      </div>
 
-        <!-- Input Field (visible initially) -->
-        <div id="inputContainer" class="hidden">
-          <label for="portInput" class="block text-sm font-medium text-gray-700">Port</label>
-          <input wire:model="port_of_loading" type="text" id="portInput" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200" placeholder="Enter port name">
+      <!-- Port Of Discharge -->
+      <div class="port-container" data-model="port_of_discharge" data-radio-name="inputTypeDischarge" wire:ignore>
+        <h2>Port Of Discharge</h2>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Select or Input Port</label>
+          <div class="flex items-center gap-4">
+            <label class="cursor-pointer">
+              <input type="radio" value="select" name="inputTypeDischarge" checked> Select from List
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" value="input" name="inputTypeDischarge"> Enter Port Manually
+            </label>
+          </div>
+        </div>
+        <!-- Select Dropdown -->
+        <div class="select-container">
+          <label class="block text-sm font-medium text-gray-700">Port</label>
+          <select wire:model="port_of_discharge" class="port-select block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+            <option value="" disabled selected>Select a port...</option>
+          </select>
+        </div>
+        <!-- Input Field -->
+        <div class="input-container hidden">
+          <label class="block text-sm font-medium text-gray-700">Port</label>
+          <input wire:model="port_of_discharge" type="text" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200" placeholder="Enter port name">
         </div>
       </div>
 
@@ -202,37 +224,43 @@
 
 <script>
   document.addEventListener("DOMContentLoaded", function() {
-    fetch('/data/ports.json') // Sesuaikan path JSON sesuai kebutuhan
+    // Fetch data port satu kali untuk semua select
+    fetch('/data/ports.json')
       .then(response => response.json())
       .then(data => {
-        const select = document.getElementById('portSelect');
-        data.forEach(port => {
-          const option = document.createElement('option');
-          option.value = port.code; // Nilai option
-          option.textContent = `${port.name} - ${port.code}`; // Tampilan option
-          select.appendChild(option);
-        });
-        // Setelah option ditambahkan, inisialisasi select2
-        $('#portSelect').select2({
-          placeholder: 'Select a port',
-          allowClear: true,
-          theme: 'tailwindcss-3' // Ubah tema jika diperlukan, misal 'tailwindcss'
+        document.querySelectorAll('.port-select').forEach(select => {
+          data.forEach(port => {
+            const option = document.createElement('option');
+            option.value = port.code;
+            option.textContent = `${port.name} - ${port.code}`;
+            select.appendChild(option);
+          });
+          // Inisialisasi select2 untuk tiap select
+          $(select).select2({
+            placeholder: 'Select a port',
+            allowClear: true,
+            theme: 'tailwindcss-3'
+          });
         });
       })
       .catch(error => console.error('Error loading ports:', error));
-  });
-  document.querySelectorAll('input[name="inputType"]').forEach((radio) => {
-    radio.addEventListener('change', function() {
-      const selectContainer = document.getElementById('selectContainer');
-      const inputContainer = document.getElementById('inputContainer');
 
-      if (this.value === 'select') {
-        selectContainer.classList.remove('hidden');
-        inputContainer.classList.add('hidden');
-      } else {
-        selectContainer.classList.add('hidden');
-        inputContainer.classList.remove('hidden');
-      }
+    // Tangani toggle radio (select/input) untuk tiap container
+    document.querySelectorAll('.port-container').forEach(container => {
+      // Cari radio di dalam container tersebut
+      container.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+          const selectContainer = container.querySelector('.select-container');
+          const inputContainer = container.querySelector('.input-container');
+          if (this.value === 'select') {
+            selectContainer.classList.remove('hidden');
+            inputContainer.classList.add('hidden');
+          } else {
+            selectContainer.classList.add('hidden');
+            inputContainer.classList.remove('hidden');
+          }
+        });
+      });
     });
   });
 </script>

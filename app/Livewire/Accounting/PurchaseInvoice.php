@@ -4,14 +4,15 @@ namespace App\Livewire\Accounting;
 
 use Livewire\Component;
 use App\Models\{Customer, Container, Invoice, Transaction, Shipment};
+use Barryvdh\DomPDF\Facade\Pdf;
 use Spatie\Browsershot\Browsershot;
 use Illuminate\Support\Facades\View;
 
-class SaleInvoice extends Component
+class PurchaseInvoice extends Component
 {
-    public $invoice_number, $shipmentId, $customer_id, $date, $due_date, $total_amount = 0;
+    public $invoice_number, $shipmentId, $vendor_id, $date, $due_date, $total_amount = 0;
     public $status = 'Unpaid', $notes, $currency, $pdfData = '';
-    public $shipments, $customers, $transactions, $containers, $clients;
+    public $shipments, $vendors, $transactions, $containers;
 
     protected $listeners = ['setShipmentId'];
 
@@ -24,13 +25,8 @@ class SaleInvoice extends Component
             $this->invoice_number = $this->generateInvoiceNumber();
         }
 
-        $customerNames = Shipment::where('id', $shipmentId)
-            ->selectRaw("shipper AS name")
-            ->union(Shipment::selectRaw("consignee AS name")->where('id', $shipmentId))
-            ->union(Shipment::selectRaw("notify AS name")->where('id', $shipmentId))
-            ->pluck('name');
-
-        $this->clients = Customer::whereIn('name', $customerNames)->get();
+        // Ambil daftar vendor dari transaksi yang sudah ada
+        $this->vendors = Customer::whereIn('id', Transaction::whereNotNull('vendor_id')->pluck('vendor_id'))->get();
         $this->containers = Container::all();
 
         if ($shipmentId) {
@@ -40,43 +36,43 @@ class SaleInvoice extends Component
 
     public function generatePDF()
     {
-        if (!$this->shipmentId || !$this->customer_id || $this->transactions->isEmpty()) {
-            session()->flash('error', 'Pilih dulu jir customernya 😹');
+        if (!$this->shipmentId || !$this->vendor_id || $this->transactions->isEmpty()) {
+            session()->flash('error', 'Incomplete data for PDF generation.');
             return;
         }
 
         $shipment = Shipment::with('containers')->findOrFail($this->shipmentId);
-        $customer = Customer::findOrFail($this->customer_id);
+        $vendor = Customer::findOrFail($this->vendor_id);
 
-        $data = compact('shipment', 'customer') + [
+        $data = compact('shipment', 'vendor') + [
             'invoice_number' => $this->invoice_number,
             'transactions'   => $this->transactions,
-            'currency'       => $customer->currency,
+            'currency'       => $vendor->currency,
         ];
 
-        $html = view('livewire.accounting.invoice-pdf', $data)->render();
+        $html = view('livewire.accounting.purchase-invoice-pdf', $data)->render();
         $pdfContent = Browsershot::html($html)->setOption('no-sandbox', true)->pdf();
 
-        return response()->streamDownload(fn() => print($pdfContent), 'invoice.pdf');
+        return response()->streamDownload(fn() => print($pdfContent), 'purchase-invoice.pdf');
     }
 
     public function previewPDF()
     {
-        if (!$this->shipmentId || !$this->customer_id || $this->transactions->isEmpty()) {
+        if (!$this->shipmentId || !$this->vendor_id || $this->transactions->isEmpty()) {
             session()->flash('error', 'No data available for preview.');
             return;
         }
 
         $shipment = Shipment::with('containers')->findOrFail($this->shipmentId);
-        $customer = Customer::findOrFail($this->customer_id);
+        $vendor = Customer::findOrFail($this->vendor_id);
 
-        $data = compact('shipment', 'customer') + [
+        $data = compact('shipment', 'vendor') + [
             'invoice_number' => $this->invoice_number,
             'transactions'   => $this->transactions,
-            'currency'       => $customer->currency,
+            'currency'       => $vendor->currency,
         ];
 
-        $html = view('livewire.accounting.invoice-pdf', $data)->render();
+        $html = view('livewire.accounting.purchase-invoice-pdf', $data)->render();
         $pdfContent = Browsershot::html($html)->setOption('no-sandbox', true)->pdf();
         $this->pdfData = base64_encode($pdfContent);
 
@@ -85,7 +81,7 @@ class SaleInvoice extends Component
 
     public function generateInvoiceNumber()
     {
-        return "INV-BRN-" . now()->format('ymd') . str_pad(Invoice::whereDate('created_at', today())->count() + 1, 3, '0', STR_PAD_LEFT);
+        return "PI-BRN-" . now()->format('ymd') . str_pad(Invoice::whereDate('created_at', today())->count() + 1, 3, '0', STR_PAD_LEFT);
     }
 
     public function setShipmentId($shipmentId)
@@ -94,11 +90,11 @@ class SaleInvoice extends Component
         $this->loadTransactions();
     }
 
-    public function updatedCustomerId()
+    public function updatedVendorId()
     {
-        $customer = Customer::find($this->customer_id);
-        if ($customer) {
-            $this->currency = $customer->currency;
+        $vendor = Customer::find($this->vendor_id);
+        if ($vendor) {
+            $this->currency = $vendor->currency;
         }
         $this->loadTransactions();
         $this->pdfData = '';
@@ -106,8 +102,8 @@ class SaleInvoice extends Component
 
     public function loadTransactions()
     {
-        $this->transactions = ($this->shipmentId && $this->customer_id)
-            ? Transaction::where('shipment_id', $this->shipmentId)->where('customer_id', $this->customer_id)->get()
+        $this->transactions = ($this->shipmentId && $this->vendor_id)
+            ? Transaction::where('shipment_id', $this->shipmentId)->where('vendor_id', $this->vendor_id)->get()
             : collect();
     }
 
@@ -116,7 +112,7 @@ class SaleInvoice extends Component
         $this->validate([
             'invoice_number' => 'nullable|unique:invoices',
             'shipmentId'     => 'required|exists:shipments,id',
-            '   '    => 'required|exists:customers,id',
+            'vendor_id'      => 'required|exists:customers,id',
             'date'           => 'required|date',
             'due_date'       => 'required|date|after_or_equal:date',
             'total_amount'   => 'required|numeric',
@@ -127,7 +123,7 @@ class SaleInvoice extends Component
         $invoice = Invoice::create([
             'invoice_number' => $this->invoice_number,
             'shipment_id'    => $this->shipmentId,
-            'customer_id'    => $this->customer_id,
+            'customer_id'    => $this->vendor_id,
             'date'           => $this->date,
             'due_date'       => $this->due_date,
             'total_amount'   => $this->total_amount,
@@ -137,16 +133,16 @@ class SaleInvoice extends Component
         ]);
 
         Transaction::where('shipment_id', $this->shipmentId)
-            ->where('customer_id', $this->customer_id)
+            ->where('vendor_id', $this->vendor_id)
             ->update(['invoice_id' => $invoice->id]);
 
-        session()->flash('message', 'Sale Invoice created successfully!');
-        return redirect()->route('sale-invoice.show', ['id' => $invoice->id]);
+        session()->flash('message', 'Purchase Invoice created successfully!');
+        return redirect()->route('purchase-invoice.show', ['id' => $invoice->id]);
     }
 
     public function render()
     {
-        return view('livewire.accounting.sale-invoice', [
+        return view('livewire.accounting.purchase-invoice', [
             'invoices'  => Invoice::where('shipment_id', $this->shipmentId)->with(['shipment.containers', 'customer', 'transactions'])->get(),
             'shipments' => $this->shipments,
         ]);

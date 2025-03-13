@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('coa_id')->nullable()->constrained('chart_of_accounts');
+            $table->enum('category', ['creditor', 'debtor']);
             $table->string('name');
             $table->string('country');
             $table->json('roles');
@@ -22,7 +24,6 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamps();
         });
-
     }
 
     /**

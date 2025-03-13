@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 
-use App\Models\Shipments;
+use App\Models\Shipment;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
@@ -11,7 +11,7 @@ class ShipmentImport implements ToModel, WithHeadingRow, WithValidation
 {
     public function model(array $row)
     {
-        return new Shipments([
+        return new Shipment([
             'shipment_id' => $row['bl'] ?? $row['b/l'] ?? null,
             'container_id' => $row['container_id'] ?? null,
             'container_type' => $row['container_type'] ?? null,

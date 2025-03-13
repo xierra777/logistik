@@ -4,7 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Livewire\WithPagination;
-use App\Models\Shipments;
+use App\Models\Shipment;
 use App\Exports\ShipmentExport; // Ensure this class exists in the specified namespace
 use App\Imports\ShipmentImport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -38,7 +38,7 @@ class Shipmment extends Component
 
     public function render()
     {
-        $query = Shipments::query();
+        $query = Shipment::query();
 
         if ($this->start_date && $this->end_date) {
             $query->whereBetween('created_at', [$this->start_date, $this->end_date]);
@@ -49,7 +49,7 @@ class Shipmment extends Component
         return view('livewire.shipmment', compact('shipments'));
     }
 
-     protected $rules = [
+    protected $rules = [
         'file' => 'required|mimes:xlsx,xls,csv'
     ];
     public function downloadExcel()
@@ -75,7 +75,7 @@ class Shipmment extends Component
     public function confirmDelete($get_id)
     {
         try {
-            Shipments::destroy($get_id);
+            Shipment::destroy($get_id);
             session()->flash('message', 'Shipment deleted successfully!');
         } catch (\Exception $e) {
             session()->flash('error', 'Error deleting shipment: ' . $e->getMessage());

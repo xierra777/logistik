@@ -17,12 +17,6 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        .sigma {
-            width: 100%;
-            color: blue;
         }
 
         td,
@@ -42,28 +36,42 @@
     </style>
 </head>
 
-<body>
+<body class="border border-2">
     <!-- Header Section -->
-    <div class="grid grid-cols-2 items-center mb-6">
+    <div class="grid grid-cols-2 items-left">
         <!-- Logo di kiri -->
         <div class="flex justify-start">
             <img src="{{ public_path('images/logo.png') }}" alt="Company Logo" width="150">
         </div>
         <!-- Teks di kanan dengan rata kiri -->
-        <div class="text-left">
-            <h2 class="text-2xl font-bold">PT. BERKAH NUSANTARA INTERNATIONAL</h2>
-            <p>
+        <div class="text-right pt-6">
+            <h2 class="text-orange-500 font-bold">PT. BERKAH NUSANTARA INTERNATIONAL</h2>
+            <p class="text-right">
                 Graha Casablanca, Jl. Casablanca No. 45, Jakarta Selatan<br>
                 021 22837847 | info@bernusa.id
             </p>
         </div>
     </div>
+    <div style="border-bottom: 2px solidrgb(252, 185, 0); width: 100%; height: 50px;"></div>
+
+    <table>
+        <thead>
+            <tr>
+                <th><strong>Invoice No.: </strong></th>
+                <th>{{ $invoice_number }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Client:</strong></td>
+                <td>{{ $customer->name }}</td>
+            </tr>
+        </tbody>
+    </table>
+
     <!-- Invoice Header -->
     <table class="mb-6">
-        <tr>
-            <td><strong>Invoice No.:</strong> {{ $invoice_number }}</td>
-            <td><strong>Client:</strong> {{ $customer->name }}</td>
-        </tr>
+
         <tr>
             <td><strong>MAWB/MBL No.:</strong> {{ $shipment->shipment_id }}</td>
             <td><strong>Date:</strong> {{ \Carbon\Carbon::now()->format('d M Y') }}</td>
@@ -84,8 +92,6 @@
             <td><strong>Port of Discharge:</strong> {{ $shipment->port_of_discharge }}</td>
         </tr>
     </table>
-    <div class="bg-blue-500 w-full h-5"></div>
-    <div id="sigma" class="sigma"> ini divider</div>
 
     <!-- Container Details -->
     <h3 class="text-lg font-bold mb-2">Container Details</h3>

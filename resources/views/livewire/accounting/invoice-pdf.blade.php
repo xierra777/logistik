@@ -44,13 +44,20 @@
 
 <body>
     <!-- Header Section -->
-    <div class="text-center mb-6">
-        <img src="{{ public_path('images/logo.png') }}" alt="Company Logo" width="150">
-        <h2 class="text-2xl font-bold">PT. BERKAH NUSANTARA INTERNATIONAL</h2>
-        <p>Graha Casablanca, Jl. Casablanca No. 45, Jakarta Selatan<br>
-            021 22837847 | info@bernusa.id</p>
+    <div class="grid grid-cols-2 items-center mb-6">
+        <!-- Logo di kiri -->
+        <div class="flex justify-start">
+            <img src="{{ public_path('images/logo.png') }}" alt="Company Logo" width="150">
+        </div>
+        <!-- Teks di kanan dengan rata kiri -->
+        <div class="text-left">
+            <h2 class="text-2xl font-bold">PT. BERKAH NUSANTARA INTERNATIONAL</h2>
+            <p>
+                Graha Casablanca, Jl. Casablanca No. 45, Jakarta Selatan<br>
+                021 22837847 | info@bernusa.id
+            </p>
+        </div>
     </div>
-
     <!-- Invoice Header -->
     <table class="mb-6">
         <tr>
@@ -82,7 +89,7 @@
 
     <!-- Container Details -->
     <h3 class="text-lg font-bold mb-2">Container Details</h3>
-    <table class="mb-6">
+    <table>
         <thead class="bg-gray-200">
             <tr>
                 <th>Container No.</th>
@@ -102,6 +109,8 @@
             @endforeach
         </tbody>
     </table>
+    <div style="border-bottom: 2px solid #000080; width: 100%; height: 50px;"></div>
+
 
     <!-- Transaction Details -->
     <h3 class="text-lg font-bold mb-2">Transaction Details</h3>

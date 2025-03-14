@@ -13,6 +13,8 @@ use App\Livewire\ChartOfAccounts;
 use App\Livewire\Users;
 use App\Livewire\JournalEntries;
 use App\Livewire\Customers\CreateCustomer;
+use App\Livewire\Customers\EditCustomer;
+use App\Livewire\Customers\ViewCustomer;
 use App\Livewire\Customers\ListCustomer;
 use Illuminate\Http\Request;
 
@@ -61,6 +63,16 @@ Route::get('/view-shipments/{id}', ViewShipments::class)->middleware([
     'verified'
 ]);
 Route::get('/edit-shipments/{id}', EditShipments::class)->middleware([
+    'auth',
+    'verified'
+]);
+
+Route::get('/view-customers/{id}', ViewCustomer::class)->middleware([
+    'auth',
+    'verified'
+]);
+
+Route::get('/edit-customers/{id}', EditCustomer::class)->middleware([
     'auth',
     'verified'
 ]);

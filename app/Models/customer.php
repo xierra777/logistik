@@ -13,11 +13,11 @@ class Customer extends Model
     protected $fillable = [
         'name',
         'country',
-        'roles',
         'address',
         'contact',
         'web',
         'email',
+        'roles',
         'coa_id'
     ];
 
@@ -28,7 +28,7 @@ class Customer extends Model
     // Relasi ke Chart of Accounts
     public function coa()
     {
-        return $this->belongsTo(ChartOfAccount::class, 'coa_id');
+        return $this->belongsTo(ChartOfAccount::class);
     }
 
     // Misalnya, jika kamu ingin menentukan kategori customer secara dinamis berdasarkan data COA:

@@ -8,10 +8,28 @@ use App\Models\Container;
 
 class ViewShipments extends Component
 {
-    public $shipment;
     public $editingContainerId = null;
     public $editContainer = [];
     public $newContainer = [];
+    public $shipment;
+    public $shipmentId;
+
+    protected $listeners = ['invoiceGenerated', 'transactionSaved' => 'refreshShipment'];
+
+    public function mount($id)
+    {
+        $this->shipmentId = $id;
+        $this->shipment = Shipment::with(['transactions', 'containers'])->findOrFail($id);
+    }
+
+    public function refreshShipment()
+    {
+        $this->shipment = Shipment::with(['transactions', 'containers', 'invoices'])
+            ->findOrFail($this->shipment->id);
+
+        // Emit ke child component untuk memperbarui datanya
+        $this->dispatch('transaction', 'refreshTransactionData', $this->shipment->transactions);
+    }
 
 
     public $editingContainer = null, $editContainerData = [
@@ -29,14 +47,7 @@ class ViewShipments extends Component
         $this->editingContainer = $id;
         $this->editContainerData = $container->toArray();
     }
-    protected $listeners = ['invoiceGenerated', 'transactionSaved' => 'refreshShipment'];
 
-
-    public function refreshShipment()
-    {
-        $this->shipment = Shipment::with(['transactions', 'containers', 'invoices'])
-            ->findOrFail($this->shipment->id);
-    }
     public function updateContainer()
     {
         $this->validate([
@@ -52,11 +63,9 @@ class ViewShipments extends Component
 
         $this->editingContainer = null;
         $this->editContainerData = [];
+        $this->refreshShipment(); // Tambahkan refresh setelah update
+
         $this->dispatch('swal', ['title' => 'Updated!', 'icon' => 'success']);
-    }
-    public function mount($id)
-    {
-        $this->shipment = Shipment::with(['transactions', 'containers'])->findOrFail($id);
     }
 
     public function resetEditing()
@@ -68,7 +77,7 @@ class ViewShipments extends Component
     public function deleteContainer($containerId)
     {
         Container::findOrFail($containerId)->delete();
-        $this->refreshShipment();
+        $this->refreshShipment(); // Perbarui data shipment setelah delete
         session()->flash('success', 'Container deleted successfully.');
     }
 
@@ -83,9 +92,10 @@ class ViewShipments extends Component
             'newContainer.measurement'    => 'required|max:255',
         ]);
 
-        Container::create(array_merge(['shipment_id' => $this->shipment->id], $this->newContainer));
+        Container::create(array_merge(['shipment_id' => $this->shipmentId], $this->newContainer));
 
         $this->resetNewContainer();
+        $this->refreshShipment(); // Tambahkan refresh setelah create
         session()->flash('success', 'Container created successfully.');
     }
 
@@ -103,6 +113,8 @@ class ViewShipments extends Component
 
     public function render()
     {
-        return view('livewire.view-shipments');
+        return view('livewire.view-shipments', [
+            'shipmentId' => $this->shipmentId, // Kirim ke blade
+        ]);
     }
 }

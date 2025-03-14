@@ -122,7 +122,7 @@
         </div>
     </div>
     <pre>{{ $pdfData ? 'PDF Generated' : 'No PDF Data' }}</pre>
-    <a href="" class="bg-gray-600 text-white px-4 py-2 rounded-lg">
+    <a wire:navigate href="/view-shipments/{{ $shipmentId }}" class="py-3 px-4 bg-blue-600 text-white rounded-lg">
         Back
     </a>
     @if(session()->has('error'))

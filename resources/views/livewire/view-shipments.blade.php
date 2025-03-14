@@ -162,135 +162,108 @@
             </tbody>
         </table>
     </div>
-
-
+    <pre>{{ var_dump($shipmentId) }}</pre>
 
     <div class="border rounded-lg overflow-hidden">
-        <div x-data="{ open: false }"
-            @close-modal.window="open = false">
-            <div class="flex justify-end mb-4 p-4">
-                <a href="{{ route('sale-invoice', ['shipmentId' => $shipment->id]) }}" class="py-3 px-4 mr-4 bg-green-500 text-white rounded ">
-                    Invoice
-                </a>
-                <a href="{{ route('purchase-invoice', ['shipmentId' => $shipment->id]) }}" class="p-4 bg-red-500 text-white rounded-lg mr-4">Print PI </a>
-                <button @click=" open = true " class="py-3 px-4 bg-blue-600 text-white rounded-lg" @open-transaction-modal.window="open = true; Livewire.dispatch('reloadTransactionData', { shipmentId: '{{ $shipment->id }}' })">
-                    Add Cost
-                </button>
 
-            </div>
+        <div class="border rounded-lg overflow-hidden">
+            <div x-data="{ open: false }" @close-modal.window="open = false"
+                x-ref="modalContent">
+                <div class=" flex justify-end mb-4 p-4">
+                    <a href="{{ route('sale-invoice', ['shipmentId' => $shipment->id]) }}" class="py-3 px-4 mr-4 bg-green-500 text-white rounded">
+                        Invoice
+                    </a>
+                    <a href="{{ route('purchase-invoice', ['shipmentId' => $shipment->id]) }}" class="p-4 bg-red-500 text-white rounded-lg mr-4">
+                        Print PI
+                    </a>
+                    <button @click="open = true; $dispatch('reloadTransactionData', { shipmentId: '{{ $shipment->id }}' })"
+                        class="py-3 px-4 bg-blue-600 text-white rounded-lg">
+                        Add Cost
+                    </button>
+                </div>
 
-            <!-- Background Overlay -->
-            <div x-cloak x-show="open"
-                x-transition:enter="transition ease-out duration-300 delay-150"
-                x-transition:leave="transition ease-in duration-200"
-                class="fixed inset-0 bg-gray-500 bg-opacity-50 pointer-events-none z-40">
-            </div>
+                <!-- Background Overlay -->
+                <div x-cloak x-show="open"
+                    x-transition:enter="transition ease-out duration-300 delay-150"
+                    x-transition:leave="transition ease-in duration-200"
+                    class="fixed inset-0 bg-gray-500 bg-opacity-50 z-40">
+                </div>
 
-            <!-- Modal Container -->
-            <div x-cloak x-show="open"
-                x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="scale-90 opacity-0"
-                x-transition:enter-end="scale-100 opacity-100"
-                x-transition:leave="transition ease-in duration-200"
-                x-transition:leave-start="scale-100 opacity-100"
-                x-transition:leave-end="scale-90 opacity-0"
-                class="fixed inset-0 flex items-center justify-center z-50 pointer-events-auto px-4">
-                <div class="bg-white rounded-lg shadow-md w-full max-w-7,5sxl ">
-                    <!-- Modal Header -->
-                    <div class="flex justify-between items-center p-4 border-b">
-                        <h2 class="text-lg font-semibold text-gray-800">Costing</h2>
-                        <button @click="open = false" class="text-gray-400 hover:text-gray-600 focus:outline-none">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
+                <!-- Modal Container -->
+                <div x-cloak x-show="open"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="scale-90 opacity-0"
+                    x-transition:enter-end="scale-100 opacity-100"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="scale-100 opacity-100"
+                    x-transition:leave-end="scale-90 opacity-0"
+                    class="fixed inset-0 flex items-center justify-center z-50 px-4">
+                    <div class="bg-white rounded-lg shadow-md w-full max-w-7.5xl">
+                        <!-- Modal Header -->
+                        <div class="flex justify-between items-center p-4 border-b">
+                            <h2 class="text-lg font-semibold text-gray-800">Costing</h2>
+                            <button @click="open = false" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <!-- Form -->
+                        @livewire('accounting.tranksaksi', ['shipmentId' => $shipment->id], key('transaction-' . $shipment->id))
+                        <!-- End Form -->
                     </div>
-                    <!-- Form -->
-                    @livewire('accounting.tranksaksi', ['shipmentId' => $shipment->id], key('tranksaksi-' . $shipment->id))
-                    <!-- End Form -->
                 </div>
             </div>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
-                <thead class="divide-y divide-gray-200 dark:divide-neutral-700">
-                    <tr class="divide-x divide-gray-200 dark:divide-neutral-700">
-                        <th scope="col" class="p-3 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Edit</th>
-                        <th scope="col" class="p-4 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Line No</th>
-                        <th scope="col" class="p-6 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Description</th>
-                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Unit</th>
-                        <th scope="col" class="px-6 py-3 bg-orange-500 text-center text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Client</th>
-                        <th scope="col" class="px-6 py-3 bg-orange-500 text-center text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Sale</th>
-                        <th scope="col" class="px-6 py-3 bg-orange-500 text-center text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Amount (IDR)</th>
-                        <th scope="col" class="px-6 py-3 bg-orange-500 text-center text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Dr/Cr</th>
-                        <th scope="col" class="px-6 py-3 bg-blue-500 text-center text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Vendor</th>
-                        <th scope="col" class="px-6 py-3 bg-blue-500 text-center text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Cost</th>
-                        <th scope="col" class="px-6 py-3 bg-blue-500 text-center text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Amount (IDR)</th>
-                        <th scope="col" class="px-6 py-3 bg-blue-500 text-center text-xs font-medium text-gray-100 uppercase dark:text-neutral-500">Dr/Cr</th>
-                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Freight</th>
-                        <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase dark:text-neutral-500">Gross Profit</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 dark:divide-neutral-700">
-                    @forelse($shipment->transactions as $transaction)
-                    <tr class="hover:bg-gray-100 dark:hover:bg-neutral-700 divide-x divide-gray-200 dark:divide-neutral-700">
-                        <td class="px-6 py-4 text-center text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            <button class="w-10 h-10 rounded-xl">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </button>
-                        </td>
-                        <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $loop->iteration * 10 }}
-                        </td>
-                        <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->description ?? '' }}
-                        </td>
-                        <td class="px-6 py-4 text-center text-xs font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->unit ?? '' }}
-                        </td>
-                        <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">
-                            {{ $transaction->sclient ?? '' }}
-                        </td>
-                        <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">
-                            {{ $transaction->sale ?? '' }}
-                        </td>
-                        <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">
-                            {{ $transaction->samountidr ?? '' }}
-                        </td>
-                        <td class="px-6 py-4 text-center text-xs font-medium bg-orange-500 text-gray-100 dark:text-neutral-200">
-                            {{ $transaction->sdrcr ?? '' }}
-                        </td>
-                        <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">
-                            {{ $transaction->cvendor ?? '' }}
-                        </td>
-                        <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">
-                            {{ $transaction->cost ?? '' }}
-                        </td>
-                        <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">
-                            {{ $transaction->camountidr ?? '' }}
-                        </td>
-                        <td class="px-6 py-4 text-center text-sm font-medium bg-blue-500 text-gray-100 dark:text-neutral-200">
-                            {{ $transaction->cdrcr ?? '' }}
-                        </td>
-                        <td class="px-6 py-4 text-center text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->freight ?? '' }}
-                        </td>
-                        <td class="px-6 py-4 text-center text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->sgrossprofit ?? '' }}
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="14" class="bg-cya-500 text-white p-4">
-                            <div class="flex items-center justify-center h-full">
-                                Tidak ada transaksi.
-                            </div>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
+                    <thead class="divide-y divide-gray-200 dark:divide-neutral-700">
+                        <tr class="divide-x divide-gray-200 dark:divide-neutral-700">
+                            <th class="p-3 text-center text-xs font-medium text-gray-500 uppercase">Edit</th>
+                            <th class="p-4 text-center text-xs font-medium text-gray-500 uppercase">Line No</th>
+                            <th class="p-6 text-center text-xs font-medium text-gray-500 uppercase">Description</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Unit</th>
+                            <th class="px-6 py-3 bg-orange-500 text-center text-xs font-medium text-gray-100 uppercase">Client</th>
+                            <th class="px-6 py-3 bg-orange-500 text-center text-xs font-medium text-gray-100 uppercase">Sale</th>
+                            <th class="px-6 py-3 bg-orange-500 text-center text-xs font-medium text-gray-100 uppercase">Amount (IDR)</th>
+                            <th class="px-6 py-3 bg-orange-500 text-center text-xs font-medium text-gray-100 uppercase">Dr/Cr</th>
+                            <th class="px-6 py-3 bg-blue-500 text-center text-xs font-medium text-gray-100 uppercase">Vendor</th>
+                            <th class="px-6 py-3 bg-blue-500 text-center text-xs font-medium text-gray-100 uppercase">Cost</th>
+                            <th class="px-6 py-3 bg-blue-500 text-center text-xs font-medium text-gray-100 uppercase">Amount (IDR)</th>
+                            <th class="px-6 py-3 bg-blue-500 text-center text-xs font-medium text-gray-100 uppercase">Dr/Cr</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Freight</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Gross Profit</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-neutral-700">
+                        @forelse($shipment->transactions as $transaction)
+                        <tr class="hover:bg-gray-100 dark:hover:bg-neutral-700 divide-x divide-gray-200">
+                            <td class="px-6 py-4 text-center">
+                                <button class="w-10 h-10 rounded-xl" @click="$dispatch('editTransaction', { id: {{ $transaction->id }} })">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                            </td>
+                            <td class="px-6 py-4 text-center">{{ $loop->iteration }}</td>
+                            <td class="px-6 py-4 text-center">{{ $transaction->description ?? '' }}</td>
+                            <td class="px-6 py-4 text-center">{{ $transaction->unit ?? '' }}</td>
+                            <td class="px-6 py-4 text-center bg-orange-500 text-gray-100">{{ $transaction->sclient ?? '' }}</td>
+                            <td class="px-6 py-4 text-center bg-orange-500 text-gray-100">{{ $transaction->sale ?? '' }}</td>
+                            <td class="px-6 py-4 text-center bg-orange-500 text-gray-100">{{ $transaction->samountidr ?? '' }}</td>
+                            <td class="px-6 py-4 text-center bg-orange-500 text-gray-100">{{ $transaction->sdrcr ?? '' }}</td>
+                            <td class="px-6 py-4 text-center bg-blue-500 text-gray-100">{{ $transaction->cvendor ?? '' }}</td>
+                            <td class="px-6 py-4 text-center bg-blue-500 text-gray-100">{{ $transaction->cost ?? '' }}</td>
+                            <td class="px-6 py-4 text-center bg-blue-500 text-gray-100">{{ $transaction->camountidr ?? '' }}</td>
+                            <td class="px-6 py-4 text-center bg-blue-500 text-gray-100">{{ $transaction->cdrcr ?? '' }}</td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="14" class="bg-cyan-500 text-white p-4 text-center">Tidak ada transaksi.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

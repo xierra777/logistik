@@ -1,5 +1,7 @@
 <form wire:submit.prevent="save" class="py-5 px-3 max-h-[80vh] overflow-y-auto space-y-3  [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:hidden">
     <!-- Charge Section -->
+    <pre>{{ var_dump($shipmentId) }}</pre>
+
     <div class="bg-white">
         <!-- Heading Bar -->
         <div class="bg-green-600 p-3 rounded-t-xl">
@@ -156,13 +158,13 @@
         <!-- Sale Form -->
         <div class="space-y-1.5 p-4 border border-gray-200 rounded-b-md shadow-xl">
             <!-- Row 1: Client, Currency, Exchange Rate -->
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-3 gap-4" wire:ignore>
                 <div class="mb-4">
                     <label class="block font-medium">Pilih Client</label>
                     <select wire:model="sclient" class="w-full border rounded-md border-gray-300 p-2">
                         <option value="">-- Pilih Client --</option>
                         @foreach($clients ?? [] as $client)
-                        <option value="{{ $client->id }}">{{ $client->name }}</option>
+                        <option wire:key="{{$client}}" value="{{ $client->id }}">{{ $client->name }}</option>
                         @endforeach
                     </select>
                     @error('sclient') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -376,7 +378,7 @@
                     <select wire:model="cvendor" class="w-full border rounded-md border-gray-300 p-2">
                         <option value="">-- Pilih Vendor --</option>
                         @foreach($vendors ?? [] as $vendor)
-                        <option value="{{ $vendor->id }}">{{ $vendor->name }}</option>
+                        <option wire:key="{{$vendor}}" value="{{ $vendor->id }}">{{ $vendor->name }}</option>
                         @endforeach
                     </select>
                     @error('vendor') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -518,10 +520,10 @@
     </div>
     <!-- Modal Footer (Buttons) -->
     <div class="flex justify-end mt-4 gap-2 p-4 border-t color-gray-200">
-        <button type="button" @click="open = false" class="px-4 py-2 bg-gray-500 text-white rounded-lg">
+        <button type="button" @click="open = false" class="px-4 py-2 bg-gray-500 text-white rounded-lg" @click="$refs.modalContent.scrollTo({ top: 0, behavior: 'smooth' })">
             Cancel
         </button>
-        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg" @click="$refs.modalContent.scrollTo({ top: 0, behavior: 'smooth' })">
             Save
         </button>
     </div>

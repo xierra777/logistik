@@ -11,13 +11,16 @@ class shipment extends Model
 
     protected $fillable = [
         'shipment_id',
+        'shipment_no',
         'shipper',
         'consignee',
         'notify',
+        'estimearrival',
+        'estimedelivery',
         'ocean_vessel_feeder',
         'ocean_vessel_mother',
         'port_of_discharge',
-        'combined_transport',
+        'place_of_receipt',
         'port_of_loading',
         'description',
     ];

@@ -4,53 +4,72 @@
             {{ __('Data Shipments') }}
         </h2>
     </x-slot>
-    <div class="mb-4 text-center grid grid-cols-1">
-        <span class="font-bold bg-gray-200 px-4 py-2">MAWB/MBL No. :</span>
-        <span class="bg-white px-4 py-2">{{ $shipment->shipment_id ?? 'N/A' }}</span>
+    <div>
+        <div class="flex justify-end p-2">
+            <button wire:click="create" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">HBL</button>
+        </div>
+        <div class="mb-4 text-center grid grid-cols-1">
+            <span class="font-bold bg-gray-200 px-4 py-2">No Job</span>
+            <span class="bg-white px-4 py-2">{{ $shipment->shipment_no ?? 'N/A' }}</span>
+        </div>
+
+        <!-- Grid data dengan 3 kolom (total 9 item) -->
+        <div class="grid grid-cols-3">
+            <!-- Baris 1 -->
+            <div class="flex flex-col">
+                <span class="font-bold bg-gray-200 px-4 py-2">MAWB/MBL</span>
+                <span class="bg-white px-4 py-2">{{ $shipment->shipment_id ?? 'N/A' }}</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-bold bg-gray-200 px-4 py-2">ETA / Estimate time arrival</span>
+                <span class="bg-white px-4 py-2">{{ $shipment->estimearrival ?? 'N/A' }}</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-bold bg-gray-200 px-4 py-2">ETA / Estimate time Departure</span>
+                <span class="bg-white px-4 py-2">{{ $shipment->estimedelivery ?? 'N/A' }}</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-bold bg-gray-200 px-4 py-2">Shipper</span>
+                <span class="bg-white px-4 py-2">{{ $shipment->shipper ?? 'N/A' }}</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-bold bg-gray-200 px-4 py-2">Consignee</span>
+                <span class="bg-white px-4 py-2">{{ $shipment->consignee ?? 'N/A' }}</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-bold bg-gray-200 px-4 py-2">Notify</span>
+                <span class="bg-white px-4 py-2">{{ $shipment->notify ?? 'N/A' }}</span>
+            </div>
+            <!-- Baris 2 -->
+            <div class="flex flex-col">
+                <span class="font-bold bg-gray-200 px-4 py-2">Port of Discharge</span>
+                <span class="bg-white px-4 py-2">{{ $shipment->port_of_discharge ?? 'N/A' }}</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-bold bg-gray-200 px-4 py-2">Place Of Reciept</span>
+                <span class="bg-white px-4 py-2">{{ $shipment->place_of_receipt ?? 'N/A' }}</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-bold bg-gray-200 px-4 py-2">Port of Loading</span>
+                <span class="bg-white px-4 py-2">{{ $shipment->port_of_loading ?? 'N/A' }}</span>
+            </div>
+            <!-- Baris 3 -->
+            <div class="flex flex-col">
+                <span class="font-bold bg-gray-200 px-4 py-2">Ocean Vessel Mother</span>
+                <span class="bg-white px-4 py-2">{{ $shipment->ocean_vessel_mother ?? 'N/A' }}</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-bold bg-gray-200 px-4 py-2">Description</span>
+                <span class="bg-white px-4 py-2">{{ $shipment->description ?? 'N/A' }}</span>
+            </div>
+            <div class="flex flex-col">
+                <span class="font-bold bg-gray-200 px-6 py-2">...</span>
+                <span class="bg-white px-4 py-2"></span>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Grid data dengan 3 kolom (total 9 item) -->
-    <div class="grid grid-cols-3">
-        <!-- Baris 1 -->
-        <div class="flex flex-col">
-            <span class="font-bold bg-gray-200 px-4 py-2">Shipper</span>
-            <span class="bg-white px-4 py-2">{{ $shipment->shipper ?? 'N/A' }}</span>
-        </div>
-        <div class="flex flex-col">
-            <span class="font-bold bg-gray-200 px-4 py-2">Consignee</span>
-            <span class="bg-white px-4 py-2">{{ $shipment->consignee ?? 'N/A' }}</span>
-        </div>
-        <div class="flex flex-col">
-            <span class="font-bold bg-gray-200 px-4 py-2">Notify</span>
-            <span class="bg-white px-4 py-2">{{ $shipment->notify ?? 'N/A' }}</span>
-        </div>
-        <!-- Baris 2 -->
-        <div class="flex flex-col">
-            <span class="font-bold bg-gray-200 px-4 py-2">Ocean Vessel Feeder</span>
-            <span class="bg-white px-4 py-2">{{ $shipment->ocean_vessel_feeder ?? 'N/A' }}</span>
-        </div>
-        <div class="flex flex-col">
-            <span class="font-bold bg-gray-200 px-4 py-2">Ocean Vessel Mother</span>
-            <span class="bg-white px-4 py-2">{{ $shipment->ocean_vessel_mother ?? 'N/A' }}</span>
-        </div>
-        <div class="flex flex-col">
-            <span class="font-bold bg-gray-200 px-4 py-2">Port of Discharge</span>
-            <span class="bg-white px-4 py-2">{{ $shipment->port_of_discharge ?? 'N/A' }}</span>
-        </div>
-        <!-- Baris 3 -->
-        <div class="flex flex-col">
-            <span class="font-bold bg-gray-200 px-4 py-2">Combined Transport</span>
-            <span class="bg-white px-4 py-2">{{ $shipment->combined_transport ?? 'N/A' }}</span>
-        </div>
-        <div class="flex flex-col">
-            <span class="font-bold bg-gray-200 px-4 py-2">Port of Loading</span>
-            <span class="bg-white px-4 py-2">{{ $shipment->port_of_loading ?? 'N/A' }}</span>
-        </div>
-        <div class="flex flex-col">
-            <span class="font-bold bg-gray-200 px-4 py-2">Description</span>
-            <span class="bg-white px-4 py-2">{{ $shipment->description ?? 'N/A' }}</span>
-        </div>
-    </div>
 
 
 

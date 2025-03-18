@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('ocean_vessel_feeder')->nullable();
             $table->string('ocean_vessel_mother')->nullable();
             $table->string('port_of_discharge')->nullable();
-            $table->string('combined_transport')->nullable();
+            $table->string('place_of_receipt')->nullable();
             $table->string('port_of_loading')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();

@@ -100,14 +100,29 @@
 
     <!-- Buttons -->
     <div class="mt-4 flex gap-2">
-        <button wire:click="save" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-            Save Invoice
+        <button
+            wire:click="generatePDF"
+            wire:loading.attr="disabled"
+            wire:target="generatePDF"
+            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+            <span wire:loading.remove wire:target="generatePDF">
+                Print Invoice for Selected Customer
+            </span>
+            <span wire:loading wire:target="generatePDF">
+                Processing...
+            </span>
         </button>
-        <button wire:click="generatePDF" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-            Print Invoice for Selected Customer
-        </button>
-        <button wire:click="previewPDF" class="bg-yellow-600 text-white px-4 py-2 rounded-lg">
-            Preview Invoice
+        <button
+            wire:click="previewPDF"
+            wire:loading.attr="disabled"
+            wire:target="previewPDF"
+            class="bg-yellow-600 text-white px-4 py-2 rounded-lg">
+            <span wire:loading.remove wire:target="previewPDF">
+                Preview Invoice
+            </span>
+            <span wire:loading wire:target="previewPDF">
+                Loading...
+            </span>
         </button>
     </div>
     <div x-data="{ open: false, pdfSrc: '', loading: false }" x-cloak
@@ -121,10 +136,14 @@
             </div>
         </div>
     </div>
-    <pre>{{ $pdfData ? 'PDF Generated' : 'No PDF Data' }}</pre>
-    <a wire:navigate href="/view-shipments/{{ $shipmentId }}" class="py-3 px-4 bg-blue-600 text-white rounded-lg">
-        Back
-    </a>
+    <div class="flex justify-end">
+        <a wire:navigate href="/view-shipments/{{ $shipmentId }}" class="py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg 
+               transform transition duration-200 ease-in-out shadow:hover-cyan-200
+               hover:bg-cyan-400 hover:scale-100  ">
+            Back
+        </a>
+    </div>
+
     @if(session()->has('error'))
     <div class="mt-4 p-2 bg-red-200 text-red-800 rounded-lg">
         {{ session('error') }}

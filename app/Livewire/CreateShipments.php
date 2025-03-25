@@ -46,7 +46,7 @@ class CreateShipments extends Component
         }
         // Inisialisasi minimal dengan satu baris container
         $this->containers = [
-            ['container_id' => '', 'container_type' => '', 'container_seal' => '', 'gross_weight' => '', 'pack_type' => '', 'measurement' => '', 'pcs' => '', 'unit' => '',]
+            ['container_id' => '', 'container_type' => '', 'container_seal' => '', 'gross_weight' => '', 'pack_type' => '', 'measurement' => '', 'pcs' => '', 'unit' => '', 'volume_weight' => '', 'chargeable_weight' => ''],
         ];
     }
 
@@ -56,7 +56,7 @@ class CreateShipments extends Component
     }
     public function addContainer()
     {
-        $this->containers[] = ['container_id' => '', 'container_type' => '', 'container_seal' => '', 'gross_weight' => '', 'pack_type' => '', 'measurement' => '', 'pcs' => '', 'unit' => '',];
+        $this->containers[] = ['container_id' => '', 'container_type' => '', 'container_seal' => '', 'gross_weight' => '', 'pack_type' => '', 'measurement' => '', 'pcs' => '', 'unit' => '', 'volume_weight' => '', 'chargeable_weight' => ''];
     }
 
     public function removeContainer($index)
@@ -106,6 +106,8 @@ class CreateShipments extends Component
                 "containers.$index.unit"          => 'required|max:255',
                 "containers.$index.pack_type"     => 'required|max:255',
                 "containers.$index.measurement"   => 'max:255',
+                "containers.$index.volume_weight"   => 'max:255',
+                "containers.$index.chargeable_weight"   => 'max:255',
             ]);
         }
 
@@ -125,6 +127,8 @@ class CreateShipments extends Component
                     'unit'           => $container['unit'],
                     'gross_weight'   => $container['gross_weight'],
                     'pack_type'      => $container['pack_type'],
+                    'volume_weight'      => $container['volume_weight'],
+                    'chargeable_weight'      => $container['chargeable_weight'],
                 ]);
             }
 

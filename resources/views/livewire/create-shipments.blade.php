@@ -193,7 +193,7 @@
         <h3 class="text-lg font-semibold mb-4">Containers</h3>
         @foreach($containers as $index => $container)
         <div class="mb-4 p-4 border rounded-md">
-          <div class="grid grid-cols-4 gap-4">
+          <div class="grid grid-cols-5 gap-2">
             <!-- Kolom 1: Container ID -->
             <div>
               <label class="block text-sm font-medium text-gray-700">Container ID:</label>
@@ -252,11 +252,27 @@
               <span class="text-red-500 text-sm">{{ $message }}</span>
               @enderror
             </div>
-            <!-- Kolom 3: Measurement -->
+            <!-- Kolom 4: Unit -->
             <div>
               <label class="block text-sm font-medium text-gray-700">Unit:</label>
               <input type="text" name="unit" wire:model="containers.{{ $index }}.unit" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
               @error("containers.$index.unit")
+              <span class="text-red-500 text-sm">{{ $message }}</span>
+              @enderror
+            </div>
+            <!-- Kolom 5: volume_weight -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">V. Weight:</label>
+              <input type="text" name="unit" wire:model="containers.{{ $index }}.volume_weight" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+              @error("containers.$index.volume_weight")
+              <span class="text-red-500 text-sm">{{ $message }}</span>
+              @enderror
+            </div>
+            <!-- Kolom 5: chargeable_weight -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">C. Weight:</label>
+              <input type="text" name="unit" wire:model="containers.{{ $index }}.chargeable_weight" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+              @error("containers.$index.chargeable_weight")
               <span class="text-red-500 text-sm">{{ $message }}</span>
               @enderror
             </div>

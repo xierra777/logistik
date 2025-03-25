@@ -1,6 +1,5 @@
 <form wire:submit.prevent="save" class="py-5 px-3 max-h-[80vh] overflow-y-auto space-y-3  [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:hidden">
     <!-- Charge Section -->
-    <pre>{{ var_dump($shipmentId) }}</pre>
 
     <div class="bg-white">
         <!-- Heading Bar -->

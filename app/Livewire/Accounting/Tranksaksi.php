@@ -49,7 +49,6 @@ class Tranksaksi extends Component
         $this->shipmentId = $shipmentId;
         $customers = Customer::orderBy('name')->get();
 
-        // Filter customers berdasarkan kategori
         $this->vendors = $customers->where('category', 'CR');
         $this->clients = $customers->where('category', 'DR');
     }

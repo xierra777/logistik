@@ -279,9 +279,8 @@
                         <p class="text-left col-span-2">: BMRIIDJAXXX</p>
                     </div>
                 </div>
-                @if($customer->country == 'ID - Indonesia')
-                <p class="font-semibold italic mt-1">Payment Term 30 Days After Invoice Received</p>
-                @endif
+                <p class="font-semibold italic mt-1"> Payment Term 30 Days After Invoice received</p>
+
             </div>
         </div>
     </div>

@@ -88,5 +88,16 @@
     @endif
 
     <button wire:click="previewPDF" class="bg-yellow-500 text-white p-2 rounded mt-4">Preview Invoice</button>
-    <button wire:click="save" class="bg-blue-500 text-white p-2 rounded mt-4">Save Invoice</button>
+    <button wire:click="generatePDF" class="bg-blue-500 text-white p-2 rounded mt-4">Save Invoice</button>
+    <div x-data="{ open: false, pdfSrc: '', loading: false }" x-cloak
+        @open-pdf-preview.window="loading = true; open = true; pdfSrc = $event.detail.pdf; console.log('PDF Loaded:', pdfSrc); setTimeout(() => loading = false, 1000);">
+        <div x-show="open" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center z-50">
+            <div class="bg-white p-4 rounded-lg max-w-4xl w-full">
+                <div class="flex justify-end">
+                    <button @click="open = false" class="bg-red-600 text-white px-4 py-2 rounded">Close</button>
+                </div>
+                <iframe src="data:application/pdf;base64,{{ $pdfData }}" class="w-full h-[600px]"></iframe>
+            </div>
+        </div>
+    </div>
 </div>

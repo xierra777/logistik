@@ -27,13 +27,16 @@
                     <span class="sr-only">Choose Excel file</span>
                     <input type="file" wire:model="file"
                         class="block w-full text-sm text-gray-500
-                                  file:me-4 file:py-2 file:px-4
-                                  file:rounded-lg file:border-0
-                                  file:text-sm file:font-semibold
-                                  file:bg-blue-600 file:text-white
-                                  hover:file:bg-blue-700 file:disabled:opacity-50 file:disabled:pointer-events-none
-                                  dark:file:bg-neutral-700 dark:file:text-neutral-300">
+                       file:me-4 file:py-2 file:px-4
+                       file:rounded-lg file:border-0
+                       file:text-sm file:font-semibold
+                       file:bg-blue-600 file:text-white
+                       hover:file:bg-blue-700 file:disabled:opacity-50 file:disabled:pointer-events-none
+                       dark:file:bg-neutral-700 dark:file:text-neutral-300">
                 </label>
+                @error('file')
+                <span class="text-red-500 text-xs">{{ $message }}</span>
+                @enderror
                 @error('file')
                 <span class="text-red-500 text-xs">{{ $message }}</span>
                 @enderror
@@ -41,8 +44,10 @@
                     class="mt-3 py-2 px-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
                     Import Excel
                 </button>
+                <span wire:loading wire:target="file">sabar..</span>
             </form>
         </div>
+
 
         <!-- Status Messages -->
         @if(session('message'))

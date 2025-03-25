@@ -7,12 +7,15 @@ use App\Models\{Customer, Container, Invoice, Transaction, Shipment};
 use Barryvdh\DomPDF\Facade\Pdf;
 use Spatie\Browsershot\Browsershot;
 use Illuminate\Support\Facades\View;
+use carbon\Carbon;
 
 class PurchaseInvoice extends Component
 {
     public $invoice_number, $shipmentId, $vendor_id, $date, $due_date, $total_amount = 0;
     public $status = 'Unpaid', $notes, $currency, $pdfData = '';
     public $shipments, $vendors, $transactions, $containers;
+    public $totalPcs = 0;
+    public $totalgw = 0;
 
     protected $listeners = ['setShipmentId'];
 
@@ -37,25 +40,34 @@ class PurchaseInvoice extends Component
     public function generatePDF()
     {
         if (!$this->shipmentId || !$this->vendor_id || $this->transactions->isEmpty()) {
-            session()->flash('error', 'Incomplete data for PDF generation.');
+            session()->flash('error', 'Pilih shipment dan customer yang valid terlebih dahulu.');
             return;
         }
 
-        $shipment = Shipment::with('containers')->findOrFail($this->shipmentId);
-        $vendor = Customer::findOrFail($this->vendor_id);
 
-        $data = compact('shipment', 'vendor') + [
+        $shipment = Shipment::with('containers')->findOrFail($this->shipmentId);
+        $customer = Transaction::findOrFail($this->vendor_id);
+        $totalPcs = $shipment->containers->sum('pcs');
+
+        $data = compact('shipment', 'customer') + [
             'invoice_number' => $this->invoice_number,
             'transactions'   => $this->transactions,
-            'currency'       => $vendor->currency,
+            'totalPcs'       => $this->totalPcs,
+            'currency'       => $customer->currency,
         ];
+        $now = Carbon::now(); // mendapatkan instance Carbon untuk tanggal dan waktu saat ini
+        echo $now->format('d-m-Y'); // misal: "24-03-2025"
+        $html = view('livewire.accounting.invoice-pdf', $data)->render();
 
-        $html = view('livewire.accounting.purchase-invoice-pdf', $data)->render();
-        $pdfContent = Browsershot::html($html)->setOption('no-sandbox', true)->pdf();
+        $pdfContent = Browsershot::html($html)
+            ->setOption('no-sandbox', true)
+            ->format('A3')
+            ->margins(5, 5, 5, 5)
+            ->showBackground()
+            ->pdf();
 
-        return response()->streamDownload(fn() => print($pdfContent), 'purchase-invoice.pdf');
+        return response()->streamDownload(fn() => print($pdfContent), "Invoice-{$this->invoice_number}.pdf");
     }
-
     public function previewPDF()
     {
         if (!$this->shipmentId || !$this->vendor_id || $this->transactions->isEmpty()) {
@@ -64,16 +76,26 @@ class PurchaseInvoice extends Component
         }
 
         $shipment = Shipment::with('containers')->findOrFail($this->shipmentId);
-        $vendor = Customer::findOrFail($this->vendor_id);
+        $customer = Customer::findOrFail($this->vendor_id);
+        $totalPcs = $shipment->containers->sum('pcs');
+        $totalgw = $shipment->containers->sum('gross_weight');
 
-        $data = compact('shipment', 'vendor') + [
+
+        $data = compact('shipment', 'customer') + [
             'invoice_number' => $this->invoice_number,
             'transactions'   => $this->transactions,
-            'currency'       => $vendor->currency,
+            'totalPcs'  => $this->totalPcs,
+            'totalgw'  => $this->totalgw,
+            'currency'       => $customer->currency,
         ];
 
-        $html = view('livewire.accounting.purchase-invoice-pdf', $data)->render();
-        $pdfContent = Browsershot::html($html)->setOption('no-sandbox', true)->pdf();
+        $html = view('livewire.accounting.invoice-pdf', $data)->render();
+        $pdfContent = Browsershot::html($html)
+            ->setOption('no-sandbox', true)
+            ->format('A3')
+            ->margins(5, 5, 5, 5)
+            ->showBackground()
+            ->pdf();
         $this->pdfData = base64_encode($pdfContent);
 
         $this->dispatch('open-pdf-preview', pdf: 'data:application/pdf;base64,' . $this->pdfData);
@@ -107,38 +129,7 @@ class PurchaseInvoice extends Component
             : collect();
     }
 
-    public function save()
-    {
-        $this->validate([
-            'invoice_number' => 'nullable|unique:invoices',
-            'shipmentId'     => 'required|exists:shipments,id',
-            'vendor_id'      => 'required|exists:customers,id',
-            'date'           => 'required|date',
-            'due_date'       => 'required|date|after_or_equal:date',
-            'total_amount'   => 'required|numeric',
-            'status'         => 'required|in:Unpaid,Paid,Overdue',
-            'notes'          => 'nullable|string',
-        ]);
 
-        $invoice = Invoice::create([
-            'invoice_number' => $this->invoice_number,
-            'shipment_id'    => $this->shipmentId,
-            'customer_id'    => $this->vendor_id,
-            'date'           => $this->date,
-            'due_date'       => $this->due_date,
-            'total_amount'   => $this->total_amount,
-            'status'         => $this->status,
-            'notes'          => $this->notes,
-            'currency'       => $this->currency,
-        ]);
-
-        Transaction::where('shipment_id', $this->shipmentId)
-            ->where('vendor_id', $this->vendor_id)
-            ->update(['invoice_id' => $invoice->id]);
-
-        session()->flash('message', 'Purchase Invoice created successfully!');
-        return redirect()->route('purchase-invoice.show', ['id' => $invoice->id]);
-    }
 
     public function render()
     {

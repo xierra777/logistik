@@ -7,5 +7,7 @@
         </x-slot>
         <h1>Selamat datang</h1>
         <p>dilayanan bernusa</p>
+        <h1 class="font-[Papyrus] text-3xl">Judul Pakai Papyrus</h1>
+
     </div>
 </x-app-layout>

@@ -9,7 +9,7 @@ use App\Models\customer;
 class ListCustomer extends Component
 {
     use WithPagination;
-    public $perPage = 3;
+    public $perPage = 5;
 
     public function confirmDelete($get_id)
     {
@@ -27,4 +27,3 @@ class ListCustomer extends Component
         ]);
     }
 }
-

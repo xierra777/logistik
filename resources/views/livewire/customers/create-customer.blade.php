@@ -39,7 +39,7 @@
         </label>
         <input
           wire:model="contact"
-          type="number"
+          type="text"
           id="contact"
           name="contact"
           required
@@ -57,6 +57,19 @@
         <!-- Input hidden untuk menyimpan nilai ke Livewire -->
         <input type="hidden" wire:model="country" id="hiddenCountry">
         @error('country') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
+      </div>
+
+      <div class="mb-4">
+        <label class="block font-medium">Pilih Akun COA</label>
+        <select wire:model="coa_id" class="w-full border rounded p-2">
+          <option value="">-- Pilih COA --</option>
+          @foreach($chartOfAccounts as $coa)
+          <option value="{{ $coa->id }}">
+            {{ $coa->account_code }} - {{ $coa->account_name }} ({{ $coa->term_type }})
+          </option>
+          @endforeach
+        </select>
+        @error('coa_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
       </div>
       <!-- roles -->
       <div wire:ignore class="relative w-full mb-4 bg">
@@ -109,7 +122,7 @@
 
   <!-- Buttons -->
   <div class="mt-6 flex items-center justify-end gap-x-6">
-    <a wire:navigate href="{{route ('shipments')}}" class="text-sm/6 font-semibold text-gray-900 bg-gray-200 px-4 py-3 rounded-md hover:bg-gray-300">
+    <a wire:navigate href="{{route ('customers.list')}}" class="text-sm/6 font-semibold text-gray-900 bg-gray-200 px-4 py-3 rounded-md hover:bg-gray-300">
       Back
     </a>
 

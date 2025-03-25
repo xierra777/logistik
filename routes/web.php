@@ -5,12 +5,19 @@ use App\Livewire\CreateShipments;
 use App\Livewire\ViewShipments;
 use App\Livewire\EditShipments;
 use App\Livewire\Shipmment;
-use App\Livewire\Accounting\accountant;
-use App\Livewire\Accounting\tranksaksi;
-use App\Livewire\users;
+use App\Livewire\Accounting\Accountant;
+use App\Livewire\Accounting\PurchaseInvoice;
+use App\Livewire\Accounting\Tranksaksi;
+use App\Livewire\Accounting\SaleInvoice;
+use App\Livewire\ChartOfAccounts;
+use App\Livewire\Users;
+use App\Livewire\JournalEntries;
 use App\Livewire\Customers\CreateCustomer;
+use App\Livewire\Customers\EditCustomer;
+use App\Livewire\Customers\ViewCustomer;
 use App\Livewire\Customers\ListCustomer;
 use Illuminate\Http\Request;
+
 
 
 Route::view('/', 'welcome');
@@ -31,7 +38,16 @@ Route::view('shipment', 'shipments.create',)
     ->middleware(['auth'])
     ->name('shipment');
 
+Route::get('/chart-of-accounts', ChartOfAccounts::class)->middleware([
+    'auth',
+    'verified'
+]);
 
+
+Route::get('/journal-entries', JournalEntries::class)->middleware([
+    'auth',
+    'verified'
+]);
 
 Route::get('create-shipments', CreateShipments::class)->middleware([
     'auth',
@@ -50,24 +66,41 @@ Route::get('/edit-shipments/{id}', EditShipments::class)->middleware([
     'auth',
     'verified'
 ]);
+
+Route::get('/view-customers/{id}', ViewCustomer::class)->middleware([
+    'auth',
+    'verified'
+]);
+
+Route::get('/edit-customers/{id}', EditCustomer::class)->middleware([
+    'auth',
+    'verified'
+]);
 Route::get('/customers/create', CreateCustomer::class)->middleware(['auth', 'verified'])->name('customers.create');
 
 Route::get('/customers', ListCustomer::class)
     ->middleware(['auth', 'verified'])
     ->name('customers.list');
 
-Route::get('users', users::class)
+Route::get('users', Users::class)
     ->middleware(['auth', 'verified'])
     ->name('user.list');
 
-Route::get('accountant', accountant::class)
+Route::get('accountant', Accountant::class)
     ->middleware(['auth', 'verified'])
     ->name('accountant.list');
 
-Route::get('transaksi', tranksaksi::class)
+Route::get('/accounting/tranksaksi', Tranksaksi::class)
     ->middleware(['auth', 'verified'])
-    ->name('transaksi');
+    ->name('Tranksaksi');
 
+Route::get('/purchase-invoice/{shipmentId}', PurchaseInvoice::class)
+    ->middleware(['auth', 'verified'])
+    ->name('purchase-invoice');
+
+Route::get('/sale-invoice/{shipmentId}', SaleInvoice::class)
+    ->middleware(['auth', 'verified'])
+    ->name('sale-invoice');
 Route::get('/csrf-token', function (Request $request) {
     return response()->json(['csrf_token' => csrf_token()]);
 })->name('csrf-token');

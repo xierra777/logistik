@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Livewire;
+
+use Livewire\WithPagination;
+use Livewire\Component;
+use App\Models\Shipment;
+use App\Models\Customer;
+
+class Dashboard extends Component
+{
+    use WithPagination;
+
+    public $perPage = 5;
+
+    public function render()
+    {
+        $shipments = Shipment::latest()->paginate($this->perPage);
+        $customers = Customer::latest()->paginate($this->perPage); // Tambahkan ini
+
+        return view('livewire.dashboard', compact('shipments', 'customers'));
+    }
+}

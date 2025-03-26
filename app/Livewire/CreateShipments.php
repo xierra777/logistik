@@ -6,7 +6,7 @@ use Livewire\Attributes\On;
 use Livewire\Component;
 use App\Models\Customer;
 use App\Models\Container;
-use App\Models\shipment;
+use App\Models\Shipment;
 use Illuminate\Support\Facades\DB;
 
 
@@ -52,7 +52,7 @@ class CreateShipments extends Component
 
     public function generateInvoiceNumber()
     {
-        return "BRNJKT" . now()->format('ym') . str_pad(shipment::whereDate('created_at', today())->count() + 1, 3, '0', STR_PAD_LEFT);
+        return "BRNJKT" . now()->format('ym') . str_pad(Shipment::whereDate('created_at', today())->count() + 1, 3, '0', STR_PAD_LEFT);
     }
     public function addContainer()
     {

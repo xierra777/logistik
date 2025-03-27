@@ -31,7 +31,7 @@
                     <tbody class="divide-y divide-gray-200 dark:divide-neutral-700 bg-white dark:bg-neutral-900 rounded-xl">
                         @forelse($shipments as $shipment)
                         <tr class="hover:bg-gray-50 dark:hover:bg-neutral-600 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600 dark:text-neutral-300 hover:underline hover:text-blue-300">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600 dark:text-neutral-300 hover:underline hover:text-blue-900 ">
                                 <a wire:navigate href="/view-shipments/{{ $shipment->id }}">{{ $shipment->shipment_id }}</a>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 dark:text-neutral-300 font-semibold">

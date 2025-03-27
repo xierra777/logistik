@@ -56,5 +56,15 @@
 <footer>
     <!-- Footer content can go here -->
 </footer>
+<script>
+    document.addEventListener("livewire:load", () => {
+        Livewire.onError((statusCode) => {
+            if (statusCode === 419) {
+                alert("Session expired. Please refresh the page.");
+                window.location.reload(); // Auto-refresh the page
+            }
+        });
+    });
+</script>
 
 </html>

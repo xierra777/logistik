@@ -72,21 +72,23 @@ class CreateShipments extends Component
     {
         // Validasi data shipment (tanpa container_id dan container_type karena data container dikelola secara terpisah)
         // Buat shipment baru
-        $validatedData = $this->validate([
-            'shipment_id'           => 'required|max:255|unique:shipments,shipment_id',
-            'shipment_no'           => 'required|max:255|unique:shipments,shipment_no',
-            'place_of_receipt'      => 'nullable|string|max:255',
-            'shipper'               => 'nullable|string|max:255',
-            'consignee'             => 'nullable|string|max:255',
-            'notify'                => 'nullable|string|max:255',
-            'estimearrival'         => 'nullable|date',
-            'estimedelivery'        => 'nullable|date',
-            'ocean_vessel_feeder'   => 'nullable|string|max:255',
-            'ocean_vessel_mother'   => 'nullable|string|max:255',
-            'port_of_discharge'     => 'nullable|string|max:255',
-            'port_of_loading'       => 'nullable|string|max:255',
-            'description'           => 'nullable|string',
-        ]);
+        $validatedData =
+
+            $this->validate([
+                'shipment_id'           => 'required|max:255|unique:shipments,shipment_id',
+                'shipment_no'           => 'required|max:255|unique:shipments,shipment_no',
+                'place_of_receipt'      => 'nullable|string|max:255',
+                'shipper'               => 'nullable|string|max:255',
+                'consignee'             => 'nullable|string|max:255',
+                'notify'                => 'nullable|string|max:255',
+                'estimearrival'         => 'nullable|date',
+                'estimedelivery'        => 'nullable|date',
+                'ocean_vessel_feeder'   => 'nullable|string|max:255',
+                'ocean_vessel_mother'   => 'nullable|string|max:255',
+                'port_of_discharge'     => 'nullable|string|max:255',
+                'port_of_loading'       => 'nullable|string|max:255',
+                'description'           => 'nullable|string',
+            ]);
 
         // Validate Containers
         if (empty($this->containers)) {

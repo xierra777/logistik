@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\shipment;
+use App\Models\Shipment;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
@@ -28,18 +28,37 @@ class ShipmentExport implements FromCollection, WithHeadings
             ->when($this->start_date && $this->end_date, function ($query) {
                 $query->whereBetween('created_at', [$this->start_date, $this->end_date]);
             })
-            ->get(['id', 'shipment_id', 'container_id', 'shipper', 'consignee', 'created_at']);
+            ->get([
+                'shipment_no',
+                'shipment_id',
+                'shipper',
+                'consignee',
+                'notify',
+                'estimearrival',
+                'estimedelivery',
+                'ocean_vessel_mother',
+                'ocean_vessel_feeder',
+                'port_of_discharge',
+                'place_of_receipt',
+                'port_of_loading',
+            ]);
     }
 
     public function headings(): array
     {
         return [
-            'ID',
+            'Job No',
             'B/L',
-            'Container ID',
             'Shipper',
             'Consignee',
-            'Created At',
+            'notify',
+            'ETA',
+            'ETD',
+            'Mother Vessel ',
+            'Feeder Vessel',
+            'Port Of Discharge',
+            'Place Of Receipt',
+            'Port of Loading',
         ];
     }
 }

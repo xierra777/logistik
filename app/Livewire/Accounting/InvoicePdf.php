@@ -5,7 +5,7 @@ namespace App\Livewire\Accounting;
 use Livewire\Component;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Invoice;
-use App\Models\shipment;
+use App\Models\Shipment;
 
 class InvoicePdf extends Component
 {

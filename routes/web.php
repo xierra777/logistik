@@ -18,12 +18,9 @@ use App\Livewire\Customers\ViewCustomer;
 use App\Livewire\Customers\ListCustomer;
 use App\Livewire\Dashboard;
 use Illuminate\Http\Request;
-use App\Models\Shipment;
-use App\Models\Customer;
 
 
-Route::view('/', 'welcome');
-Route::view('preline', 'preline');
+Route::redirect('/', '/login'); // Redirect otomatis ke halaman login
 
 Route::get('/dashboard', Dashboard::class)->middleware([
     'auth',

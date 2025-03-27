@@ -5,6 +5,8 @@ namespace App\Livewire\Customers;
 use Livewire\Component;
 use App\Models\Customer;
 use App\Models\ChartOfAccount;
+use Livewire\Attributes\Validate;
+
 
 class CreateCustomer extends Component
 {
@@ -16,13 +18,14 @@ class CreateCustomer extends Component
 
 
     protected $rules = [
-        'name'    => 'required|min:3',
+        'name'    => ['required|min:3' => 'balls'],
         'email'   => 'required|email|unique:customers,email',
         'roles'   => 'min:1|array',
         'contact' => 'required',
         'address' => 'required',
         'coa_id'  => 'required|exists:chart_of_accounts,id',
-
+        'country' => 'required',
+        'web'     => 'required',
     ];
 
     public function mount()

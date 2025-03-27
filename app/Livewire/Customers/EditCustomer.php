@@ -3,7 +3,7 @@
 namespace App\Livewire\Customers;
 
 use Livewire\Component;
-use App\Models\customer;
+use App\Models\Customer;
 use App\Models\ChartOfAccount;
 
 class EditCustomer extends Component

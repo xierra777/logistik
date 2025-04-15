@@ -26,43 +26,33 @@ class Tranksaksi extends Component
     public $cincludedtax = "No", $cfcyamount = 0, $camountidr = 0, $cvatgst, $cvatgstamount = 0;
     public $ctaxableamount, $cremarks, $cwhtaxrate, $cwhtaxamount = 0;
 
-    public $vendor_id, $client_id;
     public $vendors, $clients;
-
     public $totalall = 0;
+
     protected $listeners = ['reloadTransactionData' => 'setShipmentId'];
 
-    // === Set Shipment ID dari Parent ===
+    // === Set Shipment ID dari Parent (bila diupdate) ===
     public function setShipmentId($shipmentId)
     {
         $this->shipmentId = $shipmentId;
+        $this->updateQty();
     }
 
     public function updateQty()
     {
-        // Count containers from the database
         $this->quantity = Container::where('shipment_id', $this->shipmentId)->count();
     }
 
-    // === Load Clients ===
-    public function loadClients()
-    {
-        $this->clients = Customer::where('category', 'DR')->get();
-    }
-
-    // === Lifecycle Hook ===
     public function mount($shipmentId)
     {
-
         $this->shipmentId = $shipmentId;
         $customers = Customer::orderBy('name')->get();
-
         $this->vendors = $customers->where('category', 'CR');
         $this->clients = $customers->where('category', 'DR');
         $this->updateQty();
     }
 
-    // === Simpan Data Transaksi ===
+    // === Simpan Data Transaksi Baru ===
     public function save()
     {
         if (!$this->shipmentId) {
@@ -82,10 +72,9 @@ class Tranksaksi extends Component
             'quantity' => $this->quantity,
             'ofdtype' => $this->ofdtype,
             'remarks' => $this->remarks,
-
             // Sale
-            'sclient' => $client?->name,
             'customer_id' => $client?->id,
+            'sclient' => $client?->name,
             'scurrency' => $this->scurrency,
             'srate' => $this->srate,
             'samount_qty' => $this->samount_qty,
@@ -100,10 +89,9 @@ class Tranksaksi extends Component
             'swhtaxamount' => $this->swhtaxamount,
             'sremarks' => $this->sremarks,
             'sgrossprofit' => $this->sgrossprofit,
-
             // Cost
-            'cvendor' => $vendor?->name,
             'vendor_id' => $vendor?->id,
+            'cvendor' => $vendor?->name,
             'creferenceno' => $this->creferenceno,
             'cdate' => $this->cdate,
             'cdrcr' => $this->cdrcr,
@@ -121,16 +109,18 @@ class Tranksaksi extends Component
             'cwhtaxamount' => $this->cwhtaxamount,
         ]);
 
-        $this->reset(); // Reset form setelah save
-        $this->loadClients(); // Refresh data client
-        $this->dispatch('transactionSaved')->to('App\Livewire\ViewShipments'); // Refresh parent
-        $this->dispatch('close-modal'); // Tutup modal
+        $this->reset(); // Reset semua field setelah simpan
+        $this->loadClients(); // Refresh data jika perlu
+        $this->dispatch('transactionSaved'); // Emit event ke parent untuk refresh data\n        $this->dispatch('close-modal');  // Tutup modal child
 
         session()->flash('message', 'Transaksi berhasil disimpan!');
     }
 
+    public function loadClients()
+    {
+        $this->clients = Customer::where('category', 'DR')->orderBy('name')->get();
+    }
 
-    // === Render Component ===
     public function render()
     {
         return view('livewire.accounting.tranksaksi', [

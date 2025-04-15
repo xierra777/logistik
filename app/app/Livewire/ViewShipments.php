@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Shipment;
 use App\Models\Container;
+use App\Models\Transaction;
 
 class ViewShipments extends Component
 {
@@ -13,24 +14,42 @@ class ViewShipments extends Component
     public $newContainer = [];
     public $shipment;
     public $shipmentId;
-
+    public $transaction; // Your list of transactions
+    public $transactionId; // Selected transaction to edit
     public $isEditing = false;
-    protected $listeners = ['invoiceGenerated', 'transactionSaved' => 'refreshShipment'];
 
-    public function editTransaction()
+    protected $listeners = [
+        'invoiceGenerated',
+        'transactionSaved' => 'refreshShipment',
+        'closeModal' => 'closeEdit',
+        'confirmDelete' // ini penting
+    ];
+
+    public function editTransaction($transactionId)
     {
-        $this->isEditing = true;
+        $this->transactionId = $transactionId;
+        $this->isEditing = true; // TAMBAHKAN INI!
+        $this->dispatch('isEditing', $transactionId);
     }
     public function closeEdit()
     {
-        $this->isEditing = false; // Tutup form edit
+        // Reset isEditing ke false, sehingga modal akan ditutup
+        $this->isEditing = false;
+        // Reset juga transactionId jika perlu
+        $this->transactionId = null;
     }
     public function mount($id)
     {
         $this->shipmentId = $id;
         $this->shipment = Shipment::with(['transactions', 'containers'])->findOrFail($id);
-    }
 
+        // Jika tidak ada transaksi, buat transaksi baru
+        if ($this->shipment->transactions->isEmpty()) {
+            $this->transaction = new Transaction(); // Membuat objek transaksi kosong
+        } else {
+            $this->transaction = $this->shipment->transactions->first();
+        }
+    }
     public function refreshShipment()
     {
         $this->shipment = Shipment::with(['transactions', 'containers', 'invoices'])
@@ -39,8 +58,20 @@ class ViewShipments extends Component
         // Emit ke child component untuk memperbarui datanya
         $this->dispatch('transaction', 'refreshTransactionData', $this->shipment->transactions);
     }
-
-
+    public function triggerDelete()
+    {
+        $this->dispatch('confirm-delete');
+    }
+    public function confirmDelete($get_id)
+    {
+        try {
+            // Attempt to delete the transaction
+            Transaction::destroy($get_id);
+        } catch (\Exception $e) {
+            // Handle error
+            session()->flash('error', 'Error deleting transaction: ' . $e->getMessage());
+        }
+    }
     public $editingContainer = null, $editContainerData = [
         'container_id' => '',
         'container_type' => '',
@@ -135,8 +166,11 @@ class ViewShipments extends Component
 
     public function render()
     {
+
         return view('livewire.view-shipments', [
             'shipmentId' => $this->shipmentId, // Kirim ke blade
+            'transaction' => $this->transaction,
+
         ]);
     }
 }

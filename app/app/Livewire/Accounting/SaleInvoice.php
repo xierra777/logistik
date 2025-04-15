@@ -49,32 +49,46 @@ class SaleInvoice extends Component
             return;
         }
 
+        // Get Shipment and Customer
         $shipment = Shipment::with('containers')->findOrFail($this->shipmentId);
         $customer = Customer::findOrFail($this->customer_id);
+
+        // Calculate totals
         $totalPcs = $shipment->containers->sum('pcs');
         $totalgw = $shipment->containers->sum('gross_weight');
 
+        // Prepare data for the view
         $data = compact('shipment', 'customer') + [
             'invoice_number' => $this->invoice_number,
             'transactions'   => $this->transactions,
-            'totalPcs'       => $this->totalPcs,
-            'totalgw'  => $this->totalgw,
-            'currency'       => $customer->currency,
+            'totalPcs'       => $totalPcs,
+            'totalgw'         => $totalgw,
+            'currency'        => $customer->currency,
         ];
-        $now = Carbon::now(); // mendapatkan instance Carbon untuk tanggal dan waktu saat ini
-        echo $now->format('d-m-Y'); // misal: "24-03-2025"
+
+        // Get current date (Optional - can be used for the document or logs)
+        $now = Carbon::now();
+        $formattedDate = $now->format('d-m-Y');  // For example: "24-03-2025"
+
+        // Render the HTML view
         $html = view('livewire.accounting.invoice-pdf', $data)->render();
 
+        // Generate PDF content using Browsershot
         $pdfContent = Browsershot::html($html)
-        ->setChromePath('/usr/bin/google-chrome')
-        ->format('A3')
-        ->margins(5, 5, 5, 5)
-        ->showBackground()
-        ->setOption('args', ['--no-sandbox']) 
-        ->pdf();
+            ->setChromePath('/usr/bin/google-chrome') // Make sure this is correct
+            ->format('A3')
+            ->margins(5, 5, 5, 5)
+            ->showBackground()
+            ->setOption('args', ['--no-sandbox'])
+            ->pdf();
 
-        return response()->streamDownload(fn() => print($pdfContent), "Invoice-{$this->invoice_number}.pdf");
+        // Return PDF content as a download response
+        return response()->streamDownload(
+            fn() => print($pdfContent),
+            "Invoice-{$this->invoice_number}.pdf"
+        );
     }
+
     public function previewPDF()
     {
         if (!$this->shipmentId || !$this->customer_id || $this->transactions->isEmpty()) {
@@ -99,12 +113,12 @@ class SaleInvoice extends Component
 
         $html = view('livewire.accounting.invoice-pdf', $data)->render();
         $pdfContent = Browsershot::html($html)
-        ->setChromePath('/usr/bin/google-chrome')
-        ->format('A3')
-        ->margins(5, 5, 5, 5)
-        ->showBackground()
-        ->setOption('args', ['--no-sandbox']) 
-        ->pdf();
+            ->setChromePath('/usr/bin/google-chrome')
+            ->format('A3')
+            ->margins(5, 5, 5, 5)
+            ->showBackground()
+            ->setOption('args', ['--no-sandbox'])
+            ->pdf();
         $this->pdfData = base64_encode($pdfContent);
 
         $this->dispatch('open-pdf-preview', pdf: 'data:application/pdf;base64,' . $this->pdfData);

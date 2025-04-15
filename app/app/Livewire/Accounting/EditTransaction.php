@@ -12,12 +12,13 @@ class EditTransaction extends Component
     public $shipmentId;
     public $transactionId;
     public $customers_id;
+    public $isEditing = false;
 
     // === Charge Details ===
     public $charge, $description, $freight, $unit, $ofdtype, $remarks;
     public $quantity = 0;
 
-    // === Sale Details ===s
+    // === Sale Details ===
     public $sclient, $scurrency, $srate = 0, $samount_qty = 0, $sincludedtax = "No";
     public $sfcyamount = 0, $samountidr = 0, $sdrcr, $svatgst = 0, $staxableamount = 0;
     public $svatgstamount = 0, $swhtaxrate, $swhtaxamount = 0, $sremarks, $sgrossprofit = 0;
@@ -29,11 +30,30 @@ class EditTransaction extends Component
 
     public $clients, $vendors;
 
-    protected $listeners = ['reloadTransactionData' => 'setShipmentId'];
+    protected $listeners = ['loadTransaction' => 'getTransactionId'];
 
-    public function setShipmentId($shipmentId)
+    public function mount($shipmentId = null, $transactionId = null)
     {
         $this->shipmentId = $shipmentId;
+        $this->transactionId = $transactionId;
+
+        $customers = Customer::orderBy('name')->get();
+        $this->vendors = $customers->where('category', 'CR');
+        $this->clients = $customers->where('category', 'DR');
+
+        $this->updateQty();
+
+        if ($this->transactionId) {
+            $this->loadTransaction($this->transactionId);
+            $this->isEditing = true;
+        }
+    }
+
+    public function getTransactionId($transactionId)
+    {
+        $this->transactionId = $transactionId;
+        $this->isEditing = true;
+        $this->loadTransaction($transactionId);
     }
 
     public function updateQty()
@@ -41,20 +61,30 @@ class EditTransaction extends Component
         $this->quantity = Container::where('shipment_id', $this->shipmentId)->count();
     }
 
-    public function mount($shipmentId = null, $transactionId = null)
+    public function resetFields()
     {
-        $this->shipmentId = $shipmentId;
-        $this->transactionId = $transactionId;
+        $this->transactionId = null;
+        $this->charge = $this->description = $this->freight = $this->unit = $this->ofdtype = $this->remarks = null;
+        $this->quantity = 0;
 
-        if ($this->transactionId) {
-            $this->loadTransaction($this->transactionId);
-        }
-        $customers = Customer::orderBy('name')->get();
+        $this->sclient = $this->scurrency = $this->sdrcr = $this->sremarks = null;
+        $this->srate = $this->samount_qty = $this->sfcyamount = $this->samountidr = 0;
+        $this->sincludedtax = "No";
+        $this->svatgst = $this->staxableamount = $this->svatgstamount = $this->swhtaxrate = $this->swhtaxamount = $this->sgrossprofit = 0;
 
-        $this->vendors = $customers->where('category', 'CR');
-        $this->clients = $customers->where('category', 'DR');
-        $this->updateQty();
+        $this->cvendor = $this->creferenceno = $this->cdate = $this->cdrcr = $this->ccurrency = $this->cremarks = null;
+        $this->crate = $this->camount_qty = $this->cfcyamount = $this->camountidr = 0;
+        $this->cincludedtax = "No";
+        $this->cvatgst = $this->cvatgstamount = $this->ctaxableamount = $this->cwhtaxrate = $this->cwhtaxamount = 0;
     }
+
+    public function closeModal()
+    {
+        $this->resetFields();
+        $this->isEditing = false;
+        $this->dispatch('closeModal'); // untuk Alpine.js tutup modal
+    }
+
     public function loadTransaction($transactionId)
     {
         $transaction = Transaction::find($transactionId);
@@ -69,7 +99,6 @@ class EditTransaction extends Component
         $this->ofdtype = $transaction->ofdtype;
         $this->remarks = $transaction->remarks;
 
-        // Sale
         $this->sclient = $transaction->customer_id;
         $this->scurrency = $transaction->scurrency;
         $this->srate = $transaction->srate;
@@ -97,59 +126,57 @@ class EditTransaction extends Component
         $vendor = Customer::find($this->cvendor);
         $client = Customer::find($this->sclient);
 
-        Transaction::updateOrCreate(
-            ['id' => $this->transactionId],
-            [
-                'shipment_id' => $this->shipmentId,
-                'charge' => $this->charge,
-                'description' => $this->description,
-                'freight' => $this->freight,
-                'unit' => $this->unit,
-                'quantity' => $this->quantity,
-                'ofdtype' => $this->ofdtype,
-                'remarks' => $this->remarks,
-                'customer_id' => $client?->id,
-                'scurrency' => $this->scurrency,
-                'srate' => $this->srate,
-                'samount_qty' => $this->samount_qty,
-                'sincludedtax' => $this->sincludedtax,
-                'sfcyamount' => $this->sfcyamount,
-                'samountidr' => $this->samountidr,
-                'sdrcr' => $this->sdrcr,
-                'svatgst' => $this->svatgst,
-                'staxableamount' => $this->staxableamount,
-                'svatgstamount' => $this->svatgstamount,
-                'swhtaxrate' => $this->swhtaxrate,
-                'swhtaxamount' => $this->swhtaxamount,
-                'sremarks' => $this->sremarks,
-                'sgrossprofit' => $this->sgrossprofit,
-                'vendor_id' => $vendor?->id,
-                'creferenceno' => $this->creferenceno,
-                'cdate' => $this->cdate,
-                'cdrcr' => $this->cdrcr,
-                'ccurrency' => $this->ccurrency,
-                'crate' => $this->crate,
-                'camount_qty' => $this->camount_qty,
-                'cincludedtax' => $this->cincludedtax,
-                'cfcyamount' => $this->cfcyamount,
-                'camountidr' => $this->camountidr,
-                'cvatgst' => $this->cvatgst,
-                'cvatgstamount' => $this->cvatgstamount,
-                'ctaxableamount' => $this->ctaxableamount,
-                'cremarks' => $this->cremarks,
-                'cwhtaxrate' => $this->cwhtaxrate,
-                'cwhtaxamount' => $this->cwhtaxamount,
-            ]
-        );
+        Transaction::where('id', $this->transactionId)->update([
+            'shipment_id' => $this->shipmentId,
+            'charge' => $this->charge,
+            'description' => $this->description,
+            'freight' => $this->freight,
+            'unit' => $this->unit,
+            'quantity' => $this->quantity,
+            'ofdtype' => $this->ofdtype,
+            'remarks' => $this->remarks,
+            'customer_id' => $client?->id,
+            'sclient' => $client?->name,
+            'cvendor' => $vendor?->name,
+            'scurrency' => $this->scurrency,
+            'srate' => $this->srate,
+            'samount_qty' => $this->samount_qty,
+            'sincludedtax' => $this->sincludedtax,
+            'sfcyamount' => $this->sfcyamount,
+            'samountidr' => $this->samountidr,
+            'sdrcr' => $this->sdrcr,
+            'svatgst' => $this->svatgst,
+            'staxableamount' => $this->staxableamount,
+            'svatgstamount' => $this->svatgstamount,
+            'swhtaxrate' => $this->swhtaxrate,
+            'swhtaxamount' => $this->swhtaxamount,
+            'sremarks' => $this->sremarks,
+            'sgrossprofit' => $this->sgrossprofit,
+            'vendor_id' => $vendor?->id,
+            'creferenceno' => $this->creferenceno,
+            'cdate' => $this->cdate,
+            'cdrcr' => $this->cdrcr,
+            'ccurrency' => $this->ccurrency,
+            'crate' => $this->crate,
+            'camount_qty' => $this->camount_qty,
+            'cincludedtax' => $this->cincludedtax,
+            'cfcyamount' => $this->cfcyamount,
+            'camountidr' => $this->camountidr,
+            'cvatgst' => $this->cvatgst,
+            'cvatgstamount' => $this->cvatgstamount,
+            'ctaxableamount' => $this->ctaxableamount,
+            'cremarks' => $this->cremarks,
+            'cwhtaxrate' => $this->cwhtaxrate,
+            'cwhtaxamount' => $this->cwhtaxamount,
+        ]);
 
         $this->dispatch('transactionSaved')->to('App\Livewire\ViewShipments');
-        $this->dispatch('close-modal');
-
+        $this->closeModal();
         session()->flash('message', 'Transaksi berhasil disimpan!');
     }
 
     public function render()
     {
-        return view('livewire.accounting.tranksaksi');
+        return view('livewire.accounting.edit-transaction');
     }
 }

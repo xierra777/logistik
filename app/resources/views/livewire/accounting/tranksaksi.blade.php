@@ -46,7 +46,7 @@
                     </label>
                     <select id="unit" name="unit" wire:model="unit"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="">PER CONTAINER</option>
+                        <option value="CONTAINER">PER CONTAINER</option>
                         <option value=""></option>
                     </select>
                 </div>

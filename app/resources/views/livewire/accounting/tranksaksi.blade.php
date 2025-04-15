@@ -46,8 +46,8 @@
                     </label>
                     <select id="unit" name="unit" wire:model="unit"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="CONTAINER">PER CONTAINER</option>
                         <option value=""></option>
+                        <option value="CONTAINER">PER CONTAINER</option>
                     </select>
                 </div>
                 <!-- Quantity -->
@@ -523,7 +523,7 @@
         <button type="button" @click="open = false" class="px-4 py-2 bg-gray-500 text-white rounded-lg" @click="$refs.modalContent.scrollTo({ top: 0, behavior: 'smooth' })">
             Cancel
         </button>
-        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg" @click="$refs.modalContent.scrollTo({ top: 0, behavior: 'smooth' })">
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">
             Save
         </button>
     </div>

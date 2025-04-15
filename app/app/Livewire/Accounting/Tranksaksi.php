@@ -38,6 +38,7 @@ class Tranksaksi extends Component
         $this->updateQty();
     }
 
+
     public function updateQty()
     {
         $this->quantity = Container::where('shipment_id', $this->shipmentId)->count();

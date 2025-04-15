@@ -122,11 +122,15 @@ class ViewShipments extends Component
         $this->editContainer = [];
     }
 
-    public function deleteContainer($containerId)
+    public function containerDelete($get_id)
     {
-        Container::findOrFail($containerId)->delete();
+        Container::findOrFail($get_id)->delete();
         $this->refreshShipment(); // Perbarui data shipment setelah delete
         session()->flash('success', 'Container deleted successfully.');
+    }
+    public function deleteContainer()
+    {
+        dispatch('confirm-apus');
     }
 
     public function createContainer()

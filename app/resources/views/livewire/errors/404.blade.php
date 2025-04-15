@@ -6,7 +6,8 @@
             <h1>404 - Page Not Found</h1>
             <p>Oops! The page you're looking for doesn't exist.</p>
         </div>
-        <a href="{{ url('dashboard') }}" class="py-4 px-9 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-red-100 text-red-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200"><b>Return Home</b></a>
+        <button onclick="window.history.back()" class="py-4 px-9 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-red-100 text-red-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200">🔙 Kembali</button>
+
     </div>
 
 </x-app-layout>

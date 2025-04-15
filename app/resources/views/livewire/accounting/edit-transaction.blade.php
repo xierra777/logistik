@@ -1,6 +1,5 @@
-<div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+<div class="bg-white p-6 rounded-lg shadow-lg  w-full max-w-7.5xlmax-h-[90vh] overflow-y-auto">
     <form wire:submit.prevent="save" class="py-5 px-3 max-h-[80vh] overflow-y-auto space-y-3  [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:hidden">
-        <h2 class="text-xl font-bold"> Edit Transactions</h2>
         <!-- Charge Section -->
         <h3 class="text-lg font-semibold">Edit Transaksi #{{ $transactionId }}</h3>
 

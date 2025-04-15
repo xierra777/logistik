@@ -201,9 +201,10 @@
                         <td class="px-4 py-2 text-sm text-gray-800">{{ $container->pack_type }}</td>
                         <td class="px-4 py-2 text-sm text-gray-800">{{ $container->gross_weight }}</td>
                         <td class="px-4 py-2 text-sm text-gray-800">{{ $container->measurement ?? 'N/A'}}</td>
-                        <td class="px-4 py-2 text-sm">
-                            <button wire:click="editContainer({{ $container->id }})" class="text-indigo-600 hover:text-indigo-900">Edit</button>
-                            <button wire:click="deleteContainer({{ $container->id }})" class="ml-2 text-red-600 hover:text-red-900">Delete</button>
+                        <td class="px-4 py-2 text-sm gap-2">
+                            <button wire:click="editContainer({{ $container->id }})" class="text-indigo-600 hover:text-indigo-600">Edit</button>
+                            <button wire:click="$dispatch('confirm-apus', { get_id: {{ $container->id }} })" class="text-red-500">Delete
+                            </button>
                         </td>
                     </tr>
                     @endforeach
@@ -291,13 +292,11 @@
                             @forelse($shipment->transactions as $transaction)
                             <tr class="hover:bg-gray-100 dark:hover:bg-neutral-700 divide-x divide-gray-200">
                                 <td class="px-6 py-4 text-center">
-                                    <div class="flex justify-center gap-2 items-center">
+                                    <div class="flex justify-center gap-2 items-center p-2">
                                         <button wire:click="editTransaction({{ $transaction->id }})">
-                                            <i class="fa-solid fa-pen-to-square"></i>
-                                        </button>
+                                            <i class="fa-solid fa-pen-to-square fa-2xl" style="color: #FFD43B;"></i> </button>
                                         <button wire:click="$dispatch('confirm-delete', { get_id: {{ $transaction->id }} })">
-                                            <i class="fa-solid fa-trash" style="color: #f50000;"></i>
-                                        </button>
+                                            <i class="fa-solid fa-trash fa-2xl" style="color: #ff0000;"></i> </button>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-center">{{ $loop->iteration }}</td>
@@ -331,6 +330,11 @@
             </div>
         </div>
         <div x-data="{ show: @entangle('isEditing') }">
+            <div x-cloak x-show="show"
+                x-transition:enter="transition ease-out duration-300 delay-150"
+                x-transition:leave="transition ease-in duration-200"
+                class="fixed inset-0 bg-gray-500 bg-opacity-50 z-40">
+            </div>
             <div x-cloak x-show="show"
                 class="fixed inset-0 flex items-center justify-center z-50 px-4"
                 x-transition:enter="transition ease-out duration-300"
@@ -370,7 +374,7 @@
     const get_id = $event.detail.get_id;
     
     Swal.fire({
-        title: 'Are you sure?',
+        title: 'Are you sure?, <br> want to delete this transaction?',
         text: 'You won\'t be able to revert this!',
         icon: 'warning',
         showCancelButton: true,
@@ -380,6 +384,28 @@
     }).then((result) => {
         if (result.isConfirmed) {
             $wire.confirmDelete(get_id).then(() => {
+                Swal.fire('Deleted!', 'Data berhasil dihapus.', 'success');
+            });
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            Swal.fire('Cancelled', 'Data batal dihapus.', 'error');
+        }
+    });
+"></div>
+
+    <div x-data @confirm-apus.window="
+    const get_id = $event.detail.get_id;
+    
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'You won\'t be able to revert this!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $wire.containerDelete(get_id).then(() => {
                 Swal.fire('Deleted!', 'Data berhasil dihapus.', 'success');
             });
         } else if (result.dismiss === Swal.DismissReason.cancel) {

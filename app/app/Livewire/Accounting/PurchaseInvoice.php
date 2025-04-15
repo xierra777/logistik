@@ -59,10 +59,11 @@ class PurchaseInvoice extends Component
         $html = view('livewire.accounting.invoice-pdf', $data)->render();
 
         $pdfContent = Browsershot::html($html)
-            ->setOption('no-sandbox', true)
+            ->setChromePath('/usr/bin/google-chrome') // Make sure this is correct
             ->format('A3')
             ->margins(5, 5, 5, 5)
             ->showBackground()
+            ->setOption('args', ['--no-sandbox'])
             ->pdf();
 
         return response()->streamDownload(fn() => print($pdfContent), "Invoice-{$this->invoice_number}.pdf");
@@ -90,10 +91,11 @@ class PurchaseInvoice extends Component
 
         $html = view('livewire.accounting.invoice-pdf', $data)->render();
         $pdfContent = Browsershot::html($html)
-            ->setOption('no-sandbox', true)
+            ->setChromePath('/usr/bin/google-chrome') // Make sure this is correct
             ->format('A3')
             ->margins(5, 5, 5, 5)
             ->showBackground()
+            ->setOption('args', ['--no-sandbox'])
             ->pdf();
         $this->pdfData = base64_encode($pdfContent);
 

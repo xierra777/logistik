@@ -99,5 +99,12 @@
                 <iframe src="data:application/pdf;base64,{{ $pdfData }}" class="w-full h-[600px]"></iframe>
             </div>
         </div>
+        <div class="flex justify-end p-3">
+            <a wire:navigate href="/view-shipments/{{ $shipmentId }}" class="py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg 
+                   transform transition duration-200 ease-in-out shadow:hover-cyan-200
+                   hover:bg-cyan-400 hover:scale-100  ">
+                Back
+            </a>
+        </div>
     </div>
 </div>

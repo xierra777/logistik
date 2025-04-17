@@ -17,7 +17,10 @@ use App\Livewire\Customers\EditCustomer;
 use App\Livewire\Customers\ViewCustomer;
 use App\Livewire\Customers\ListCustomer;
 use App\Livewire\Dashboard;
+use App\Livewire\HouseBL;
+use App\Livewire\Pdfhbl;
 use Illuminate\Http\Request;
+
 
 
 Route::redirect('/', '/login'); // Redirect otomatis ke halaman login
@@ -44,6 +47,11 @@ Route::get('/chart-of-accounts', ChartOfAccounts::class)->middleware([
     'verified'
 ]);
 
+Route::get('/house-b-l/{shipmentId}', HouseBL::class)
+    ->middleware(['auth', 'verified'])
+    ->name('house-b-l');
+
+Route::get('pdfhbl/{shipmentId}', PdfHbl::class)->middleware(['auth', 'verified']);
 
 Route::get('/journal-entries', JournalEntries::class)->middleware([
     'auth',
@@ -106,7 +114,6 @@ Route::get('/csrf-token', function (Request $request) {
     return response()->json(['csrf_token' => csrf_token()]);
 })->name('csrf-token');
 
-Route::fallback(function () {
-    return view('livewire/errors.404');
-});
+
+
 require __DIR__ . '/auth.php';

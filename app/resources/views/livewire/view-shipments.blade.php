@@ -6,7 +6,10 @@
     </x-slot>
     <div>
         <div class="flex justify-end p-2">
-            <button wire:click="create" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">HBL</button>
+            <a href="{{ route('house-b-l', ['shipmentId' => $shipment->id]) }}" class="py-3 px-4 mr-4 bg-green-500 text-white rounded">
+                Invoice
+            </a>
+
         </div>
         <div class="mb-4 text-center grid grid-cols-1">
             <span class="font-bold bg-gray-200 px-4 py-2">No Job</span>

@@ -25,10 +25,11 @@ class ViewShipments extends Component
         'confirmDelete' // ini penting
     ];
 
+
     public function editTransaction($transactionId)
     {
         $this->transactionId = $transactionId;
-        $this->isEditing = true; // TAMBAHKAN INI!
+        $this->isEditing = true;
         $this->dispatch('isEditing', $transactionId);
     }
     public function closeEdit()
@@ -55,7 +56,6 @@ class ViewShipments extends Component
         $this->shipment = Shipment::with(['transactions', 'containers', 'invoices'])
             ->findOrFail($this->shipment->id);
 
-        // Emit ke child component untuk memperbarui datanya
         $this->dispatch('transaction', 'refreshTransactionData', $this->shipment->transactions);
     }
     public function triggerDelete()

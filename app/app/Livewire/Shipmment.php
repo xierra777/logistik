@@ -25,7 +25,8 @@ class Shipmment extends Component
     public $mySelected = [];
     public $file;
     public $start_date, $end_date;
-
+    public $searchField   = 'shipment_id';  // default column
+    public $searchTerm    = '';
 
     protected $queryString = [
         'perPage' => ['except' => 5], // Store perPage in URL
@@ -40,18 +41,26 @@ class Shipmment extends Component
 
     public function render()
     {
-        $query = Shipment::query();
+        $query = Shipment::latest(); // orderBy created_at desc
 
         if ($this->start_date && $this->end_date) {
-            $query->whereBetween('created_at', [$this->start_date, $this->end_date]);
+            $query->whereBetween('created_at', [
+                $this->start_date,
+                $this->end_date
+            ]);
         }
 
+        if ($this->searchTerm) {
+            // dynamically pick the column
+            $column = $this->searchField;
 
-        if (! $this->search) {
-            $shipments = $query->paginate($this->perPage);
-        } else {
-            $shipments = $query->where('shipment_id', 'like', '%' . $this->search . '%')->paginate($this->perPage);
+            // if you need special handling for relationships or different names,
+            // you can map here: e.g. 
+            // if ($column==='customer_name') { ... join or whereHas … }
+            $query->where($column, 'like', '%' . $this->searchTerm . '%');
         }
+
+        $shipments = $query->paginate($this->perPage);
 
         return view('livewire.shipmment', compact('shipments'));
     }
@@ -61,7 +70,18 @@ class Shipmment extends Component
     ];
     public function downloadExcel()
     {
-        return Excel::download(new ShipmentExport($this->start_date, $this->end_date), 'shipments.xlsx');
+        $now      = now()->format('Ymd_His');
+        $filename = "shipments-{$this->start_date}_{$this->end_date}_{$now}.xlsx";
+
+        try {
+            return Excel::download(
+                new ShipmentExport($this->start_date, $this->end_date, $this->searchTerm, $this->searchField),
+                $filename
+            );
+        } catch (\Throwable $e) {
+            session()->flash('error', 'Export failed: ' . $e->getMessage());
+            return back();
+        }
     }
 
 

@@ -1,8 +1,16 @@
 <div class="bg-white p-6 rounded-lg shadow-lg  w-full max-w-7.5xlmax-h-[90vh] overflow-y-auto">
+
+    <div class="flex justify-between items-center p-4 border-b">
+        <h2 class="text-lg font-semibold text-gray-800">Edit Transaksi {{$sigma->shipment_id}}</h2>
+        <button wire:click="closeModal" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
     <form wire:submit.prevent="save" class="py-5 px-3 max-h-[80vh] overflow-y-auto space-y-3  [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:hidden">
         <!-- Charge Section -->
-        <h3 class="text-lg font-semibold">Edit Transaksi #{{ $transactionId }}</h3>
-
         <div class="bg-white">
             <!-- Heading Bar -->
             <div class="bg-green-600 p-3 rounded-t-xl">

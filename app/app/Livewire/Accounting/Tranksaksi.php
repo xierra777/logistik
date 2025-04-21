@@ -5,11 +5,13 @@ namespace App\Livewire\Accounting;
 use Livewire\Component;
 use App\Models\Transaction;
 use App\Models\Customer;
+use App\Models\Shipment;
 use App\Models\Container;
 
 class Tranksaksi extends Component
 {
     public $shipmentId;
+    public $shipment;
     public $customer_id;
 
     // === Charge Details ===
@@ -29,12 +31,13 @@ class Tranksaksi extends Component
     public $vendors, $clients;
     public $totalall = 0;
 
-    protected $listeners = ['reloadTransactionData' => 'setShipmentId'];
 
     // === Set Shipment ID dari Parent (bila diupdate) ===
     public function setShipmentId($shipmentId)
     {
         $this->shipmentId = $shipmentId;
+        $shipment = Shipment::find($shipmentId);
+        $this->shipmentId = $shipment->id;
         $this->updateQty();
     }
 
@@ -122,6 +125,11 @@ class Tranksaksi extends Component
         $this->clients = Customer::where('category', 'DR')->orderBy('name')->get();
     }
 
+    public function closeModal()
+    {
+        $this->resetFields();
+        $this->dispatch('open = false'); // untuk Alpine.js tutup modal
+    }
     public function render()
     {
         return view('livewire.accounting.tranksaksi', [

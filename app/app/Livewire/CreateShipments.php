@@ -15,9 +15,9 @@ class CreateShipments extends Component
     // Field Shipment
     public $shipment_id = '';
     public $shipment_no = '';
-    public $shipper = '';
-    public $consignee = '';
-    public $notify = '';
+    public $shipper_id;
+    public $consignee_id;
+    public $notify_id;
     public $ocean_vessel_feeder = '';
     public $ocean_vessel_mother = '';
     public $port_of_discharge = '';
@@ -32,6 +32,10 @@ class CreateShipments extends Component
     public $containers = [];
     public $customers;
 
+
+    protected $rules = [
+        'notify_id' => 'required|exists:customers,id',
+    ];
     #[On('port-updated')]
     public function updatePort($model, $value)
     {
@@ -78,9 +82,9 @@ class CreateShipments extends Component
                 'shipment_id'           => 'required|max:255|unique:shipments,shipment_id',
                 'shipment_no'           => 'required|max:255|unique:shipments,shipment_no',
                 'place_of_receipt'      => 'nullable|string|max:255',
-                'shipper'               => 'nullable|string|max:255',
-                'consignee'             => 'nullable|string|max:255',
-                'notify'                => 'nullable|string|max:255',
+                'shipper_id'            => 'required|exists:customers,id',
+                'consignee_id'          => 'required|exists:customers,id',
+                'notify_id'                => 'required|exists:customers,id',
                 'estimearrival'         => 'nullable|date',
                 'estimedelivery'        => 'nullable|date',
                 'ocean_vessel_feeder'   => 'nullable|string|max:255',
@@ -117,6 +121,7 @@ class CreateShipments extends Component
 
         DB::beginTransaction();
         try {
+
             $shipment = Shipment::create($validatedData);
 
             foreach ($this->containers as $container) {

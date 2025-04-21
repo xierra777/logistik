@@ -15,6 +15,9 @@ class Shipment extends Model
         'shipper',
         'consignee',
         'notify',
+        'shipper_id',
+        'consignee_id',
+        'notify_id',
         'estimearrival',
         'estimedelivery',
         'ocean_vessel_feeder',
@@ -25,9 +28,18 @@ class Shipment extends Model
         'description',
     ];
 
-    public function customer()
+    public function shipper()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class, 'shipper_id');
+    }
+
+    public function consignee()
+    {
+        return $this->belongsTo(Customer::class, 'consignee_id');
+    }
+    public function notify()
+    {
+        return $this->belongsTo(Customer::class, 'notify_id');
     }
 
     public function transactions()

@@ -6,6 +6,8 @@ use Livewire\Component;
 use App\Models\Transaction;
 use App\Models\Customer;
 use App\Models\Container;
+use App\Models\Shipment;
+use phpDocumentor\Reflection\Types\This;
 
 class EditTransaction extends Component
 {
@@ -13,6 +15,7 @@ class EditTransaction extends Component
     public $transactionId;
     public $customers_id;
     public $isEditing = false;
+    public $sigma;
 
     // === Charge Details ===
     public $charge, $description, $freight, $unit, $ofdtype, $remarks;
@@ -36,7 +39,8 @@ class EditTransaction extends Component
     {
         $this->shipmentId = $shipmentId;
         $this->transactionId = $transactionId;
-
+        $sigma = Shipment::find($shipmentId);
+        $this->sigma = $sigma->where('id', $shipmentId)->first();
         $customers = Customer::orderBy('name')->get();
         $this->vendors = $customers->where('category', 'CR');
         $this->clients = $customers->where('category', 'DR');

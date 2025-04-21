@@ -39,57 +39,76 @@
         </div>
       </div>
 
-      <div class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="mb-4">
+      <div class="mb-4 grid grid-cols-4 gap-6">
+        <!-- Mother Vessel -->
+        <div class="mb-4=">
           <label for="ocean_vessel_mother">Mother Vessel</label>
-          <input type="text" name="ocean_vessel_mother" wire:model="ocean_vessel_mother" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+          <input type="text" id="ocean_vessel_mother" name="ocean_vessel_mother" wire:model="ocean_vessel_mother" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
           @error('ocean_vessel_mother')
           <span class="text-red-500 text-sm">{{ $message }}</span>
           @enderror
         </div>
+
+        <!-- Feeder Vessel -->
         <div class="mb-4">
-          <label for="">ETA / Estimate Time Arrival</label>
-          <input type="date" name="estimearrival" id="estimearrival" wire:model="estimearrival" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-          @error('estimearrival') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+          <label for="ocean_vessel_feeder">Feeder Vessel</label>
+          <input type="text" id="ocean_vessel_feeder" name="ocean_vessel_feeder" wire:model="ocean_vessel_feeder" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+          @error('ocean_vessel_feeder')
+          <span class="text-red-500 text-sm">{{ $message }}</span>
+          @enderror
         </div>
+
+        <!-- ETA -->
         <div class="mb-4">
-          <label for="">ETD / Estimate Time Departure</label>
-          <input type="date" name="estimedelivery" id="estimedelivery" wire:model="estimedelivery" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-          @error('estimedeparture') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+          <label for="estimearrival">ETA / Estimate Time Arrival</label>
+          <input type="date" id="estimearrival" name="estimearrival" wire:model="estimearrival" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+          @error('estimearrival')
+          <span class="text-red-500 text-sm">{{ $message }}</span>
+          @enderror
+        </div>
+
+        <!-- ETD -->
+        <div class="mb-4">
+          <label for="estimedelivery">ETD / Estimate Time Departure</label>
+          <input type="date" id="estimedelivery" name="estimedelivery" wire:model="estimedelivery" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+          @error('estimedelivery')
+          <span class="text-red-500 text-sm">{{ $message }}</span>
+          @enderror
         </div>
       </div>
 
+
       <!-- Organization -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="mb-4" wire:ignore>
+        <div class="mb-4">
           <label for="shipper">Shipper</label>
-          <select wire:model="shipper" id="shipper" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+          <select wire:model="shipper_id" id="shipper" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
             <option value="">Select Shipper</option>
             @foreach($customers as $customer)
             @if(in_array('shipper', $customer->roles)) <!-- Only show customers with role "shipper" -->
-            <option value="{{ $customer->name }}">{{ $customer->name }}</option>
+            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
             @endif
             @endforeach
           </select>
         </div>
         <div class="mb-4" wire:ignore>
           <label for="consignee">Consignee</label>
-          <select wire:model="consignee" id="consignee" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+          <select wire:model="consignee_id" id="consignee" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
             <option value="">Select Consignee</option>
             @foreach($customers as $customer)
             @if(in_array('consignee', $customer->roles)) <!-- Only show customers with role "consignee" -->
-            <option value="{{ $customer->name }}">{{ $customer->name }}</option>
+            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
             @endif
             @endforeach
           </select>
         </div>
         <div class="mb-4" wire:ignore>
           <label for="notify">Notify</label>
-          <select wire:model="notify" id="notify" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+          <select wire:model="notify_id" id="notify_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
             <option value="">Select Notify</option>
             @foreach($customers as $customer)
             @if(in_array('notify', $customer->roles)) <!-- Only show customers with role "notify" -->
-            <option value="{{ $customer->name }}">{{ $customer->name }}</option>
+            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
             @endif
             @endforeach
           </select>
@@ -306,7 +325,7 @@
 
     <!-- Buttons -->
     <div class="mt-6 flex items-center justify-end gap-x-6">
-      <a wire:navigate href="{{route ('shipments')}}" class="text-sm/6 font-semibold text-gray-900 bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">
+      <a href="{{route ('shipments')}}" class="text-sm/6 font-semibold text-gray-900 bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">
         Back
       </a>
 
@@ -400,7 +419,7 @@
       let data = $(this).val();
       // console.log(data);
       // $wire.set('roles',data,false);
-      $wire.shipper = data;
+      $wire.shipper_id = data;
     });
   });
 </script>
@@ -417,7 +436,7 @@
       let data = $(this).val();
       // console.log(data);
       // $wire.set('roles',data,false);
-      $wire.consignee = data;
+      $wire.consignee_id = data;
     });
   });
 </script>
@@ -425,16 +444,16 @@
 @script()
 <script>
   $(document).ready(function() {
-    $('#notify').select2({
+    $('#notify_id').select2({
       placeholder: "Select roles",
       allowClear: true,
       theme: 'tailwindcss-3'
     });
-    $('#notify').on('change', function() {
+    $('#notify_id').on('change', function() {
       let data = $(this).val();
       // console.log(data);
       // $wire.set('roles',data,false);
-      $wire.notify = data;
+      $wire.notify_id = data;
     });
   });
 </script>

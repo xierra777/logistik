@@ -6,8 +6,8 @@
     </x-slot>
     <div>
         <div class="flex justify-end p-2">
-            <a href="{{ route('house-b-l', ['shipmentId' => $shipment->id]) }}" class="py-3 px-4 mr-4 bg-green-500 text-white rounded">
-                Invoice
+            <a href="{{ route('house-b-l', ['shipmentId' => $shipment->id]) }}" class="py-3 px-4 mr-4 bg-blue-500 text-white rounded">
+                House Bill Lading
             </a>
 
         </div>
@@ -332,6 +332,8 @@
                 </div>
             </div>
         </div>
+
+
         <div x-data="{ show: @entangle('isEditing') }">
             <div x-cloak x-show="show"
                 x-transition:enter="transition ease-out duration-300 delay-150"
@@ -373,28 +375,7 @@
             </a>
         </div>
     </div>
-    <div x-data @confirm-delete.window="
-    const get_id = $event.detail.get_id;
-    
-    Swal.fire({
-        title: 'Are you sure?, <br> want to delete this transaction?',
-        text: 'You won\'t be able to revert this!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            $wire.confirmDelete(get_id).then(() => {
-                Swal.fire('Deleted!', 'Data berhasil dihapus.', 'success');
-            });
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-            Swal.fire('Cancelled', 'Data batal dihapus.', 'error');
-        }
-    });
-"></div>
-
+    <x-confirm-delete />
     <div x-data @confirm-apus.window="
     const get_id = $event.detail.get_id;
     

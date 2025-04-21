@@ -1,8 +1,7 @@
 <form wire:submit.prevent="save" class="py-5 px-3 max-h-[80vh] overflow-y-auto space-y-3  [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:hidden">
-    <!-- Charge Section -->
-
     <div class="bg-white">
         <!-- Heading Bar -->
+        {{$shipmentId}}
         <div class="bg-green-600 p-3 rounded-t-xl">
             <h2 class="text-white text-lg font-semibold">Charge</h2>
         </div>
@@ -520,7 +519,7 @@
     </div>
     <!-- Modal Footer (Buttons) -->
     <div class="flex justify-end mt-4 gap-2 p-4 border-t color-gray-200">
-        <button type="button" @click="open = false" class="px-4 py-2 bg-gray-500 text-white rounded-lg" @click="$refs.modalContent.scrollTo({ top: 0, behavior: 'smooth' })">
+        <button type="button" wire:click="closeModal" class="px-4 py-2 bg-gray-500 text-white rounded-lg" @click="$refs.modalContent.scrollTo({ top: 0, behavior: 'smooth' })">
             Cancel
         </button>
         <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">

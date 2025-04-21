@@ -64,7 +64,7 @@
             <div class="col-span-2 grid grid-cols-2">
                 <div class="p-2 border-r border-b border-gray-400">
                     <h2 class="font-bold uppercase text-sm">Pre-Carriage By</h2>
-                    <p>(Detail)</p>
+                    <p>{{$shipment->ocean_vessel_feeder}}</p>
                 </div>
                 <div class="p-2 border-b border-gray-400">
                     <h2 class="font-bold  uppercase text-sm">Place of Receipt</h2>

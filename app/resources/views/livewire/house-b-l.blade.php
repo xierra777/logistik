@@ -5,15 +5,15 @@
     <div class="grid grid-cols-2 mb-4">
         <div class="block w-full flex">
             <p class="font-bold">Shipper : </p>
-            <p>{{$shipment->shipper ?? ""}} / {{$shipmentId}}</p>
+            <p>{{$shipment->shipper->name ?? ""}} / {{$shipmentId}}</p>
         </div>
         <div class="block w-full flex">
             <p class="font-bold">Consignee : </p>
-            <p>{{$shipment->consignee ?? ""}} / {{$shipmentId}}</p>
+            <p>{{$shipment->consignee->name ?? ""}} / {{$shipmentId}}</p>
         </div>
         <div class="block w-full flex">
             <p class="font-bold">Notify : </p>
-            <p>{{$shipment->notify ?? ""}} / {{$shipmentId}}</p>
+            <p>{{$shipment->notify->name ?? ""}} / {{$shipmentId}}</p>
         </div>
         <div class="block w-full flex">
             <p class="font-bold">Job No : </p>
@@ -54,15 +54,6 @@
             Back
         </a>
     </div>
-    <iframe width="560" height="315"
-        src="https://www.youtube.com/embed/JtLGhkcnshU?si=gIwY5n-1-LwmtOpr&autoplay=1"
-        title="YouTube video player"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        referrerpolicy="strict-origin-when-cross-origin"
-        allowfullscreen>
-    </iframe>
 
-
-
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/XQzHF8DGYp8?si=LCqmWd7dInxl5Fyu" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 </div>

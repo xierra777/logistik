@@ -21,8 +21,8 @@
             <!-- SHIPPER -->
             <div class="col-span-2 p-2 border-t border-l border-gray-400">
                 <h2 class="font-bold uppercase ">Shipper</h2>
-                <p>{{$shipment->shipper}}</p>
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Blanditiis deleniti facilis odio culpa quam, rem amet modi voluptatum tempore corporis.</p>
+                <p>{{$shipment->shipper->name}}</p>
+                <p>{{$shipment->shipper->address}}</p>
             </div>
 
             <!-- LOGO + TITLE + INFO -->
@@ -49,15 +49,15 @@
             <!-- CONSIGNEE -->
             <div class="col-span-2 p-2">
                 <h2 class="font-bold uppercase">Consignee</h2>
-                <p>{{$shipment->consignee}}</p>
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Blanditiis deleniti facilis odio culpa quam, rem amet modi voluptatum tempore corporis.</p>
+                <p>{{$shipment->consignee->name}}</p>
+                <p>{{$shipment->consignee->address}}</p>
             </div>
 
             <!-- NOTIFY PARTY -->
             <div class="col-span-2 p-2">
                 <h2 class="font-bold uppercase">Notify Party</h2>
-                <p>{{$shipment->notify}}</p>
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Blanditiis deleniti facilis odio culpa quam, rem amet modi voluptatum tempore corporis.</p>
+                <p>{{$shipment->notify->name}}</p>
+                <p>{{$shipment->notify->address}}</p>
             </div>
 
             <!-- INFO 4 KOLOM -->
@@ -194,5 +194,10 @@
         </div>
     </div>
 </body>
+<footer>
+    <div class="border border-gray-900">
+        <p>"This document is automatically generated from the shipment management system and considered valid without physical signature.</p>
+    </div>
+</footer>
 
 </html>

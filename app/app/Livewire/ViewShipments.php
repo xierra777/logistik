@@ -17,6 +17,7 @@ class ViewShipments extends Component
     public $transaction; // Your list of transactions
     public $transactionId; // Selected transaction to edit
     public $isEditing = false;
+    public $refreshKey = null;
 
     protected $listeners = [
         'invoiceGenerated',
@@ -43,6 +44,7 @@ class ViewShipments extends Component
     {
         $this->shipmentId = $id;
         $this->shipment = Shipment::with(['transactions', 'containers'])->findOrFail($id);
+        $this->refreshKey = now()->timestamp;
 
         // Jika tidak ada transaksi, buat transaksi baru
         if ($this->shipment->transactions->isEmpty()) {
@@ -50,6 +52,11 @@ class ViewShipments extends Component
         } else {
             $this->transaction = $this->shipment->transactions->first();
         }
+    }
+
+    public function refreshTransaction()
+    {
+        $this->refreshKey = now()->timestamp; // atau Str::uuid() juga bisa
     }
     public function refreshShipment()
     {

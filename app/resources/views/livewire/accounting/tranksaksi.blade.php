@@ -1,4 +1,5 @@
 <form wire:submit.prevent="save" class="py-5 px-3 max-h-[80vh] overflow-y-auto space-y-3  [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:hidden">
+
     <div class="bg-white">
         <!-- Heading Bar -->
         {{$shipmentId}}
@@ -79,77 +80,77 @@
     </div>
     <!-- Sell Section -->
     <div class="bg-white" x-data="{
-                scurrency: @entangle('scurrency'),
-                srate: @entangle('srate'),
-                amount: @entangle('samount_qty'),
-                sincludedtax: @entangle('sincludedtax'),
-                svatgst: @entangle('svatgst'),
-                swhtaxrate: @entangle('swhtaxrate'),
-                // Number formatting function
-                formatNumber(value) {
-                    if (isNaN(value) || value === null || value === undefined) return '';
-                    return new Intl.NumberFormat('de-DE', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }).format(value);
-                },
-        
-                // Computed properties
-                get fcyAmount() {
-                    return this.amount;
-                },
-                get samountidr() {
-                    return parseFloat((this.srate || 0).toString().replace(',', '')) * 
-                    parseFloat((this.fcyAmount || 0).toString().replace(',', ''));               
-                 },
-                get gp() {
-                    const isTaxIncluded = (this.sincludedtax || 'No').toString().trim() === 'Yes';
-                    return isTaxIncluded ? this.samountidr + this.taxAmount : this.samountidr;
-                },
-                get taxable() {
-                    // Clean tax rate (handle values like '1,1%')
-                    const rateString = (this.svatgst || '0').replace('%', '').replace(',', '.');
-                    const rate = parseFloat(rateString) || 0;
-                    return this.samountidr * (rate / 100);
-                },
-                get swhtaxamount() {
-                    // Clean tax rate (handle values like '1,1%')
-                    const rateString = (this.swhtaxrate || '0').replace('%', '').replace(',', '.');
-                    const rate = parseFloat(rateString) || 0;
-                    return this.samountidr * (rate / 100);
-                },
-                get taxAmount() {
-                    return this.taxable + this.swhtaxamount;
-                },
-        
-                // Initialization
-                init() {
-                    this.$watch('fcyAmount', value => @this.set('sfcyamount', value));
-                    this.$watch('amount', value => @this.set('samount_qty', value));
-                    this.$watch('formatNumber(taxAmount)', value => @this.set('svatgstamount', value));
-                    this.$watch('formatNumber(taxable)', value => @this.set('staxableamount', value));
-                    this.$watch('formatNumber(samountidr)', value => @this.set('samountidr', value));
-                    this.$watch('formatNumber(gp)', value => @this.set('sgrossprofit', value));
-                    this.$watch('scurrency', value => this.fetchExchangeRate(value));
-                    this.fetchExchangeRate(this.scurrency);
-                },
-                fetchExchangeRate(currency) {
-                    if (!currency || currency.trim().length < 3) {
-                        this.srate = 0;
-                        return;
-                    }
-                    let curr = currency.trim().toUpperCase();
-                    fetch(`https://api.exchangerate-api.com/v4/latest/${curr}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            this.srate = data.rates?.IDR || 0;
-                        })
-                        .catch(error => {
-                            console.error('Error fetching exchange rate:', error);
-                            this.srate = 0;
-                        });
-                }
-            }">
+        scurrency: @entangle('scurrency'),
+        srate: @entangle('srate'),
+        amount: @entangle('samount_qty'),
+        sincludedtax: @entangle('sincludedtax'),
+        svatgst: @entangle('svatgst'),
+        swhtaxrate: @entangle('swhtaxrate'),
+        // Number formatting function
+        formatNumber(value) {
+            if (isNaN(value) || value === null || value === undefined) return '';
+            return new Intl.NumberFormat('de-DE', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value);
+        },
+
+        // Computed properties
+        get fcyAmount() {
+            return this.amount;
+        },
+        get samountidr() {
+            return parseFloat((this.srate || 0).toString().replace(',', '')) * 
+            parseFloat((this.fcyAmount || 0).toString().replace(',', ''));               
+         },
+        get gp() {
+            const isTaxIncluded = (this.sincludedtax || 'No').toString().trim() === 'Yes';
+            return isTaxIncluded ? this.samountidr + this.taxAmount : this.samountidr;
+        },
+        get taxable() {
+            // Clean tax rate (handle values like '1,1%')
+            const rateString = (this.svatgst || '0').replace('%', '').replace(',', '.');
+            const rate = parseFloat(rateString) || 0;
+            return this.samountidr * (rate / 100);
+        },
+        get swhtaxamount() {
+            // Clean tax rate (handle values like '1,1%')
+            const rateString = (this.swhtaxrate || '0').replace('%', '').replace(',', '.');
+            const rate = parseFloat(rateString) || 0;
+            return this.samountidr * (rate / 100);
+        },
+        get taxAmount() {
+            return this.taxable + this.swhtaxamount;
+        },
+
+        // Initialization
+        init() {
+            this.$watch('fcyAmount', value => @this.set('sfcyamount', value));
+            this.$watch('amount', value => @this.set('samount_qty', value));
+            this.$watch('formatNumber(taxAmount)', value => @this.set('svatgstamount', value));
+            this.$watch('formatNumber(taxable)', value => @this.set('staxableamount', value));
+            this.$watch('formatNumber(samountidr)', value => @this.set('samountidr', value));
+            this.$watch('formatNumber(gp)', value => @this.set('sgrossprofit', value));
+            this.$watch('scurrency', value => this.fetchExchangeRate(value));
+            this.fetchExchangeRate(this.scurrency);
+        },
+        fetchExchangeRate(currency) {
+            if (!currency || currency.trim().length < 3) {
+                this.srate = 0;
+                return;
+            }
+            let curr = currency.trim().toUpperCase();
+            fetch(`https://api.exchangerate-api.com/v4/latest/${curr}`)
+                .then(response => response.json())
+                .then(data => {
+                    this.srate = data.rates?.IDR || 0;
+                })
+                .catch(error => {
+                    console.error('Error fetching exchange rate:', error);
+                    this.srate = 0;
+                });
+        }
+    }">
         <!-- Heading Bar -->
         <div class="bg-orange-500 p-3 rounded-t-xl">
             <h2 class="text-white text-lg font-semibold">Sale</h2>
@@ -290,79 +291,79 @@
     </div>
     <!-- Cost Section -->
     <div class="bg-white" x-data="{
-                ccurrency: @entangle('ccurrency'),
-                // (crate): @entangle('crate'),
-                camount: @entangle('camount_qty'),
-                cincludedtax: @entangle('cincludedtax'),
-                cvatgst: @entangle('cvatgst'),
-                cwhtaxrate: @entangle('cwhtaxrate'),    
-                ctaxamount: @entangle ('cvatgstamount'),
-                // Number formatting function
+        ccurrency: @entangle('ccurrency'),
+        // (crate): @entangle('crate'),
+        camount: @entangle('camount_qty'),
+        cincludedtax: @entangle('cincludedtax'),
+        cvatgst: @entangle('cvatgst'),
+        cwhtaxrate: @entangle('cwhtaxrate'),    
+        ctaxamount: @entangle ('cvatgstamount'),
+        // Number formatting function
 
-                formatNumber(value) {
-                    if (isNaN(value) || value === null || value === undefined) return '';
-                    return new Intl.NumberFormat('de-DE', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }).format(value);
-                },
-        
-                // Computed properties
-                get cfcyAmount() {
-                    return this.camount;
-                },
-                get camountidr() {
-                 return parseFloat((this.crate || 0).toString().replace(',', '')) * 
-                     parseFloat((this.cfcyAmount || 0).toString().replace(',', ''));
-                },
-                get gp() {
-                    const isTaxIncluded = (this.cincludedtax || 'No').toString().trim() === 'Yes';
-                    return isTaxIncluded ? this.camountidr - this.ctaxAmount : this.samountidr;
-                },
-                get ctaxable() {
-                    // Clean tax rate (handle values like '1,1%')
-                    const rateString = (this.cvatgst || '0').replace('%', '').replace(',', '.');
-                    const rate = parseFloat(rateString) || 0;
-                    return this.camountidr * (rate / 100);
-                },
-                get cwhtaxamount() {
-                    // Clean tax rate (handle values like '1,1%')
-                    const rateString = (this.cwhtaxrate || '0').replace('%', '').replace(',', '.');
-                    const rate = parseFloat(rateString) || 0;
-                    return this.camountidr * (rate / 100);
-                },
-                get ctaxamount() {
-                    return this.ctaxable + this.cwhtaxamount;
-                },
-        
-                // Initialization
-                init() {
-                    this.$watch('cfcyAmount', value => @this.set('cfcyamount', value));
-                    this.$watch('camount', value => @this.set('camount_qty', value));
-                    this.$watch('formatNumber(ctaxamount)', value => @this.set('cvatgstamount', value));
-                    this.$watch('formatNumber(ctaxable)', value => @this.set('ctaxableamount', value));
-                    this.$watch('formatNumber(camountidr)', value => @this.set('camountidr', value));
-                    this.$watch('formatNumber(cwhtaxamount)', value => @this.set('cwhtaxamount', value));
-                    this.$watch('ccurrency', value => this.fetchExchangeRate(value));
-                    this.fetchExchangeRate(this.ccurrency);
-                },
-                fetchExchangeRate(currency) {
-                    if (!currency || currency.trim().length < 3) {
-                        this.crate = 0;
-                        return;
-                    }
-                    let curr = currency.trim().toUpperCase();
-                    fetch(`https://api.exchangerate-api.com/v4/latest/${curr}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            this.crate = data.rates?.IDR || 0;
-                        })
-                        .catch(error => {
-                            console.error('Error fetching exchange rate:', error);
-                            this.crate = 0;
-                        });
-                }
-            }">
+        formatNumber(value) {
+            if (isNaN(value) || value === null || value === undefined) return '';
+            return new Intl.NumberFormat('de-DE', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value);
+        },
+
+        // Computed properties
+        get cfcyAmount() {
+            return this.camount;
+        },
+        get camountidr() {
+         return parseFloat((this.crate || 0).toString().replace(',', '')) * 
+             parseFloat((this.cfcyAmount || 0).toString().replace(',', ''));
+        },
+        get gp() {
+            const isTaxIncluded = (this.cincludedtax || 'No').toString().trim() === 'Yes';
+            return isTaxIncluded ? this.camountidr - this.ctaxAmount : this.samountidr;
+        },
+        get ctaxable() {
+            // Clean tax rate (handle values like '1,1%')
+            const rateString = (this.cvatgst || '0').replace('%', '').replace(',', '.');
+            const rate = parseFloat(rateString) || 0;
+            return this.camountidr * (rate / 100);
+        },
+        get cwhtaxamount() {
+            // Clean tax rate (handle values like '1,1%')
+            const rateString = (this.cwhtaxrate || '0').replace('%', '').replace(',', '.');
+            const rate = parseFloat(rateString) || 0;
+            return this.camountidr * (rate / 100);
+        },
+        get ctaxamount() {
+            return this.ctaxable + this.cwhtaxamount;
+        },
+
+        // Initialization
+        init() {
+            this.$watch('cfcyAmount', value => @this.set('cfcyamount', value));
+            this.$watch('camount', value => @this.set('camount_qty', value));
+            this.$watch('formatNumber(ctaxamount)', value => @this.set('cvatgstamount', value));
+            this.$watch('formatNumber(ctaxable)', value => @this.set('ctaxableamount', value));
+            this.$watch('formatNumber(camountidr)', value => @this.set('camountidr', value));
+            this.$watch('formatNumber(cwhtaxamount)', value => @this.set('cwhtaxamount', value));
+            this.$watch('ccurrency', value => this.fetchExchangeRate(value));
+            this.fetchExchangeRate(this.ccurrency);
+        },
+        fetchExchangeRate(currency) {
+            if (!currency || currency.trim().length < 3) {
+                this.crate = 0;
+                return;
+            }
+            let curr = currency.trim().toUpperCase();
+            fetch(`https://api.exchangerate-api.com/v4/latest/${curr}`)
+                .then(response => response.json())
+                .then(data => {
+                    this.crate = data.rates?.IDR || 0;
+                })
+                .catch(error => {
+                    console.error('Error fetching exchange rate:', error);
+                    this.crate = 0;
+                });
+        }
+    }">
         <!-- Heading Bar -->
         <div class="bg-blue-500 p-3 rounded-t-xl">
             <h2 class="text-white text-lg font-semibold">Cost</h2>

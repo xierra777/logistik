@@ -31,6 +31,7 @@ class Tranksaksi extends Component
     public $vendors, $clients;
     public $totalall = 0;
 
+    protected $listeners = ['reloadTransactionData' => 'setShipmentId', 'handleReload'];
 
     // === Set Shipment ID dari Parent (bila diupdate) ===
     public function setShipmentId($shipmentId)
@@ -39,6 +40,15 @@ class Tranksaksi extends Component
         $shipment = Shipment::find($shipmentId);
         $this->shipmentId = $shipment->id;
         $this->updateQty();
+    }
+
+    public function handleReload($payload)
+    {
+        if ($payload['shipmentId'] == $this->shipmentId) {
+            // Do refresh logic here
+            $this->reset(); // or refresh specific data
+            // $this->mount($this->shipmentId); // optional kalau kamu mau re-run mount logic
+        }
     }
 
 

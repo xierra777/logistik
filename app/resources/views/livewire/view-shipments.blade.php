@@ -205,7 +205,7 @@
                         <td class="px-4 py-2 text-sm text-gray-800">{{ $container->gross_weight }}</td>
                         <td class="px-4 py-2 text-sm text-gray-800">{{ $container->measurement ?? 'N/A'}}</td>
                         <td class="px-4 py-2 text-sm gap-2">
-                            <button wire:click="editContainer({{ $container->id }})" class="text-indigo-600 hover:text-indigo-600">Edit</button>
+                            <button wire:click="updateContainer({{ $container->id }})" class="text-indigo-600 hover:text-indigo-600">Edit</button>
                             <button wire:click="$dispatch('confirm-apus', { get_id: {{ $container->id }} })" class="text-red-500">Delete
                             </button>
                         </td>
@@ -222,7 +222,7 @@
 
         <div class="border rounded-lg overflow-hidden">
             <div class="border rounded-lg overflow-hidden">
-                <div x-data="{ open: false }" @close-modal.window="open = false"
+                <div x-data="{ open: true }" @close-modal.window="open = false"
                     x-ref="modalContent">
                     <div class=" flex justify-end mb-4 p-4">
                         <a href="{{ route('sale-invoice', ['shipmentId' => $shipment->id]) }}" class="py-3 px-4 mr-4 bg-green-500 text-white rounded">
@@ -231,7 +231,9 @@
                         <a href="{{ route('purchase-invoice', ['shipmentId' => $shipment->id]) }}" class="p-4 bg-red-500 text-white rounded-lg mr-4">
                             Print PI
                         </a>
-                        <button @click="open = true; $dispatch('reloadTransactionData', { shipmentId: '{{ $shipment->id }}' })"
+                        <button
+                            wire:click="refreshTransaction"
+                            @click="open = true"
                             class="py-3 px-4 bg-blue-600 text-white rounded-lg">
                             Add Cost
                         </button>
@@ -265,8 +267,9 @@
                                 </button>
                             </div>
                             <!-- Form -->
-                            <livewire:accounting.tranksaksi :shipmentId="$shipment->id" :key="'transaction-' . $shipment->id" />
-                            <!-- End Form -->
+                            <livewire:accounting.tranksaksi
+                                :shipmentId="$shipment->id"
+                                :key="'transaction-' . $shipment->id . '-' . now()->timestamp" /> <!-- End Form -->
                         </div>
                     </div>
                 </div>
@@ -298,8 +301,9 @@
                                     <div class="flex justify-center gap-2 items-center p-2">
                                         <button wire:click="editTransaction({{ $transaction->id }})">
                                             <i class="fa-solid fa-pen-to-square fa-2xl" style="color: #FFD43B;"></i> </button>
-                                        <button wire:click="$dispatch('confirm-delete', { get_id: {{ $transaction->id }} })">
-                                            <i class="fa-solid fa-trash fa-2xl" style="color: #ff0000;"></i> </button>
+                                        <button type="button" wire:click="$dispatch('confirm-delete', { get_id: {{ $transaction->id }} })">
+                                            <i class="fa-solid fa-trash fa-2xl" style="color: #ff0000;"></i>
+                                        </button>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-center">{{ $loop->iteration }}</td>

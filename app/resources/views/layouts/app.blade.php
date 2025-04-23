@@ -24,6 +24,12 @@
     dark:[&::-webkit-scrollbar-track]:bg-neutral-700
     dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500">
     <input type="hidden" name="_token" value="{{ csrf_token() }}">
+    @if(session('alert'))
+    <div class="alert alert-warning">
+        {{ session('alert') }}
+    </div>
+    @endif
+
     @csrf
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
         <livewire:layout.navigation />

@@ -26,10 +26,11 @@ class Tranksaksi extends Component
     // === Cost Details ===
     public $cvendor, $creferenceno, $cdate, $cdrcr, $ccurrency, $crate = 0, $camount_qty = 0;
     public $cincludedtax = "No", $cfcyamount = 0, $camountidr = 0, $cvatgst, $cvatgstamount = 0;
-    public $ctaxableamount, $cremarks, $cwhtaxrate, $cwhtaxamount = 0;
+    public $ctaxableamount, $cremarks, $cwhtaxrate, $cwhtaxamount = 0, $totalcost = 0;
 
+    public $svatgstusd = 0, $cvatgstusd = 0;
+    public $shwtaxrateusd = 0, $chwtaxrateusd = 0;
     public $vendors, $clients;
-    public $totalall = 0;
 
     protected $listeners = ['reloadTransactionData' => 'setShipmentId', 'handleReload'];
 
@@ -121,11 +122,16 @@ class Tranksaksi extends Component
             'cremarks' => $this->cremarks,
             'cwhtaxrate' => $this->cwhtaxrate,
             'cwhtaxamount' => $this->cwhtaxamount,
+            'svatgstusd' => $this->svatgstusd,
+            'cvatgstusd' => $this->cvatgstusd,
+            'shwtaxrateusd' => $this->shwtaxrateusd,
+            'chwtaxrateusd' => $this->chwtaxrateusd,
         ]);
 
         $this->reset(); // Reset semua field setelah simpan
         $this->loadClients(); // Refresh data jika perlu
         $this->dispatch('transactionSaved'); // Emit event ke parent untuk refresh data\n        $this->dispatch('close-modal');  // Tutup modal child
+        $this->dispatch('close-modal');
 
         session()->flash('message', 'Transaksi berhasil disimpan!');
     }

@@ -111,35 +111,39 @@
         </div>
 
         <!-- ISI TABEL -->
-        <div class="grid grid-cols-7 h-96 text-sm border-l border-r border-gray-400 divide-x divide-gray-400">
+        <div class="grid grid-cols-7 text-sm border-l border-r border-gray-400 divide-x divide-gray-400">
             <div class="col-span-2 p-2">
                 <p>CY/CY</p>
                 <p>Dammam</p>
                 <p class="text-center">// CONTAINER NO //</p>
-                <p class="text-center">Container</p>
-                <p class="text-center">Container</p>
-                <p class="text-center">Container</p>
-                <p class="text-center">Container</p>
+                @foreach($shipment->containers as $container)
+                {{$container->container_id}} /<br>{{$container->container_seal}} ({{$container->container_type}})</p>
+                @endforeach
+
             </div>
             <div class="p-2 text-right">
-                <p>20GP X3</p>
+                @foreach($shipment->containers->groupBy('container_type') as $type => $items)
+                <p>{{ $type }} x {{ $items->count() }}</p>
+                @endforeach
                 <br>
-                <p>5,249 CARTONS</p>
+                @foreach($groupedUnits as $item)
+                <p>{{ $item['totalPcs'] }} {{ $item['unit'] }}</p>
+                @endforeach
             </div>
             <div class="col-span-2 p-2">
                 <p>"SHIPPER'S LOAD, STOW, COUNT AND SEAL"</p>
                 <p>SAID TO CONTAIN :</p>
                 <br>
-                <p>5249 CARTONS INDOFOOD CHILI SAUCE</p>
+                <p>{{$shipment->description}}</p>
                 <br>
                 <p>ORDER NO:</p>
-                <p>FS/121/PCL/SBTC/IX/2024-A-D</p>
-                <p>FS/121/PCL/SBTC/IX/2024-A-D</p>
+                <p>{{$shipment->shipment_no}}</p>
+                <p>{{$shipment->shipment_no}}</p>
                 <br>
                 <p>NET WEIGHT : 42,432.68 KGS</p>
             </div>
-            <div class="p-2">80.100 CBM</div>
-            <div class="p-2 font-semibold text-lg">52,253.240 KGS</div>
+            <div class="p-2">{{$totalgw}} CBM</div>
+            <div class="p-2 font-semibold text-lg">{{$totalgw}} {{$shipment->containers->first()->unit ?? '' }}</div>
         </div>
 
         <!-- FOOTER -->

@@ -13,8 +13,11 @@ class HouseBL extends Component
 {
     public $pdfData = '';
     public $shipmentId;
+    public $customer;
     public $shipment;
     public $shipment_no;
+    public $totalPcs = 0;
+    public $totalgw = 0;
     public function mount($shipmentId)
     {
         $this->shipmentId = $shipmentId;
@@ -31,9 +34,18 @@ class HouseBL extends Component
 
         // Get Shipment and Customer
         $shipment = Shipment::with('containers')->findOrFail($this->shipmentId);
+        // $totalType = $shipment->containers->groupBy('container_type')->map->count();
+        $totalPcs = $shipment->containers->sum('pcs');
+        $totalgw = $shipment->containers->sum('gross_weight');
 
         // Prepare data for the view
-        $data = compact('shipment');
+        $containers = $shipment->containers; // Retrieve containers from the shipment
+        $data = compact('shipment', 'customer') +  [
+            'shipment' => $shipment,
+            'containers' => $containers,
+            'totalPcs'       => $totalPcs,
+            'totalgw'         => $totalgw,
+        ];
         // Get current date (Optional - can be used for the document or logs)
         $now = Carbon::now();
         $formattedDate = $now->format('d-m-Y');  // For example: "24-03-2025"
@@ -63,13 +75,29 @@ class HouseBL extends Component
         //     session()->flash('error', 'No data available for preview.');
         //     return;
         // }
-
         $shipment = Shipment::with('containers')->findOrFail($this->shipmentId);
+        $description = $shipment->description;
+        $descriptionLines = explode("\n", wordwrap($description, 90)); // 90 bisa disesuaikan dengan lebar per baris
+        $descChunks = array_chunk($descriptionLines, 30); // 30 baris per halaman
+        $totalPcs   = $shipment->containers->sum('pcs');
+        $totalgw    = $shipment->containers->sum('gross_weight');
+        $groupedUnits = $shipment->containers
+            ->groupBy('unit')
+            ->map(function ($group) {
+                return [
+                    'unit' => $group->first()->unit,
+                    'totalPcs' => $group->sum('pcs'),
+                ];
+            })->values();
+        $data = [
+            'shipment' => $shipment,
+            'containers' => $shipment->containers,
+            'groupedUnits' => $groupedUnits,
+            'totalPcs' => $totalPcs,
+            'totalgw' => $totalgw,
+            'descChunks' => $descChunks,
 
-
-
-        $data = compact('shipment');
-
+        ];
         $html = view('livewire.pdfhbl', $data)->render();
         $pdfContent = Browsershot::html($html)
             ->setChromePath('/usr/bin/google-chrome')

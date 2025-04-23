@@ -88,21 +88,6 @@
       </div>
       <!-- endroles -->
       <div class="relative w-full mb-4 bg">
-        <label for="address" class="block text-sm font-medium text-gray-700">
-          Alamat <span class="text-red-500">*</span>
-        </label>
-        <input
-          wire:model="address"
-          type="text"
-          id="address"
-          name="address"
-          required
-          class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        @error('address')
-        <span class="text-sm text-red-500">{{ $message }}</span>
-        @enderror
-      </div>
-      <div class="relative w-full mb-4 bg">
         <label for="web" class="block text-sm font-medium text-gray-700">
           Web <span class="text-red-500">*</span>
         </label>
@@ -113,6 +98,20 @@
           name="web"
           class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
         @error('web')
+        <span class="text-sm text-red-500">{{ $message }}</span>
+        @enderror
+      </div>
+
+      <div class="relative w-full mb-4 bg">
+        <label for="address" class="block text-sm font-medium text-gray-700">
+          Alamat <span class="text-red-500">*</span>
+        </label>
+        <textarea class="py-2 px-3 sm:py-3 sm:px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600" rows="3" placeholder="This is a textarea placeholder" wire:model="address"
+          type="text"
+          id="address"
+          name="address"
+          required></textarea>
+        @error('address')
         <span class="text-sm text-red-500">{{ $message }}</span>
         @enderror
       </div>

@@ -1,4 +1,164 @@
-<form wire:submit.prevent="save" class="py-5 px-3 max-h-[80vh] overflow-y-auto space-y-3  [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:hidden">
+<form wire:submit.prevent="save" class="py-5 px-3 max-h-[80vh] overflow-y-auto space-y-3  [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:hidden"
+    x-data="{
+        scurrency: @entangle('scurrency'),
+        srate: @entangle('srate'),
+        amount: @entangle('samount_qty'),
+        sincludedtax: @entangle('sincludedtax'),
+        svatgst: @entangle('svatgst'),
+        swhtaxrate: @entangle('swhtaxrate'),
+        fcyAmount: @entangle('sfcyamount'),
+        samountidr: @entangle('samountidr'),
+        camountidr : @entangle('camountidr'),
+        // Number formatting function
+        formatNumber(value) {
+            if (isNaN(value) || value === null || value === undefined) return '';
+            return new Intl.NumberFormat('de-DE', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value);
+        },
+        ccurrency: @entangle('ccurrency'),
+        crate: @entangle('crate'),
+        camount: @entangle('camount_qty'),
+        cincludedtax: @entangle('cincludedtax'),
+        cvatgst: @entangle('cvatgst'),
+        cwhtaxrate: @entangle('cwhtaxrate'),    
+        ctaxamount: @entangle ('cvatgstamount'),
+        // Number formatting function
+
+        
+
+
+         // Computed properties
+        get fcyAmount() {
+            return this.amount;
+        },
+        get samountidr() {
+            // Apakah tax included?
+            const isTaxIncluded = (this.sincludedtax || 'No').trim() === 'Yes';
+
+            // Bersihkan rate VAT jadi angka murni
+            const rateNum = parseFloat(
+                (this.svatgst || '0')
+                    .replace('%', '')
+                    .replace(',', '.')
+            ) || 0;
+
+            // Base IDR tanpa pajak
+            const baseIdr = this.srate * (parseFloat(this.fcyAmount) || 0);
+
+            if (isTaxIncluded) {
+                // Jika tax include, gross = base + VAT
+                return baseIdr * (1 + rateNum / 100);
+            } else {
+                // Jika tax exclude, cuma base
+                return baseIdr;
+            }
+        },
+
+        get gp() {
+            return this.samountidr - this.camountidr;
+        },
+        get taxable() {
+                    const rateString = (this.svatgst || '0').replace('%', '').replace(',', '.');
+                    const rate = parseFloat(rateString) || 0;
+                    return this.samountidr * (rate / 100);
+        },
+        get taxableusd() {
+                    const rateString = (this.svatgst || '0').replace('%', '').replace(',', '.');
+                    const rate = parseFloat(rateString) || 0;
+                    return this.fcyAmount * (rate / 100);
+        },
+        get swhtaxamountusd() {
+            const rateString = (this.swhtaxrate || '0').replace('%', '').replace(',', '.');
+            const rate = parseFloat(rateString) || 0;
+            return this.fcyAmount * (rate / 100);
+        },
+        get taxAmount() {
+            return this.taxable + this.swhtaxamount;
+        },
+        // Computed properties
+        get cfcyAmount() {
+            return this.camount;
+        },
+        get camountidr() {
+         return parseFloat((this.crate || 0).toString().replace(',', '')) * 
+             parseFloat((this.cfcyAmount || 0).toString().replace(',', ''));
+        },
+
+        get ctaxable() {
+            // Clean tax rate (handle values like '1,1%')
+            const rateString = (this.cvatgst || '0').replace('%', '').replace(',', '.');
+            const rate = parseFloat(rateString) || 0;
+            return this.camountidr * (rate / 100);
+        },
+        get cwhtaxamount() {
+            // Clean tax rate (handle values like '1,1%')
+            const rateString = (this.cwhtaxrate || '0').replace('%', '').replace(',', '.');
+            const rate = parseFloat(rateString) || 0;
+            return this.camountidr * (rate / 100);
+        },
+        get ctaxamount() {
+            return this.ctaxable + this.cwhtaxamount;
+        },
+
+        // Initialization
+        init() {
+            this.$watch('cfcyAmount', value => @this.set('cfcyamount', value));
+            this.$watch('camount', value => @this.set('camount_qty', value));
+            this.$watch('formatNumber(ctaxamount)', value => @this.set('cvatgstamount', value));
+            this.$watch('formatNumber(ctaxable)', value => @this.set('ctaxableamount', value));
+            this.$watch('formatNumber(camountidr)', value => @this.set('camountidr', value));
+            this.$watch('formatNumber(cwhtaxamount)', value => @this.set('cwhtaxamount', value));
+            this.$watch('ccurrency', value => this.fetchExchangRate(value));
+            this.fetchExchangRate(this.ccurrency);
+            this.$watch('formatNumber(gp)', value => @this.set('sgrossprofit', value));
+            this.$watch('fcyAmount', value =>  @this.set('sfcyamount', value));    
+            this.$watch('amount', value => @this.set('samount_qty', value));
+            this.$watch('formatNumber(taxAmount)', value => @this.set('svatgstamount', value));
+            this.$watch('formatNumber(taxable)', value => @this.set('staxableamount', value));
+            this.$watch('formatNumber(taxable)', value => @this.set('swhtaxamount', value));
+
+            
+            this.$watch('formatNumber(taxableusd)', value => @this.set('svatgstusd', value));
+            this.$watch('formatNumber(samountidr)', value => @this.set('samountidr', value));
+            this.$watch('formatNumber(gp)', value => @this.set('sgrossprofit', value));
+            this.$watch('scurrency', value => this.fetchExchangeRate(value));
+            this.fetchExchangeRate(this.scurrency);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                },
+        fetchExchangRate(currency) {
+            if (!currency || currency.trim().length < 3) {
+                this.crate = 0;
+                return;
+            }
+            let curr = currency.trim().toUpperCase();
+            fetch(`https://api.exchangerate-api.com/v4/latest/${curr}`)
+                .then(response => response.json())
+                .then(data => {
+                    this.crate = data.rates?.IDR || 0;
+                })
+                .catch(error => {
+                    console.error('Error fetching exchange rate:', error);
+                    this.crate = 0;
+                });
+        },
+        fetchExchangeRate(currency) {
+            if (!currency || currency.trim().length < 3) {
+                this.srate = 0;
+                return;
+            }
+            let curr = currency.trim().toUpperCase();
+            fetch(`https://api.exchangerate-api.com/v4/latest/${curr}`)
+                .then(response => response.json())
+                .then(data => {
+                    this.srate = data.rates?.IDR || 0;
+                })
+                .catch(error => {
+                    console.error('Error fetching exchange rate:', error);
+                    this.srate = 0;
+                });
+        }
+    }">
 
     <div class="bg-white">
         <!-- Heading Bar -->
@@ -17,7 +177,18 @@
                     </label>
                     <select id="charge" name="charge" wire:model="charge"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value=""></option>
                         <option value="FCL">FCL</option>
+                        <option value="TERMINAL HANDLING CHARGES : THC">TERMINAL HANDLING CHARGES : THC</option>
+                        <option value=" DOCUMENT CHARGES : DOC FEE">DOCUMENT CHARGES : DOC FEE</option>
+                        <option value="ADMINISTRATION CHARGES">ADMINISTRATION CHARGES</option>
+                        <option value="BL CHARGES">BL FEE</option>
+                        <option value="OTHERS">OTHERS</option>
+                        <option value="STORAGE">STORAGE</option>
+                        <option value="FREIGHT CHARGES">FREIGHT CHARGES OCEAN/AIR</option>
+                        <option value="TRUCKING">TRUCKING</option>
+                        <option value="HANDLING CHARGES">HANDLING CHARGES</option>
+                        <option value="PEB/PIB CHARGES">PEB/PIB CHARGES</option>
                     </select>
                 </div>
                 <!-- Description -->
@@ -33,8 +204,11 @@
                     <label for="freight" class="block text-sm font-medium text-gray-700">
                         Freight<span class="text-red-500">*</span>
                     </label>
-                    <input type="text" id="freight" name="freight" wire:model="freight" placeholder=""
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <select name="freight" id="freight" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value=""></option>
+                        <option value="prepaid">Prepaid</option>
+                        <option value="collect">Collect</option>
+                    </select>
                 </div>
             </div>
             <!-- Row 2 -->
@@ -63,8 +237,11 @@
                     <label for="cofdtype" class="block text-sm font-medium text-gray-700">
                         OFD Type
                     </label>
-                    <input type="text" id="cofdtype" name="cofdtype" wire:model="ofdtype" placeholder=""
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <select name="cofdtype" id="cofdtype" wire:model="ofdtype" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value=""></option>
+                        <option value="OFD">OFD</option>
+                        <option value="OFC">OFC</option>
+                    </select>
                 </div>
             </div>
             <!-- Row 3: Remarks -->
@@ -79,78 +256,7 @@
         </div>
     </div>
     <!-- Sell Section -->
-    <div class="bg-white" x-data="{
-        scurrency: @entangle('scurrency'),
-        srate: @entangle('srate'),
-        amount: @entangle('samount_qty'),
-        sincludedtax: @entangle('sincludedtax'),
-        svatgst: @entangle('svatgst'),
-        swhtaxrate: @entangle('swhtaxrate'),
-        // Number formatting function
-        formatNumber(value) {
-            if (isNaN(value) || value === null || value === undefined) return '';
-            return new Intl.NumberFormat('de-DE', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }).format(value);
-        },
-
-        // Computed properties
-        get fcyAmount() {
-            return this.amount;
-        },
-        get samountidr() {
-            return parseFloat((this.srate || 0).toString().replace(',', '')) * 
-            parseFloat((this.fcyAmount || 0).toString().replace(',', ''));               
-         },
-        get gp() {
-            const isTaxIncluded = (this.sincludedtax || 'No').toString().trim() === 'Yes';
-            return isTaxIncluded ? this.samountidr + this.taxAmount : this.samountidr;
-        },
-        get taxable() {
-            // Clean tax rate (handle values like '1,1%')
-            const rateString = (this.svatgst || '0').replace('%', '').replace(',', '.');
-            const rate = parseFloat(rateString) || 0;
-            return this.samountidr * (rate / 100);
-        },
-        get swhtaxamount() {
-            // Clean tax rate (handle values like '1,1%')
-            const rateString = (this.swhtaxrate || '0').replace('%', '').replace(',', '.');
-            const rate = parseFloat(rateString) || 0;
-            return this.samountidr * (rate / 100);
-        },
-        get taxAmount() {
-            return this.taxable + this.swhtaxamount;
-        },
-
-        // Initialization
-        init() {
-            this.$watch('fcyAmount', value => @this.set('sfcyamount', value));
-            this.$watch('amount', value => @this.set('samount_qty', value));
-            this.$watch('formatNumber(taxAmount)', value => @this.set('svatgstamount', value));
-            this.$watch('formatNumber(taxable)', value => @this.set('staxableamount', value));
-            this.$watch('formatNumber(samountidr)', value => @this.set('samountidr', value));
-            this.$watch('formatNumber(gp)', value => @this.set('sgrossprofit', value));
-            this.$watch('scurrency', value => this.fetchExchangeRate(value));
-            this.fetchExchangeRate(this.scurrency);
-        },
-        fetchExchangeRate(currency) {
-            if (!currency || currency.trim().length < 3) {
-                this.srate = 0;
-                return;
-            }
-            let curr = currency.trim().toUpperCase();
-            fetch(`https://api.exchangerate-api.com/v4/latest/${curr}`)
-                .then(response => response.json())
-                .then(data => {
-                    this.srate = data.rates?.IDR || 0;
-                })
-                .catch(error => {
-                    console.error('Error fetching exchange rate:', error);
-                    this.srate = 0;
-                });
-        }
-    }">
+    <div class="bg-white">
         <!-- Heading Bar -->
         <div class="bg-orange-500 p-3 rounded-t-xl">
             <h2 class="text-white text-lg font-semibold">Sale</h2>
@@ -188,7 +294,7 @@
                 <div class="flex space-x-4">
                     <div class="flex-1">
                         <label for="samount_qty" class="block text-sm font-medium text-gray-700">Amount / Qty</label>
-                        <input type="number" id="samount_qty" name="samount_qty"
+                        <input type="text" id="samount_qty" name="samount_qty"
                             x-model.number="amount" wire:model="samount_qty"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
@@ -242,6 +348,18 @@
                         :value="formatNumber(taxable)" wire:model="staxableamount"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
+                <div>
+                    <label for="svatgstusd" class="block text-sm font-medium text-gray-700">taxableusd</label>
+                    <input type="text" id="svatgstusd" name="svatgstusd"
+                        :value="formatNumber(taxableusd)" wire:model="svatgstusd"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="shwtaxrateusd" class="block text-sm font-medium text-gray-700">swhtaxamountusd</label>
+                    <input type="text" id="shwtaxrateusd" name="shwtaxrateusd"
+                        :value="formatNumber(swhtaxamountusd)" wire:model="shwtaxrateusd"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
             </div>
             <!-- Row 4: VAT/GST Amount, W/H Tax Rate, W/H Tax Amount -->
             <div class="grid grid-cols-3 gap-4">
@@ -281,89 +399,21 @@
                     <label for="sgrossprofit" class="block text-sm font-medium text-gray-700">Gross Profit</label>
                     <div class="flex items-center space-x-2  rounded-t-md border-b focus:outline-none focus:ring-0 border-gray-300">
                         <span class="text-gray-700">Rp.</span>
-                        <input type="text" id="sgrossprofit" name="sgrossprofit"
-                            :value="formatNumber(gp)" wire:model="sgrossprofit" readonly
-                            class="mt-1 block w-full  focus:ring-0 focus:outline-none  text-green-700 border-0">
+                        <input type="text"
+                            id="sgrossprofit"
+                            name="sgrossprofit"
+                            :value="formatNumber(gp)"
+                            wire:model="sgrossprofit"
+                            readonly
+                            :class="{'text-red-500': gp < 0, 'text-green-700': gp >= 0}"
+                            class="mt-1 block w-full focus:ring-0 focus:outline-none border-0">
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <!-- Cost Section -->
-    <div class="bg-white" x-data="{
-        ccurrency: @entangle('ccurrency'),
-        // (crate): @entangle('crate'),
-        camount: @entangle('camount_qty'),
-        cincludedtax: @entangle('cincludedtax'),
-        cvatgst: @entangle('cvatgst'),
-        cwhtaxrate: @entangle('cwhtaxrate'),    
-        ctaxamount: @entangle ('cvatgstamount'),
-        // Number formatting function
-
-        formatNumber(value) {
-            if (isNaN(value) || value === null || value === undefined) return '';
-            return new Intl.NumberFormat('de-DE', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }).format(value);
-        },
-
-        // Computed properties
-        get cfcyAmount() {
-            return this.camount;
-        },
-        get camountidr() {
-         return parseFloat((this.crate || 0).toString().replace(',', '')) * 
-             parseFloat((this.cfcyAmount || 0).toString().replace(',', ''));
-        },
-        get gp() {
-            const isTaxIncluded = (this.cincludedtax || 'No').toString().trim() === 'Yes';
-            return isTaxIncluded ? this.camountidr - this.ctaxAmount : this.samountidr;
-        },
-        get ctaxable() {
-            // Clean tax rate (handle values like '1,1%')
-            const rateString = (this.cvatgst || '0').replace('%', '').replace(',', '.');
-            const rate = parseFloat(rateString) || 0;
-            return this.camountidr * (rate / 100);
-        },
-        get cwhtaxamount() {
-            // Clean tax rate (handle values like '1,1%')
-            const rateString = (this.cwhtaxrate || '0').replace('%', '').replace(',', '.');
-            const rate = parseFloat(rateString) || 0;
-            return this.camountidr * (rate / 100);
-        },
-        get ctaxamount() {
-            return this.ctaxable + this.cwhtaxamount;
-        },
-
-        // Initialization
-        init() {
-            this.$watch('cfcyAmount', value => @this.set('cfcyamount', value));
-            this.$watch('camount', value => @this.set('camount_qty', value));
-            this.$watch('formatNumber(ctaxamount)', value => @this.set('cvatgstamount', value));
-            this.$watch('formatNumber(ctaxable)', value => @this.set('ctaxableamount', value));
-            this.$watch('formatNumber(camountidr)', value => @this.set('camountidr', value));
-            this.$watch('formatNumber(cwhtaxamount)', value => @this.set('cwhtaxamount', value));
-            this.$watch('ccurrency', value => this.fetchExchangeRate(value));
-            this.fetchExchangeRate(this.ccurrency);
-        },
-        fetchExchangeRate(currency) {
-            if (!currency || currency.trim().length < 3) {
-                this.crate = 0;
-                return;
-            }
-            let curr = currency.trim().toUpperCase();
-            fetch(`https://api.exchangerate-api.com/v4/latest/${curr}`)
-                .then(response => response.json())
-                .then(data => {
-                    this.crate = data.rates?.IDR || 0;
-                })
-                .catch(error => {
-                    console.error('Error fetching exchange rate:', error);
-                    this.crate = 0;
-                });
-        }
-    }">
+    <div class="bg-white">
         <!-- Heading Bar -->
         <div class="bg-blue-500 p-3 rounded-t-xl">
             <h2 class="text-white text-lg font-semibold">Cost</h2>
@@ -421,7 +471,7 @@
                 <!-- Exchange Rate -->
                 <div>
                     <label for="crate" class="block text-sm font-medium text-gray-700">Ex.rate</label>
-                    <input type="text" id="crate" name="crate" wire:model="crate" :value="formatNumber(crate)"
+                    <input type="text" id="crate" name="crate" wire:model="crate" :value="crate"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
             </div>
@@ -516,11 +566,13 @@
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="0">
                 </div>
             </div>
+
+
         </div>
     </div>
     <!-- Modal Footer (Buttons) -->
     <div class="flex justify-end mt-4 gap-2 p-4 border-t color-gray-200">
-        <button type="button" wire:click="closeModal" class="px-4 py-2 bg-gray-500 text-white rounded-lg" @click="$refs.modalContent.scrollTo({ top: 0, behavior: 'smooth' })">
+        <button type="button" class="px-4 py-2 bg-gray-500 text-white rounded-lg" @click="$refs.modalContent.scrollTo({ top: 0, behavior: 'smooth' })">
             Cancel
         </button>
         <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">

@@ -15,8 +15,10 @@ class SaleInvoice extends Component
     public $shipments, $customers, $transactions, $containers, $clients;
     public $totalPcs = 0;
     public $totalgw = 0;
+    public $shipment;
 
     protected $listeners = ['setShipmentId'];
+
 
     public function mount($shipmentId = null)
     {
@@ -27,11 +29,13 @@ class SaleInvoice extends Component
             $this->invoice_number = $this->generateInvoiceNumber();
         }
 
-        $customerNames = Shipment::where('id', $shipmentId)
-            ->selectRaw("shipper AS name")
-            ->union(Shipment::selectRaw("consignee AS name")->where('id', $shipmentId))
-            ->union(Shipment::selectRaw("notify AS name")->where('id', $shipmentId))
-            ->pluck('name');
+        $shipment = Shipment::with(['shipper', 'consignee', 'notify'])->find($shipmentId);
+
+        $customerNames = collect([
+            $shipment->shipper?->name,
+            $shipment->consignee?->name,
+            $shipment->notify?->name,
+        ])->filter();
 
         $this->clients = Customer::whereIn('name', $customerNames)->get();
         $this->containers = Container::all();
@@ -53,6 +57,16 @@ class SaleInvoice extends Component
         $shipment = Shipment::with('containers')->findOrFail($this->shipmentId);
         $customer = Customer::findOrFail($this->customer_id);
 
+        $total = 0;
+
+        foreach ($this->transactions as $transaction) {
+            $samount = $this->parseIndoNumber($transaction->samountidr);
+            $quantity = $this->parseIndoNumber($transaction->quantity);
+
+            $total += $samount * $quantity;
+        }
+
+        $formattedTotal = number_format($total, 2, ',', '.');
         // Calculate totals
         $totalPcs = $shipment->containers->sum('pcs');
         $totalgw = $shipment->containers->sum('gross_weight');
@@ -64,6 +78,7 @@ class SaleInvoice extends Component
             'totalPcs'       => $totalPcs,
             'totalgw'         => $totalgw,
             'currency'        => $customer->currency,
+            'formattedTotal' => $formattedTotal,
         ];
 
         // Get current date (Optional - can be used for the document or logs)
@@ -88,6 +103,10 @@ class SaleInvoice extends Component
             "Invoice-{$this->invoice_number}.pdf"
         );
     }
+    public function parseIndoNumber($number)
+    {
+        return floatval(str_replace(',', '.', str_replace('.', '', $number)));
+    }
 
     public function previewPDF()
     {
@@ -101,17 +120,61 @@ class SaleInvoice extends Component
         $totalPcs = $shipment->containers->sum('pcs');
         $totalgw = $shipment->containers->sum('gross_weight');
 
+        // Inisialisasi total berdasarkan mata uang
+        $totals = [];
+        $formattedTotals = [];
 
+        foreach ($this->transactions as $transaction) {
+            $currency = strtoupper(trim($transaction->scurrency));
+            $qty = (int) $transaction->quantity;
+
+            $amount = $currency === 'IDR'
+                ? (float) $this->parseIndoNumber($transaction->samountidr)
+                : (float) $transaction->sfcyamount;
+
+            $vat = $currency === 'IDR'
+                ? (float) ($transaction->svatgstamount ?? 0)
+                : (float) ($transaction->svatgstusd ?? 0);
+
+            $wht = $currency === 'IDR'
+                ? (float) ($transaction->swhtaxamount ?? 0)
+                : (float) ($transaction->shwtaxrateusd ?? 0);
+
+            $subtotal = $qty * $amount;
+            $total = $subtotal + $vat + $wht;
+
+            $transaction->subtotal = $subtotal;
+            $transaction->total = $total;
+
+            if (!isset($totals[$currency])) {
+                $totals[$currency] = 0;
+            }
+            $totals[$currency] += $total;
+        }
+
+        // Format total akhir
+        foreach ($totals as $curr => $total) {
+            $formattedTotals[$curr] = $curr === 'IDR'
+                ? number_format($total, 2, ',', '.')
+                : number_format($total, 2, '.', ',');
+        }
+
+        // Simpan subtotal ke dalam transaksi biar bisa dipakai di blade (optional)
+        // Data ke PDF
         $data = compact('shipment', 'customer') + [
             'invoice_number' => $this->invoice_number,
             'transactions'   => $this->transactions,
-            'totalPcs'  => $this->totalPcs,
-            'totalgw'  => $this->totalgw,
+            'totalPcs'       => $totalPcs,
+            'totalgw'        => $totalgw,
             'currency'       => $customer->currency,
-            'country' => $customer->country,
+            'country'        => $customer->country,
+            'formattedTotals' => $formattedTotals,
+            'vat'            => $vat,
+            'wht'            => $wht,
         ];
 
         $html = view('livewire.accounting.invoice-pdf', $data)->render();
+
         $pdfContent = Browsershot::html($html)
             ->setChromePath('/usr/bin/google-chrome')
             ->format('A3')
@@ -119,10 +182,12 @@ class SaleInvoice extends Component
             ->showBackground()
             ->setOption('args', ['--no-sandbox'])
             ->pdf();
-        $this->pdfData = base64_encode($pdfContent);
 
+        $this->pdfData = base64_encode($pdfContent);
         $this->dispatch('open-pdf-preview', pdf: 'data:application/pdf;base64,' . $this->pdfData);
     }
+
+
 
     public function generateInvoiceNumber()
     {

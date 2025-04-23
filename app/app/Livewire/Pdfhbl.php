@@ -6,6 +6,9 @@ use Livewire\Component;
 
 class Pdfhbl extends Component
 {
+    public $contaiers;
+
+
     public function mount()
     {
         $referer = request()->headers->get('referer');

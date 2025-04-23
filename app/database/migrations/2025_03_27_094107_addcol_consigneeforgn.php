@@ -9,9 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('shipments', function (Blueprint $table) {
-            $table->foreignId('consignee_id')->nullable()->constrained('customers')->after('notify');
-            $table->foreignId('shipper_id')->nullable()->constrained('customers')->after('notify');
-            $table->foreignId('notify_id')->nullable()->constrained('customers')->after('notify');
+            $table->foreignId('consignee_id')->nullable()->constrained('customers')->after('shipment_id');
+            $table->foreignId('shipper_id')->nullable()->constrained('customers')->after('shipment_id');
+            $table->foreignId('notify_id')->nullable()->constrained('customers')->after('shipment_id');
         });
     }
 

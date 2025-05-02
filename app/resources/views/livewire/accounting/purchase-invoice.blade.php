@@ -15,6 +15,12 @@
                         @endforeach
                     </select>
                 </td>
+                <td>
+                    <select wire:model="finalCurrency" class="w-full px-3 py-2 border rounded-lg">
+                        <option value="IDR">Total dalam IDR</option>
+                        <option value="USD">Total dalam USD</option>
+                    </select>
+                </td>
             </tr>
         </table>
     </div>

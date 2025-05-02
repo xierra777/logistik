@@ -15,7 +15,7 @@
                         <a href="{{ url('/shipments') }}" class="px-4 py-1 text-white">
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
-                        <a href="" class="px-4 py-1 text-white">
+                        <a href="{{ url('shipment')}}" class="px-4 py-1 text-white">
                             <i class="fa-solid fa-plus"></i>
                         </a>
                     </div>
@@ -35,7 +35,7 @@
                                 <a wire:navigate href="/view-shipments/{{ $shipment->id }}">{{ $shipment->shipment_id }}</a>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 dark:text-neutral-300 font-semibold">
-                                {{ $shipment->shipper }}
+                                {{ $shipment->shipper?->name }}
                             </td>
                         </tr>
                         @empty

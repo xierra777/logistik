@@ -1,9 +1,48 @@
 <form wire:submit="save">
   <div class="space-y-12">
     <div class="border-b border-gray-900/10 pb-12">
-      <h2 class="text-base/7 font-semibold text-gray-900">Tambahkan Data Kapal disini</h2>
-      <br>
-      <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <h2 class="text-base/7 font-semibold text-gray-900 mb-5">Tambahkan Data Kapal disini</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+
+        <label for="hs-radio-air-inbound" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" wire:model="jobType" value="airInbound" id="hs-radio-air-inbound">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Air Inbound</span>
+        </label>
+        <label for="hs-radio-air-outbound" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 ring-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" value="airOutbound" wire:model="jobType" id="hs-radio-air-outbound">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Air Outbound</span>
+        </label>
+        <label for="hs-radio-domestic-transport" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" wire:model="jobType" value="domesticTransportation" id="hs-radio-domestic-transport">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Domestic Transportation</span>
+        </label>
+        <label for="hs-radio-local-truck" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" value="localTruck" wire:model="jobType" id="hs-radio-local-truck">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Local Truck</span>
+        </label>
+        <label for="hs-radio-logistics" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" value="Logistics" wire:model="jobType" id="hs-radio-logistics">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Logistics</span>
+        </label>
+        <label for="hs-radio-OceanFclExport" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" value="OceanFclExport" wire:model="jobType" id="hs-radio-OceanFclExport">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Ocean FCL Export</span>
+        </label>
+        <label for="hs-radio-OceanFclImport" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" value="OceanFclImport" wire:model="jobType" id="hs-radio-OceanFclImport">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Ocean FCL Import</span>
+        </label>
+        <label for="hs-radio-OceanLclBulkExport" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" value="OceanLclBulkExport" wire:model="jobType" id="hs-radio-OceanLclBulkExport">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Ocean LCL/Bulk Export</span>
+        </label>
+        <label for="hs-radio-OceanLclBulkImport" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" value="OceanLclBulkImport" wire:model="jobType" id="hs-radio-OceanLclBulkImport">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Ocean LCL/Bulk Import</span>
+        </label>
+      </div>
+      <div class="mb-4 grid grid-cols-4 gap-6">
+
         <!-- Shipment ID -->
         <div>
           <label for="shipment_id" class="block text-sm font-medium text-gray-700">
@@ -37,7 +76,40 @@
           <span class="text-sm text-red-500">{{ $message }}</span>
           @enderror
         </div>
+        <div>
+          <label for="servicesType" class="block text-sm font-medium text-gray-700">
+            Service Type <span class="text-red-500">*</span>
+          </label>
+          <select name="servicesType" id="servicesType" wire:model="servicesType" class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            <option value=""></option>
+            <option value="CY-CY">CY-CY</option>
+            <option value="FCL-FCL">FCL-FCL</option>
+            <option value="CFS-CY">CFS-CY</option>
+            <option value="CY-CFS">CY-CFS</option>
+            <option value="DOOR-DOOR">DOOR-DOOR</option>
+
+          </select>
+          @error('shipment_no')
+          <span class="text-sm text-red-500">{{ $message }}</span>
+          @enderror
+        </div>
+        <div>
+          <label for="servicesType" class="block text-sm font-medium text-gray-700">
+            Service Type <span class="text-red-500">*</span>
+          </label>
+          <select name="servicesType" id="servicesType" wire:model="servicesType" class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            @foreach($customers as $customer)
+            @if(in_array('carrier', $customer->roles)) <!-- Only show customers with role "shipper" -->
+            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+            @endif
+            @endforeach
+          </select>
+          @error('shipment_no')
+          <span class="text-sm text-red-500">{{ $message }}</span>
+          @enderror
+        </div>
       </div>
+
 
       <div class="mb-4 grid grid-cols-4 gap-6">
         <!-- Mother Vessel -->
@@ -80,7 +152,7 @@
 
       <!-- Organization -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="mb-4">
+        <div class="mb-4" wire:ignore>
           <label for="shipper">Shipper</label>
           <select wire:model="shipper_id" id="shipper" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
             <option value="">Select Shipper</option>
@@ -102,7 +174,7 @@
             @endforeach
           </select>
         </div>
-        <div class="mb-4" wire:ignore>
+        <div class="mb-4" wire:ignore.self>
           <label for="notify">Notify</label>
           <select wire:model="notify_id" id="notify_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
             <option value="">Select Notify</option>

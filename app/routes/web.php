@@ -19,33 +19,33 @@ use App\Livewire\Customers\ListCustomer;
 use App\Livewire\Dashboard;
 use App\Livewire\HouseBL;
 use App\Livewire\Pdfhbl;
+use App\Livewire\Job\CreateJob;
 use Illuminate\Http\Request;
 
 
 
 Route::redirect('/', '/login'); // Redirect otomatis ke halaman login
-
 Route::get('/dashboard', Dashboard::class)->middleware([
     'auth',
     'verified'
 ])->name('dashboard');
-
-
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
-
 Route::view('shipments', 'shipments.index',)
     ->middleware(['auth', 'verified'])
     ->name('shipments');
 Route::view('shipment', 'shipments.create',)
     ->middleware(['auth'])
     ->name('shipment');
-
 Route::get('/chart-of-accounts', ChartOfAccounts::class)->middleware([
     'auth',
     'verified'
 ]);
+Route::get('create-job', CreateJob::class)->middleware([
+    'auth',
+    'verified'
+])->name('Createjob');
 
 Route::get('/house-b-l/{shipmentId}', HouseBL::class)
     ->middleware(['auth', 'verified'])

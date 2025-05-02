@@ -222,7 +222,7 @@
 
         <div class="border rounded-lg overflow-hidden">
             <div class="border rounded-lg overflow-hidden">
-                <div x-data="{ open: true }" @close-modal.window="open = false"
+                <div x-data="{ open: false }" @close-modal.window="open = false"
                     x-ref="modalContent">
                     <div class=" flex justify-end mb-4 p-4">
                         <a href="{{ route('sale-invoice', ['shipmentId' => $shipment->id]) }}" class="py-3 px-4 mr-4 bg-green-500 text-white rounded">

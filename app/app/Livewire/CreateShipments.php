@@ -8,13 +8,16 @@ use App\Models\Customer;
 use App\Models\Container;
 use App\Models\Shipment;
 use Illuminate\Support\Facades\DB;
-
+use Termwind\Components\Dd;
 
 class CreateShipments extends Component
 {
     // Field Shipment
     public $shipment_id = '';
     public $shipment_no = '';
+    public $liners = '';
+    public $servicesType = '';
+    public $jobType = '';
     public $shipper_id;
     public $consignee_id;
     public $notify_id;
@@ -33,9 +36,7 @@ class CreateShipments extends Component
     public $customers;
 
 
-    protected $rules = [
-        'notify_id' => 'required|exists:customers,id',
-    ];
+
     #[On('port-updated')]
     public function updatePort($model, $value)
     {
@@ -56,8 +57,16 @@ class CreateShipments extends Component
 
     public function generateInvoiceNumber()
     {
-        return "BRNJKT" . now()->format('ym') . str_pad(Shipment::whereDate('created_at', today())->count() + 1, 3, '0', STR_PAD_LEFT);
+        return "BRNJKT" . now()->format('ym') . str_pad(
+            Shipment::whereYear('created_at', now()->year)
+                ->whereMonth('created_at', now()->month)
+                ->count() + 1,
+            3,
+            '0',
+            STR_PAD_LEFT
+        );
     }
+
     public function addContainer()
     {
         $this->containers[] = ['container_id' => '', 'container_type' => '', 'container_seal' => '', 'gross_weight' => '', 'pack_type' => '', 'measurement' => '', 'pcs' => '', 'unit' => '', 'volume_weight' => '', 'chargeable_weight' => ''];
@@ -76,29 +85,26 @@ class CreateShipments extends Component
     {
         // Validasi data shipment (tanpa container_id dan container_type karena data container dikelola secara terpisah)
         // Buat shipment baru
-        $validatedData =
+        $validatedData = $this->validate([
+            'shipment_id'           => 'required|max:255|unique:shipments,shipment_id',
+            'shipment_no'           => 'required|max:255|unique:shipments,shipment_no',
+            'place_of_receipt'      => 'nullable|string|max:255',
+            'shipper_id'            => 'required|exists:customers,id',
+            'consignee_id'          => 'required|exists:customers,id',
+            'notify_id'             => 'required|exists:customers,id',
+            'estimearrival'         => 'nullable|date',
+            'estimedelivery'        => 'nullable|date',
+            'ocean_vessel_feeder'   => 'nullable|string|max:255',
+            'ocean_vessel_mother'   => 'nullable|string|max:255',
+            'servicesType'   => 'nullable|string|max:255',
+            'jobType'   => 'nullable|string|max:255',
+            'liners'   => 'nullable|string|max:255',
+            'port_of_discharge'     => 'nullable|string|max:255',
+            'port_of_loading'       => 'nullable|string|max:255',
+            'description'           => 'nullable|string',
+        ]);
 
-            $this->validate([
-                'shipment_id'           => 'required|max:255|unique:shipments,shipment_id',
-                'shipment_no'           => 'required|max:255|unique:shipments,shipment_no',
-                'place_of_receipt'      => 'nullable|string|max:255',
-                'shipper_id'            => 'required|exists:customers,id',
-                'consignee_id'          => 'required|exists:customers,id',
-                'notify_id'                => 'required|exists:customers,id',
-                'estimearrival'         => 'nullable|date',
-                'estimedelivery'        => 'nullable|date',
-                'ocean_vessel_feeder'   => 'nullable|string|max:255',
-                'ocean_vessel_mother'   => 'nullable|string|max:255',
-                'port_of_discharge'     => 'nullable|string|max:255',
-                'port_of_loading'       => 'nullable|string|max:255',
-                'description'           => 'nullable|string',
-            ]);
-
-        // Validate Containers
-        if (empty($this->containers)) {
-            session()->flash('error', 'Minimal harus ada satu container.');
-            return;
-        }
+        // Validasi Containers
 
 
         // Looping dan simpan setiap container yang dimasukkan
@@ -108,20 +114,27 @@ class CreateShipments extends Component
                 "containers.$index.container_type" => 'required|max:255',
                 "containers.$index.container_seal" => 'required|max:255',
                 "containers.$index.gross_weight"   => 'required|max:255',
-                "containers.$index.pcs"           => 'required|max:255',
-                "containers.$index.unit"          => 'required|max:255',
-                "containers.$index.pack_type"     => 'required|max:255',
-                "containers.$index.measurement"   => 'max:255',
-                "containers.$index.volume_weight"   => 'max:255',
-                "containers.$index.chargeable_weight"   => 'max:255',
+                "containers.$index.pcs"            => 'required|max:255',
+                "containers.$index.unit"           => 'required|max:255',
+                "containers.$index.pack_type"      => 'required|max:255',
+                "containers.$index.measurement"    => 'nullable|max:255',
+                "containers.$index.volume_weight"  => 'nullable|max:255',
+                "containers.$index.chargeable_weight" => 'nullable|max:255',
             ]);
+            if (empty($this->containers)) {
+                // Trigger error toast event dengan pesan error
+                $this->dispatch('error-toast', ['message' => 'Minimal harus ada satu container.']);
+                return;
+            }
         }
+
 
 
 
         DB::beginTransaction();
         try {
 
+            // dd($validatedData);
             $shipment = Shipment::create($validatedData);
 
             foreach ($this->containers as $container) {

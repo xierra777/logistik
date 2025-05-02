@@ -24,15 +24,20 @@
         cvatgst: @entangle('cvatgst'),
         cwhtaxrate: @entangle('cwhtaxrate'),    
         ctaxamount: @entangle ('cvatgstamount'),
-        // Number formatting function
-
-        
-
-
-         // Computed properties
         get fcyAmount() {
-            return this.amount;
-        },
+        const isTaxIncluded = (this.sincludedtax || 'No').trim() === 'Yes';
+        const rateNum = parseFloat(
+                        (this.svatgst || '0')
+                            .replace('%', '')
+                            .replace(',', '.')
+                    ) || 0;
+        const baseIdr = this.amount ;
+            if (isTaxIncluded) {
+        return parseFloat((baseIdr / (1 + rateNum / 100)).toFixed(3));
+            } else {
+                return baseIdr;
+            }
+       },
         get samountidr() {
             // Apakah tax included?
             const isTaxIncluded = (this.sincludedtax || 'No').trim() === 'Yes';
@@ -45,13 +50,12 @@
             ) || 0;
 
             // Base IDR tanpa pajak
-            const baseIdr = this.srate * (parseFloat(this.fcyAmount) || 0);
+            const baseIdr = this.srate * (parseFloat(this.amount) || 0);
 
             if (isTaxIncluded) {
                 // Jika tax include, gross = base + VAT
-                return baseIdr * (1 + rateNum / 100);
+                return baseIdr / (1 + rateNum / 100);
             } else {
-                // Jika tax exclude, cuma base
                 return baseIdr;
             }
         },
@@ -59,12 +63,17 @@
         get gp() {
             return this.samountidr - this.camountidr;
         },
-        get taxable() {
+        get whtaxAmount() {
+            const rateString = (this.swhtaxrate || '0').replace('%', '').replace(',', '.');
+            const rate = parseFloat(rateString) || 0;
+            return this.samountidr * (rate / 100);
+        },
+        get vatAmount() {
                     const rateString = (this.svatgst || '0').replace('%', '').replace(',', '.');
                     const rate = parseFloat(rateString) || 0;
                     return this.samountidr * (rate / 100);
         },
-        get taxableusd() {
+        get vatAmountUsd() {
                     const rateString = (this.svatgst || '0').replace('%', '').replace(',', '.');
                     const rate = parseFloat(rateString) || 0;
                     return this.fcyAmount * (rate / 100);
@@ -74,16 +83,43 @@
             const rate = parseFloat(rateString) || 0;
             return this.fcyAmount * (rate / 100);
         },
-        get taxAmount() {
-            return this.taxable + this.swhtaxamount;
+        get totalTax() {
+            return this.vatAmount + this.whtaxAmount;
         },
         // Computed properties
         get cfcyAmount() {
-            return this.camount;
-        },
+           const isTaxIncluded = (this.cincludedtax || 'No').trim() === 'Yes';
+        const rateNum = parseFloat(
+                        (this.cvatgst || '0')
+                            .replace('%', '')
+                            .replace(',', '.')
+                    ) || 0;
+        const baseIdr = this.camount ;
+            if (isTaxIncluded) {
+        return parseFloat((baseIdr / (1 + rateNum / 100)).toFixed(3));
+            } else {
+                return baseIdr;
+            }
+       },
         get camountidr() {
-         return parseFloat((this.crate || 0).toString().replace(',', '')) * 
-             parseFloat((this.cfcyAmount || 0).toString().replace(',', ''));
+         // Apakah tax included?
+            const isTaxIncluded = (this.cincludedtax || 'No').trim() === 'Yes';
+
+            // Bersihkan rate VAT jadi angka murni
+            const rateNum = parseFloat(
+                (this.cvatgst || '0')
+                    .replace('%', '')
+                    .replace(',', '.')
+            ) || 0;
+
+            const baseIdr = this.crate * (parseFloat(this.camount) || 0);
+
+            if (isTaxIncluded) {
+                // Jika tax include, gross = base + VAT
+                return baseIdr / (1 + rateNum / 100);
+            } else {
+                return baseIdr;
+            }
         },
 
         get ctaxable() {
@@ -115,12 +151,10 @@
             this.$watch('formatNumber(gp)', value => @this.set('sgrossprofit', value));
             this.$watch('fcyAmount', value =>  @this.set('sfcyamount', value));    
             this.$watch('amount', value => @this.set('samount_qty', value));
-            this.$watch('formatNumber(taxAmount)', value => @this.set('svatgstamount', value));
-            this.$watch('formatNumber(taxable)', value => @this.set('staxableamount', value));
-            this.$watch('formatNumber(taxable)', value => @this.set('swhtaxamount', value));
-
-            
-            this.$watch('formatNumber(taxableusd)', value => @this.set('svatgstusd', value));
+            this.$watch('formatNumber(vatAmount)', value => @this.set('svatgstamount', value));
+            this.$watch('formatNumber(totalTax)', value => @this.set('staxableamount', value));
+            this.$watch('formatNumber(whtaxAmount)', value => @this.set('swhtaxamount', value));
+            this.$watch('formatNumber(vatAmountUsd)', value => @this.set('svatgstusd', value));
             this.$watch('formatNumber(samountidr)', value => @this.set('samountidr', value));
             this.$watch('formatNumber(gp)', value => @this.set('sgrossprofit', value));
             this.$watch('scurrency', value => this.fetchExchangeRate(value));
@@ -159,6 +193,7 @@
                 });
         }
     }">
+
 
     <div class="bg-white">
         <!-- Heading Bar -->
@@ -267,7 +302,7 @@
             <div class="grid grid-cols-3 gap-4" wire:ignore>
                 <div class="mb-4">
                     <label class="block font-medium">Pilih Client</label>
-                    <select wire:model="sclient" class="w-full border rounded-md border-gray-300 p-2">
+                    <select wire:model="sclient" id="sclient" class="w-full border rounded-md border-gray-300 p-2">
                         <option value="">-- Pilih Client --</option>
                         @foreach($clients ?? [] as $client)
                         <option wire:key="{{$client}}" value="{{ $client->id }}">{{ $client->name }}</option>
@@ -311,7 +346,7 @@
                 <div>
                     <label for="sfcyamount" class="block text-sm font-medium text-gray-700">FCY Amount</label>
                     <input type="text" id="sfcyamount" name="sfcyamount"
-                        :value="fcyAmount" readonly wire:model="sfcyamount"
+                        :value="formatNumber(fcyAmount)" readonly wire:model="sfcyamount"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <div>
@@ -343,33 +378,6 @@
                     </select>
                 </div>
                 <div>
-                    <label for="staxableamount" class="block text-sm font-medium text-gray-700">Taxable Amount</label>
-                    <input type="text" id="staxableamount" name="staxableamount"
-                        :value="formatNumber(taxable)" wire:model="staxableamount"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label for="svatgstusd" class="block text-sm font-medium text-gray-700">taxableusd</label>
-                    <input type="text" id="svatgstusd" name="svatgstusd"
-                        :value="formatNumber(taxableusd)" wire:model="svatgstusd"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                </div>
-                <div>
-                    <label for="shwtaxrateusd" class="block text-sm font-medium text-gray-700">swhtaxamountusd</label>
-                    <input type="text" id="shwtaxrateusd" name="shwtaxrateusd"
-                        :value="formatNumber(swhtaxamountusd)" wire:model="shwtaxrateusd"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                </div>
-            </div>
-            <!-- Row 4: VAT/GST Amount, W/H Tax Rate, W/H Tax Amount -->
-            <div class="grid grid-cols-3 gap-4">
-                <div>
-                    <label for="svatgstamount" class="block text-sm font-medium text-gray-700">Total TAX</label>
-                    <input type="text" id="svatgstamount" name="svatgstamount"
-                        :value="formatNumber(taxAmount)" readonly
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                </div>
-                <div>
                     <label for="swhtaxrate" class="block text-sm font-medium text-gray-700">W/H Tax Rate</label>
                     <select id="swhtaxrate" name="swhtaxrate" wire:model="swhtaxrate" x-model="swhtaxrate"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
@@ -380,10 +388,41 @@
                         <option value="7.5%">7,5%</option>
                     </select>
                 </div>
+
+
+                <div class="hidden">
+                    <div>
+                        <label for="svatgstusd" class="block text-sm font-medium text-gray-700">VAT TAX (USD)</label>
+                        <input type="text" id="svatgstusd" name="svatgstusd"
+                            :value="formatNumber(vatAmountUsd)" wire:model="svatgstusd"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="shwtaxrateusd" class="block text-sm font-medium text-gray-700">WHT TAX (USD)</label>
+                        <input type="text" id="shwtaxrateusd" name="shwtaxrateusd"
+                            :value="formatNumber(swhtaxamountusd)" wire:model="shwtaxrateusd"
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                </div>
+            </div>
+            <!-- Row 4: VAT/GST Amount, W/H Tax Rate, W/H Tax Amount -->
+            <div class="grid grid-cols-3 gap-4">
+                <div>
+                    <label for="svatgstamount" class="block text-sm font-medium text-gray-700">VAT TAX </label>
+                    <input type="text" id="svatgstamount" name="svatgstamount"
+                        :value="formatNumber(vatAmount)" readonly
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
                 <div>
                     <label for="swhtaxamount" class="block text-sm font-medium text-gray-700">W/H Tax Amount</label>
                     <input type="text" id="swhtaxamount" name="swhtaxamount"
-                        :value="formatNumber(swhtaxamount)" wire:model="swhtaxamount"
+                        :value="formatNumber(whtaxAmount)" wire:model="swhtaxamount"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label for="staxableamount" class="block text-sm font-medium text-gray-700">Total TAX</label>
+                    <input type="text" id="staxableamount" name="staxableamount"
+                        :value="formatNumber(totalTax)" wire:model="staxableamount"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
             </div>
@@ -412,6 +451,7 @@
             </div>
         </div>
     </div>
+
     <!-- Cost Section -->
     <div class="bg-white">
         <!-- Heading Bar -->
@@ -518,8 +558,8 @@
                         <option value="">0</option>
                         <option value="1.1%">1.1%</option>
                         <option value="1.2%">1.2%</option>
-                        <option value="11%">11</option>
-                        <option value="12%">12</option>
+                        <option value="11%">11%</option>
+                        <option value="12%">12%</option>
                     </select>
                 </div>
                 <!-- W/H TAX RATE -->
@@ -570,6 +610,7 @@
 
         </div>
     </div>
+
     <!-- Modal Footer (Buttons) -->
     <div class="flex justify-end mt-4 gap-2 p-4 border-t color-gray-200">
         <button type="button" class="px-4 py-2 bg-gray-500 text-white rounded-lg" @click="$refs.modalContent.scrollTo({ top: 0, behavior: 'smooth' })">
@@ -580,3 +621,20 @@
         </button>
     </div>
 </form>
+@script()
+<script>
+    $(document).ready(function() {
+        $('#sclient').select2({
+            placeholder: "Select roles",
+            allowClear: true,
+            theme: 'tailwindcss-3'
+        });
+        $('#sclient').on('change', function() {
+            let data = $(this).val();
+            // console.log(data);
+            // $wire.set('roles',data,false);
+            $wire.sclient = data;
+        });
+    });
+</script>
+@endscript

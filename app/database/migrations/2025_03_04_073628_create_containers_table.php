@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('shipment_id')->constrained('shipments')->onDelete('cascade');
             $table->string('container_id')->unique();
             $table->string('container_type');
+            $table->string('volume_weight');
+            $table->string('chargeable_weight');
             $table->string('pcs');
             $table->string('unit');
             $table->string('container_seal');

@@ -55,16 +55,4 @@
         </a>
     </div>
 
-    <iframe
-        width="560"
-        height="315"
-        src="https://www.youtube.com/embed/XQzHF8DGYp8?si=LCqmWd7dInxl5Fyu"
-        title="YouTube video player"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen
-        loading="lazy"
-        sandbox="allow-same-origin allow-scripts allow-popups allow-presentation allow-forms"
-        referrerpolicy="no-referrer-when-downgrade">
-    </iframe>
 </div>

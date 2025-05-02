@@ -12,9 +12,9 @@ class Shipment extends Model
     protected $fillable = [
         'shipment_id',
         'shipment_no',
-        'shipper',
-        'consignee',
-        'notify',
+        'liners',
+        'servicesType',
+        'jobtType',
         'shipper_id',
         'consignee_id',
         'notify_id',

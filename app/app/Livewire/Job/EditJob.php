@@ -8,8 +8,7 @@ use App\Models\Customer;
 use Carbon\Carbon;
 use Livewire\Attributes\On;
 
-
-class CreateJob extends Component
+class EditJob extends Component
 {
     public $step = 1;
     public $type_job;
@@ -25,7 +24,6 @@ class CreateJob extends Component
     public $shipper_id;
     public $consignee_id;
     public $notify_id;
-    public array $ports = [];
 
     // Bagian Ocean
     public $shipment_id = "", $shipment_no,
@@ -37,7 +35,7 @@ class CreateJob extends Component
         $port_of_loading = "",
         $description = "",
         $estimearrival,
-        $estimedelivery, $voyage;
+        $estimedelivery;
 
     public $container_number = "";
     public $container_size = "";
@@ -52,14 +50,6 @@ class CreateJob extends Component
         $this->consignees = Customer::whereJsonContains('roles', 'consignee')->get();
         $this->notifies = Customer::whereJsonContains('roles', 'notify')->get();
     }
-
-    public function getClientNameProperty()
-    {
-        if (!$this->client_id) return '';
-
-        $client = $this->clients->firstWhere('id', $this->client_id);
-        return $client ? $client->name : '';
-    }
     #[On('port-updated')]
     public function updatePort($model, $value)
     {
@@ -69,15 +59,18 @@ class CreateJob extends Component
     {
         $this->validateCurrentStep();
         $this->step++;
+        $this->dispatch('reinit-select2');
     }
     public function updatedTypeJob()
     {
         $this->generateJobName();
+        $this->dispatch('reinit-select2');
     }
 
     public function previousStep()
     {
         $this->step--;
+        $this->dispatch('reinit-select2');
     }
 
     private function validateCurrentStep()
@@ -96,14 +89,14 @@ class CreateJob extends Component
                 switch ($this->type_job) {
                     case 'ocean_fcl_export':
                         $rules = [
-                            'job_id' => 'required',
+                            'job_name' => 'required',
                             'shipment_no' => 'required',
                             'shipment_id' => 'required'
                         ];
                         break;
 
                     case 'trucking':
-                        $rules = [];
+                        $rules = ['trucking_detail' => 'required'];
                         break;
 
                     // Tambahkan case untuk tipe job lainnya
@@ -116,6 +109,10 @@ class CreateJob extends Component
                 break;
 
             case 3:
+                $this->validate([
+                    'container_number' => 'required',
+                    'container_size' => 'required'
+                ]);
                 break;
         }
     }
@@ -177,19 +174,13 @@ class CreateJob extends Component
         }
 
         // Format job_name otomatis berdasarkan prefix dan tanggal
-        $this->job_id = "{$prefix}{$date}{$sequence}";
+        $this->job_name = "{$prefix}{$date}{$sequence}";
     }
 
     public function ocean_fcl_export()
     {
-
-        $json = file_get_contents(public_path('data/ports.json'));
-        $this->ports = json_decode($json, true);
-
-        $container = [
-            'container_name' => $this->container_name
-        ];
-        $data = [
+        $payload = [
+            // Data payload khusus untuk Ocean FCL Export
             'shipment_id'         => $this->shipment_id,
             'shipment_no'         => $this->shipment_no,
             'servicesType'        => $this->servicesType,
@@ -209,7 +200,7 @@ class CreateJob extends Component
             'notify_id' => $this->notify_id,
             'type_job' => $this->type_job,
             'job_name' => $this->job_name,
-            'data' => $data,
+            'data' => $payload,
         ]);
 
 
@@ -223,13 +214,12 @@ class CreateJob extends Component
             'shipment_no' => $this->shipment_no,
             'shipment_id' => $this->shipment_id,
             'data'  => $payload,
-            'container' => $container
 
         ]);
         session()->flash('message', 'Ocean FCL Export job created successfully.');
     }
     public function render()
     {
-        return view('livewire.job.create-job');
+        return view('livewire.job.edit-job');
     }
 }

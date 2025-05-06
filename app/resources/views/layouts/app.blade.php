@@ -58,6 +58,8 @@
         </main>
     </div>
     @include('include.script')
+    @stack('scripts')
+
 </body>
 <footer>
     <!-- Footer content can go here -->

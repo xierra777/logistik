@@ -20,6 +20,7 @@ use App\Livewire\Dashboard;
 use App\Livewire\HouseBL;
 use App\Livewire\Pdfhbl;
 use App\Livewire\Job\CreateJob;
+use App\Livewire\Job\EditJob;
 use Illuminate\Http\Request;
 
 
@@ -46,6 +47,12 @@ Route::get('create-job', CreateJob::class)->middleware([
     'auth',
     'verified'
 ])->name('Createjob');
+
+Route::get('edit-job', EditJob::class)->middleware([
+    'auth',
+    'verified'
+])->name('EditJob');
+
 
 Route::get('/house-b-l/{shipmentId}', HouseBL::class)
     ->middleware(['auth', 'verified'])

@@ -15,11 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('job_id')->unique();
             $table->string('type_job');
+            $table->string('job_name');
             $table->foreignId('client_id')->nullable()->constrained('customers');
             $table->foreignId('consignee_id')->nullable()->constrained('customers');
             $table->foreignId('shipper_id')->nullable()->constrained('customers');
             $table->foreignId('notify_id')->nullable()->constrained('customers');
             $table->json('data');
+            $table->json('container');
             $table->timestamps();
         });
     }

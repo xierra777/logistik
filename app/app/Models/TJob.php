@@ -35,4 +35,8 @@ class TJob extends Model
     {
         return $this->belongsTo(Customer::class, 'notify_id');
     }
+    public function carrier()
+    {
+        return $this->belongsTo(Customer::class, 'carrier');
+    }
 }

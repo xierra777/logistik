@@ -50,10 +50,11 @@ class EditJob extends Component
         $this->consignees = Customer::whereJsonContains('roles', 'consignee')->get();
         $this->notifies = Customer::whereJsonContains('roles', 'notify')->get();
     }
-    #[On('port-updated')]
-    public function updatePort($model, $value)
+    protected $listeners = ['portUpdated'];
+
+    public function portUpdated($model, $value)
     {
-        $this->$model = $value;
+        $this->{$model} = $value;
     }
     public function nextStep()
     {

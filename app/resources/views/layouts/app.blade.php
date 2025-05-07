@@ -33,6 +33,9 @@
     @csrf
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
         <livewire:layout.navigation />
+        <p class="alert alert-warning" wire:offline>
+            Whoops, your device has lost connection. The web page you are viewing is offline.
+        </p>
 
         <!-- Page Heading -->
         @if (isset($header))

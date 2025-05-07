@@ -35,7 +35,7 @@ class CreateCustomer extends Component
 
     public function save()
     {
-        $this->validate();
+        // $this->validate();
         // dd($this->name, $this->email, $this->contact, $this->country, $this->address, $this->web, $this->roles);
         // dd($this->roles);  // This will dump the roles to check if they are being passed correctly.
         Customer::create([

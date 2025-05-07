@@ -123,7 +123,10 @@ class CreateShipments extends Component
             ]);
             if (empty($this->containers)) {
                 // Trigger error toast event dengan pesan error
-                $this->dispatch('error-toast', ['message' => 'Minimal harus ada satu container.']);
+                $this->dispatch('error', [
+                    'icon'  => 'error',
+                    'title' => 'error! add 1 containers',
+                ]);
                 return;
             }
         }
@@ -139,15 +142,15 @@ class CreateShipments extends Component
 
             foreach ($this->containers as $container) {
                 Container::create([
-                    'shipment_id'    => $shipment->id,
-                    'container_id'   => $container['container_id'],
-                    'container_type' => $container['container_type'],
-                    'container_seal' => $container['container_seal'],
-                    'pcs'            => $container['pcs'],
-                    'unit'           => $container['unit'],
-                    'gross_weight'   => $container['gross_weight'],
-                    'pack_type'      => $container['pack_type'],
-                    'volume_weight'      => $container['volume_weight'],
+                    'shipment_id'            => $shipment->id,
+                    'container_id'           => $container['container_id'],
+                    'container_type'         => $container['container_type'],
+                    'container_seal'         => $container['container_seal'],
+                    'pcs'                    => $container['pcs'],
+                    'unit'                   => $container['unit'],
+                    'gross_weight'           => $container['gross_weight'],
+                    'pack_type'              => $container['pack_type'],
+                    'volume_weight'          => $container['volume_weight'],
                     'chargeable_weight'      => $container['chargeable_weight'],
                 ]);
             }

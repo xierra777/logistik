@@ -448,6 +448,9 @@
           $(select).on('change', function() {
             let selectedValue = $(this).val();
             let modelName = $(this).attr('wire:model'); // Ambil nama model Livewire
+            // console.log('Selected value:', selectedValue);
+            // console.log('Model name:', modelName);
+
 
             // Kirim ke Livewire dengan dispatch event
             window.dispatchEvent(new CustomEvent('port-updated', {

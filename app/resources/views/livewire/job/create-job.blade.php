@@ -35,7 +35,7 @@
                 <h2 class="text-lg font-semibold mb-3">Pilih Tipe Job & Client</h2>
                 <div class="flex flex-col space-y-3 rounded-md mb-4 w-1/2" wire:ignore>
                     <label class="font-bold">Client</label>
-                    <select wire:model.live="client_id" id="client_id" class="border p-2 rounded ">
+                    <select wire:model="client_id" id="client_id" class="border p-2 rounded ">
                         <option value="">Pilih Client</option>
                         @foreach($clients as $client)
                         <option value="{{ $client->id }}">{{ $client->name }}</option>
@@ -407,28 +407,39 @@
 
                         <!-- Left Column -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="flex flex-col space-y-2 col-span-2" wire:ignore>
+                                <label>Container Type</label>
+                                <select name="" id="containerType" class="w-full block rounded-md border border-gray-300">
+                                    <option value=""></option>
+                                    <option value="20'DG">20'DG</option>
+                                    <option value="20'FT">20'FT</option>
+                                    <option value="20'HQ">20'HQ</option>
+                                    <option value="40'Standard">40'Standard</option>
+                                </select>
+                                @error('container_type')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                            </div>
                             <div class="flex flex-col space-y-2">
                                 <label>Container Release No.</label>
-                                <input type="text" placeholder="Enter Container No  "
+                                <input type="text" placeholder="Enter Container No  " wire:model="containerReleaseNo"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                 @error('container_size')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                             </div>
                             <div class="flex flex-col space-y-2">
                                 <label>Release date</label>
-                                <input type="date" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                <input type="date" wire:model="containerReleaseDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                 @error('')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                             </div>
 
                             <!-- Package Info -->
                             <div class="flex flex-col space-y-2">
                                 <label>No Of Packages</label>
-                                <input type="text" placeholder="Enter No Of Packages"
+                                <input type="text" wire:model="noOfPackages" placeholder="Enter No Of Packages"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             </div>
-                            <div class="flex flex-col space-y-2">
+                            <div class="flex flex-col space-y-2" wire:ignore>
                                 <label>Type Of Packages</label>
-                                <select class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value="" disabled>Pilih</option>
+                                <select id="typeOfPackages" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                    <option value=""></option>
                                     <option value="packages">Packages</option>
                                     <option value="cartoon">Cartoon</option>
                                     <option value="roll">Roll</option>
@@ -439,28 +450,28 @@
                             <!-- Weight Info -->
                             <div class="flex flex-col space-y-2">
                                 <label>Gross Weight</label>
-                                <input type="text" placeholder="Enter Gross weight"
+                                <input type="text" placeholder="Enter Gross weight" wire:model="grossWeight"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             </div>
-                            <div class="flex flex-col space-y-2">
+                            <div class="flex flex-col space-y-2" wire:ignore>
                                 <label>Type Of Gross Weight</label>
-                                <select class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value="" disabled>Pilih</option>
-                                    <option value="kgs">KGS</option>
+                                <select id="typeOfGrossWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                    <option value=""></option>
+                                    <option value="KGS">KGS</option>
                                 </select>
                             </div>
 
                             <!-- Volume Weight Info -->
                             <div class="flex flex-col space-y-2">
                                 <label>Volume Weight</label>
-                                <input type="text" placeholder="Enter Gross weight"
+                                <input type="text" wire:model="volumeWeight" placeholder="Enter Gross weight"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Type Of Gross Weight</label>
-                                <select class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value="" disabled>Pilih</option>
-                                    <option value="kgs">KGS</option>
+                            <div class="flex flex-col space-y-2" wire:ignore>
+                                <label>Type Of Volume Weight</label>
+                                <select id="typeOfVolumeWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                    <option value=""></option>
+                                    <option value="KGS">KGS</option>
                                 </select>
                             </div>
 
@@ -468,7 +479,7 @@
                             <div class="flex flex-col space-y-2">
                                 <label>Volume</label>
                                 <div class="flex">
-                                    <input type="text" placeholder="Enter volume"
+                                    <input type="text" wire:model="volume" placeholder="Enter volume"
                                         class="block w-full rounded-l-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                     <span class="inline-flex items-center px-3 border border-l-0 border-gray-300 bg-gray-100 text-gray-600 rounded-r-md">
                                         CBM
@@ -477,14 +488,14 @@
                             </div>
                             <div class="flex flex-col space-y-2">
                                 <label>Chargeable Weight</label>
-                                <input type="text" placeholder="Enter Chargeable Weight"
+                                <input type="text" placeholder="Enter Chargeable Weight" wire:model="chargableWeight"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             </div>
 
                             <!-- Remarks -->
                             <div class="flex flex-col space-y-2 col-span-2">
                                 <label>Remarks</label>
-                                <textarea placeholder="Enter remarks" rows="3"
+                                <textarea placeholder="Enter remarks" rows="3" wire:model="containerRemarks"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
                             </div>
                         </div>
@@ -492,50 +503,54 @@
                         <!-- Right Column -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div class="flex flex-col space-y-2">
+                                <label>Container No.</label>
+                                <input type="text" placeholder="Enter Container No" wire:model="containerNo"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            </div>
+                            <div class="flex flex-col space-y-2">
+                                <label>Seal No.</label>
+                                <input type="text" placeholder="Enter Seal No" wire:model="containerSealNo"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            </div>
+                            <div class="flex flex-col space-y-2">
                                 <label>No of Pallet</label>
-                                <input type="text" placeholder="Enter No Of Pallet"
+                                <input type="text" placeholder="Enter No Of Pallet" wire:model="noOfPallet"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             </div>
                             <div></div>
                             <div class="flex flex-col space-y-2">
                                 <label>Net Of Weight</label>
-                                <input type="text" placeholder="Enter Net Of Weight"
+                                <input type="text" placeholder="Enter Net Of Weight" wire:model="netOfWeight"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             </div>
-                            <div class="flex flex-col space-y-2">
+                            <div class="flex flex-col space-y-2" wire:ignore>
                                 <label>Type Of Packages</label>
-                                <select class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value="">Pilih</option>
-                                    <option value="packages">Packages</option>
-                                    <option value="cartoon">Cartoon</option>
-                                    <option value="roll">Roll</option>
-                                    <option value="pallet">Pallet</option>
+                                <select id="typeNetOfWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                    <option value=""></option>
+                                    <option value="KGS">KGS</option>
                                 </select>
                             </div>
                             <div class="flex flex-col space-y-2">
                                 <label>Total Weight</label>
-                                <input type="text" placeholder="Enter Net Of Weight"
+                                <input type="text" placeholder="Enter Net Of Weight" wire:model="totalWeight"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             </div>
-                            <div class="flex flex-col space-y-2">
+                            <div class="flex flex-col space-y-2" wire:ignore>
                                 <label>Type Of Weight</label>
-                                <select class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value="">Pilih</option>
-                                    <option value="packages">Packages</option>
-                                    <option value="cartoon">Cartoon</option>
-                                    <option value="roll">Roll</option>
-                                    <option value="pallet">Pallet</option>
+                                <select id="typeOfTotalWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                    <option value=""></option>
+                                    <option value="KGS">KGS</option>
                                 </select>
                             </div>
                             <div class="flex flex-col space-y-2">
                                 <label>HS Code</label>
-                                <input type="text" placeholder="Enter HS Code"
+                                <input type="text" placeholder="Enter HS Code" wire:model="hsCode"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             </div>
                             <div></div>
                             <div class="flex flex-col space-y-2 col-span-2">
                                 <label>HS Description</label>
-                                <textarea placeholder="Enter Hs Description" rows="3"
+                                <textarea placeholder="Enter Hs Description" rows="3" wire:model="hsCodeDesc"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
                             </div>
                         </div>
@@ -554,6 +569,7 @@
                 <div class="space-y-2">
                     @switch($type_job)
                     @case('ocean_fcl_export')
+                    <div class="font-bold text-2xl text-center mb-4">Detail Jobs</div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="space-y-6">
                             <div class="flex flex-items grid grid-cols-3 ">
@@ -639,6 +655,85 @@
                             </div>
                         </div>
                     </div>
+                    <div class="font-bold text-2xl text-center mb-4">Container</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-6">
+                            <div class="flex flex-items grid grid-cols-3 ">
+                                <p class="col-span-1"><strong>Type Container</strong> </p>
+                                <p class="col-span-2">: {{$containerType}} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>Container Release No </strong></p>
+                                <p class="col-span-2">: {{ $containerReleaseNo }} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>Container Release Date </strong> </p>
+                                <p class="col-span-2">: {{ $containerReleaseDate }} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>No of Packages</strong> </p>
+                                <p class="col-span-2">: {{ $noOfPackages }} {{$typeOfPackages}} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>Gross Weight</strong> </p>
+                                <p class="col-span-2">: {{ $grossWeight }} {{$typeOfGrossWeight}} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>Volume Weight</strong> </p>
+                                <p class="col-span-2">: {{ $volumeWeight }} {{$typeOfVolumeWeight}} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>Volume</strong> </p>
+                                <p class="col-span-2">: {{ $volume }} CBM </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>Chargable Weight</strong> </p>
+                                <p class="col-span-2">: {{ $chargableWeight }} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>Remarks</strong> </p>
+                                <p class="col-span-2">: {{ $containerRemarks }} </p>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="flex flex-items grid grid-cols-3 ">
+                                <p class="col-span-1"><strong>Container No.</strong> </p>
+                                <p class="col-span-2">: {{$containerNo}} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>Container Release No </strong></p>
+                                <p class="col-span-2">: {{ $containerSealNo }} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>Container Release Date </strong> </p>
+                                <p class="col-span-2">: {{ $containerReleaseDate }} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>No of Packages</strong> </p>
+                                <p class="col-span-2">: {{ $noOfPackages }} {{$typeOfPackages}} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>Gross Weight</strong> </p>
+                                <p class="col-span-2">: {{ $grossWeight }} {{$typeOfGrossWeight}} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>Volume Weight</strong> </p>
+                                <p class="col-span-2">: {{ $volumeWeight }} {{$typeOfVolumeWeight}} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>Volume</strong> </p>
+                                <p class="col-span-2">: {{ $volume }} CBM </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>Chargable Weight</strong> </p>
+                                <p class="col-span-2">: {{ $chargableWeight }} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>Remarks</strong> </p>
+                                <p class="col-span-2">: {{ $containerRemarks }} </p>
+                            </div>
+                        </div>
+                    </div>
                     @break
                     @case('trucking')
                     <p><strong>Detail Trucking:</strong> {{ $trucking_detail }}</p>
@@ -712,6 +807,37 @@
                 model: 'servicesType',
                 placeholder: 'Select services Type '
             },
+            {
+                sel: '#containerType',
+                model: 'containerType',
+                placeholder: 'Select container Type '
+            },
+            {
+                sel: '#typeOfPackages',
+                model: 'typeOfPackages',
+                placeholder: 'Select Type Of Packages '
+            },
+            {
+                sel: '#typeOfGrossWeight',
+                model: 'typeOfGrossWeight',
+                placeholder: 'Select Type Of Gross Weight '
+            },
+            {
+                sel: '#typeOfVolumeWeight',
+                model: 'typeOfVolumeWeight',
+                placeholder: 'Select Type Of Volume Weight '
+            },
+            {
+                sel: '#typeNetOfWeight',
+                model: 'typeNetOfWeight',
+                placeholder: 'Select Type Of Net Of Packages '
+            },
+            {
+                sel: '#typeOfTotalWeight',
+                model: 'typeOfTotalWeight',
+                placeholder: 'Select Type Of Total Weight '
+            },
+
         ].forEach(({
             sel,
             model,
@@ -731,6 +857,14 @@
                 width: '100%',
             });
 
+            // Watch for Livewire updates
+            $wire.watch(model, (value) => {
+                if ($el.val() !== value) {
+                    $el.val(value).trigger('change');
+                }
+            });
+
+            // Handle select2 changes
             $el.off('change.lw').on('change.lw', function() {
                 $wire.set(model, $(this).val());
                 console.log($(this).val());
@@ -833,5 +967,6 @@
         });
     });
 </script>
+
 @endscript
 @endpush

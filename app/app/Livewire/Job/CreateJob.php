@@ -6,8 +6,10 @@ use App\Models\TJob;
 use Livewire\Component;
 use App\Models\Customer;
 use App\Models\Container;
+use App\Models\jobContainer;
 use Carbon\Carbon;
 use Livewire\Attributes\On;
+use Illuminate\Database\QueryException;
 
 use Illuminate\Support\Facades\DB;
 
@@ -43,15 +45,14 @@ class CreateJob extends Component
         $estimearrival,
         $estimedelivery, $voyage;
 
-    public $containers = [];
+    // Container Section
+    public $containerType, $noOfPackages, $containerReleaseNo, $containerReleaseDate, $typeOfPackages, $grossWeight, $typeOfGrossWeight, $volumeWeight, $typeOfVolumeWeight, $volume, $chargableWeight, $containerRemarks, $containerNo, $containerSealNo, $noOfPallet, $netOfWeight, $typeNetOfWeight, $totalWeight, $typeOfTotalWeight, $hsCode, $hsCodeDesc;
 
 
 
     public function mount()
     {
-        $this->containers = [
-            ['container_id' => '', 'container_type' => '', 'container_seal' => '', 'gross_weight' => '', 'pack_type' => '', 'measurement' => '', 'pcs' => '', 'unit' => '', 'volume_weight' => '', 'chargeable_weight' => ''],
-        ];
+
         $this->clients = Customer::whereJsonContains('roles', 'client')->get();
         $this->shippers = Customer::whereJsonContains('roles', 'shipper')->get();
         $this->consignees = Customer::whereJsonContains('roles', 'consignee')->get();
@@ -213,10 +214,28 @@ class CreateJob extends Component
     public function ocean_fcl_export()
     {
 
-        $json = file_get_contents(public_path('data/ports.json'));
-        $this->ports = json_decode($json, true);
 
-        $container = [];
+
+        $container = [
+            'containerType'       => $this->containerType,
+            'containerReleaseNo'  => $this->containerReleaseNo,
+            'containerReleaseDate' => $this->containerReleaseDate,
+            'noOfPackages'        => $this->noOfPackages,
+            'typeOfPackages'      => $this->typeOfPackages,
+            'grossWeight'         => $this->grossWeight,
+            'typeOfGrossWeight'   => $this->typeOfGrossWeight,
+            'volumeWeight'        => $this->volumeWeight,
+            'typeOfVolumeWeight'  => $this->typeOfVolumeWeight,
+            'volume'              => $this->volume,
+            'containerSealNo'     => $this->containerSealNo,
+            'noOfPallet'          => $this->noOfPallet,
+            'netOfWeight'         => $this->netOfWeight,
+            'typeNetOfWeight'     => $this->typeNetOfWeight,
+            'totalWeight'         => $this->totalWeight,
+            'typeOfTotalWeight'   => $this->typeOfTotalWeight,
+            'hsCode'              => $this->hsCode,
+            'hsCodeDesc'          => $this->hsCodeDesc,
+        ];
         $data = [
             'shipment_id'         => $this->shipment_id,
             'shipment_no'         => $this->shipment_no,
@@ -229,55 +248,43 @@ class CreateJob extends Component
             'estimedelivery'      => $this->estimedelivery,
             'place_of_receipt'    => $this->place_of_receipt,
             'port_of_discharge'   => $this->port_of_discharge,
+            'place_of_delivery'   => $this->place_of_delivery,
             'port_of_loading'     => $this->port_of_loading,
             'description'         => $this->description,
             'shipper_id'          => $this->shipper_id,
 
         ];
-        dd([
+        // dd([
+        //     'shipper_id' => $this->shipper_id,
+        //     'consignee_id' => $this->consignee_id,
+        //     'notify_id' => $this->notify_id,
+        //     'type_job' => $this->type_job,
+        //     'job_name' => $this->job_name,
+        //     'data' => $data,
+        //     'container' => $container
+        // ]);
+
+
+        $job = TJob::create([
+            'job_id' => $this->job_id,
+            'type_job' => $this->type_job,
+            'client_id' => $this->client_id,
             'shipper_id' => $this->shipper_id,
             'consignee_id' => $this->consignee_id,
             'notify_id' => $this->notify_id,
-            'type_job' => $this->type_job,
-            'job_name' => $this->job_name,
-            'data' => $data,
+            'data'  => $data,
         ]);
 
-        DB::beginTransaction();
-        try {
-            foreach ($this->containers as $container) {
-                Container::create([
-                    'shipment_id'            => $shipment->id,
-                    'container_id'           => $container['container_id'],
-                    'container_type'         => $container['container_type'],
-                    'container_seal'         => $container['container_seal'],
-                    'pcs'                    => $container['pcs'],
-                    'unit'                   => $container['unit'],
-                    'gross_weight'           => $container['gross_weight'],
-                    'pack_type'              => $container['pack_type'],
-                    'volume_weight'          => $container['volume_weight'],
-                    'chargeable_weight'      => $container['chargeable_weight'],
-                ]);
-            }
-            TJob::create([
-                'job_id' => $this->job_id,
-                'job_name' => $this->job_name,
-                'type_job' => $this->type_job,
-                'shipper_id' => $this->shipper_id,
-                'consignee_id' => $this->consignee_id,
-                'notify_id' => $this->notify_id,
-                'shipment_no' => $this->shipment_no,
-                'shipment_id' => $this->shipment_id,
-                'data'  => $payload,
-                'container' => $container
+        jobContainer::create([
+            'id_job' =>  $job->id,
+            'containers' => $container
+        ]);
 
-            ]);
-            DB::commit();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            session()->flash('error', 'Gagal menyimpan data: ' . $e->getMessage());
-        }
+        // return redirect()->route('listJob')->with('success', [
+        //     'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.
+        //     'title' => 'Success!', // Toast title
 
+        // ]);
 
         session()->flash('message', 'Ocean FCL Export job created successfully.');
     }

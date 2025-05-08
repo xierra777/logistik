@@ -24,15 +24,15 @@ class Customer extends Model
         'roles' => 'array',
     ];
 
-    // public function chartOfAccount()
-    // {
-    //     return $this->belongsTo(ChartOfAccount::class);
-    // }
+    public function chartOfAccount()
+    {
+        return $this->belongsTo(ChartOfAccount::class);
+    }
 
-    // public function getCategoryAttribute()
-    // {
-    //     return $this->coa ? $this->coa->term_type : 'unknown';
-    // }
+    public function getCategoryAttribute()
+    {
+        return $this->coa ? $this->coa->term_type : 'unknown';
+    }
 
 
     public function shipments()

@@ -18,7 +18,10 @@ class TJob extends Model
         'data',
     ];
 
-
+    public function TjobContainer()
+    {
+        return $this->hasMany(jobContainer::class, 'id_job');
+    }
     public function client()
     {
         return $this->belongsTo(Customer::class, 'client_id');

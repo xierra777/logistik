@@ -14,7 +14,7 @@ class ViewCustomer extends Component
 
     public function mount(Customer $id)
     {
-        $this->customer = $id->load('coa');
+        $this->customer = $id->load('chartOfAccount');
 
         // Ambil object ChartOfAccount, bukan cuma ID
         $this->chartOfAccount = ChartOfAccount::where('id', $this->customer->coa_id)->first();

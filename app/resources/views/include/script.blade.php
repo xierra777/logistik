@@ -18,7 +18,7 @@
 
         // Initialize CSRF token if already set
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-        console.log(csrfToken); // You can remove this line if not needed
+        // console.log(csrfToken); // You can remove this line if not needed
     });
 </script>
 

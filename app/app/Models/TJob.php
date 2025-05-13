@@ -12,9 +12,8 @@ class TJob extends Model
         'job_id',
         'type_job',
         'client_id',
-        'consignee_id',
-        'shipper_id',
-        'notify_id',
+        'ogentsJob',
+        'dagentsJob',
         'data',
     ];
 

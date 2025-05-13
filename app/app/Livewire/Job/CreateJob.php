@@ -21,19 +21,16 @@ class CreateJob extends Component
     public $job_id = "";
 
     public $clients;
-    public $shippers;
-    public $consignees;
-    public $notifies;
+    public $dagentsJob;
+    public $ogentsJob;
     public $carriers;
 
     public $client_id;
-    public $shipper_id;
-    public $consignee_id;
-    public $notify_id;
+    public $deliveryAgent;
     public array $ports = [];
 
     // Bagian Ocean
-    public $shipment_id = "", $shipment_no,
+    public $mbl_no = "", $customerCodeJob,
         $carrier, $servicesType = "", $incoTerms,
         $vessel_name = "",
         $ocean_vessel_feeder = "",
@@ -43,7 +40,7 @@ class CreateJob extends Component
         $port_of_loading = "",
         $description = "",
         $estimearrival,
-        $estimedelivery, $voyage;
+        $estimedelivery, $voyage, $mbl_date, $cross_trade, $hazardousType, $hazardousClassType, $payableAtJob, $freightTypeJob, $remarksJobDetailJobs;
 
     // Container Section
     public $containerType, $noOfPackages, $containerReleaseNo, $containerReleaseDate, $typeOfPackages, $grossWeight, $typeOfGrossWeight, $volumeWeight, $typeOfVolumeWeight, $volume, $chargableWeight, $containerRemarks, $containerNo, $containerSealNo, $noOfPallet, $netOfWeight, $typeNetOfWeight, $totalWeight, $typeOfTotalWeight, $hsCode, $hsCodeDesc;
@@ -54,9 +51,8 @@ class CreateJob extends Component
     {
 
         $this->clients = Customer::whereJsonContains('roles', 'client')->get();
-        $this->shippers = Customer::whereJsonContains('roles', 'shipper')->get();
-        $this->consignees = Customer::whereJsonContains('roles', 'consignee')->get();
-        $this->notifies = Customer::whereJsonContains('roles', 'notify')->get();
+        $this->dagentsJob = Customer::whereJsonContains('roles', 'agent')->get();
+        $this->ogentsJob = Customer::whereJsonContains('roles', 'agent')->get();
         $this->carriers = Customer::whereJsonContains('roles', 'carrier')->get();
     }
 
@@ -68,29 +64,7 @@ class CreateJob extends Component
         return $client ? $client->name : '';
     }
 
-    public function getShipperNameProperty()
-    {
-        if (!$this->shipper_id) return '';
 
-        $shipper = $this->shippers->firstWhere('id', $this->shipper_id);
-        return $shipper ? $shipper->name : '';
-    }
-
-    public function getConsigneeNameProperty()
-    {
-        if (!$this->consignee_id) return '';
-
-        $consignee = $this->consignees->firstWhere('id', $this->consignee_id);
-        return $consignee ? $consignee->name : '';
-    }
-
-    public function getNotifyNameProperty()
-    {
-        if (!$this->notify_id) return '';
-
-        $notify = $this->notifies->firstWhere('id', $this->notify_id);
-        return $notify ? $notify->name : '';
-    }
     #[On('port-updated')]
     public function updatePort($model, $value)
     {
@@ -117,7 +91,6 @@ class CreateJob extends Component
             case 1:
                 $this->validate([
                     'type_job' => 'required',
-                    'client_id' => 'required',
                 ]);
                 break;
 
@@ -128,8 +101,7 @@ class CreateJob extends Component
                     case 'ocean_fcl_export':
                         $rules = [
                             'job_id' => 'required',
-                            'shipment_no' => 'required',
-                            'shipment_id' => 'required'
+
                         ];
                         break;
 
@@ -237,13 +209,26 @@ class CreateJob extends Component
             'hsCodeDesc'          => $this->hsCodeDesc,
         ];
         $data = [
-            'shipment_id'         => $this->shipment_id,
-            'shipment_no'         => $this->shipment_no,
+            'mbl_no'              => $this->mbl_no,
+            'mbl_date'            => $this->mbl_date,
+            'customerCodeJob'     => $this->customerCodeJob,
             'servicesType'        => $this->servicesType,
-            'carrier'             => $this->carrier,
             'incoTerms'           => $this->incoTerms,
-            'ocean_vessel_feeder' => $this->ocean_vessel_feeder,
+            'deliveryAgent'       => $this->deliveryAgent,
+            'carrier'             => $this->carrier,
             'vessel_name'         => $this->vessel_name,
+            'voyage'              => $this->voyage,
+
+
+            'ocean_vessel_feeder' => $this->ocean_vessel_feeder, //hidden right here
+            'cross_trade'         => $this->cross_trade, //buat relasinya besok soalnya diquery nanti
+            'harzardousType'      => $this->hazardousType,
+            'hazardousClassType'  => $this->hazardousClassType,
+
+            'payableAtJob'        => $this->payableAtJob, //Kemungkinan Query Terjadi
+            'freightTypeJob'      => $this->freightTypeJob,
+            'remarksJobDetailJobs' => $this->remarksJobDetailJobs,
+
             'estimearrival'       => $this->estimearrival,
             'estimedelivery'      => $this->estimedelivery,
             'place_of_receipt'    => $this->place_of_receipt,
@@ -251,8 +236,6 @@ class CreateJob extends Component
             'place_of_delivery'   => $this->place_of_delivery,
             'port_of_loading'     => $this->port_of_loading,
             'description'         => $this->description,
-            'shipper_id'          => $this->shipper_id,
-
         ];
         // dd([
         //     'shipper_id' => $this->shipper_id,
@@ -269,9 +252,12 @@ class CreateJob extends Component
             'job_id' => $this->job_id,
             'type_job' => $this->type_job,
             'client_id' => $this->client_id,
-            'shipper_id' => $this->shipper_id,
-            'consignee_id' => $this->consignee_id,
-            'notify_id' => $this->notify_id,
+            'dagentsJob' => $this->deliveryAgent,
+            'ogentsJob' => $this->deliveryAgent,
+
+            // 'shipper_id' => $this->shipper_id,
+            // 'consignee_id' => $this->consignee_id,
+            // 'notify_id' => $this->notify_id,
             'data'  => $data,
         ]);
 
@@ -280,11 +266,11 @@ class CreateJob extends Component
             'containers' => $container
         ]);
 
-        // return redirect()->route('listJob')->with('success', [
-        //     'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.
-        //     'title' => 'Success!', // Toast title
+        return redirect()->route('listJob')->with('success', [
+            'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.
+            'title' => 'Success!', // Toast title
 
-        // ]);
+        ]);
 
         session()->flash('message', 'Ocean FCL Export job created successfully.');
     }

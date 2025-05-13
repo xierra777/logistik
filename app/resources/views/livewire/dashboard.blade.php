@@ -55,9 +55,9 @@
         <div class="shadow-md rounded-md h-full">
             <div class="overflow-x-auto rounded-md">
                 <div class="bg-blue-900 flex between items-center justify-between p-2">
-                    <h1 class="font-semibold text-neutral-100">Shipments</h1>
+                    <h1 class="font-semibold text-neutral-100">Job </h1>
                     <div class="flex justify-end">
-                        <a href="{{ url('/shipments') }}" class="px-4 py-1 text-white">
+                        <a href="{{ url('/list-job') }}" class="px-4 py-1 text-white">
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
                         <a href="{{ url('shipment')}}" class="px-4 py-1 text-white">
@@ -68,19 +68,19 @@
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700 rounded-md">
                     <thead class="bg-gray-50 dark:bg-neutral-800 rounded-t-xl">
                         <tr>
-                            <th class="px-6 py-3 text-xs font-bold text-gray-500 uppercase dark:text-neutral-400">B/L</th>
-                            <th class="px-6 py-3 text-xs font-bold text-gray-500 uppercase dark:text-neutral-400">Shipper</th>
+                            <th class="px-6 py-3 text-xs font-bold text-gray-500 uppercase dark:text-neutral-400">Job ID</th>
+                            <th class="px-6 py-3 text-xs font-bold text-gray-W500 uppercase dark:text-neutral-400">Client</th>
                         </tr>
                     </thead>
 
                     <tbody class="divide-y divide-gray-200 dark:divide-neutral-700 bg-white dark:bg-neutral-900 rounded-xl">
-                        @forelse($shipments as $shipment)
+                        @forelse($jobs as $j)
                         <tr class="hover:bg-gray-50 dark:hover:bg-neutral-600 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600 dark:text-neutral-300 hover:underline hover:text-blue-900 ">
-                                <a wire:navigate href="/view-shipments/{{ $shipment->id }}">{{ $shipment->shipment_id }}</a>
+                                <a wire:navigate href="/view-job/{{ $j->id }}">{{ $j->job_id }}</a>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 dark:text-neutral-300 font-semibold">
-                                {{ $shipment->shipper?->name }}
+                                {{ $j->client?->name }}
                             </td>
                         </tr>
                         @empty
@@ -119,13 +119,13 @@
                     </thead>
 
                     <tbody class="divide-y divide-gray-200 dark:divide-neutral-700 bg-white dark:bg-neutral-900 rounded-xl">
-                        @forelse($customers as $customer)
+                        @forelse($customers as $c)
                         <tr class="hover:bg-gray-50 dark:hover:bg-neutral-600 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600 dark:text-neutral-300 hover:underline hover:text-blue-300">
-                                <a wire:navigate href="/view-customers/{id}">{{ $customer->name }}</a>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600 dark:text-neutral-300 hover:underline hover:text-blue-900 ">
+                                <a wire:navigate href="/view-customers/{{$c->id}}">{{ $c->name }}</a>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 dark:text-neutral-300 font-semibold">
-                                {{ $customer->country }}
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 dark:text-neutral-300 font-semibold uppercase">
+                                {{ implode(', ', $c->roles) }}
                             </td>
                         </tr>
                         @empty

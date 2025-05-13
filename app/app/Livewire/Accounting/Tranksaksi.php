@@ -62,8 +62,16 @@ class Tranksaksi extends Component
     {
         $this->shipmentId = $shipmentId;
         $customers = Customer::orderBy('name')->get();
+        $shipment = Shipment::find($shipmentId);
+
         $this->vendors = $customers->where('category', 'CR');
-        $this->clients = $customers->where('category', 'DR');
+
+        $this->clients = collect([
+            $shipment->shipper,
+            $shipment->consignee,
+            $shipment->notify_party,
+        ])->filter();
+
         $this->updateQty();
     }
 

@@ -174,6 +174,8 @@ class EditTransaction extends Component
             'cwhtaxamount' => $this->cwhtaxamount,
         ]);
 
+        // Debugging all variables
+        // dd(get_object_vars($this));
         $this->dispatch('transactionSaved')->to('App\Livewire\ViewShipments');
         $this->closeModal();
         session()->flash('message', 'Transaksi berhasil disimpan!');

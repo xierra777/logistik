@@ -1,123 +1,287 @@
-<form wire:submit="updateShipments" class="p-6 text-dark-900 dark:text-gray-100">
+<form wire:submit="updateShipments">
   <div class="space-y-12">
     <div class="border-b border-gray-900/10 pb-12">
-      <h2 class="text-base/7 font-semibold text-gray-900">Edit Data Kapal disini</h2>
-      <br>
-      <div>
-        <label for="shipment_id" class="block text-sm font-medium text-gray-700">
-          Shipment ID <span class="text-red-500">*</span>
+      <h2 class="text-base/7 font-semibold text-gray-900 mb-5">Tambahkan Data Kapal disini</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5">
+
+        <label for="hs-radio-air-inbound" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" wire:model="jobType" value="airInbound" id="hs-radio-air-inbound">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Air Inbound</span>
         </label>
-        <input
-          wire:model="shipment_id"
-          type="text"
-          id="shipment_id"
-          name="shipment_id"
-          required
-          class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        @error('shipment_id')
-        <span class="text-sm text-red-500">{{ $message }}</span>
-        @enderror
+        <label for="hs-radio-air-outbound" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 ring-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" value="airOutbound" wire:model="jobType" id="hs-radio-air-outbound">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Air Outbound</span>
+        </label>
+        <label for="hs-radio-domestic-transport" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" wire:model="jobType" value="domesticTransportation" id="hs-radio-domestic-transport">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Domestic Transportation</span>
+        </label>
+        <label for="hs-radio-local-truck" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" value="localTruck" wire:model="jobType" id="hs-radio-local-truck">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Local Truck</span>
+        </label>
+        <label for="hs-radio-logistics" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" value="Logistics" wire:model="jobType" id="hs-radio-logistics">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Logistics</span>
+        </label>
+        <label for="hs-radio-OceanFclExport" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" value="OceanFclExport" wire:model="jobType" id="hs-radio-OceanFclExport">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Ocean FCL Export</span>
+        </label>
+        <label for="hs-radio-OceanFclImport" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" value="OceanFclImport" wire:model="jobType" id="hs-radio-OceanFclImport">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Ocean FCL Import</span>
+        </label>
+        <label for="hs-radio-OceanLclBulkExport" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" value="OceanLclBulkExport" wire:model="jobType" id="hs-radio-OceanLclBulkExport">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Ocean LCL/Bulk Export</span>
+        </label>
+        <label for="hs-radio-OceanLclBulkImport" class="flex p-3 w-full bg-white border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400">
+          <input type="radio" name="hs-radio-in-form" class="border border-gray-500 shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800" value="OceanLclBulkImport" wire:model="jobType" id="hs-radio-OceanLclBulkImport">
+          <span class="text-sm text-gray-500 ms-3 dark:text-neutral-400 uppercase font-bold">Ocean LCL/Bulk Import</span>
+        </label>
+      </div>
+      <div class="mb-4 grid grid-cols-4 gap-6">
+
+        <!-- Shipment ID -->
+        <div>
+          <label for="shipment_id" class="block text-sm font-medium text-gray-700">
+            MAWB/MBL <span class="text-red-500">*</span>
+          </label>
+          <input
+            wire:model="shipment_id"
+            type="text"
+            id="shipment_id"
+            name="shipment_id"
+            required
+            class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+          @error('shipment_id')
+          <span class="text-sm text-red-500">{{ $message }}</span>
+          @enderror
+        </div>
+
+        <!-- Shipment Number -->
+        <div>
+          <label for="shipment_no" class="block text-sm font-medium text-gray-700">
+            No Job <span class="text-red-500">*</span>
+          </label>
+          <input
+            wire:model="shipment_no"
+            type="text"
+            id="shipment_no"
+            name="shipment_no"
+            required
+            class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+          @error('shipment_no')
+          <span class="text-sm text-red-500">{{ $message }}</span>
+          @enderror
+        </div>
+        <div>
+          <label for="servicesType" class="block text-sm font-medium text-gray-700">
+            Service Type <span class="text-red-500">*</span>
+          </label>
+          <select name="servicesType" id="servicesType" wire:model="servicesType" class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            <option value=""></option>
+            <option value="CY-CY">CY-CY</option>
+            <option value="FCL-FCL">FCL-FCL</option>
+            <option value="CFS-CY">CFS-CY</option>
+            <option value="CY-CFS">CY-CFS</option>
+            <option value="DOOR-DOOR">DOOR-DOOR</option>
+
+          </select>
+          @error('shipment_no')
+          <span class="text-sm text-red-500">{{ $message }}</span>
+          @enderror
+        </div>
+        <div>
+          <label for="servicesType" class="block text-sm font-medium text-gray-700">
+            Service Type <span class="text-red-500">*</span>
+          </label>
+          <select name="servicesType" id="servicesType" wire:model="servicesType" class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            @foreach($customers as $customer)
+            @if(in_array('carrier', $customer->roles)) <!-- Only show customers with role "shipper" -->
+            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+            @endif
+            @endforeach
+          </select>
+          @error('shipment_no')
+          <span class="text-sm text-red-500">{{ $message }}</span>
+          @enderror
+        </div>
       </div>
 
-      <!-- Container ID -->
-      <div>
-        <label for="container_id" class="block text-sm font-medium text-gray-700">
-          Container ID <span class="text-red-500">*</span>
-        </label>
-        <input
-          wire:model="container_id"
-          type="text"
-          id="container_id"
-          name="container_id"
-          required
-          class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        @error('container_id')
-        <span class="text-sm text-red-500">{{ $message }}</span>
-        @enderror
+
+      <div class="mb-4 grid grid-cols-4 gap-6">
+        <!-- Mother Vessel -->
+        <div class="mb-4=">
+          <label for="ocean_vessel_mother">Mother Vessel</label>
+          <input type="text" id="ocean_vessel_mother" name="ocean_vessel_mother" wire:model="ocean_vessel_mother" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+          @error('ocean_vessel_mother')
+          <span class="text-red-500 text-sm">{{ $message }}</span>
+          @enderror
+        </div>
+
+        <!-- Feeder Vessel -->
+        <div class="mb-4">
+          <label for="ocean_vessel_feeder">Feeder Vessel</label>
+          <input type="text" id="ocean_vessel_feeder" name="ocean_vessel_feeder" wire:model="ocean_vessel_feeder" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+          @error('ocean_vessel_feeder')
+          <span class="text-red-500 text-sm">{{ $message }}</span>
+          @enderror
+        </div>
+
+        <!-- ETA -->
+        <div class="mb-4">
+          <label for="estimearrival">ETA / Estimate Time Arrival</label>
+          <input type="date" id="estimearrival" name="estimearrival" wire:model="estimearrival" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+          @error('estimearrival')
+          <span class="text-red-500 text-sm">{{ $message }}</span>
+          @enderror
+        </div>
+
+        <!-- ETD -->
+        <div class="mb-4">
+          <label for="estimedelivery">ETD / Estimate Time Departure</label>
+          <input type="date" id="estimedelivery" name="estimedelivery" wire:model="estimedelivery" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+          @error('estimedelivery')
+          <span class="text-red-500 text-sm">{{ $message }}</span>
+          @enderror
+        </div>
       </div>
 
-      <!-- Container Type -->
-      <div>
-        <label for="container_type" class="block text-sm font-medium text-gray-700">
-          Container Type <span class="text-red-500">*</span>
-        </label>
-        <input
-          wire:model="container_type"
-          type="text"
-          id="container_type"
-          name="container_type"
-          required
-          class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        @error('container_type')
-        <span class="text-sm text-red-500">{{ $message }}</span>
-        @enderror
-      </div>
 
-      <!-- Shipper -->
-      <div>
-        <label for="shipper" class="block text-sm font-medium text-gray-700">
-          Shipper
-        </label>
-        <input
-          wire:model="shipper"
-          type="text"
-          id="shipper"
-          name="shipper"
-          class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        @error('shipper')
-        <span class="text-sm text-red-500">{{ $message }}</span>
-        @enderror
+      <!-- Organization -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="mb-4" wire:ignore>
+          <label for="shipper">Shipper</label>
+          <select wire:model="shipper_id" id="shipper" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+            <option value="">Select Shipper</option>
+            @foreach($customers as $customer)
+            @if(in_array('shipper', $customer->roles)) <!-- Only show customers with role "shipper" -->
+            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+            @endif
+            @endforeach
+          </select>
+        </div>
+        <div class="mb-4" wire:ignore>
+          <label for="consignee">Consignee</label>
+          <select wire:model="consignee_id" id="consignee" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+            <option value="">Select Consignee</option>
+            @foreach($customers as $customer)
+            @if(in_array('consignee', $customer->roles)) <!-- Only show customers with role "consignee" -->
+            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+            @endif
+            @endforeach
+          </select>
+        </div>
+        <div class="mb-4" wire:ignore>
+          <label for="notify">Notify</label>
+          <select wire:model="notify_id" id="notify_id" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+            <option value="">Select Notify</option>
+            @foreach($customers as $customer)
+            @if(in_array('notify', $customer->roles)) <!-- Only show customers with role "notify" -->
+            <option value="{{ $customer->id }}">{{ $customer->name }}</option>
+            @endif
+            @endforeach
+          </select>
+        </div>
       </div>
-
-      <!-- Consignee -->
-      <div>
-        <label for="consignee" class="block text-sm font-medium text-gray-700">
-          Consignee
-        </label>
-        <input
-          wire:model="consignee"
-          type="text"
-          id="consignee"
-          name="consignee"
-          class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        @error('consignee')
-        <span class="text-sm text-red-500">{{ $message }}</span>
-        @enderror
-      </div>
-
-      <!-- Notify -->
-      <div>
-        <label for="notify" class="block text-sm font-medium text-gray-700">
-          Notify
-        </label>
-        <input
-          wire:model="notify"
-          type="text"
-          id="notify"
-          name="notify"
-          class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        @error('notify')
-        <span class="text-sm text-red-500">{{ $message }}</span>
-        @enderror
-      </div>
-
-      <!-- Packages -->
-      <div>
-        <label for="packages" class="block text-sm font-medium text-gray-700">
-          Packages
-        </label>
-        <input
-          wire:model="packages"
-          type="text"
-          id="packages"
-          class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        @error('packages')
-        <span class="text-sm text-red-500">{{ $message }}</span>
-        @enderror
+      <!-- Select Port -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4 border rounded-md p-4 border-1 border-gray-300">
+        <!-- Port Of Loading -->
+        <div class="port-container" data-model="port_of_loading" data-radio-name="inputTypeLoading" wire:ignore wire:change="port_of_loading">
+          <h2 class="text-lg font-semibold">Port Of Loading</h2>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Select or Input Port</label>
+            <div class="flex items-center gap-4">
+              <label class="cursor-pointer">
+                <input type="radio" value="select" name="inputTypeLoading" checked> Select from List
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" value="input" name="inputTypeLoading"> Enter Port Manually
+              </label>
+            </div>
+          </div>
+          <!-- Select Dropdown -->
+          <div class="select-container">
+            <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+            <select wire:model="port_of_loading"
+              class="port-select block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+              <option value="" disabled selected>Select a port...</option>
+            </select>
+          </div>
+          <!-- Input Field -->
+          <div class="input-container hidden">
+            <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+            <input wire:model="port_of_loading" type="text"
+              class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"
+              placeholder="Enter port name">
+          </div>
+        </div>
+        <!-- Place Of Receipts -->
+        <div class="port-container" data-model="place_of_receipt" data-radio-name="inputTypeReceipt" wire:ignore wire:change="place_of_receipt">
+          <h2 class="text-lg font-semibold">Place Of Receipts</h2>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Select or Input Port</label>
+            <div class="flex items-center gap-4">
+              <label class="cursor-pointer">
+                <input type="radio" value="select" name="inputTypeReceipt" checked> Select from List
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" value="input" name="inputTypeReceipt"> Enter Port Manually
+              </label>
+            </div>
+          </div>
+          <!-- Select Dropdown -->
+          <div class="select-container">
+            <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+            <select wire:model="place_of_receipt"
+              class="port-select block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+              <option value="" disabled selected>Select a port...</option>
+            </select>
+          </div>
+          <!-- Input Field -->
+          <div class="input-container hidden">
+            <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+            <input wire:model="place_of_receipt" type="text"
+              class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"
+              placeholder="Enter port name">
+          </div>
+        </div>
+        <!-- Port Of Discharge -->
+        <div class="port-container" data-model="port_of_discharge" data-radio-name="inputTypeDischarge" wire:ignore>
+          <h2 class="text-lg font-semibold">Port Of Discharge</h2>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Select or Input Port</label>
+            <div class="flex items-center gap-4">
+              <label class="cursor-pointer">
+                <input type="radio" value="select" name="inputTypeDischarge" checked> Select from List
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" value="input" name="inputTypeDischarge"> Enter Port Manually
+              </label>
+            </div>
+          </div>
+          <!-- Select Dropdown -->
+          <div class="select-container">
+            <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+            <select wire:model="port_of_discharge"
+              class="port-select block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+              <option value="" disabled selected>Select a port...</option>
+            </select>
+          </div>
+          <!-- Input Field -->
+          <div class="input-container hidden">
+            <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+            <input wire:model="port_of_discharge" type="text"
+              class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"
+              placeholder="Enter port name">
+          </div>
+        </div>
       </div>
 
       <!-- Description -->
-      <div>
+      <div class="mb-4">
         <label for="description" class="block text-sm font-medium text-gray-700">
           Description
         </label>
@@ -129,61 +293,141 @@
         <span class="text-sm text-red-500">{{ $message }}</span>
         @enderror
       </div>
-
-      <!-- Gross Weight -->
-      <div>
-        <label for="gross_weight" class="block text-sm font-medium text-gray-700">
-          Gross Weight <span class="text-red-500">*</span>
-        </label>
-        <input
-          wire:model="gross_weight"
-          type="text"
-          id="gross_weight"
-          required
-          class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        @error('gross_weight')
-        <span class="text-sm text-red-500">{{ $message }}</span>
-        @enderror
-      </div>
-
-      <!-- Measurement -->
-      <div>
-        <label for="measurement" class="block text-sm font-medium text-gray-700">
-          Measurement <span class="text-red-500">*</span>
-        </label>
-        <input
-          wire:model="measurement"
-          type="text"
-          id="measurement"
-          required
-          class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-        @error('measurement')
-        <span class="text-sm text-red-500">{{ $message }}</span>
-        @enderror
-      </div>
     </div>
+
 
     <!-- Buttons -->
     <div class="mt-6 flex items-center justify-end gap-x-6">
-      <a wire:navigate href="/shipments" class="text-sm/6 font-semibold text-gray-900 bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">
+      <a href="{{route ('shipments')}}" class="text-sm/6 font-semibold text-gray-900 bg-gray-200 px-4 py-2 rounded-md hover:bg-gray-300">
         Back
       </a>
 
       <button type="submit" class="rounded-md bg-indigo-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 bg-cyan-500 shadow-lg shadow-cyan-500/50">
-        Update
+        Save
       </button>
     </div>
 </form>
 
 <script>
-  document.addEventListener('livewire:initialized', () => {
-    Livewire.on('swal', (event) => {
-      const data = event
-      swal.fire({
-        icon: data[0]['icon'],
-        title: data[0]['title'],
-        text: data[0]['text'],
-      });
-    })
-  })
+  document.addEventListener('DOMContentLoaded', function() {
+    Livewire.on('scroll-to-error', function(fieldName) {
+      let errorField = document.querySelector(`[data-error="${fieldName}"]`);
+      if (errorField) {
+        errorField.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+        errorField.focus(); // Fokus ke input biar user langsung bisa edit
+      }
+    });
+  });
 </script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    fetch('/data/ports.json')
+      .then(response => response.json())
+      .then(data => {
+        document.querySelectorAll('.port-select').forEach(select => {
+          // Kosongkan dulu biar tidak double append
+          select.innerHTML = '<option value="" disabled selected>Select a port...</option>';
+
+          data.forEach(port => {
+            const option = document.createElement('option');
+            option.value = `${port.name} - ${port.code}`;
+            option.textContent = `${port.name} - ${port.code}`;
+            select.appendChild(option);
+          });
+
+          // Inisialisasi Select2
+          $(select).select2({
+            placeholder: 'Select a port',
+            allowClear: true,
+            theme: 'tailwindcss-3'
+          });
+
+          // Pastikan data tetap tersimpan di Livewire
+          $(select).on('change', function() {
+            let selectedValue = $(this).val();
+            let modelName = $(this).attr('wire:model'); // Ambil nama model Livewire
+
+            // Kirim ke Livewire dengan dispatch event
+            window.dispatchEvent(new CustomEvent('port-updated', {
+              detail: {
+                model: modelName,
+                value: selectedValue
+              }
+            }));
+          });
+        });
+      })
+      .catch(error => console.error('Error loading ports:', error));
+  });
+  // Tangani toggle radio (select/input) untuk tiap container
+  document.querySelectorAll('.port-container').forEach(container => {
+    // Cari radio di dalam container tersebut
+    container.querySelectorAll('input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        const selectContainer = container.querySelector('.select-container');
+        const inputContainer = container.querySelector('.input-container');
+        if (this.value === 'select') {
+          selectContainer.classList.remove('hidden');
+          inputContainer.classList.add('hidden');
+        } else {
+          selectContainer.classList.add('hidden');
+          inputContainer.classList.remove('hidden');
+        }
+      });
+    });
+  });
+</script>
+@script()
+<script>
+  $(document).ready(function() {
+    $('#shipper').select2({
+      placeholder: "Select roles",
+      allowClear: true,
+      theme: 'tailwindcss-3'
+    });
+    $('#shipper').on('change', function() {
+      let data = $(this).val();
+      // console.log(data);
+      // $wire.set('roles',data,false);
+      $wire.shipper_id = data;
+    });
+  });
+</script>
+@endscript
+@script()
+<script>
+  $(document).ready(function() {
+    $('#consignee').select2({
+      placeholder: "Select roles",
+      allowClear: true,
+      theme: 'tailwindcss-3'
+    });
+    $('#consignee').on('change', function() {
+      let data = $(this).val();
+      // console.log(data);
+      // $wire.set('roles',data,false);
+      $wire.consignee_id = data;
+    });
+  });
+</script>
+@endscript
+@script()
+<script>
+  $(document).ready(function() {
+    $('#notify_id').select2({
+      placeholder: "Select roles",
+      allowClear: true,
+      theme: 'tailwindcss-3'
+    });
+    $('#notify_id').on('change', function() {
+      let data = $(this).val();
+      // console.log(data);
+      // $wire.set('roles',data,false);
+      $wire.notify_id = data;
+    });
+  });
+</script>
+@endscript

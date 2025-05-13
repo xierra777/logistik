@@ -24,13 +24,11 @@ class Customer extends Model
         'roles' => 'array',
     ];
 
-    // Relasi ke Chart of Accounts
-    public function coa()
+    public function chartOfAccount()
     {
         return $this->belongsTo(ChartOfAccount::class);
     }
 
-    // Misalnya, jika kamu ingin menentukan kategori customer secara dinamis berdasarkan data COA:
     public function getCategoryAttribute()
     {
         return $this->coa ? $this->coa->term_type : 'unknown';

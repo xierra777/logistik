@@ -55,11 +55,11 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Shipper</p>
-                    <p class="col-span-3">: {{$shipment->shipper}}</p>
+                    <p class="col-span-3">: {{$shipment->shipper->name}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Consignee</p>
-                    <p class="col-span-3">: {{$shipment->consignee}}</p>
+                    <p class="col-span-3">: {{$shipment->consignee->name}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">ETA/ETD</p>
@@ -184,18 +184,69 @@
                         <tr class="bg-white dark:bg-neutral-900 align-top">
                             <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center">{{ $transaction->description }}</td>
                             <td class="px-4 border-r border-l border-gray-900 text-center">{{ $transaction->quantity }}</td>
-                            <td class="px-4 border-r border-l border-gray-900 text-center">{{ $transaction->scurrency }}</td>
-                            <td class="px-4 border-r border-l border-gray-900 text-center"></td>
-                            <td class="px-4 border-r border-l border-gray-900 text-center"> {{ number_format(floatval(str_replace(',', '.', str_replace('.', '', $transaction->samountidr))), 2, ',', '.') }}
+                            <td class="px-4 border-r border-l border-gray-900 text-center">{{ $transaction->ccurrency }}</td>
+                            <td class="px-4 border-r border-l border-gray-900 text-center">@if($transaction->ccurrency == 'USD')
+                                {{ $transaction->crate }}
+                                @endif
                             </td>
-                            <td class="px-4 border-r border-l border-gray-900 text-center">sale+qty</td>
-                            <td class="px-4 border-r border-l border-gray-900 text-center">{{ number_format(floatval(str_replace(',', '.', str_replace('.', '', $transaction->svatgstamount))), 2, ',', '.') }}</td>
-                            <td class="px-4 border-r border-l border-gray-900 text-center">{{ number_format(floatval(str_replace(',', '.', str_replace('.', '', $transaction->swhtamount))), 2, ',', '.') }}</td>
-                            <td class="px-4 border-r border-l border-gray-900 text-center">{{ number_format(
-                                        floatval(str_replace(',', '.', str_replace('.', '', $transaction->samountidr))) +
-                                        floatval(str_replace(',', '.', str_replace('.', '', $transaction->svatgstamount))),
-                                        2, ',', '.'
-                             ) }}</td>
+                            <td class="px-2 border-r border-l border-gray-900 text-xs">
+                                <div class="flex justify-between w-full">
+                                    <span class="text-left">
+                                        {{ $transaction->ccurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}
+                                    </span>
+                                    <span class="text-right">
+                                        {{ $transaction->ccurrency == 'IDR'
+                                    ? $transaction->camountidr
+                                    : number_format($transaction->cfcyamount, 2, '.', ',') }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-4 border-r border-l border-gray-900 text-center">
+                                <div class="flex justify-between w-full">
+                                    <span class="text-left">{{ $transaction->ccurrency }}</span>
+                                    <span class="text-right">
+                                        {{ $transaction->ccurrency == 'IDR'
+                                            ? number_format($transaction->subtotal, 2, ',', '.')
+                                            : number_format($transaction->subtotal, 2, '.', ',') }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-2 border-r border-l border-gray-900 text-center">
+                                @if (!is_null($transaction->ctaxable) || !is_null($transaction->cvatgstusd))
+                                <div class="flex justify-between w-full">
+                                    <span class="text-left">{{ $transaction->ccurrency }}</span>
+                                    <span class="text-right">
+                                        {{ $transaction->ccurrency == 'IDR'
+                                            ? $transaction->ctaxableamount
+                                            : $transaction->cvatgstusd }}
+                                    </span>
+                                </div>
+                                @else
+                                &nbsp; {{-- biar tetap ada spacing kalau kosong --}}
+                                @endif
+                            </td>
+                            <td class=" px-4 border-r border-l border-gray-900 text-center">
+                                @if (($transaction->cwhtaxamount ?? 0) > 0 || ($transaction->chwtaxrateusd ?? 0) > 0)
+                                <div class="flex justify-between w-full">
+                                    <span class="text-left">{{ $transaction->ccurrency }}</span>
+                                    <span class="text-right">
+                                        {{ $transaction->ccurrency == 'IDR'
+                                    ? $transaction->cwhtaxamount
+                                    : $transaction->chwtaxrateusd }}
+                                    </span>
+                                </div>
+                                @else
+                                &nbsp; {{-- agar cell tetap terisi dan layout stabil --}}
+                                @endif
+                            </td>
+                            <td class="px-4 border-r border-l border-gray-900 text-center">
+                                <div class="flex justify-between w-full">
+                                    <span class="text-left">{{ $transaction->ccurrency }}</span>
+                                    <span class="text-right">
+                                        {{ number_format($transaction->total, 2, ',', '.') }}
+                                    </span>
+                                </div>
+                            </td>
                         </tr>
                         @endforeach
 
@@ -203,57 +254,33 @@
                 </table>
             </div>
             <div class="col-span-4 mt-3">
-                <div class="grid grid-cols-4 ">
-                    <div class="col-start-5 w-full ">
-                        <!-- Subtotal, VAT, WHT, Total -->
+                <div class="grid grid-cols-4">
+                    <div class="col-start-5 w-full">
                         <div class="grid grid-cols-5 gap-y-2 px-5 text-right">
-                            <!-- Sub Total -->
+                            <!-- Subtotal -->
                             <div class="col-span-3 font-semibold">Sub total :</div>
-                            <div class="text-left">Rp</div>
-                            <div>
-                                {{ number_format(
-                                    $transactions->sum(fn($t) => floatval(str_replace(',', '.', str_replace('.', '', $t->samountidr)))),
-                                    2, ',', '.'
-                                ) }}
-                            </div>
+                            <div class="text-left">{{ $finalCurrency }}</div>
+                            <div>{{ $formattedSummary['subtotal'] }}</div>
 
                             <!-- VAT -->
                             <div class="col-span-3 font-semibold">VAT :</div>
-                            <div class="text-left">Rp</div>
-                            <div>
-                                {{ number_format(
-                                $transactions->sum(fn($t) => floatval(str_replace(',', '.', str_replace('.', '', $t->svatgstamount)))),
-                                2, ',', '.'
-                            ) }}
-                            </div>
+                            <div class="text-left">{{ $finalCurrency }}</div>
+                            <div>{{ $formattedSummary['vat'] }}</div>
 
                             <!-- WHT -->
                             <div class="col-span-3 font-semibold">WHT :</div>
-                            <div class="text-left">Rp</div>
-                            <div>
-                                {{ number_format(
-                                    $transactions->sum(fn($t) => floatval(str_replace(',', '.', str_replace('.', '', $t->swhtaxamount)))),
-                                    2, ',', '.'
-                                ) }}
-                            </div>
+                            <div class="text-left">{{ $finalCurrency }}</div>
+                            <div>{{ $formattedSummary['wht'] }}</div>
 
                             <!-- Total -->
                             <div class="col-span-3 font-semibold">Total :</div>
-                            <div class="text-left">Rp</div>
-                            <div>
-                                {{ number_format(
-                                    $transactions->sum(fn($t) => 
-                                        floatval(str_replace(',', '.', str_replace('.', '', $t->samountidr))) + 
-                                        floatval(str_replace(',', '.', str_replace('.', '', $t->svatgstamount)))
-                                    ),
-                                    2, ',', '.'
-                                ) }}
-                            </div>
+                            <div class="text-left">{{ $finalCurrency }}</div>
+                            <div>{{ $formattedSummary['total'] }}</div>
                         </div>
-
                     </div>
                 </div>
             </div>
+
             <div class="col-span-4 border h-4 bg-orange-400  border-orange-400"></div>
             <div class="col-span-2 p-2">
                 <p class="font-bold">Bank Details</p>

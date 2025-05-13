@@ -19,33 +19,51 @@ use App\Livewire\Customers\ListCustomer;
 use App\Livewire\Dashboard;
 use App\Livewire\HouseBL;
 use App\Livewire\Pdfhbl;
+use App\Livewire\Job\CreateJob;
+use App\Livewire\Job\EditJob;
+use App\Livewire\Job\ListJob;
+use App\Livewire\Job\ViewJob;
 use Illuminate\Http\Request;
 
 
 
 Route::redirect('/', '/login'); // Redirect otomatis ke halaman login
-
 Route::get('/dashboard', Dashboard::class)->middleware([
     'auth',
     'verified'
 ])->name('dashboard');
-
-
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
-
 Route::view('shipments', 'shipments.index',)
     ->middleware(['auth', 'verified'])
     ->name('shipments');
 Route::view('shipment', 'shipments.create',)
     ->middleware(['auth'])
     ->name('shipment');
-
 Route::get('/chart-of-accounts', ChartOfAccounts::class)->middleware([
     'auth',
     'verified'
 ]);
+Route::get('create-job', CreateJob::class)->middleware([
+    'auth',
+    'verified'
+])->name('Createjob');
+
+Route::get('edit-job', EditJob::class)->middleware([
+    'auth',
+    'verified'
+])->name('EditJob');
+
+Route::get('list-job', ListJob::class)->middleware([
+    'auth',
+    'verified'
+])->name('listJob');
+
+Route::get('/view-job/{id}', ViewJob::class)->middleware([
+    'auth',
+    'verified'
+])->name('viewJob');
 
 Route::get('/house-b-l/{shipmentId}', HouseBL::class)
     ->middleware(['auth', 'verified'])

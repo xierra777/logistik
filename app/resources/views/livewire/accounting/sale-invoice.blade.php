@@ -2,31 +2,35 @@
     <h2 class="text-2xl font-bold mb-4">Sale Invoice</h2>
 
     <!-- Invoice Header -->
-    <div class="border p-4 rounded-lg mb-6">
-        <table class="w-full text-sm border-collapse">
-            <tr>
-                <td class="font-bold">Invoice No:</td>
-                <td>
-                    <input type="text" wire:model="invoice_number" class="w-full px-3 py-2 border rounded-lg bg-gray-100">
-                </td>
-                <td class="font-bold">Client:</td>
-                <td>
-                    <select wire:model.live="customer_id" class="w-full px-3 py-2 border rounded-lg">
-                        <option value="">Select Client</option>
-                        @foreach($clients as $client)
-                        <option value="{{ $client->id }}">{{ $client->name }}</option>
-                        @endforeach
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td class="font-bold">MBL:</td>
-                <td>{{ $shipmentId }}</td>
-                <td class="font-bold">Currency:</td>
-                <td>{{ $currency }}</td>
-            </tr>
-        </table>
-    </div>
+    <table class="w-full text-sm border-collapse p-2 ">
+        <tr class="gap-2">
+            <td class="font-bold">Invoice No:</td>
+            <td>
+                <input type="text" wire:model="invoice_number" class="w-full px-3 py-2 border rounded-lg bg-gray-100">
+            </td>
+            <td class="font-bold">Client:</td>
+            <td>
+                <select wire:model.live="customer_id" class="w-full px-3 py-2 border rounded-lg">
+                    <option value="">Select Client</option>
+                    @foreach($clients as $client)
+                    <option value="{{ $client->id }}">{{ $client->name }}</option>
+                    @endforeach
+                </select>
+            </td>
+        </tr>
+        <tr class>
+            <td class="font-bold">MBL:</td>
+            <td>{{ $shipmentId }}</td>
+            <td class="font-bold">Currency:</td>
+            <td>
+                <select wire:model="finalCurrency" class="w-full px-3 py-2 border rounded-lg">
+                    <option value="IDR">Total dalam IDR</option>
+                    <option value="USD">Total dalam USD</option>
+                </select>
+            </td>
+        </tr>
+
+    </table>
 
     <!-- Transaction Summary -->
     @if($shipmentId && $customer_id && $transactions->isNotEmpty())

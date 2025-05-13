@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
 
@@ -33,6 +33,9 @@
     @csrf
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
         <livewire:layout.navigation />
+        <p class="alert alert-warning" wire:offline>
+            Whoops, your device has lost connection. The web page you are viewing is offline.
+        </p>
 
         <!-- Page Heading -->
         @if (isset($header))
@@ -58,6 +61,8 @@
         </main>
     </div>
     @include('include.script')
+    @stack('scripts')
+
 </body>
 <footer>
     <!-- Footer content can go here -->

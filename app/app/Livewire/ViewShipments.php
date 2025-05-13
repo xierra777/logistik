@@ -45,10 +45,8 @@ class ViewShipments extends Component
         $this->shipmentId = $id;
         $this->shipment = Shipment::with(['transactions', 'containers'])->findOrFail($id);
         $this->refreshKey = now()->timestamp;
-
-        // Jika tidak ada transaksi, buat transaksi baru
         if ($this->shipment->transactions->isEmpty()) {
-            $this->transaction = new Transaction(); // Membuat objek transaksi kosong
+            $this->transaction = new Transaction();
         } else {
             $this->transaction = $this->shipment->transactions->first();
         }

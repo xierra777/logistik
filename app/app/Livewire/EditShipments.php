@@ -3,44 +3,55 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use App\Models\Customer;
+use App\Models\Container;
 use App\Models\Shipment;
+use Illuminate\Support\Facades\DB;
+use Termwind\Components\Dd;
 
 class EditShipments extends Component
 {
+    // Field Shipment
+    public $shipment_id = '';
+    public $shipment_no = '';
     public $shipments;
-    public $shipment_id;
-    public $container_id;
-    public $container_type;
-    public $shipper;
-    public $consignee;
-    public $notify;
-    public $ocean_vessel_feeder;
-    public $ocean_vessel_mother;
-    public $port_of_discharge;
-    public $combined_transport;
-    public $port_of_loading;
-    public $packages;
-    public $description;
-    public $gross_weight;
-    public $measurement;
+    public $liners = '';
+    public $servicesType = '';
+    public $jobType = '';
+    public $shipper_id;
+    public $consignee_id;
+    public $notify_id;
+    public $ocean_vessel_feeder = '';
+    public $ocean_vessel_mother = '';
+    public $port_of_discharge = '';
+    public $place_of_receipt = '';
+    public $port_of_loading = '';
+    public $description = '';
+    public $gross_weight = '';
+    public $measurement = '';
+    public $estimearrival;
+    public $estimedelivery;
 
+    // Field untuk input dinamis Container
+    public $containers = [];
+    public $customers;
     public function mount(Shipment $id)
     {
+        $this->customers = Customer::all();
+
+        // Inisialisasi minimal dengan satu baris container
+        $this->containers = [
+            ['container_id' => '', 'container_type' => '', 'container_seal' => '', 'gross_weight' => '', 'pack_type' => '', 'measurement' => '', 'pcs' => '', 'unit' => '', 'volume_weight' => '', 'chargeable_weight' => ''],
+        ];
         $this->shipments = $id;
-        $this->shipment_id = $id->shipment_id;
-        $this->container_id = $id->container_id;
-        $this->container_type = $id->container_type;
-        $this->shipper = $id->shipper;
-        $this->notify = $id->notify;
+        $this->shipment_id = $id->shipment;
+        $this->shipper_id = $id->shipper;
+        $this->notify_id = $id->notify;
         $this->ocean_vessel_feeder = $id->ocean_vessel_feeder;
         $this->ocean_vessel_mother = $id->ocean_vessel_mother;
         $this->port_of_discharge = $id->port_of_discharge;
-        $this->combined_transport = $id->combined_transport;
         $this->port_of_loading = $id->port_of_loading;
-        $this->packages = $id->packages;
         $this->description = $id->description;
-        $this->gross_weight = $id->gross_weight;
-        $this->measurement = $id->measurement;
     }
     public function render()
     {

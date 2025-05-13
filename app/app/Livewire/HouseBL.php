@@ -75,10 +75,13 @@ class HouseBL extends Component
         //     session()->flash('error', 'No data available for preview.');
         //     return;
         // }
+
+
         $shipment = Shipment::with('containers')->findOrFail($this->shipmentId);
         $description = $shipment->description;
-        $descriptionLines = explode("\n", wordwrap($description, 90)); // 90 bisa disesuaikan dengan lebar per baris
-        $descChunks = array_chunk($descriptionLines, 30); // 30 baris per halaman
+        $words = str_word_count($description, 1);
+        $descFirstPage = implode(' ', array_slice($words, 0, 40));
+        $descSecondPage = implode(' ', array_slice($words, 40));
         $totalPcs   = $shipment->containers->sum('pcs');
         $totalgw    = $shipment->containers->sum('gross_weight');
         $groupedUnits = $shipment->containers
@@ -95,7 +98,8 @@ class HouseBL extends Component
             'groupedUnits' => $groupedUnits,
             'totalPcs' => $totalPcs,
             'totalgw' => $totalgw,
-            'descChunks' => $descChunks,
+            'descFirstPage' => $descFirstPage,
+            'descSecondPage' => $descSecondPage,
 
         ];
         $html = view('livewire.pdfhbl', $data)->render();

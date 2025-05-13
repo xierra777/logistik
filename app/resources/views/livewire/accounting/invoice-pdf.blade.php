@@ -63,7 +63,7 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">ETA/ETD</p>
-                    <p class="col-span-3">: {{$shipment->estimearrival}}/{{$shipment->estimedelivery}}</p>
+                    <p class="col-span-3">: {{$shipment->estimearrival}} / {{$shipment->estimedelivery}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">HAWB/HBL No.</p>
@@ -122,11 +122,11 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Currency</p>
-                    <p class="col-span-3">: </p>
+                    <p class="col-span-3">: {{$finalCurrency}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Narration</p>
-                    <p class="col-span-3">: </p>
+                    <p class="col-span-3">: (Liners)</p>
                 </div>
             </div>
             <div class="col-span-4 border h-4 bg-blue-900  border-blue-900"></div>
@@ -182,10 +182,10 @@
                     <tbody class="">
                         @foreach ($transactions as $transaction)
                         <tr class="bg-white dark:bg-neutral-900 align-top">
-                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center">{{ $transaction->description }}</td>
+                            <td class=" border-r border-l border-gray-900 text-center">{{ $transaction->description }}</td>
                             <td class="px-4 border-r border-l border-gray-900 text-center">{{ $transaction->quantity }}</td>
                             <td class="px-4 border-r border-l border-gray-900 text-center">{{ $transaction->scurrency }}</td>
-                            <td class="px-4 border-r border-l border-gray-900 text-center">@if($transaction->scurrency == 'IDR')
+                            <td class="px-4 border-r border-l border-gray-900 text-center">@if($transaction->scurrency == 'USD')
                                 {{ $transaction->srate }}
                                 @endif
                             </td>
@@ -196,7 +196,7 @@
                                     </span>
                                     <span class="text-right">
                                         {{ $transaction->scurrency == 'IDR'
-                                    ? number_format($parseIndoNumber($transaction->samountidr ?? 0), 2, ',', '.')
+                                    ? $transaction->samountidr
                                     : number_format($transaction->sfcyamount, 2, '.', ',') }}
                                     </span>
                                 </div>
@@ -215,13 +215,13 @@
                             </td>
                             </td>
                             <td class="px-2 border-r border-l border-gray-900 text-center text-xs">
-                                @if (!is_null($transaction->staxable) || !is_null($transaction->svatgstusd))
+                                @if (!is_null($transaction->svatgstamount) || !is_null($transaction->svatgstusd))
                                 <div class="flex justify-between w-full">
                                     <span class="text-left">{{ $transaction->scurrency }}</span>
                                     <span class="text-right">
                                         {{ $transaction->scurrency == 'IDR'
-                                    ? $transaction->staxable
-                                    : $transaction->svatgstusd }}
+                                            ? $transaction->svatgstamount
+                                            : $transaction->svatgstusd }}
                                     </span>
                                 </div>
                                 @else
@@ -257,58 +257,34 @@
                 </table>
             </div>
             <div class="col-span-4 mt-3">
-                <div class="grid grid-cols-4 ">
-                    <div class="col-start-5 w-full ">
-                        <!-- Subtotal, VAT, WHT, Total -->
+                <div class="grid grid-cols-4">
+                    <div class="col-start-5 w-full">
                         <div class="grid grid-cols-5 gap-y-2 px-5 text-right">
-                            <!-- Sub Total -->
+                            <!-- Subtotal -->
                             <div class="col-span-3 font-semibold">Sub total :</div>
-                            <div class="text-left">Rp</div>
-                            <div>
-                                {{ number_format(
-                                    $transactions->sum(fn($t) => floatval(str_replace(',', '.', str_replace('.', '', $t->samountidr)))),
-                                    2, ',', '.'
-                                ) }}
-                            </div>
+                            <div class="text-left">{{ $finalCurrency }}</div>
+                            <div>{{ $formattedSummary['subtotal'] }}</div>
+
                             <!-- VAT -->
                             <div class="col-span-3 font-semibold">VAT :</div>
-                            <div class="text-left">Rp</div>
-                            <div>
-                                {{ number_format(
-                                $transactions->sum(fn($t) => floatval(str_replace(',', '.', str_replace('.', '', $t->svatgstamount)))),
-                                2, ',', '.'
-                            ) }}
-                            </div>
+                            <div class="text-left">{{ $finalCurrency }}</div>
+                            <div>{{ $formattedSummary['vat'] }}</div>
 
                             <!-- WHT -->
                             <div class="col-span-3 font-semibold">WHT :</div>
-                            <div class="text-left">Rp</div>
-                            <div>
-                                {{ number_format(
-                                    $transactions->sum(fn($t) => floatval(str_replace(',', '.', str_replace('.', '', $t->swhtaxamount)))),
-                                    2, ',', '.'
-                                ) }}
-                            </div>
+                            <div class="text-left">{{ $finalCurrency }}</div>
+                            <div>{{ $formattedSummary['wht'] }}</div>
 
                             <!-- Total -->
                             <div class="col-span-3 font-semibold">Total :</div>
-                            <div class="text-left">Rp</div>
-                            <div>
-                                {{ number_format(
-                                    $transactions->sum(fn($t) => 
-                                        floatval(str_replace(',', '.', str_replace('.', '', $transaction->samountidr))) *
-                                        floatval(str_replace(',', '.', str_replace('.', '', $transaction->quantity))) + 
-                                        floatval(str_replace(',', '.', str_replace('.', '', $transaction->svatgstamount))) +  
-                                        floatval(str_replace(',', '.', str_replace('.', '', $transaction->swhtamount))),
-                                    ),
-                                    2, ',', '.'
-                                ) }}
-                            </div>
+                            <div class="text-left">{{ $finalCurrency }}</div>
+                            <div>{{ $formattedSummary['total'] }}</div>
                         </div>
-
                     </div>
                 </div>
             </div>
+
+
             <div class="col-span-4 border h-4 bg-orange-400  border-orange-400"></div>
             <div class="col-span-2 p-2">
                 <p class="font-bold">Bank Details</p>

@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('shipments', function (Blueprint $table) {
-            // COA untuk sisi penjualan (client)
-            $table->date('estimearrival')->nullable()->after('ocean_vessel_mother');
-            $table->date('estimedelivery')->nullable()->after('ocean_vessel_mother');
+        Schema::create('job_containers', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('id_job')->constrained('t_jobs')->onDelete('cascade');
+            $table->json('containers');
+            $table->timestamps();
         });
     }
 
@@ -23,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('job_containers');
     }
 };

@@ -100,52 +100,57 @@
                 <p>{{$shipment->shipment_no}}</p>
             </div>
         </div>
-
-        <!-- HEADER TABEL -->
-        <div class="grid grid-cols-7 text-sm text-center font-bold border border-gray-400 divide-x divide-gray-400">
-            <div class="col-span-2 p-2">Marks & Numbers<br><span class="font-normal">Container & Seal Number</span></div>
-            <div class="p-2">Number of Packages</div>
-            <div class="col-span-2 p-2">Description of Packages and Goods<br><span class="text-sm font-normal">Particular Furnished by Shipper</span></div>
-            <div class="p-2">Measurement<br>(cbm)</div>
-            <div class="p-2">Gross Weight<br>(kilos)</div>
-        </div>
-
-        <!-- ISI TABEL -->
-        <div class="grid grid-cols-7 text-sm border-l border-r border-gray-400 divide-x divide-gray-400">
-            <div class="col-span-2 p-2">
-                <p>CY/CY</p>
-                <p>Dammam</p>
-                <p class="text-center">// CONTAINER NO //</p>
-                @foreach($shipment->containers as $container)
-                {{$container->container_id}} /<br>{{$container->container_seal}} ({{$container->container_type}})</p>
-                @endforeach
-
-            </div>
-            <div class="p-2 text-right">
-                @foreach($shipment->containers->groupBy('container_type') as $type => $items)
-                <p>{{ $type }} x {{ $items->count() }}</p>
-                @endforeach
-                <br>
-                @foreach($groupedUnits as $item)
-                <p>{{ $item['totalPcs'] }} {{ $item['unit'] }}</p>
-                @endforeach
-            </div>
-            <div class="col-span-2 p-2">
-                <p>"SHIPPER'S LOAD, STOW, COUNT AND SEAL"</p>
-                <p>SAID TO CONTAIN :</p>
-                <br>
-                <p>{{$shipment->description}}</p>
-                <br>
-                <p>ORDER NO:</p>
-                <p>{{$shipment->shipment_no}}</p>
-                <p>{{$shipment->shipment_no}}</p>
-                <br>
-                <p>NET WEIGHT : 42,432.68 KGS</p>
-            </div>
-            <div class="p-2">{{$totalgw}} CBM</div>
-            <div class="p-2 font-semibold text-lg">{{$totalgw}} {{$shipment->containers->first()->unit ?? '' }}</div>
-        </div>
-
+        <table class="w-full table-border text-sm border-collapse border border-gray-400 h-full divide-gray-400 divide-y p-2">
+            <thead>
+                <tr>
+                    <th scope="col" class="px-6 py-3 font-bold whitespace-nowrap text-center">
+                        Marks & Numbers<br><span class="font-normal text-xs">Container & Seal Number</span>
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-center font-bold">Number of Packages</th>
+                    <th scope="col" class="px-6 py-3 text-center font-bold">Description of Packages and Goods<br><span class="text-xs font-normal">Particular Furnished by Shipper</span></th>
+                    <th scope="col" class="px-6 py-3 text-center font-bold">Gross Weight<br>(kilos)</th>
+                    <th scope="col" class="px-6 py-3 text-center font-bold"> Measurement<br>(cbm)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="align-top divide-x divide-gray-400 p-2">
+                    <td class="p-2 text-bottom align-top">{{$shipment->servicesType}}<br>
+                        {{$shipment->place_of_delivery}}<br>
+                        <p class="text-center mt-4">// CONTAINER NO // </p><br>
+                        <div>
+                            @foreach($shipment->containers as $container) {{$container->container_id}} /
+                            {{$container->container_seal}} ({{$container->container_type}})
+                            @endforeach
+                        </div>
+                    </td>
+                    <td class="align-top p-4">@foreach($shipment->containers->groupBy('container_type') as $type => $items)
+                        <p>{{ $type }} x {{ $items->count() }}</p>
+                        @endforeach
+                        <br>
+                        @foreach($groupedUnits as $item)
+                        <p>{{ $item['totalPcs'] }} {{ $item['unit'] }}</p>
+                        @endforeach
+                    </td>
+                    <td class="p-3 align-top">
+                        <p>"SHIPPER'S LOAD & COUNT"
+                            <br>
+                        <p>SAID TO CONTAIN :</p>
+                        <br>
+                        <div>
+                            <h3>Description:</h3>
+                            <p>{{ $descFirstPage }}</p>
+                        </div>
+                        <br>
+                        <p>ORDER NO: {{$shipment->shipment_no}}</p>
+                        <br>
+                        <p>NET WEIGHT : </p>
+                        </p>
+                    </td>
+                    <td class="p-4">{{$totalgw}} {{$shipment->containers->first()->unit ?? '' }}</td>
+                    <td class="p-4"> {{$totalgw}} CBM </td>
+                </tr>
+            </tbody>
+        </table>
         <!-- FOOTER -->
         <div class="grid grid-cols-6 text-sm divide-y divide-x divide-gray-400">
             <table class="w-full col-span-4 table-fixed text-sm border-collapse  border-gray-400 h-full  ">
@@ -203,5 +208,36 @@
         <p>"This document is automatically generated from the shipment management system and considered valid without physical signature.</p>
     </div>
 </footer>
+<div style="page-break-before: always;">
+    <table class="w-full table-border text-sm border-collapse border border-gray-400 h-full divide-gray-400 divide-y p-2">
+        <thead>
+            <tr>
+                <th scope="col" class="px-6 py-3 font-bold whitespace-nowrap text-center">
+                    Marks & Numbers<br><span class="font-normal text-xs">Container & Seal Number</span>
+                </th>
+                <th scope="col" class="px-6 py-3 text-center font-bold">Number of Packages</th>
+                <th scope="col" class="px-6 py-3 text-center font-bold">Description of Packages and Goods<br><span class="text-xs font-normal">Particular Furnished by Shipper</span></th>
+                <th scope="col" class="px-6 py-3 text-center font-bold"> Measurement<br>(cbm)</th>
+                <th scope="col" class="px-6 py-3 text-center font-bold">Gross Weight<br>(kilos)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="align-top divide-x divide-gray-400 p-2">
+                <td class="p-2 text-bottom align-top">
+                </td>
+                <td class="align-top p-4">
+                </td>
+                <td class="p-3 align-top">
+                    <div>
+                        <p>{{ $descFirstPage }}</p>
+                    </div>
+                </td>
+                <td class="p-4"></td>
+                <td class="p-4"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
 
 </html>

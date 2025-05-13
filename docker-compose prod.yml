@@ -39,7 +39,7 @@ services:
       PMA_USER: laravel
       PMA_PASSWORD: secret
     ports:
-      - "8080:80"
+      - "8081:80"
     depends_on:
       - mysql
     networks:

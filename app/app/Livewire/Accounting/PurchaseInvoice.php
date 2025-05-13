@@ -15,6 +15,7 @@ class PurchaseInvoice extends Component
     public $shipments, $vendors, $transactions, $containers;
     public $totalPcs = 0;
     public $totalgw = 0;
+    public string $finalCurrency = 'IDR'; // default
 
     protected $listeners = ['setShipmentId'];
 
@@ -48,6 +49,103 @@ class PurchaseInvoice extends Component
         $customer = Transaction::findOrFail($this->vendor_id);
         $totalPcs = $shipment->containers->sum('pcs');
 
+
+
+        // inisialisasi summary
+        $summary = [
+            'subtotal' => 0,
+            'vat'      => 0,
+            'wht'      => 0,
+            'total'    => 0,
+        ];
+
+        foreach ($this->transactions as $trx) {
+            $currency = strtoupper(trim($trx->ccurrency));
+            $qty      = (int) ($trx->quantity ?? 0);
+            $rate     = (float) ($trx->crate ?? 1);
+
+            // amount asli
+            $amount = $currency === 'IDR'
+                ? (float) $this->parseIndoNumber($trx->camountidr)
+                : (float) $trx->cfcyamount;
+
+            // VAT
+            $vat = $currency === 'IDR'
+                ? (float) ($trx->cvatgstamount ?? 0)
+                : (float) ($trx->cvatgstusd    ?? 0);
+
+            // WHT
+            if ($currency === 'IDR') {
+                $wht = (float) ($trx->cwhtaxamount ?? 0);
+            } else {
+                // contoh: konversi dari IDR amount ke USD
+                $wht = ((float) ($trx->cwhtaxamount ?? 0)) / $rate;
+            }
+
+            $subtotal = $qty * $amount;
+            $total    = $subtotal + $vat + $wht;
+
+            $trx->subtotal = $subtotal;
+            $trx->total    = $total;
+
+
+            // === 2) konversi ke finalCurrency ===
+            if ($currency !== $this->finalCurrency) {
+                if ($currency === 'IDR' && $this->finalCurrency === 'USD') {
+                    $cSub   = $subtotal / $rate;
+                    $cVat   = $vat      / $rate;
+                    $cWht   = $wht      / $rate;
+                } elseif ($currency === 'USD' && $this->finalCurrency === 'IDR') {
+                    $cSub   = $subtotal * $rate;
+                    $cVat   = $vat      * $rate;
+                    $cWht   = $wht      * $rate;
+                } else {
+                    // fallback—kalau ada mata uang lain, bisa extend di sini
+                    $cSub = $subtotal;
+                    $cVat = $vat;
+                    $cWht = $wht;
+                }
+            } else {
+                // sama dengan finalCurrency, no conversion
+                $cSub = $subtotal;
+                $cVat = $vat;
+                $cWht = $wht;
+            }
+
+            // accumulate summary
+            $summary['subtotal'] += $cSub;
+            $summary['vat']      += $cVat;
+            $summary['wht']      += $cWht;
+            $summary['total']    += ($cSub + $cVat + $cWht);
+        }
+
+        // format summary untuk blade
+        $formattedSummary = [
+            'subtotal' => number_format(
+                $summary['subtotal'],
+                2,
+                $this->finalCurrency === 'IDR' ? ',' : '.',
+                $this->finalCurrency === 'IDR' ? '.' : ','
+            ),
+            'vat'      => number_format(
+                $summary['vat'],
+                2,
+                $this->finalCurrency === 'IDR' ? ',' : '.',
+                $this->finalCurrency === 'IDR' ? '.' : ','
+            ),
+            'wht'      => number_format(
+                $summary['wht'],
+                2,
+                $this->finalCurrency === 'IDR' ? ',' : '.',
+                $this->finalCurrency === 'IDR' ? '.' : ','
+            ),
+            'total'    => number_format(
+                $summary['total'],
+                2,
+                $this->finalCurrency === 'IDR' ? ',' : '.',
+                $this->finalCurrency === 'IDR' ? '.' : ','
+            ),
+        ];
         $data = compact('shipment', 'customer') + [
             'invoice_number' => $this->invoice_number,
             'transactions'   => $this->transactions,
@@ -56,7 +154,7 @@ class PurchaseInvoice extends Component
         ];
         $now = Carbon::now(); // mendapatkan instance Carbon untuk tanggal dan waktu saat ini
         echo $now->format('d-m-Y'); // misal: "24-03-2025"
-        $html = view('livewire.accounting.invoice-pdf', $data)->render();
+        $html = view('livewire.accounting.purchasing-pdf', $data)->render();
 
         $pdfContent = Browsershot::html($html)
             ->setChromePath('/usr/bin/google-chrome') // Make sure this is correct
@@ -78,18 +176,112 @@ class PurchaseInvoice extends Component
         $shipment = Shipment::with('containers')->findOrFail($this->shipmentId);
         $customer = Customer::findOrFail($this->vendor_id);
         $totalPcs = $shipment->containers->sum('pcs');
-        $totalgw = $shipment->containers->sum('gross_weight');
+        $totalgw  = $shipment->containers->sum('gross_weight');
 
+        // inisialisasi summary
+        $summary = [
+            'subtotal' => 0,
+            'vat'      => 0,
+            'wht'      => 0,
+            'total'    => 0,
+        ];
+
+        foreach ($this->transactions as $trx) {
+            $currency = strtoupper(trim($trx->ccurrency));
+            $qty      = (int) $trx->quantity;
+            $rate     = (float) ($trx->crate ?? 1);
+
+            // === 1) hitung nilai asli per transaksi ===
+            $amount = $currency === 'IDR'
+                ? (float) $this->parseIndoNumber($trx->camountidr)
+                : (float) $trx->cfcyamount;
+
+            $vat = $currency === 'IDR'
+                ? (float) ($trx->ctaxableamount ?? 0)
+                : (float) ($trx->cvatgstusd    ?? 0);
+
+            $wht = $currency === 'IDR'
+                ? (float) ($trx->cwhtaxamount   ?? 0)
+                : (float) ($trx->chwtaxrateusd  ?? 0);
+
+            $subtotal = $qty * $amount;
+            $total    = $subtotal + $vat + $wht;
+
+            // simpan utk row-table
+            $trx->subtotal = $subtotal;
+            $trx->vat      = $vat;
+            $trx->wht      = $wht;
+            $trx->total    = $total;
+
+            // === 2) konversi ke finalCurrency ===
+            if ($currency !== $this->finalCurrency) {
+                if ($currency === 'IDR' && $this->finalCurrency === 'USD') {
+                    $cSub   = $subtotal / $rate;
+                    $cVat   = $vat      / $rate;
+                    $cWht   = $wht      / $rate;
+                } elseif ($currency === 'USD' && $this->finalCurrency === 'IDR') {
+                    $cSub   = $subtotal * $rate;
+                    $cVat   = $vat      * $rate;
+                    $cWht   = $wht      * $rate;
+                } else {
+                    // fallback—kalau ada mata uang lain, bisa extend di sini
+                    $cSub = $subtotal;
+                    $cVat = $vat;
+                    $cWht = $wht;
+                }
+            } else {
+                // sama dengan finalCurrency, no conversion
+                $cSub = $subtotal;
+                $cVat = $vat;
+                $cWht = $wht;
+            }
+
+            // accumulate summary
+            $summary['subtotal'] += $cSub;
+            $summary['vat']      += $cVat;
+            $summary['wht']      += $cWht;
+            $summary['total']    += ($cSub + $cVat + $cWht);
+        }
+
+        // format summary untuk blade
+        $formattedSummary = [
+            'subtotal' => number_format(
+                $summary['subtotal'],
+                2,
+                $this->finalCurrency === 'IDR' ? ',' : '.',
+                $this->finalCurrency === 'IDR' ? '.' : ','
+            ),
+            'vat'      => number_format(
+                $summary['vat'],
+                2,
+                $this->finalCurrency === 'IDR' ? ',' : '.',
+                $this->finalCurrency === 'IDR' ? '.' : ','
+            ),
+            'wht'      => number_format(
+                $summary['wht'],
+                2,
+                $this->finalCurrency === 'IDR' ? ',' : '.',
+                $this->finalCurrency === 'IDR' ? '.' : ','
+            ),
+            'total'    => number_format(
+                $summary['total'],
+                2,
+                $this->finalCurrency === 'IDR' ? ',' : '.',
+                $this->finalCurrency === 'IDR' ? '.' : ','
+            ),
+        ];
 
         $data = compact('shipment', 'customer') + [
             'invoice_number' => $this->invoice_number,
             'transactions'   => $this->transactions,
             'totalPcs'  => $this->totalPcs,
             'totalgw'  => $this->totalgw,
-            'currency'       => $customer->currency,
+            'finalCurrency'        => $this->finalCurrency,
+            'formattedSummary'     => $formattedSummary,
+            'currency'       => $customer->country,
         ];
 
-        $html = view('livewire.accounting.invoice-pdf', $data)->render();
+        $html = view('livewire.accounting.purchasing-pdf', $data)->render();
         $pdfContent = Browsershot::html($html)
             ->setChromePath('/usr/bin/google-chrome') // Make sure this is correct
             ->format('A3')

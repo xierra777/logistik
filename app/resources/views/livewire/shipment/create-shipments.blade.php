@@ -40,34 +40,66 @@
 
             <!-- STEP 1: Pilih Tipe Job -->
             <div x-show="step === 1" x-transition x-cloak>
-                <h2 class="text-lg font-semibold mb-3">Pilih Tipe Job & Client</h2>
-                <div class="flex flex-col space-y-3 rounded-md mb-4 w-full" wire:ignore>
-                    <label class="font-bold">Client</label>
-                    <select wire:model="client_id" id="client_id" class="border p-2 rounded ">
-                        <option value="">Pilih Client</option>
-                        @foreach($clients as $client)
-                        <option value="{{ $client->id }}">{{ $client->name }}</option>
-                        @endforeach
-                    </select>
-                    @error('client_id')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    @foreach([
-                    'ocean_fcl_export' => 'Ocean FCL Export',
-                    'ocean_fcl_import' => 'Ocean FCL Import',
-                    'ocean_lcl_export' => 'Ocean LCL Export',
-                    'ocean_lcl_import' => 'Ocean LCL Import',
-                    'air_outbound' => 'Air Outbound',
-                    'air_inbound' => 'Air Inbound',
-                    'trucking' => 'Trucking',
-                    'logistics' => 'Logistics',
-                    'domestic_transportation' => 'Domestic Transportation'
-                    ] as $key => $label)
-                    <label class="flex w-full items-center space-x-2 cursor-pointer border p-2 rounded border-gray-400 hover:bg-gray-100 rounded-lg">
-                        <input type="radio" value="{{ $key }}" x-model="type_job"
+                <h2 class="text-lg font-semibold mb-3">Pilih Tipe Shipment</h2>
 
-                            class="text-blue-600">
-                        <span>{{ $label }}</span>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    @foreach([
+                    ['key' => 'ocean_fcl_export', 'label' => 'Ocean FCL Export', 'icon' => 'fa-ship'],
+                    ['key' => 'ocean_fcl_import', 'label' => 'Ocean FCL Import', 'icon' => 'fa-anchor'],
+                    ['key' => 'ocean_lcl_export', 'label' => 'Ocean LCL Export', 'icon' => 'fa-water'],
+                    ['key' => 'ocean_lcl_import', 'label' => 'Ocean LCL Import', 'icon' => 'fa-box'],
+                    ['key' => 'air_outbound', 'label' => 'Air Outbound', 'icon' => 'fa-plane-departure'],
+                    ['key' => 'air_inbound', 'label' => 'Air Inbound', 'icon' => 'fa-plane-arrival'],
+                    ['key' => 'trucking', 'label' => 'Trucking', 'icon' => 'fa-truck'],
+                    ['key' => 'logistics', 'label' => 'Logistics', 'icon' => 'fa-dolly'],
+                    ['key' => 'domestic_transportation', 'label' => 'Domestic Transportation', 'icon' => 'fa-route'],
+                    ] as $item)
+                    <label
+                        x-data="{
+                                x: 0, y: 0,
+                                radius: 0,
+                                growing: false,
+                                interval: null,
+                                move(e) {
+                                    const rect = e.target.closest('label').getBoundingClientRect();
+                                    this.x = e.clientX - rect.left;
+                                    this.y = e.clientY - rect.top;
+                                },
+                                enter() {
+                                    this.growing = true;
+                                    this.radius = 65;
+                                    this.interval = setInterval(() => {
+                                        if (!this.growing) return;
+                                        this.radius += 20;
+                                        if (this.radius > 400) this.radius = 400;
+                                    }, 20);
+                                },
+                                leave() {
+                                    this.growing = false;
+                                    clearInterval(this.interval);
+                                    this.radius = 0;
+                                }
+                            }"
+                        @mousemove="move($event)"
+                        @mouseenter="enter()"
+                        @mouseleave="leave()"
+                        class="relative flex w-full items-center space-x-3 cursor-pointer border p-4 rounded-lg border-gray-300 bg-white overflow-hidden transition-all duration-300">
+                        <!-- Background Hover Effect -->
+                        <div class="absolute inset-0 pointer-events-none z-0 transition-all duration-300 ease-out"
+                            :style="`background: radial-gradient(circle at ${x}px ${y}px, rgba(59,130,246,0.2) 0%, transparent ${radius}px);`">
+                        </div>
+
+                        <!-- Input & Label -->
+                        <input
+                            type="radio"
+                            name="type_job"
+                            value="{{ $item['key'] }}"
+                            x-model="type_job"
+                            class="relative z-10 text-blue-600">
+                        <i class="fa-solid {{ $item['icon'] }} text-blue-600 text-lg relative z-10"></i>
+                        <span class="relative z-10 text-sm font-medium text-gray-700">
+                            {{ $item['label'] }}
+                        </span>
                     </label>
                     @endforeach
                 </div>
@@ -2958,7 +2990,7 @@
                             </div>
                             <div class="flex flex-items grid grid-cols-3">
                                 <p class="col-span-1"><strong>Client </strong></p>
-                                <p class="col-span-2">: {{ $this->clientName }} </p>
+                                <p class="col-span-2">: </p>
                             </div>
                             <div class="flex flex-items grid grid-cols-3">
                                 <p class="col-span-1"><strong>No. Job / HBL No. </strong> </p>
@@ -2994,13 +3026,13 @@
                             @case('ocean_fcl_export'|| 'ocean_lcl_export' )
                             <div class="flex flex-items grid grid-cols-3 ">
                                 <p class="col-span-1"><strong>Delivery Agents</strong> </p>
-                                <p class="col-span-2">: {{ $this->dagentName}} </p>
+                                <p class="col-span-2">: </p>
                             </div>
                             @break
                             @case('ocean_fcl_import'|| 'ocean_lcl_import')
                             <div class="flex flex-items grid grid-cols-3 ">
                                 <p class="col-span-1"><strong>Origin Agents</strong> </p>
-                                <p class="col-span-2">: {{ $this->oagentsJob }} </p>
+                                <p class="col-span-2">: </p>
                             </div>flightVesselNo
                             @break
                             @case('air_outbound' || 'air_inbound')

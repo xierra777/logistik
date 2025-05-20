@@ -11,10 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('containers', function (Blueprint $table) {
-            $table->string('volume_weight')->after('measurement');
-            $table->string('chargeable_weight')->after('measurement');
-        });
+        Schema::table('containers', function (Blueprint $table) {});
     }
 
     /**

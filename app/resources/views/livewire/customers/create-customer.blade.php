@@ -60,7 +60,7 @@
 
       <div class="mb-4">
         <label class="block font-medium">Pilih Akun COA</label>
-        <select wire:model="coa_id" class="w-full border rounded p-2">
+        <select wire:model="coa_id" id="coa_id" class="w-full border rounded p-2">
           <option value="">-- Pilih COA --</option>
           @foreach($chartOfAccounts as $coa)
           <option value="{{ $coa->id }}">
@@ -81,6 +81,7 @@
           <option value="agent">Agent</option>
           <option value="notify">Notify</option>
           <option value="carrier">Carrier</option>
+          <option value="airline">Airline</option>
         </select>
         @error('roles')
         <span class="text-red-500">{{ $message }}</span>
@@ -131,6 +132,20 @@
 </form>
 @script()
 <script>
+  $(document).ready(function() {
+    $('#coa_id').select2({
+      placeholder: "Select roles",
+      allowClear: true,
+      theme: 'tailwindcss-3'
+    });
+
+    $('#coa_id').on('change', function() {
+      let data = $(this).val();
+      // console.log(data);
+      // $wire.set('roles',data,false);
+      $wire.coa_id = data;
+    });
+  });
   $(document).ready(function() {
     $('#mySelect2').select2({
       placeholder: "Select roles",

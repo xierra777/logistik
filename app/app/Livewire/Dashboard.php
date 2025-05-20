@@ -18,9 +18,9 @@ class Dashboard extends Component
 
     public function render()
     {
-        $shipments = Shipment::latest()->paginate($this->perPage);
-        $customers = Customer::latest()->paginate($this->perPage);
-        $jobs = TJob::latest()->paginate($this->perPage);
+        $shipments = Shipment::with('shipper', 'consignee', 'notify')->latest()->paginate($this->perPage);
+        $customers = Customer::select('id', 'name', 'roles')->latest()->paginate($this->perPage);
+        $jobs = TJob::with('client')->latest()->paginate($this->perPage);
 
         return view('livewire.dashboard', compact('shipments', 'customers', 'jobs'));
     }

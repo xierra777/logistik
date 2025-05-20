@@ -11,7 +11,7 @@ class ListJob extends Component
     use WithPagination;
     public $perPage = 5;
     public $start_date, $end_date;
-    public $searchField   = 'shipment_id';  // default column
+    public $searchField   = 'job_id';  // default column
     public $searchTerm    = '';
 
     public function confirmDelete($get_id)
@@ -25,7 +25,7 @@ class ListJob extends Component
     }
     public function render()
     {
-        $query = TJob::latest(); // orderBy created_at desc
+        $query = TJob::with('client')->latest(); // orderBy created_at desc
 
         if ($this->start_date && $this->end_date) {
             $query->whereBetween('created_at', [
@@ -40,7 +40,9 @@ class ListJob extends Component
                     $q->where('name', 'like', '%' . $this->searchTerm . '%');
                 });
             } else {
-                $query->where($this->searchField, 'like', '%' . $this->searchTerm . '%');
+                $normalizedSearch = str_replace(' ', '_', strtolower($this->searchTerm));
+
+                $query->whereRaw("LOWER(REPLACE(`{$this->searchField}`, '_', ' ')) LIKE ?", ['%' . strtolower($this->searchTerm) . '%']);
             }
         }
         $job = $query->paginate($this->perPage);

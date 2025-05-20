@@ -1,10 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Livewire\CreateShipments;
-use App\Livewire\ViewShipments;
-use App\Livewire\EditShipments;
-use App\Livewire\Shipmment;
+
 use App\Livewire\Accounting\Accountant;
 use App\Livewire\Accounting\PurchaseInvoice;
 use App\Livewire\Accounting\Tranksaksi;
@@ -23,11 +20,14 @@ use App\Livewire\Job\CreateJob;
 use App\Livewire\Job\EditJob;
 use App\Livewire\Job\ListJob;
 use App\Livewire\Job\ViewJob;
+
+use App\Livewire\Shipment\CreateShipments;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 
 
-
-Route::redirect('/', '/login'); // Redirect otomatis ke halaman login
+Route::redirect('/', '/login');
 Route::get('/dashboard', Dashboard::class)->middleware([
     'auth',
     'verified'
@@ -49,6 +49,53 @@ Route::get('create-job', CreateJob::class)->middleware([
     'auth',
     'verified'
 ])->name('Createjob');
+Route::get('/data/airports-ajax', function () {
+    $token = 'dfa43c42-594a-44ed-8752-0909a8dfba7e';
+    $search = request('q', '');
+    $page = request('page', 1);
+    $size = 5;
+
+    $normalized = strtolower(substr($search, 0, 3)); // ambil prefix 3 huruf
+    $cacheKey = "aviowiki-airports:{$normalized}:page:{$page}";
+
+    $start = microtime(true);
+
+    $data = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($token, $search, $page, $size) {
+        $response = Http::withToken($token)->get('https://api.aviowiki.com/free/airports/search', [
+            'query' => $search,
+            'page' => $page - 1,
+            'size' => $size,
+        ]);
+
+        if (!$response->successful()) return null;
+
+        return $response->json();
+    });
+
+    if (!$data) {
+        return response()->json([
+            'results' => [],
+            'pagination' => ['more' => false],
+        ]);
+    }
+
+    return response()->json([
+        'results' => collect($data['content'])->filter(fn($airport) => !empty($airport['iata']))->map(function ($airport) {
+            return [
+                'id' => $airport['iata'],
+                'text' => "{$airport['name']} ({$airport['iata']}) - {$airport['country']['name']}"
+            ];
+        })->values(), // important!
+        'pagination' => [
+            'more' => $data['page']['number'] + 1 < $data['page']['totalPages']
+        ],
+    ]);
+});
+
+Route::get('create-shipments', CreateShipments::class)->middleware([
+    'auth',
+    'verified'
+])->name('create-shipments');
 
 Route::get('edit-job', EditJob::class)->middleware([
     'auth',
@@ -60,10 +107,16 @@ Route::get('list-job', ListJob::class)->middleware([
     'verified'
 ])->name('listJob');
 
-Route::get('/view-job/{id}', ViewJob::class)->middleware([
+Route::get('view-job/{id}', ViewJob::class)->middleware([
     'auth',
     'verified'
 ])->name('viewJob');
+
+
+
+
+
+
 
 Route::get('/house-b-l/{shipmentId}', HouseBL::class)
     ->middleware(['auth', 'verified'])
@@ -76,23 +129,6 @@ Route::get('/journal-entries', JournalEntries::class)->middleware([
     'verified'
 ]);
 
-Route::get('create-shipments', CreateShipments::class)->middleware([
-    'auth',
-    'verified'
-]);
-
-Route::get('shipmment', Shipmment::class)->middleware([
-    'auth',
-    'verified'
-]);
-Route::get('/view-shipments/{id}', ViewShipments::class)->middleware([
-    'auth',
-    'verified'
-]);
-Route::get('/edit-shipments/{id}', EditShipments::class)->middleware([
-    'auth',
-    'verified'
-]);
 
 Route::get('/view-customers/{id}', ViewCustomer::class)->middleware([
     'auth',

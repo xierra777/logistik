@@ -33,6 +33,7 @@
                         }' class="hidden" wire:model.live="searchField">
                     <option value="job_id">Job ID</option>
                     <option value="client">Client</option>
+                    <option value="type_job">Type Job</option>
 
                 </select>
                 <input type="text"
@@ -56,61 +57,55 @@
             {{ session('error') }}
         </div>
         @endif
-        <div class="overflow-x-auto table-container">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700">
+        <div class="overflow-auto max-w-full">
+            <table class="min-w-max w-full table-auto divide-y divide-gray-200 dark:divide-neutral-700">
                 <thead class="bg-gray-50 dark:bg-neutral-800">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase dark:text-neutral-400">
-                            Job No
+                        @foreach (['Job No', 'Client', 'Department', 'POL', 'POD', 'ETD', 'ETA', 'Action'] as $th)
+                        <th scope="col" class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase dark:text-neutral-400 text-left">
+                            {{ $th }}
                         </th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase dark:text-neutral-400">
-                            Client
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase dark:text-neutral-400">
-                            POL
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase dark:text-neutral-400">
-                            POD
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase dark:text-neutral-400">
-                            ETD
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase dark:text-neutral-400">
-                            ETA
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase dark:text-neutral-400">
-                            Action
-                        </th>
+                        @endforeach
                     </tr>
                 </thead>
 
                 <tbody class="bg-white dark:bg-neutral-900 divide-y divide-gray-200 dark:divide-neutral-700">
                     @forelse($job as $j)
                     <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td class="px-4 py-4 text-sm font-medium text-gray-800 dark:text-neutral-200">
                             <a href="{{ route('viewJob', ['id' => $j->id]) }}">
-                                {{$j->job_id}}
+                                {{ $j->job_id }}
                             </a>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-300 ">
-                            <a href="{{ 'view-customers/'.$j->client_id }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-bold"> {{$j->client->name ?? ''}}
+                        <td class="px-4 py-4 text-sm text-gray-800 dark:text-neutral-300">
+                            <a href="{{ 'view-customers/' . $j->client_id }}"
+                                class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-bold">
+                                {{ $j->client->name ?? '' }}
                             </a>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-800 dark:text-neutral-300">
-                            {{ $j->data['port_of_loading']}}
+                        <td class="px-4 py-4 text-sm text-gray-800 dark:text-neutral-300 font-bold">
+                            {{ strtoupper(str_replace('_', ' ', $j->type_job)) }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-800 dark:text-neutral-300">
-                            {{ $j->data['port_of_loading']}}
+                        <td class="px-4 py-4 text-sm text-gray-800 dark:text-neutral-300">
+                            {{ $j->data['port_of_loading'] ?? '-' }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-800 dark:text-neutral-300">
-                            {{ \Carbon\Carbon::parse($j->data['estimearrival'])->format('d M Y ') }}
-
+                        <td class="px-4 py-4 text-sm text-gray-800 dark:text-neutral-300">
+                            {{ $j->data['port_of_discharge'] ?? '-' }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-800 dark:text-neutral-300">
-                            {{ \Carbon\Carbon::parse($j->data['estimedelivery'])->format('d M Y') }}
+                        <td class="px-4 py-4 text-sm text-gray-800 dark:text-neutral-300">
+                            {{ \Carbon\Carbon::parse($j->data['estimearrival'] ?? now())->format('d M Y') }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                            <div class="flex justify-center space-x-3">
+                        <td class="px-4 py-4 text-sm text-gray-800 dark:text-neutral-300">
+                            {{ \Carbon\Carbon::parse($j->data['estimedelivery'] ?? now())->format('d M Y') }}
+                        </td>
+                        <td class="px-4 py-4 text-sm text-right">
+                            <div class="flex justify-center space-x-3 font-bold">
+                                <button
+                                    wire:navigate
+                                    href="{{ route('viewJob', ['id' => $j->id]) }}"
+                                    class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                                    View
+                                </button>
                                 <button
                                     wire:navigate
                                     href=""
@@ -128,7 +123,7 @@
                     </tr>
                     @empty
                     <tr wire:loading.remove>
-                        <td colspan="7" class="py-12 text-center">
+                        <td colspan="8" class="py-12 text-center">
                             <div class="flex flex-col items-center justify-center">
                                 <img src="{{ asset('images/nodata.svg') }}"
                                     alt="No data illustration"
@@ -136,14 +131,14 @@
                                 <p class="text-lg font-medium text-gray-600 dark:text-neutral-300">
                                     No shipments found!
                                 </p>
-                                <p class="text-sm text-gray-500 dark:text-neutral-500 text-center">
+                                <p class="text-sm text-gray-500 dark:text-neutral-500">
                                     Start by adding shipments or importing data.
                                 </p>
                             </div>
                         </td>
                     </tr>
                     <tr wire:loading class="animate-pulse">
-                        <td colspan="6" class="py-12 text-center text-gray-500 dark:text-neutral-400">
+                        <td colspan="8" class="py-12 text-center text-gray-500 dark:text-neutral-400">
                             Retrieving data…
                         </td>
                     </tr>
@@ -152,6 +147,7 @@
             </table>
             <x-confirm-delete />
         </div>
+
 
         <!-- Pagination -->
         @if($job->hasPages())

@@ -10,6 +10,9 @@ class ListCustomer extends Component
 {
     use WithPagination;
     public $perPage = 5;
+    public $start_date, $end_date;
+    public $searchField   = 'name';  // default column
+    public $searchTerm    = '';
 
     public function confirmDelete($get_id)
     {
@@ -20,10 +23,25 @@ class ListCustomer extends Component
             session()->flash('error', 'Error deleting shipment: ' . $e->getMessage());
         }
     }
+
     public function render()
     {
-        return view('livewire.customers.list-customer', [
-            'customers' => Customer::latest()->paginate($this->perPage)
-        ]);
+        $query = Customer::query()->latest();
+
+        if ($this->start_date && $this->end_date) {
+            $query->whereBetween('created_at', [$this->start_date, $this->end_date]);
+        }
+
+        if ($this->searchTerm) {
+            if ($this->searchField === 'roles') {
+                $query->whereJsonContains('roles', $this->searchTerm);
+            } else {
+                $query->where($this->searchField, 'like', '%' . $this->searchTerm . '%');
+            }
+        }
+
+        $customers = $query->paginate($this->perPage);
+
+        return view('livewire.customers.list-customer', compact('customers'));
     }
 }

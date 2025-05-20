@@ -66,3 +66,11 @@
 
 {{-- Livewire Script Configuration (optional, based on your setup) --}}
 @livewireScriptConfig
+<script>
+    Livewire.hook('message.failed', (message, component, response) => {
+        if (response.status === 419) {
+            alert('Session expired. Reloading...');
+            window.location.reload();
+        }
+    });
+</script>

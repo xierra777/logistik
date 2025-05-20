@@ -24,6 +24,8 @@ return new class extends Migration
             $table->string('gross_weight');
             $table->string('pack_type');
             $table->string('measurement')->nullable();
+            $table->string('volume_weight')->nullable();
+            $table->string('chargeable_weight')->nullable();
             $table->timestamps();
         });
     }

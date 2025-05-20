@@ -4,25 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TJob extends Model
+class TShipments extends Model
 {
-    protected $casts = ['data' => 'array'];
+    protected $casts = ['dataShipments' => 'array'];
 
     protected $fillable = [
-        'job_id',
-        'type_job',
-        'carrierAirline',
-        'employee_id',
-        'client_id',
-        'ogentsJob',
-        'dagentsJob',
-        'data',
+        'id_job',
+        'shipmentsTypeJob',
+        'shipper_id',
+        'consignee_id',
+        'notify_id',
+        'carrier',
+        'dataShipments',
     ];
 
-    public function TjobContainer()
-    {
-        return $this->hasMany(jobContainer::class, 'id_job');
-    }
     public function client()
     {
         return $this->belongsTo(Customer::class, 'client_id');
@@ -47,12 +42,5 @@ class TJob extends Model
     {
         return $this->belongsTo(Customer::class, 'notify_id');
     }
-    public function carrierModel()
-    {
-        return $this->belongsTo(Customer::class, 'carrierAirline');
-    }
-    public function employee()
-    {
-        return $this->belongsTo(User::class, 'employee_id');
-    }
+
 }

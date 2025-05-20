@@ -82,6 +82,9 @@
           <option value="notify">Notify</option>
           <option value="carrier">Carrier</option>
           <option value="airline">Airline</option>
+          <option value="delivery_agent">Delivery Agent</option>
+          <option value="origin_agent">Origin Agent</option>
+          <option value="carrier_agent">Carrier Agent</option>
         </select>
         @error('roles')
         <span class="text-red-500">{{ $message }}</span>

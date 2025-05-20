@@ -44,7 +44,7 @@ class CreateJob extends Component
         $port_of_receipt = "",
         $description = "",
         $estimearrival,
-        $estimedelivery, $flightVesselNo, $jobBillLadingdDate, $cross_trade, $hazardousType, $hazardousClassType, $payableAtJob, $freightTypeJob, $remarksJobDetailJobs;
+        $estimedelivery, $flightVesselNo, $cross_trade, $hazardousType, $hazardousClassType, $payableAtJob, $freightTypeJob, $remarksJobDetailJobs;
     public $jobEmployee;
     // Bagian Air
     public $jobBillLadingNo, $jobBillLadingDate, $airlinesJob;
@@ -262,8 +262,8 @@ class CreateJob extends Component
             'hsCodeDesc'          => $this->hsCodeDesc,
         ];
         $data = [
-            'jobBillLadingNo'              => $this->jobBillLadingNo,
-            'jobBillLadingDate'            => $this->jobBillLadingDate,
+            'jobBillLadingNo'     => $this->jobBillLadingNo,
+            'jobBillLadingDate'   => $this->jobBillLadingDate,
             'customerCodeJob'     => $this->customerCodeJob, //akandibuat query
             'servicesType'        => $this->servicesType,
             'incoTerms'           => $this->incoTerms,
@@ -521,7 +521,7 @@ class CreateJob extends Component
         ];
         $data = [
             'jobBillLadingNo'    => $this->jobBillLadingNo,
-            'jobBillLadingdDate'  => $this->jobBillLadingdDate,
+            'jobBillLadingDate'  => $this->jobBillLadingDate,
             'customerCodeJob'     => $this->customerCodeJob, //akandibuat query
             'servicesType'        => $this->servicesType,
             'incoTerms'           => $this->incoTerms,

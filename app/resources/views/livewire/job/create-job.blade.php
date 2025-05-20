@@ -118,8 +118,8 @@
                         </div>
                         <div class="flex flex-col space-y-3 rounded-md">
                             <label>MBL Date</label>
-                            <input type="date" wire:model="jobBillLadingdDate" placeholder="Enter Shipment ID" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            @error('jobBillLadingdDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                            <input type="date" wire:model="jobBillLadingDate" placeholder="Enter Shipment ID" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('jobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -176,7 +176,7 @@
                     </div>
                     <div class=" grid grid-cols-1 md:grid-cols-3 gap-3">
                         <!-- Mother Vessel -->
-                        <div class=" mb-4=">
+                        <div class=" mb-4">
                             <label for=" flightVesselName">Vessel Name</label>
                             <input type="text" id="flightVesselName" name="flightVesselName" wire:model="flightVesselName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('flightVesselName')
@@ -184,7 +184,7 @@
                             @enderror
                         </div>
 
-                        <div class="mb-4=">
+                        <div class="mb-4">
                             <label for="flightVesselNo">Voyage</label>
                             <input type="text" id="flightVesselNo" name="flightVesselNo" wire:model="flightVesselNo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('flightVesselNo')
@@ -505,8 +505,8 @@
                         </div>
                         <div class="flex flex-col space-y-3 rounded-md">
                             <label>MBL Date</label>
-                            <input type="date" wire:model="jobBillLadingdDate" placeholder="Enter Shipment ID" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            @error('jobBillLadingdDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                            <input type="date" wire:model="jobBillLadingDate" placeholder="Enter Shipment ID" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('jobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -563,7 +563,7 @@
                     </div>
                     <div class=" grid grid-cols-1 md:grid-cols-3 gap-3">
                         <!-- Mother Vessel -->
-                        <div class=" mb-4=">
+                        <div class=" mb-4">
                             <label for=" flightVesselName">Vessel Name</label>
                             <input type="text" id="flightVesselName" name="flightVesselName" wire:model="flightVesselName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('flightVesselName')
@@ -571,7 +571,7 @@
                             @enderror
                         </div>
 
-                        <div class="mb-4=">
+                        <div class="mb-4">
                             <label for="flightVesselNo">Voyage</label>
                             <input type="text" id="flightVesselNo" name="flightVesselNo" wire:model="flightVesselNo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('flightVesselNo')
@@ -898,8 +898,8 @@
                         </div>
                         <div class="flex flex-col space-y-3 rounded-md">
                             <label>MBL Date</label>
-                            <input type="date" wire:model="jobBillLadingdDate" placeholder="Enter Shipment ID" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            @error('jobBillLadingdDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                            <input type="date" wire:model="jobBillLadingDate" placeholder="Enter Shipment ID" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('jobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -956,7 +956,7 @@
                     </div>
                     <div class=" grid grid-cols-1 md:grid-cols-3 gap-3">
                         <!-- Mother Vessel -->
-                        <div class=" mb-4=">
+                        <div class=" mb-4">
                             <label for=" flightVesselName">Vessel Name</label>
                             <input type="text" id="flightVesselName" name="flightVesselName" wire:model="flightVesselName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('flightVesselName')
@@ -964,7 +964,7 @@
                             @enderror
                         </div>
 
-                        <div class="mb-4=">
+                        <div class="mb-4">
                             <label for="flightVesselNo">Voyage</label>
                             <input type="text" id="flightVesselNo" name="flightVesselNo" wire:model="flightVesselNo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('flightVesselNo')
@@ -1285,8 +1285,8 @@
                         </div>
                         <div class="flex flex-col space-y-3 rounded-md">
                             <label>MBL Date</label>
-                            <input type="date" wire:model="jobBillLadingdDate" placeholder="Enter Shipment ID" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            @error('jobBillLadingdDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                            <input type="date" wire:model="jobBillLadingDate" placeholder="Enter Shipment ID" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('jobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -1343,7 +1343,7 @@
                     </div>
                     <div class=" grid grid-cols-1 md:grid-cols-3 gap-3">
                         <!-- Mother Vessel -->
-                        <div class=" mb-4=">
+                        <div class=" mb-4">
                             <label for=" flightVesselName">Vessel Name</label>
                             <input type="text" id="flightVesselName" name="flightVesselName" wire:model="flightVesselName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('flightVesselName')
@@ -1351,7 +1351,7 @@
                             @enderror
                         </div>
 
-                        <div class="mb-4=">
+                        <div class="mb-4">
                             <label for="flightVesselNo">Voyage</label>
                             <input type="text" id="flightVesselNo" name="flightVesselNo" wire:model="flightVesselNo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('flightVesselNo')
@@ -1731,7 +1731,7 @@
                     </div>
                     <div class=" grid grid-cols-1 md:grid-cols-3 gap-3">
                         <!-- Mother Vessel -->
-                        <div class=" mb-4=">
+                        <div class=" mb-4">
                             <label for=" flightVesselName">Flight Name</label>
                             <input type="text" id="flightVesselName" name="flightVesselName" wire:model="flightVesselName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('flightVesselName')
@@ -1739,7 +1739,7 @@
                             @enderror
                         </div>
 
-                        <div class="mb-4=">
+                        <div class="mb-4">
                             <label for="flightVesselNo">Flight No</label>
                             <input type="text" id="flightVesselNo" name="flightVesselNo" wire:model="flightVesselNo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('flightVesselNo')
@@ -2119,7 +2119,7 @@
                     </div>
                     <div class=" grid grid-cols-1 md:grid-cols-3 gap-3">
                         <!-- Mother Vessel -->
-                        <div class=" mb-4=">
+                        <div class=" mb-4">
                             <label for=" flight_name">Flight Name</label>
                             <input type="text" id="flight_name" name="flight_name" wire:model="flight_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('flight_name')
@@ -2127,7 +2127,7 @@
                             @enderror
                         </div>
 
-                        <div class="mb-4=">
+                        <div class="mb-4">
                             <label for="flight_no">Flight No</label>
                             <input type="text" id="flight_no" name="flight_no" wire:model="flight_no" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('flight_no')
@@ -2490,7 +2490,6 @@
                                 </select>
                             </div>
 
-                            <!-- Weight Info -->
                             <div class="flex flex-col space-y-2">
                                 <label>Gross Weight</label>
                                 <input type="text" placeholder="Enter Gross weight" wire:model="grossWeight"
@@ -2504,7 +2503,6 @@
                                 </select>
                             </div>
 
-                            <!-- Volume Weight Info -->
                             <div class="flex flex-col space-y-2">
                                 <label>Volume Weight</label>
                                 <input type="text" wire:model="volumeWeight" placeholder="Enter Gross weight"
@@ -2970,7 +2968,7 @@
                             </div>
                             <div class="flex flex-items grid grid-cols-3">
                                 <p class="col-span-1"><strong>MBL DATE</strong> </p>
-                                <p class="col-span-2">: {{ $jobBillLadingdDate }} </p>
+                                <p class="col-span-2">: {{ $jobBillLadingDate }} </p>
                             </div>
                             <div class="flex flex-items grid grid-cols-3">
                                 <p class="col-span-1"><strong>Port Of loading</strong> </p>

@@ -25,6 +25,14 @@ class TJob extends Model
     {
         return $this->belongsTo(Customer::class, 'client_id');
     }
+    public function ogents()
+    {
+        return $this->belongsTo(Customer::class, 'ogentsJob');
+    }
+    public function dagents()
+    {
+        return $this->belongsTo(Customer::class, 'dagentsJob');
+    }
     public function shipper()
     {
         return $this->belongsTo(Customer::class, 'shipper_id');
@@ -37,8 +45,8 @@ class TJob extends Model
     {
         return $this->belongsTo(Customer::class, 'notify_id');
     }
-    public function carrier()
+    public function getCarrierModelAttribute()
     {
-        return $this->belongsTo(Customer::class, 'carrier');
+        return Customer::find($this->data['carrier'] ?? null);
     }
 }

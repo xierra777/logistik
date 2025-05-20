@@ -34,6 +34,7 @@ RUN curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor
 
 # ✅ Install puppeteer-core (tanpa Chrome)
 RUN npm install -g puppeteer
+RUN npm run build
 
 # Set workdir
 WORKDIR /var/www

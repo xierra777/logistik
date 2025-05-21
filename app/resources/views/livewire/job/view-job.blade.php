@@ -75,11 +75,7 @@
             </p>
         </div>
     </div>
-    <div class="mt-2 mb-2">
-        <button class="bg-blue-500 px-3 py-1 text-xs text-white rounded-md">BL</button>
-        <button class="bg-green-500 px-3 py-1 text-xs text-white rounded-md">Create Bl</button>
 
-    </div>
     <div class="text-center p-3 bg-orange-500 rounded-t-lg font-bold mt-4">
         <p class="">Details Vessel / FLight</p>
     </div>
@@ -527,20 +523,211 @@
 
     </div>
     <div class="mt-3 mb-4 shadow-xl">
+
         <div class="bg-cyan-500 rounded-t-lg p-3 ">
             <p class="text-lg font-bold text-center ">Shipments ( Under Construction )</p>
         </div>
-        <div class=" grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 p-3">
+            @forelse ($this->assignedShipments as $s)
 
-            <div>Ini kotak</div>
-            <div>Ini kotak</div>
-            <div>Ini kotak</div>
-            <div>Ini kotak</div>
-            <div>Ini kotak</div>
-            <div>Ini kotak</div>
-            <div>Ini kotak</div>
-            <div>Ini kotak</div>
-            <div>Ini kotak</div>
+            <div class="bg-gradient-to-br from-emerald-500 via-teal-400 to-cyan-300 rounded-xl shadow-xl w-full max-w p-6 text-white space-y-4 hover:scale-[1.03] transition-transform duration-300 ease-in-out">
+                <a href="{{ url('view-shipment/' . $s->id) }}" class="block space-y-1">
+                    <div class="flex justify-center">
+
+                        @php
+                        $type = $s->shipmentsTypeJob;
+                        $icons = [
+                        'ocean_fcl_import' => 'fa-anchor',
+                        'ocean_fcl_export' => 'fa-ship',
+                        'air_import' => 'fa-plane-arrival',
+                        'air_export' => 'fa-plane-departure',
+                        'trucking' => 'fa-truck',
+                        'default' => 'fa-box',
+                        ];
+
+                        $iconClass = $icons[$type] ?? $icons['default'];
+                        @endphp
+
+                        <p class="mb-2 text-xs bg-purple-500 text-white rounded-full px-4 py-1 font-semibold shadow flex items-center gap-2">
+                            <i class="fas {{ $iconClass }}"></i>
+                            {{ strtoupper(str_replace('_', ' ', $type)) }}
+                        </p>
+                    </div>
+                    <div class="text-sm text-black font-medium">ID: {{ $s->shipment_id }}</div>
+                    <div class="text-sm text-black ">Client: {{ optional($s->client)->name }}</div>
+                </a>
+            </div>
+
+            @empty
+            <div class="bg-gray-200 p-4 text-gray-500 font-bold shadow col-span-3 text-center">
+                <p class="text-sm">No shipments assigned.</p>
+                <p class="text-xs">Click "Add Shipments" to assign.</p>
+            </div>
+            @endforelse
+        </div>
+
+        <div class="mt-3 p-1 gap-2 flex flex-row ">
+            <button class="bg-blue-600 text-white rounded-lg py-1 px-5 hover:scale-105"> Add Shipments</button>
+            <div x-data="{ openDetachAssigned: false }" @close-detach-assigned.window="openDetachAssigned = false">
+                <button @click="openDetachAssigned = true"
+                    class="bg-red-600 text-white rounded-lg py-1 px-5 hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-file-export"></i> Detach Shipment
+                </button>
+
+                <div x-cloak x-show="openDetachAssigned"
+                    x-transition:enter="transition ease-out duration-300 delay-150"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="scale-100 opacity-100"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="scale-100 opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
+
+                    <div class="bg-white rounded-xl shadow-xl w-full max-w-7xl p-6 space-y-4 relative z-50
+        max-h-[80vh] flex flex-col">
+                        <div class="p-3 flex items-center">
+                            <button @click="openDetachAssigned = false"
+                                class="absolute top-3 right-3 text-gray-500 bg-gray-200 border border-gray-200 rounded-full py-1 px-2 hover:text-gray-800 text-2xl font-bold leading-none">
+                                &times;
+                            </button>
+                        </div>
+
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Shipment Terhubung ke Job Ini</h3>
+
+                        <div class="overflow-auto flex-grow border rounded-md shadow-inner">
+                            <table class="w-full table-auto text-center min-w-[700px]">
+                                <thead class="bg-gray-100 sticky top-0">
+                                    <tr>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">No</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left"></th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Shipment Id</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">POL</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">POD</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">ETA</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">ETD</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($this->assignedShipments as $s)
+                                    <tr class="border-b last:border-b-0 hover:bg-gray-50">
+                                        <td class="px-4 py-2 text-left">{{ $loop->iteration }}</td>
+                                        <td class="px-4 py-2 text-left">
+                                            <input type="checkbox" wire:model="selectedAssignedShipments" value="{{ $s->id }}"
+                                                class="form-checkbox text-red-600 rounded-md">
+                                        </td>
+                                        <td class="px-4 py-2 text-left">{{ $s->shipment_id }}</td>
+                                        <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_loading'] ?? '-' }}</td>
+                                        <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_discharge'] ?? '-' }}</td>
+                                        <td class="px-4 py-2 text-left">
+                                            {{ isset($s->dataShipments['shipmentEstimearrival']) ? \Carbon\Carbon::parse($s->dataShipments['shipmentEstimearrival'])->format('d F Y') : '-' }}
+                                        </td>
+                                        <td class="px-4 py-2 text-left">
+                                            {{ isset($s->dataShipments['shipmentEstimedelivery']) ? \Carbon\Carbon::parse($s->dataShipments['shipmentEstimedelivery'])->format('d F Y') : '-' }}
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4 text-gray-500">Tidak ada shipment yang terhubung.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="flex justify-end space-x-2 mt-4">
+                            <button @click="openDetachAssigned = false"
+                                class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition">
+                                Batal
+                            </button>
+                            <button wire:click="detachSelectedShipments"
+                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition">
+                                Detach dari Job
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div x-data="{ openDetachShipment: false }" @close-detach-shipment.window="openDetachShipment = false">
+                <button @click="openDetachShipment = true"
+                    class="bg-green-600 text-white rounded-lg py-1 px-5 hover:scale-105 transition-transform">
+                    <i class="fa-solid fa-file-import"></i> Attach Shipment
+                </button>
+
+                <div x-cloak x-show="openDetachShipment"
+                    x-transition:enter="transition ease-out duration-300 delay-150"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="scale-100 opacity-100"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="scale-100 opacity-100"
+                    x-transition:leave-end="opacity-0"
+                    class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
+
+                    <div class="bg-white rounded-xl shadow-xl w-full max-w-7xl p-6 space-y-4 relative z-50
+              max-h-[80vh] flex flex-col">
+                        <div class="p-3 flex  items-center">
+                            <button @click="openDetachShipment = false"
+                                class="absolute top-3 right-3 text-gray-500 bg-gray-200 border border-gray-200 rounded-full py-1 px-2 hover:text-gray-800 text-2xl font-bold leading-none">
+                                &times;
+                            </button>
+                        </div>
+
+
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Shipment Yatim (Belum Terhubung)</h3>
+
+                        <div class="overflow-auto flex-grow border rounded-md shadow-inner">
+                            <table class="w-full table-auto text-center min-w-[700px]">
+                                <thead class="bg-gray-100 sticky top-0">
+                                    <tr>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">No</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left"></th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Shipment Id</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">POL</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">POD</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">ETA</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">ETD</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($this->orphanShipments as $s)
+                                    <tr class="border-b last:border-b-0 hover:bg-gray-50">
+                                        <td class="px-4 py-2 text-left">{{ $loop->iteration }}</td>
+                                        <td class="px-4 py-2 text-left">
+                                            <input type="checkbox" wire:model="selectedShipments" value="{{ $s->id }}" class="form-checkbox text-blue-600 rounded-md">
+                                        </td>
+                                        <td class="px-4 py-2 text-left">{{ $s->shipment_id }}</td>
+                                        <td></td>
+                                        <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_loading'] ?? '-' }}</td>
+                                        <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_discharge'] ?? '-' }}</td>
+                                        <td class="px-4 py-2 text-left">
+                                            {{ isset($s->dataShipments['shipmentEstimearrival']) ? \Carbon\Carbon::parse($s->dataShipments['shipmentEstimearrival'])->format('d F Y') : '-' }}
+                                        </td>
+                                        <td class="px-4 py-2 text-left">
+                                            {{ isset($s->dataShipments['shipmentEstimedelivery']) ? \Carbon\Carbon::parse($s->dataShipments['shipmentEstimedelivery'])->format('d F Y') : '-' }}
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4 text-gray-500">Tidak ada shipment yatim.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="flex justify-end space-x-2 mt-4">
+                            <button @click="openDetachShipment = false" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition">
+                                Batal
+                            </button>
+                            <button wire:click="assignSelectedShipments" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">
+                                Assign ke Job
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
 
         </div>
     </div>

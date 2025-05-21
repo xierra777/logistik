@@ -15,9 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('id_job')->nullable()->constrained('t_jobs')->onDelete('cascade');
             $table->string('shipmentsTypeJob');
-            $table->foreignId('shipper_id')->nullable()->constrained('customers');
-            $table->foreignId('consignee_id')->nullable()->constrained('customers');
-            $table->foreignId('notify_id')->nullable()->constrained('customers');
+            $table->string('shipment_id')->unique();
+            $table->foreignId('shipmentClient_id')->nullable()->constrained('customers');
+            $table->foreignId('shipmentShipper_id')->nullable()->constrained('customers');
+            $table->foreignId('shipmentConsignee_id')->nullable()->constrained('customers');
+            $table->foreignId('shipmentNotify_id')->nullable()->constrained('customers');
+            $table->foreignId('carrier')->nullable()->constrained('customers');
+            $table->foreignid('employee_id')->nullable()->constrained('users');
             $table->json('dataShipments');
             $table->timestamps();
         });

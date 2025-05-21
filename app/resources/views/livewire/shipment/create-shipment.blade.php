@@ -114,6 +114,7 @@
 
                 @switch($shipmentType_job)
                 @case('ocean_fcl_export')
+
                 <div>
                     <div class="grid grid-cols-1 md:grid-cols-2 mb-3">
                         <div class="flex flex-col space-y-3 rounded-md">
@@ -230,7 +231,7 @@
                     </div>
                     <!-- Select Port -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 border rounded-md p-4 border-1 border-gray-300 mt-5">
-                        <div class="port-container" data-model="port_of_loading" data-radio-name="inputTypeLoading" wire:ignore wire:change="port_of_loading">
+                        <div class="port-container" data-model="port_of_loading" data-radio-name="inputTypeLoading" wire:ignore>
                             <h2 class="text-lg font-semibold">Port Of Loading / POL</h2>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Select or Input Port</label>
@@ -260,7 +261,7 @@
                             </div>
                         </div>
 
-                        <div class="port-container" data-model="port_of_final" data-radio-name="inputTypeFinal" wire:ignore wire:change="port_of_final">
+                        <div class="port-container" data-model="port_of_final" data-radio-name="inputTypeFinal" wire:ignore>
                             <h2 class="text-lg font-semibold">Port Of Final / POF</h2>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Select or Input Port</label>
@@ -289,7 +290,7 @@
                                     placeholder="Enter port name">
                             </div>
                         </div>
-                        <div class="port-container" data-model="place_of_receipt" data-radio-name="inputTypeReceipt" wire:ignore wire:change="place_of_receipt">
+                        <div class="port-container" data-model="place_of_receipt" data-radio-name="inputTypeReceipt" wire:ignore>
                             <h2 class="text-lg font-semibold">Place Of Receipts <span class="text-red-500">*</span></h2>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Select or Input Port</label>
@@ -318,7 +319,7 @@
                                     placeholder="Enter port name">
                             </div>
                         </div>
-                        <div class="port-container" data-model="port_of_receipt" data-radio-name="inputTypePReceipt" wire:ignore wire:change="port_of_receipt">
+                        <div class="port-container" data-model="shipmentPort_of_receipt" data-radio-name="inputTypePReceipt" wire:ignore>
                             <h2 class="text-lg font-semibold">Port Of Receipt / POR <span class="text-red-500">*</span></h2>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Select or Input Port</label>
@@ -535,7 +536,7 @@
                         <!-- Client and Job Type Info -->
                         <div class="flex flex-col space-y-3  rounded-md">
                             <label>Client</label>
-                            <input type="text" value="{{ $this->clientName }}" readonly
+                            <input type="text" value="{{ $this->clientName->name }}" readonly
                                 class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0"
                                 placeholder="Nama client akan muncul otomatis">
                             @error('container_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
@@ -776,7 +777,7 @@
                             </div>
                             <div class="flex flex-items grid grid-cols-3">
                                 <p class="col-span-1"><strong>ETD / Estimate Time Departure</strong> </p>
-                                <p class="col-span-2">: {{ \Carbon\Carbon::parse($shipmentPlace_of_delivery)->format('d M Y H:i') }} </p>
+                                <p class="col-span-2">: {{ \Carbon\Carbon::parse($shipmentEstimedelivery)->format('d M Y H:i') }} </p>
                             </div>
                         </div>
 

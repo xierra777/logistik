@@ -20,8 +20,9 @@ use App\Livewire\Job\CreateJob;
 use App\Livewire\Job\EditJob;
 use App\Livewire\Job\ListJob;
 use App\Livewire\Job\ViewJob;
-
-use App\Livewire\Shipment\CreateShipments;
+use App\Livewire\Shipment\CreateShipment;
+use App\Livewire\Shipment\ListShipment;
+use App\Livewire\Shipment\ViewShipment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
@@ -92,11 +93,19 @@ Route::get('/data/airports-ajax', function () {
     ]);
 });
 
-Route::get('create-shipments', CreateShipments::class)->middleware([
+Route::get('create-shipment', CreateShipment::class)->middleware([
     'auth',
     'verified'
-])->name('create-shipments');
+])->name('create-shipment');
 
+Route::get('list-shipment', ListShipment::class)->middleware([
+    'auth',
+    'verified'
+])->name('listShipment');
+Route::get('view-shipment/{id}', ViewShipment::class)->middleware([
+    'auth',
+    'verified'
+])->name('viewShipment');
 Route::get('edit-job', EditJob::class)->middleware([
     'auth',
     'verified'

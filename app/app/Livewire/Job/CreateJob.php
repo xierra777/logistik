@@ -321,6 +321,7 @@ class CreateJob extends Component
             'title' => 'Success!', // Toast title
 
         ]);
+        $this->reset();
 
         session()->flash('message', 'Ocean FCL Export job created successfully.');
     }

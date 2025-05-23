@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Customer;
 use App\Models\ChartOfAccount;
 use Livewire\Attributes\Validate;
+use App\Models\customerAddress;
 
 
 class CreateCustomer extends Component
@@ -38,16 +39,21 @@ class CreateCustomer extends Component
         // $this->validate();
         // dd($this->name, $this->email, $this->contact, $this->country, $this->address, $this->web, $this->roles);
         // dd($this->roles);  // This will dump the roles to check if they are being passed correctly.
-        Customer::create([
+        $customer = Customer::create([
             'name'    => $this->name,
             'email'   => $this->email,
             'contact' => $this->contact,
             'country' => $this->country,
-            'address' => $this->address,
             'web'     => $this->web,
             'roles'   => $this->roles,
             'coa_id'  => $this->coa_id,
         ]);
+
+        customerAddress::create([
+            'address'      => $this->address,
+            'customer_id'  => $customer->id,
+        ]);
+
 
         return redirect()->route('customers.list')->with('success', [
             'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.

@@ -46,7 +46,7 @@ Route::view('shipment', 'shipments.create',)
 Route::get('/chart-of-accounts', ChartOfAccounts::class)->middleware([
     'auth',
     'verified'
-]);
+])->name('chartOfAccount');
 
 Route::get('/data/airports-ajax', function () {
     $token = 'dfa43c42-594a-44ed-8752-0909a8dfba7e';

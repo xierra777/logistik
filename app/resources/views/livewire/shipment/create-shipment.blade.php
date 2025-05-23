@@ -152,17 +152,20 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                        <div class="mb-4">
+                        <div class="mb-4 " wire:ignore>
                             <label for="shipmentClient_address">Client Address</label>
-                            <input type="text" id="shipmentClient_address" name="shipmentClient_address" wire:model="shipmentClient_address"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            <select name="shipmentClient_address" id="shipmentClient_address" wire:model="shipmentClient_address">
+                                <option value="">Pilih alamat</option>
+                                @foreach($shipmentClient_address as $a)
+                                <option value="{{ $a->address }}">{{ $a->address }}</option>
+                                @endforeach
+                            </select>
                             @error('shipmentClient_address')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 col-span-2 gap-3 mb-4">
                             <div class="flex flex-col space-y-3 rounded-md w-full" wire:ignore>
                                 <label class="font-bold">Shipper</label>
                                 <select wire:model="shipmentShipper_id" id="shipmentShipper_id" class="border p-2 rounded ">
-                                    <option value=""></option>
                                     @foreach($shippers as $s)
                                     <option value="{{ $s->id }}">{{ $s->name }}</option>
                                     @endforeach
@@ -883,6 +886,11 @@
             {
                 sel: '#shipmentClient_id',
                 model: 'shipmentClient_id',
+                placeholder: 'Select Client'
+            },
+            {
+                sel: '#shipmentClient_address',
+                model: 'shipmentClient_address',
                 placeholder: 'Select Client'
             },
             {

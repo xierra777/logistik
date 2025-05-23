@@ -60,10 +60,10 @@ return new class extends Migration
             $table->string('cwhtaxrate')->nullable();
             $table->string('cwhtaxamount')->nullable();
 
-            $table->string('shwtaxrateusd')->nullable()->after('svatgst');
-            $table->string('svatgstusd')->nullable()->after('shwtaxrateusd');
-            $table->string('chwtaxrateusd')->nullable()->after('cvatgst');
-            $table->string('cvatgstusd')->nullable()->after('chwtaxrateusd');
+            $table->string('shwtaxrateusd')->nullable();
+            $table->string('svatgstusd')->nullable();
+            $table->string('chwtaxrateusd')->nullable();
+            $table->string('cvatgstusd')->nullable();
             $table->timestamps();
         });
     }

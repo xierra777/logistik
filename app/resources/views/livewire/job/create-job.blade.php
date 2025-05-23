@@ -139,7 +139,7 @@
                             <select name="deliveryAgent" id="deliveryAgent_export" wire:model="deliveryAgent" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 select2">
                                 <option value="">Select agent</option>
                                 @foreach($dagentsJob as $da)
-                                @if(in_array('agent', $cr->roles))
+                                @if(in_array('agent', $da->roles))
                                 <option value="{{ $da->id }}">{{ $da->name }}</option>
                                 @endif
                                 @endforeach

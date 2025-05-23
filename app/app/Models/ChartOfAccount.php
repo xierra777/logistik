@@ -17,6 +17,10 @@ class ChartOfAccount extends Model
         'parent_account_id'
     ];
 
+    public function customers()
+    {
+        return $this->hasMany(Customer::class, 'coa_id');
+    }
     public function parent()
     {
         return $this->belongsTo(ChartOfAccount::class, 'parent_account_id');

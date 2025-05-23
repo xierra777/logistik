@@ -14,7 +14,10 @@ class EditCustomer extends Component
     public $country;
     public $customer_id;
     public $chartOfAccounts;
-    protected $listeners = ['updateCountry'];
+    protected $listeners = [
+        'updateCountry',
+        'setCountry' => 'setCountry', // Mendapatkan data dari Select2
+    ];
 
     public function updateCountry($data)
     {
@@ -35,24 +38,30 @@ class EditCustomer extends Component
         $this->chartOfAccounts = ChartOfAccount::orderBy('account_code')->get();
         $this->dispatch('syncCountry', $this->country);
     }
+
+
+    public function setCountry($value)
+    {
+        $this->country = $value;
+    }
     protected $rules = [
         'name'    => 'required|min:3',
         'email'   => 'required|email',
         'roles'   => 'min:1|array',
         'contact' => 'required',
         'address' => 'required',
+        'country' => 'required',
+        'web'     => 'required',
         'coa_id'  => 'required|exists:chart_of_accounts,id',
 
     ];
     public function updateCustomer()
     {
-        $this->validate();
         customer::where('id', $this->customer_id)->update([
             'name'    => $this->name,
             'email'   => $this->email,
             'contact' => $this->contact,
             'country' => $this->country,
-            'address' => $this->address,
             'web'     => $this->web,
             'coa_id'  => $this->coa_id,
             'roles'   => $this->roles,

@@ -16,8 +16,6 @@ class Accountant extends Component
     public function mount()
     {
         $this->coa = ChartOfAccount::count();
-        $this->shipmentWithTransactionsCount = Shipment::has('transactions')->count();
-        $this->totaltransaksi = Transaction::count();
     }
     public function render()
     {

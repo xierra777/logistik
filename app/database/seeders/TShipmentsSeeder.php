@@ -25,8 +25,7 @@ class TShipmentsSeeder extends Seeder
                 'shipmentShipper_id'  => $faker->randomElement($customers),
                 'shipmentConsignee_id' => $faker->randomElement($customers),
                 'shipmentNotify_id'   => $faker->randomElement($customers),
-                'employee_id' => $faker->unique()->numberBetween(1, 100),
-                'carrier'             => $faker->randomElement($customers),
+                'shipmentCarrierAirline'             => $faker->randomElement($customers),
                 'dataShipments'       => [
                     'vessel' => $faker->word,
                     'weight' => $faker->randomFloat(2, 100, 10000),

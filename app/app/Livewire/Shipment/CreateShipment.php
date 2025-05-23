@@ -12,12 +12,14 @@ use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
+use App\Models\customerAddress;
 
 class CreateShipment extends Component
 {
     public $step = 1;
     public $shipmentType_job = '';
     public $shipment_id = '';
+
 
     public $shippers;
     public $consignees;
@@ -27,7 +29,7 @@ class CreateShipment extends Component
     public $carriers;
     public $employe;
     public $shipmentEmployee_id;
-    public $shipmentClient_id, $shipmentShipper_id, $shipmentConsignee_id, $shipmentNotify_id, $shipmentCarrierAgent, $shipmentDeliveryAgent, $shipmentCarrierAirline, $shipmentClient_address;
+    public $shipmentClient_id, $shipmentShipper_id, $shipmentConsignee_id, $shipmentNotify_id, $shipmentCarrierAgent, $shipmentDeliveryAgent, $shipmentCarrierAirline, $shipmentClient_address = [];
 
 
     // Detail Shipment
@@ -48,12 +50,12 @@ class CreateShipment extends Component
         $this->carriers = Customer::whereJsonContains('roles', 'carrier')->get();
         $this->employe = User::all('id', 'name');
     }
+
     public function updatedShipmentClientId()
     {
-        $client = $this->clients->firstWhere('id', $this->shipmentClient_id);
-
-        $this->shipmentClient_address = $client?->address ?? '';
+        $this->shipmentClient_address = customerAddress::where('customer_id', $this->shipmentClient_id)->get();
     }
+
 
     public function previousStep()
     {

@@ -18,10 +18,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('country');
             $table->json('roles');
-            $table->text('address');
             $table->string('contact');
             $table->string('web');
-            $table->string('email')->unique();
+            $table->string('email');
+            $table->string('customer_code')->unique();
             $table->timestamps();
         });
     }

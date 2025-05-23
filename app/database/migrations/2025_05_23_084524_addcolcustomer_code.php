@@ -11,17 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('t_shipments', function (Blueprint $table) {
-
-            $table->id();
-            $table->foreignId('addressCostumer')->nullable()->constrained('costumerAddress');
-            $table->timestamps();
-        });
+        //
     }
-
 
     /**
      * Reverse the migrations.
      */
-    public function down(): void {}
+    public function down(): void
+    {
+        //
+    }
 };

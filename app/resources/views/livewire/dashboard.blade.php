@@ -12,10 +12,10 @@
                 <div class="bg-blue-900 flex between items-center justify-between p-2">
                     <h1 class="font-semibold text-neutral-100">Shipments</h1>
                     <div class="flex justify-end">
-                        <a href="{{ url('/shipments') }}" class="px-4 py-1 text-white">
+                        <a href="{{ url('/list-shipment') }}" class="px-4 py-1 text-white">
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
-                        <a href="{{ url('shipment')}}" class="px-4 py-1 text-white">
+                        <a href="{{ url('create-shipment')}}" class="px-4 py-1 text-white">
                             <i class="fa-solid fa-plus"></i>
                         </a>
                     </div>
@@ -23,7 +23,7 @@
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700 rounded-md">
                     <thead class="bg-gray-50 dark:bg-neutral-800 rounded-t-xl">
                         <tr>
-                            <th class="px-6 py-3 text-xs font-bold text-gray-500 uppercase dark:text-neutral-400">B/L</th>
+                            <th class="px-6 py-3 text-xs font-bold text-gray-500 uppercase dark:text-neutral-400">Shipment ID</th>
                             <th class="px-6 py-3 text-xs font-bold text-gray-500 uppercase dark:text-neutral-400">Shipper</th>
                         </tr>
                     </thead>
@@ -32,7 +32,7 @@
                         @forelse($shipments as $shipment)
                         <tr class="hover:bg-gray-50 dark:hover:bg-neutral-600 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600 dark:text-neutral-300 hover:underline hover:text-blue-900 ">
-                                <a wire:navigate href="/view-shipments/{{ $shipment->id }}">{{ $shipment->shipment_id }}</a>
+                                <a wire:navigate href="/view-shipment/{{ $shipment->id }}">{{ $shipment->shipment_id }}</a>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 dark:text-neutral-300 font-semibold">
                                 {{ $shipment->shipper?->name }}
@@ -96,7 +96,7 @@
             </div>
         </div>
 
-        {{-- Customers Section --}}
+        {{-- User Section --}}
         <div class="shadow-md rounded-md  h-full">
             <div class="overflow-x-auto rounded-md">
                 <div class="bg-orange-400 flex between items-center justify-between p-2">
@@ -114,6 +114,7 @@
                     <thead class="bg-gray-50 dark:bg-neutral-800 rounded-t-xl">
                         <tr>
                             <th class="px-6 py-3 text-xs font-bold text-gray-500 uppercase dark:text-neutral-400">Name</th>
+                            <th class="px-6 py-3 text-xs font-bold text-gray-500 uppercase dark:text-neutral-400">Roles</th>
                             <th class="px-6 py-3 text-xs font-bold text-gray-500 uppercase dark:text-neutral-400">Country</th>
                         </tr>
                     </thead>
@@ -126,6 +127,52 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 dark:text-neutral-300 font-semibold uppercase">
                                 {{ implode(', ', $c->roles) }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600 dark:text-neutral-300  ">
+                                {{ $c->country }}
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="2" class="py-12 text-center">
+                                <p class="text-gray-600 dark:text-neutral-300 text-lg font-medium mb-2">No customers found!</p>
+                                <p class="text-sm text-gray-500 dark:text-neutral-500">Start by adding customers.</p>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="shadow-md rounded-md  h-full">
+            <div class="overflow-x-auto rounded-md">
+                <div class="bg-orange-400 flex between items-center justify-between p-2">
+                    <h1 class="font-semibold text-neutral-100">Customers</h1>
+                    <div class="flex justify-end">
+                        <a href="{{ url('/customers') }}" class="px-4 py-1 text-white">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                        <a href="" class="px-4 py-1 text-white">
+                            <i class="fa-solid fa-plus"></i>
+                        </a>
+                    </div>
+                </div>
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-neutral-700 rounded-md">
+                    <thead class="bg-gray-50 dark:bg-neutral-800 rounded-t-xl">
+                        <tr>
+                            <th class="px-6 py-3 text-xs font-bold text-gray-500 uppercase dark:text-neutral-400">Name</th>
+                            <th class="px-6 py-3 text-xs font-bold text-gray-500 uppercase dark:text-neutral-400">Email</th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-gray-200 dark:divide-neutral-700 bg-white dark:bg-neutral-900 rounded-xl">
+                        @forelse($users as $s)
+                        <tr class="hover:bg-gray-50 dark:hover:bg-neutral-600 transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600 dark:text-neutral-300 hover:underline hover:text-blue-900 text-center">
+                                {{ $s->name }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600 dark:text-neutral-300 hover:underline hover:text-blue-900 text-center">
+                                {{ $s->email }}
                             </td>
                         </tr>
                         @empty

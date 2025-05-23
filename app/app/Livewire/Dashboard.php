@@ -4,9 +4,10 @@ namespace App\Livewire;
 
 use Livewire\WithPagination;
 use Livewire\Component;
-use App\Models\Shipment;
+use App\Models\TShipments;
 use App\Models\TJob;
 use App\Models\Customer;
+use App\Models\User;
 
 class Dashboard extends Component
 {
@@ -18,10 +19,11 @@ class Dashboard extends Component
 
     public function render()
     {
-        $shipments = Shipment::with('shipper', 'consignee', 'notify')->latest()->paginate($this->perPage);
-        $customers = Customer::select('id', 'name', 'roles')->latest()->paginate($this->perPage);
+        $shipments = TShipments::with('shipper', 'consignee', 'notify')->latest()->paginate($this->perPage);
+        $customers = Customer::select('id', 'name', 'roles', 'country')->latest()->paginate($this->perPage);
         $jobs = TJob::with('client')->latest()->paginate($this->perPage);
+        $users = User::select('name', 'email',)->latest()->paginate($this->perPage);
 
-        return view('livewire.dashboard', compact('shipments', 'customers', 'jobs'));
+        return view('livewire.dashboard', compact('shipments', 'customers', 'jobs', 'users'));
     }
 }

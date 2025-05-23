@@ -536,7 +536,7 @@
                         <!-- Client and Job Type Info -->
                         <div class="flex flex-col space-y-3  rounded-md">
                             <label>Client</label>
-                            <input type="text" value="{{ $this->clientName->name }}" readonly
+                            <input type="text" value="{{ $this->clientName->name ?? '-'  }}" readonly
                                 class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0"
                                 placeholder="Nama client akan muncul otomatis">
                             @error('container_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
@@ -559,8 +559,8 @@
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3  gap-3">
                         <div class="w-full " wire:ignore>
-                            <label for="shipmentCarrierAirline">Carrier</label>
-                            <select name="shipmentCarrierAirline" id="shipmentCarrierAirline" wire:model="shipmentCarrierAirline" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            <label for="containerShipmentCarrierAirline">Carrier</label>
+                            <select name="containerShipmentCarrierAirline" id="containerShipmentCarrierAirline" wire:model="containerShipmentCarrierAirline" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                 <option value="">Select Carrier</option>
                                 @foreach($carriers as $cr)
                                 @if(in_array('carrier', $cr->roles))
@@ -938,6 +938,10 @@
                 placeholder: 'Select Employee '
             },
             {
+                sel: '#containerShipmentCarrierAirline',
+                model: 'containerShipmentCarrierAirline',
+                placeholder: 'Select Employee '
+            }, {
                 sel: '#typeOfShipmentVolume',
                 model: 'typeOfShipmentVolume',
                 placeholder: 'Select Employee '

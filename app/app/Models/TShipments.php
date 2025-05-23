@@ -6,7 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class TShipments extends Model
 {
-    protected $casts = ['dataShipments' => 'array'];
+    protected $casts = [
+        'dataShipments' => 'array',
+        'dataContainers' => 'array',
+    ];
 
     protected $fillable = [
         'id_job',
@@ -22,16 +25,26 @@ class TShipments extends Model
     ];
     public function job()
     {
-        return $this->belongsTo(TJob::class, 'id_job'); // nullable
+        return $this->belongsTo(TJob::class, 'id_job');
     }
-    public function shipmentContainers()
+    public function container()
     {
         return $this->hasMany(shipmentContainers::class, 'id_shipments');
     }
+
     public function client()
     {
         return $this->belongsTo(Customer::class, 'shipmentClient_id');
     }
+    public function carrierModel()
+    {
+        return $this->belongsTo(Customer::class, 'carrier');
+    }
+    public function employee()
+    {
+        return $this->belongsTo(user::class, 'employee_id');
+    }
+
     public function ogents()
     {
         return $this->belongsTo(Customer::class, 'ogentsJob');

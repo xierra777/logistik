@@ -199,8 +199,6 @@ class CreateShipment extends Component
     public function ocean_fcl_export()
     {
         $container = [
-            'shipmentFlightVesselName'     => $this->shipmentFlightVesselName,
-            'shipmentFlightVesselNo'       => $this->shipmentFlightVesselNo,
             'shipmentNoOfPackages'         => $this->shipmentNoOfPackages,
             'shipmentContainerDeliveryAgent' => $this->shipmentContainerDeliveryAgent,
             'shipmentGrossWeight'          => $this->shipmentGrossWeight,
@@ -214,8 +212,11 @@ class CreateShipment extends Component
             'shipmentTypeOfGrossWeight'    => $this->shipmentTypeOfGrossWeight,
             'shipmentTypeOfPackages'       => $this->shipmentTypeOfPackages,
             'typeOfShipmentVolume'         => $this->typeOfShipmentVolume,
+            'containerShipmentCarrierAirline' => $this->containerShipmentCarrierAirline,
         ];
         $payload = [
+            'shipmentFlightVesselName'     => $this->shipmentFlightVesselName,
+            'shipmentFlightVesselNo'       => $this->shipmentFlightVesselNo,
             'shipmentCustomerCodeJob'      => $this->shipmentCustomerCodeJob,
             'shipmentBillLadingDate'       => $this->shipmentBillLadingDate,
             'shipmentPort_of_loading'      => $this->shipmentPort_of_loading,
@@ -255,7 +256,9 @@ class CreateShipment extends Component
             'shipmentShipper_id'     => $this->shipmentShipper_id,
             'shipmentConsignee_id'    => $this->shipmentConsignee_id,
             'shipmentNotify_id'         => $this->shipmentNotify_id,
-            'employee_id' => $this->shipmentEmployee_id,
+            'shipmentClient_address'    => $this->shipmentClient_address,
+            'shipmentCarrierAirline'      => $this->shipmentCarrierAirline,
+            'employee_id        ' => $this->shipmentEmployee_id,
             'dataShipments'              => $payload,
         ]);
 

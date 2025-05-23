@@ -34,12 +34,12 @@ new class extends Component
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <!-- <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('shipments')" :active="request()->routeIs('shipments','shipment','view-shipments')">
                         {{ __('Shipments') }}
                     </x-nav-link>
-                </div>
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                </div> -->
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex ">
                     <x-nav-link :href="route('listShipment')" :active="request()->routeIs('listShipment','viewShipment','createShipment')">
                         {{ __('Shipments') }}
                     </x-nav-link>

@@ -61,8 +61,8 @@
             <table class="min-w-max w-full table-auto divide-y divide-gray-200 dark:divide-neutral-700">
                 <thead class="bg-gray-50 dark:bg-neutral-800">
                     <tr>
-                        @foreach (['Job No', 'Client', 'Department', 'POL', 'POD', 'ETD', 'ETA', 'Action'] as $th)
-                        <th scope="col" class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase dark:text-neutral-400 text-left">
+                        @foreach (['Shipment No', 'Client', 'Department', 'POL', 'POD', 'ETD', 'ETA', 'Action'] as $th)
+                        <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase dark:text-neutral-400 ">
                             {{ $th }}
                         </th>
                         @endforeach

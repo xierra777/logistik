@@ -525,7 +525,7 @@
     <div class="mt-3 mb-4 shadow-xl">
 
         <div class="bg-cyan-500 rounded-t-lg p-3 ">
-            <p class="text-lg font-bold text-center ">Shipments ( Under Construction )</p>
+            <p class="text-lg font-bold text-center ">Shipments </p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-2 p-3">
             @forelse ($this->assignedShipments as $s)

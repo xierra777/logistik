@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignId('shipmentShipper_id')->nullable()->constrained('customers');
             $table->foreignId('shipmentConsignee_id')->nullable()->constrained('customers');
             $table->foreignId('shipmentNotify_id')->nullable()->constrained('customers');
-            $table->foreignId('carrier')->nullable()->constrained('customers');
+            $table->foreignId('shipmentCarrierAirline')->nullable()->constrained('customers');
             $table->foreignid('employee_id')->nullable()->constrained('users');
             $table->json('dataShipments');
             $table->timestamps();

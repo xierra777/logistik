@@ -19,6 +19,10 @@ class TJob extends Model
         'data',
     ];
 
+    public function shipments()
+    {
+        return $this->hasMany(TShipments::class, 'id_job');
+    }
     public function TjobContainer()
     {
         return $this->hasMany(jobContainer::class, 'id_job');

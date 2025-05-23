@@ -1,157 +1,190 @@
 <div class="p-3 bg-white shadow sm:rounded-lg">
-    <div class="text-center p-3 bg-blue-500 rounded-t-lg font-bold">
-        <p class="">Details Job</p>
+    <div class="text-center p-3 bg-gray-100 border border-gray-40 rounded-t-lg font-bold">
+        <p class="">Details Shipments</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 shadow-lg">
         <div class="flex flex-col">
-            <p class="text-center bg-gray-300 px-3 py-1">Type Job </p>
-            <p class="text-center px-4 py-2"> {{ strtoupper(str_replace('_', ' ', $job->type_job)) }}</p>
+            <p class="text-center bg-gray-300 px-3 py-1">Shipment No </p>
+            <p class="text-center px-4 py-2"> {{ $shipments->shipment_id }}</p>
         </div>
         <div class="flex flex-col">
-            <p class="text-center bg-gray-300 px-3 py-1">Job No </p>
-            <p class="text-center px-4 py-2"> {{ $job->job_id }}</p>
+            <p class="text-center bg-gray-300 px-3 py-1">Shipment Date</p>
+            <p class="text-center font-bold px-4 py-2"> {{ $shipments->dataShipments['shipmentBillLadingDate'] ?? '-' }}</p>
         </div>
-        @if($type_job === 'ocean_fcl_export' ||$type_job === 'air_outbound' )
-        <div class="flex flex-col">
-            <p class="text-center bg-gray-300 px-3 py-1">Delivery Agent </p>
-            <p class="text-center  px-4 py-2 font-bold"> {{$job->dagents->name}}</p>
-        </div>
-        @elseif($type_job === 'ocean_fcl_import')
-        <div class="flex flex-col">
-            <p class="text-center bg-gray-300 px-3 py-1">Origin Agent </p>
-            <p class="text-center px-4 py-2"> {{$job->oagents->name}}</p>
-        </div>
-        @else
-        Default Agent
-        @endif
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Client </p>
-            <p class="text-center px-4 py-2 font-bold"> {{ $job->client->name ?? '-' }}</p>
+            <p class="text-center px-4 py-2 font-bold"> {{ $shipments->client->name ?? '-' }}</p>
+        </div>
+        <div class="flex flex-col">
+            <p class="text-center bg-gray-300 px-3 py-1">Type Job </p>
+            <p class="text-center px-4 py-2"> {{ strtoupper(str_replace('_', ' ', $shipments->shipmentsTypeJob)) }}</p>
         </div>
         <div class="flex flex-col"> <!-- Disini Custome  -->
             <p class="text-center bg-gray-300 px-3 py-1">Customer Code Job </p>
-            <p class="text-center font-bold px-4 py-2"> {{ $job->data['customerCodeJob'] }}</p>
-        </div>
-        @if($type_job === 'ocean_fcl_export')
-        <div class="flex flex-col">
-            <p class="text-center bg-gray-300 px-3 py-1">MBL No </p>
-            <p class="text-center font-bold px-4 py-2"> {{ $job->data['jobBillLadingNo'] }}</p>
-        </div>
-        <div class="flex flex-col">
-            <p class="text-center bg-gray-300 px-3 py-1">MBL Date </p>
-            <p class="text-center px-4 py-2"> {{ $job->data['jobBillLadingDate'] }}</p>
-        </div>
-        @elseif($type_job === 'air_outbound')
-        <div class="flex flex-col">
-            <p class="text-center bg-gray-300 px-3 py-1">MAWB No </p>
-            <p class="text-center font-bold px-4 py-2"> {{ $job->data['jobBillLadingNo'] }}</p>
-        </div>
-        <div class="flex flex-col">
-            <p class="text-center bg-gray-300 px-3 py-1">MAWB Date </p>
-            <p class="text-center px-4 py-2"> {{ $job->data['jobBillLadingDate'] }}</p>
-        </div>
-        @endif
-
-        <div class="flex flex-col">
-            <p class="text-center bg-gray-300 px-3 py-1">Cross Trade </p>
-            <p class="text-center px-4 py-2 uppercase"> {{ $job->data['cross_trade'] }}</p>
-        </div>
-        <div class="flex flex-col">
-            <p class="text-center bg-gray-300 px-3 py-1">Inco Terms </p>
-            <p class="text-center uppercase px-4 py-2"> {{ strtoupper($job->data['incoTerms'] ?? '-') }}</p>
+            <p class="text-center font-bold px-4 py-2"> {{ $shipments->dataShipments['customerCodeJob'] ?? '-' }}</p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Freight </p>
-            <p class="text-center px-4 py-2"> {{ strtoupper($job->data['freightTypeJob'] ?? '-') }}</p>
+            <p class="text-center px-4 py-2"> {{ strtoupper($shipments->dataShipments['shipmentFreightTypeJob'] ?? '-') }}</p>
         </div>
         <div class="flex flex-col">
-            <p class="text-center bg-gray-300 px-3 py-1"> Employee </p>
-            <p class="text-center px-4 py-2"> {{ $job->employee->name }}</p>
+            <p class="text-center bg-gray-300 px-3 py-1">Port of Loading </p>
+            <p class="text-center px-4 py-2">
+                {{$shipments->dataShipments['shipmentPort_of_loading'] ?? 'No'}}
+            </p>
+        </div>
+        <div class="flex flex-col">
+            <p class="text-center bg-gray-300 px-3 py-1">Place of Receipt </p>
+            <p class="text-center px-4 py-2">
+                {{$shipments->dataShipments['shipmentPlace_of_receipt'] ?? ''}}
+            </p>
+        </div>
+        <div class="flex flex-col">
+            <p class="text-center bg-gray-300 px-3 py-1">Place of delivery </p>
+            <p class="text-center px-4 py-2">
+                {{$shipments->dataShipments['shipmentPlace_of_delivery'] ?? ''}}
+            </p>
+        </div>
+        <div class="flex flex-col">
+            <p class="text-center bg-gray-300 px-3 py-1">Port of Receipt </p>
+            <p class="text-center px-4 py-2">
+                {{$shipments->dataShipments['shipmentPort_of_loading'] ?? ''}}
+            </p>
+        </div>
+
+        <div class="flex flex-col">
+            <p class="text-center bg-gray-300 px-3 py-1">Port of Discharge </p>
+            <p class="text-center px-4 py-2">
+                {{$shipments->dataShipments['shipmentPort_of_discharge'] ?? ''}}
+            </p>
+        </div>
+        <div class=<div class="flex flex-col">
+            <p class="text-center bg-gray-300 px-3 py-1">Port of Final </p>
+            <p class="text-center px-4 py-2">
+                {{$shipments->dataShipments['shipmentPort_of_final'] ?? ''}}
+            </p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Remarks </p>
             <p class="text-center text-red-500 px-4 py-2">
-                {{$job->data['remarksJobDetailJobs'] ?? ''}}
+                {{$shipments->dataShipments['shipmentRemarksJobDetailJobs'] ?? ''}}
             </p>
         </div>
+        @if($shipments->job)
+        <div class="col-span-3 border bg-sky-300 border-gray-300 mt-3">
+            <div class="grid grid-cols-1 md:grid-cols-3 ">
+                <div class="flex flex-col">
+                    <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">Job No </p>
+                    <p class="text-center text-red-500 border font-bold text-md border-gray-900 px-4 py-2">
+                        <a href="{{  $shipments->job ? route('viewJob', ['id' => $shipments->job->id]) : '#' }}"> {{$shipments->job->job_id ?? '-'}}</a>
+                    </p>
+                </div>
+                <div class="flex flex-col">
+                    <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">POL </p>
+                    <p class="text-center border border-gray-900 px-4 py-2">
+                        {{$shipments->dataShipments['shipmentPort_of_loading'] ?? '-'}}.
+                    </p>
+                </div>
+                <div class="flex flex-col">
+                    <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">POD </p>
+                    <p class="text-center text-gray-500 border  border-gray-900 px-4 py-2">
+                        {{$shipments->job->data['place_of_delivery'] ?? '-'}}.
+                    </p>
+                </div>
+                <div class="flex flex-col">
+                    <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">Job No </p>
+                    <p class="text-center text-red-500 border font-bold text-md border-gray-900 px-4 py-2">
+                        @isset($shipments->job)
+                        <a href="{{ route('viewJob', ['id' => $shipments->job->id]) }}"> {{$shipments->job->job_id ?? '-'}}</a>
+                        @else
+                        @endisset
+                    </p>
+                </div>
+                <div class="flex flex-col">
+                    <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">POL </p>
+                    <p class="text-center border border-gray-900 px-4 py-2">
+                        {{$shipments->job->data['port_of_loading'] ?? '-'}}.
+                    </p>
+                </div>
+                <div class="flex flex-col">
+                    <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">POD </p>
+                    <p class="text-center text-gray-500 border  border-gray-900 px-4 py-2">
+                        {{$shipments->job->data['place_of_delivery'] ?? '-'}}.
+                    </p>
+                </div>
+            </div>
+        </div>
+        @else
+        @endif
     </div>
 
     <div class="text-center p-3 bg-orange-500 rounded-t-lg font-bold mt-4">
-        <p class="">Details Vessel / FLight</p>
+        <p class="">Info Details</p>
     </div>
     <div>
         <div class="grid grid-cols-1 md:grid-cols-3 shadow-lg">
             <div class="flex flex-col">
-                <p class="text-center bg-gray-300 px-3 py-1">Carrier </p>
-                <p class="text-center px-4 py-2"> {{ $job->carrierModel->name ?? '-' }}</p>
-            </div>
-            <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">Vessel Name </p>
-                <p class="text-center px-4 py-2"> {{ $job->data['flightVesselName'] }}</p>
+                <p class="text-center px-4 py-2">{{ $shipments->dataShipments['shipmentFlightVesselName'] ?? '-' }}
+                </p>
             </div>
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">Voyage </p>
-                <p class="text-center px-4 py-2"> {{ $job->data['flightVesselNo'] }}</p>
+                <p class="text-center px-4 py-2"> {{ $shipments->dataShipments['shipmentFlightVesselNo'] ?? '-' }}</p>
             </div>
+            <div class="flex flex-col">
+                <p class="text-center bg-gray-300 px-3 py-1">Carrier </p>
+                <p class="text-center px-4 py-2"> {{ $shipments->carrierModel->name ?? '-' }}</p>
+            </div>
+            <!-- i -->
+            <div class="flex flex-col">
+                <p class="text-center bg-gray-300 px-3 py-1">MBL </p>
+                <p class="text-center px-4 py-2"> {{ $shipments->job->data['jobBillLadingNo'] ?? '-' }}</p>
+            </div>
+            <div class="flex flex-col">
+                <p class="text-center bg-gray-300 px-3 py-1">MBL Date </p>
+                <p class="text-center px-4 py-2"> {{ $shipments->job->data['jobBillLadingDate'] ?? '-' }}</p>
+            </div>
+            <div class="flex flex-col">
+
+            </div>
+            <!-- Ini khusus HBL atau HAWB luar  -->
+            <div class="flex flex-col">
+                <p class="text-center bg-gray-300 px-3 py-1">HBL </p>
+                <p class="text-center px-4 py-2"> {{ $shipments->job->job_id ?? '-' }}</p>
+            </div>
+            <div class="flex flex-col">
+                <p class="text-center bg-gray-300 px-3 py-1">HBL Date </p>
+                <p class="text-center px-4 py-2"> {{ $shipments->job->d ?? '-' }}</p>
+            </div>
+            <div class="flex flex-col w-40">
+
+            </div>
+            <!-- End disini -->
 
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">ETA / Estimate Time Arrival </p>
-                <p class="text-center px-4 py-2"> {{ isset($job->data['estimedelivery']) ? \Carbon\Carbon::parse($job->data['estimearrival'])->format('l, d F Y H:i'	) : '-' }}</p>
+                <p class="text-center px-4 py-2"> {{ isset($shipments->dataShipments['shipmentEstimearrival']) ? \Carbon\Carbon::parse($shipments->dataShipments['shipmentEstimearrival'])->format('l, d F Y H:i'	) : '-' }}</p>
             </div>
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">ETD / Estimate Time Departure </p>
                 <p class="text-center px-4 py-2">
-                    {{ isset($job->data['estimedelivery']) ? \Carbon\Carbon::parse($job->data['estimedelivery'])->format('l, d F Y H:i'	) : '-' }}
-                </p>
-            </div>
-            <div class="flex flex-col">
-                <p class="text-center bg-gray-300 px-3 py-1">Hazardous </p>
-                <p class="text-center px-4 py-2">
-                    {{$job->data['hazardousClassType'] ?? 'No'}}
-                </p>
-            </div>
-            <div class="flex flex-col">
-                <p class="text-center bg-gray-300 px-3 py-1">Port of Loading </p>
-                <p class="text-center px-4 py-2">
-                    {{$job->data['port_of_loading'] ?? 'No'}}
-                </p>
-            </div>
-            <div class="flex flex-col">
-                <p class="text-center bg-gray-300 px-3 py-1">Place of Receipt </p>
-                <p class="text-center px-4 py-2">
-                    {{$job->data['place_of_receipt'] ?? ''}}
-                </p>
-            </div>
-            <div class="flex flex-col">
-                <p class="text-center bg-gray-300 px-3 py-1">Place of delivery </p>
-                <p class="text-center px-4 py-2">
-                    {{$job->data['place_of_delivery'] ?? ''}}
-                </p>
-            </div>
-            <div class="flex flex-col">
-                <p class="text-center bg-gray-300 px-3 py-1">Port of Receipt </p>
-                <p class="text-center px-4 py-2">
-                    {{$job->data['port_of_receipt'] ?? ''}}
+                    {{ isset($shipments->dataShipments['shipmentEstimedelivery']) ? \Carbon\Carbon::parse($shipments->dataShipments['shipmentEstimedelivery'])->format('l, d F Y H:i'	) : '-' }}
                 </p>
             </div>
 
-            <div class="flex flex-col">
-                <p class="text-center bg-gray-300 px-3 py-1">Port of Discharge </p>
-                <p class="text-center px-4 py-2">
-                    {{$job->data['port_of_discharge'] ?? ''}}
-                </p>
-            </div>
-            <div class=<div class="flex flex-col">
-                <p class="text-center bg-gray-300 px-3 py-1">Port of Final </p>
-                <p class="text-center px-4 py-2">
-                    {{$job->data['port_of_final'] ?? ''}}
-                </p>
-            </div>
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">Services Type </p>
-                <p class="text-center uppercase px-4 py-2"> {{ strtoupper($job->data['servicesType'] ?? '-') }}</p>
+                <p class="text-center uppercase px-4 py-2"> {{ strtoupper($shipments->dataShipments['shipmentServices_type'] ?? '-') }}</p>
             </div>
-
+            <div class="flex flex-col">
+                <p class="text-center bg-gray-300 px-3 py-1">Cross Trade </p>
+                <p class="text-center px-4 py-2 uppercase"> {{ $shipments->dataShipments['shipmentCross_trade'] }}</p>
+            </div>
+            <div class="flex flex-col">
+                <p class="text-center bg-gray-300 px-3 py-1">Inco Terms </p>
+                <p class="text-center uppercase px-4 py-2"> {{ strtoupper($shipments->dataShipments['shipmentIncoTerms'] ?? '-') }}</p>
+            </div>
         </div>
     </div>
     <div class="mt-3 rounded-lg shadow-lg">
@@ -194,32 +227,32 @@
                         <td scope="col" class="px-6 py-4  text-xs font-medium text-gray-800 dark:text-neutral-200">
                             {{ $org['label']  }}
                         </td>
-                        <td scope="col" class="px-6 py-4  text-xs font-medium text-gray-800 dark:text-neutral-200">
-                            {{$org['data']->name ?? '-'}}
+                        <td scope="col" class="px-6 py-4  text-left text-xs font-medium text-gray-800 dark:text-neutral-200">
+                            {{$org['dataShipments']->name ?? '-'}}
                         </td>
                         <td scope="col" class="px-6 py-4  text-xs font-medium text-gray-800 dark:text-neutral-200">
-                            {{$org['data']->address ?? '-'}}
+                            {{$org['dataShipments']->address ?? '-'}}
                         </td>
                         <td scope="col" class="px-6 py-4  text-xs font-medium text-gray-800 dark:text-neutral-200">
-                            {{$org['data']->email ?? '-'}}
+                            {{$org['dataShipments']->email ?? '-'}}
                         </td>
                         <td scope="col" class="px-6 py-4  text-xs font-medium text-gray-800 dark:text-neutral-200">
-                            {{$org['data']->contact ?? '-'}}
+                            {{$org['dataShipments']->contact ?? '-'}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            <button href="" class="py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg
-                            transform transition duration-200 ease-in-out shadow:hover-cyan-200
-                            hover:bg-cyan-400 hover:scale-110 ">
-                                <i class="fa-regular fa-file"></i> See Attachment
-                            </button>
+                            <a href="{{ url('view-customers/' . $org['dataShipments']->id) }}"
+                                class="py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg
+                      transform transition duration-200 ease-in-out hover:bg-cyan-400 hover:scale-105">
+                                <i class="fa-regular fa-user"></i> View Customer
+                            </a>
                         </td>
                     </tr>
                     @empty
                     <tr wire:loading.remove>
                         <td colspan=" 7" class="py-12 text-center">
                             <div class="flex flex-col items-center justify-center">
-                                <img src="{{ asset('images/nodata.svg') }}"
-                                    alt="No data illustration"
+                                <img src="{{ asset('images/nodataShipments.svg') }}"
+                                    alt="No dataShipments illustration"
                                     class="w-64 h-48 mb-4 opacity-75 dark:opacity-50">
                                 <p class="text-lg font-medium text-gray-600 dark:text-neutral-300">
                                     No Contaner found!
@@ -232,7 +265,7 @@
                     </tr>
                     <tr wire:loading class="animate-pulse">
                         <td colspan="6" class="py-12 text-center text-gray-500 dark:text-neutral-400">
-                            Retrieving data…
+                            Retrieving dataShipments…
                         </td>
                     </tr>
                     @endforelse
@@ -241,11 +274,11 @@
         </div>
 
     </div>
-    <div class="mt-3 shadow-xl">
+    <div class="mt-3 shadow-xl shadow-lg">
         <div class="bg-blue-600 rounded-t-lg mt-4 ">
             <p class="text-center mt-4 p-3  font-bold">Containers</p>
         </div>
-        <div x-data="{ openCreateContainer: false }"
+        <div x-dataShipments="{ openCreateContainer: false }"
             @close-create-container.window="openCreateContainer = false">
 
             <div class="flex justify-end p-3">
@@ -453,13 +486,7 @@
                             No
                         </th>
                         <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
-                            No Activity / No Container
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
-                            Type Container
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
-                            Gross Weight
+                            No Activity / Container No
                         </th>
                         <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Volume
@@ -470,37 +497,32 @@
                     </tr>
                 </thead>
                 <tbody class="">
-                    @forelse($job->TjobContainer as $c)
+                    @forelse($shipments->container as $c)
                     <tr>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $loop->iteration  * 10 }}
                         </td>
-                        <td scope=" col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$c->containers['containerNo'] ?? ''}}
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$c->jobContainer->containers['containerNo'] ?? ''}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$c->containers['containerType'] ?? ''}}
+                            {{$c->containersData['shipmentNoOfPackages'] ?? ''}}
                         </td>
+
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$c->containers['grossWeight'] ?? ''}}
-                        </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$c->containers['netOfWeight'] ?? ''}}
-                        </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            <button href="" class="py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg
-                            transform transition duration-200 ease-in-out shadow:hover-cyan-200
-                            hover:bg-cyan-400 hover:scale-110 ">
+                            <a href="{{ url('view-shipment/' . $shipments->id . '/container-shipment/' . $c->id) }}"
+                                class="inline-block py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg
+       transition duration-200 ease-in-out hover:bg-cyan-400 hover:scale-110">
                                 <i class="fa-regular fa-file"></i> See Attachment
-                            </button>
+                            </a>
                         </td>
                     </tr>
                     @empty
                     <tr wire:loading.remove>
                         <td colspan=" 7" class="py-12 text-center">
                             <div class="flex flex-col items-center justify-center">
-                                <img src="{{ asset('images/nodata.svg') }}"
-                                    alt="No data illustration"
+                                <img src="{{ asset('images/nodataShipments.svg') }}"
+                                    alt="No dataShipments illustration"
                                     class="w-64 h-48 mb-4 opacity-75 dark:opacity-50">
                                 <p class="text-lg font-medium text-gray-600 dark:text-neutral-300">
                                     No Contaner found!
@@ -513,7 +535,7 @@
                     </tr>
                     <tr wire:loading class="animate-pulse">
                         <td colspan="6" class="py-12 text-center text-gray-500 dark:text-neutral-400">
-                            Retrieving data…
+                            Retrieving dataShipments…
                         </td>
                     </tr>
                     @endforelse
@@ -522,221 +544,18 @@
         </div>
 
     </div>
-    <div class="mt-3 mb-4 shadow-xl">
-
-        <div class="bg-cyan-500 rounded-t-lg p-3 ">
-            <p class="text-lg font-bold text-center ">Shipments </p>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 p-3">
-            @forelse ($this->assignedShipments as $s)
-
-            <div class="bg-gradient-to-br from-emerald-500 via-teal-400 to-cyan-300 rounded-xl shadow-xl w-full max-w p-6 text-white space-y-4 hover:scale-[1.03] transition-transform duration-300 ease-in-out">
-                <a href="{{ url('view-shipment/' . $s->id) }}" class="block space-y-1">
-                    <div class="flex justify-center">
-
-                        @php
-                        $type = $s->shipmentsTypeJob;
-                        $icons = [
-                        'ocean_fcl_import' => 'fa-anchor',
-                        'ocean_fcl_export' => 'fa-ship',
-                        'air_import' => 'fa-plane-arrival',
-                        'air_export' => 'fa-plane-departure',
-                        'trucking' => 'fa-truck',
-                        'default' => 'fa-box',
-                        ];
-
-                        $iconClass = $icons[$type] ?? $icons['default'];
-                        @endphp
-
-                        <p class="mb-2 text-xs bg-purple-500 text-white rounded-full px-4 py-1 font-semibold shadow flex items-center gap-2">
-                            <i class="fas {{ $iconClass }}"></i>
-                            {{ strtoupper(str_replace('_', ' ', $type)) }}
-                        </p>
-                    </div>
-                    <div class="text-sm text-black font-medium">ID: {{ $s->shipment_id }}</div>
-                    <div class="text-sm text-black ">Client: {{ optional($s->client)->name }}</div>
-                </a>
-            </div>
-
-            @empty
-            <div class="bg-gray-200 p-4 text-gray-500 font-bold shadow col-span-3 text-center">
-                <p class="text-sm">No shipments assigned.</p>
-                <p class="text-xs">Click "Add Shipments" to assign.</p>
-            </div>
-            @endforelse
-        </div>
-
-        <div class="mt-3 p-1 gap-2 flex flex-row ">
-            <button class="bg-blue-600 text-white rounded-lg py-1 px-5 hover:scale-105"> Add Shipments</button>
-            <div x-data="{ openDetachAssigned: false }" @close-detach-assigned.window="openDetachAssigned = false">
-                <button @click="openDetachAssigned = true"
-                    class="bg-red-600 text-white rounded-lg py-1 px-5 hover:scale-105 transition-transform">
-                    <i class="fa-solid fa-file-export"></i> Detach Shipment
-                </button>
-
-                <div x-cloak x-show="openDetachAssigned"
-                    x-transition:enter="transition ease-out duration-300 delay-150"
-                    x-transition:enter-start="opacity-0"
-                    x-transition:enter-end="scale-100 opacity-100"
-                    x-transition:leave="transition ease-in duration-200"
-                    x-transition:leave-start="scale-100 opacity-100"
-                    x-transition:leave-end="opacity-0"
-                    class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
-
-                    <div class="bg-white rounded-xl shadow-xl w-full max-w-7xl p-6 space-y-4 relative z-50
-        max-h-[80vh] flex flex-col">
-                        <div class="p-3 flex items-center">
-                            <button @click="openDetachAssigned = false"
-                                class="absolute top-3 right-3 text-gray-500 bg-gray-200 border border-gray-200 rounded-full py-1 px-2 hover:text-gray-800 text-2xl font-bold leading-none">
-                                &times;
-                            </button>
-                        </div>
-
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Shipment Terhubung ke Job Ini</h3>
-
-                        <div class="overflow-auto flex-grow border rounded-md shadow-inner">
-                            <table class="w-full table-auto text-center min-w-[700px]">
-                                <thead class="bg-gray-100 sticky top-0">
-                                    <tr>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">No</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left"></th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Shipment Id</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">POL</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">POD</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">ETA</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">ETD</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($this->assignedShipments as $s)
-                                    <tr class="border-b last:border-b-0 hover:bg-gray-50">
-                                        <td class="px-4 py-2 text-left">{{ $loop->iteration }}</td>
-                                        <td class="px-4 py-2 text-left">
-                                            <input type="checkbox" wire:model="selectedAssignedShipments" value="{{ $s->id }}"
-                                                class="form-checkbox text-red-600 rounded-md">
-                                        </td>
-                                        <td class="px-4 py-2 text-left">{{ $s->shipment_id }}</td>
-                                        <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_loading'] ?? '-' }}</td>
-                                        <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_discharge'] ?? '-' }}</td>
-                                        <td class="px-4 py-2 text-left">
-                                            {{ isset($s->dataShipments['shipmentEstimearrival']) ? \Carbon\Carbon::parse($s->dataShipments['shipmentEstimearrival'])->format('d F Y') : '-' }}
-                                        </td>
-                                        <td class="px-4 py-2 text-left">
-                                            {{ isset($s->dataShipments['shipmentEstimedelivery']) ? \Carbon\Carbon::parse($s->dataShipments['shipmentEstimedelivery'])->format('d F Y') : '-' }}
-                                        </td>
-                                    </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="7" class="text-center py-4 text-gray-500">Tidak ada shipment yang terhubung.</td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="flex justify-end space-x-2 mt-4">
-                            <button @click="openDetachAssigned = false"
-                                class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition">
-                                Batal
-                            </button>
-                            <button wire:click="detachSelectedShipments"
-                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition">
-                                Detach dari Job
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div x-data="{ openDetachShipment: false }" @close-detach-shipment.window="openDetachShipment = false">
-                <button @click="openDetachShipment = true"
-                    class="bg-green-600 text-white rounded-lg py-1 px-5 hover:scale-105 transition-transform">
-                    <i class="fa-solid fa-file-import"></i> Attach Shipment
-                </button>
-
-                <div x-cloak x-show="openDetachShipment"
-                    x-transition:enter="transition ease-out duration-300 delay-150"
-                    x-transition:enter-start="opacity-0"
-                    x-transition:enter-end="scale-100 opacity-100"
-                    x-transition:leave="transition ease-in duration-200"
-                    x-transition:leave-start="scale-100 opacity-100"
-                    x-transition:leave-end="opacity-0"
-                    class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
-
-                    <div class="bg-white rounded-xl shadow-xl w-full max-w-7xl p-6 space-y-4 relative z-50
-              max-h-[80vh] flex flex-col">
-                        <div class="p-3 flex  items-center">
-                            <button @click="openDetachShipment = false"
-                                class="absolute top-3 right-3 text-gray-500 bg-gray-200 border border-gray-200 rounded-full py-1 px-2 hover:text-gray-800 text-2xl font-bold leading-none">
-                                &times;
-                            </button>
-                        </div>
-
-
-                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Shipment Yatim (Belum Terhubung)</h3>
-
-                        <div class="overflow-auto flex-grow border rounded-md shadow-inner">
-                            <table class="w-full table-auto text-center min-w-[700px]">
-                                <thead class="bg-gray-100 sticky top-0">
-                                    <tr>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">No</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left"></th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Shipment Id</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">POL</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">POD</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">ETA</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">ETD</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($this->orphanShipments as $s)
-                                    <tr class="border-b last:border-b-0 hover:bg-gray-50">
-                                        <td class="px-4 py-2 text-left">{{ $loop->iteration }}</td>
-                                        <td class="px-4 py-2 text-left">
-                                            <input type="checkbox" wire:model="selectedShipments" value="{{ $s->id }}" class="form-checkbox text-blue-600 rounded-md">
-                                        </td>
-                                        <td class="px-4 py-2 text-left">{{ $s->shipment_id }}</td>
-                                        <td></td>
-                                        <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_loading'] ?? '-' }}</td>
-                                        <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_discharge'] ?? '-' }}</td>
-                                        <td class="px-4 py-2 text-left">
-                                            {{ isset($s->dataShipments['shipmentEstimearrival']) ? \Carbon\Carbon::parse($s->dataShipments['shipmentEstimearrival'])->format('d F Y') : '-' }}
-                                        </td>
-                                        <td class="px-4 py-2 text-left">
-                                            {{ isset($s->dataShipments['shipmentEstimedelivery']) ? \Carbon\Carbon::parse($s->dataShipments['shipmentEstimedelivery'])->format('d F Y') : '-' }}
-                                        </td>
-                                    </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="7" class="text-center py-4 text-gray-500">Tidak ada shipment yatim.</td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="flex justify-end space-x-2 mt-4">
-                            <button @click="openDetachShipment = false" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition">
-                                Batal
-                            </button>
-                            <button wire:click="assignSelectedShipments" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">
-                                Assign ke Job
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
+    <div class="bg-blue-500 rounded-t-lg mt-4">
+        <p class="text-center p-3 font-bold italic border">Transaction still under Construction <br>
+            <span class="text-red-700">...</span>
+        </p>
     </div>
+
     <hr class="border-gray-500 dark:border-neutral-500 mt-5">
 
 
     <!-- SIGMA Button -->
     <div class="p-4 flex justify-end">
-        <a href="{{ url ('/list-job') }}"
+        <a href="{{ url ('/list-shipment') }}"
             class="py-2 px-6 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg transform transition duration-200 ease-in-out shadow:hover-cyan-200 hover:bg-cyan-400 hover:scale-110">
             Back
         </a>

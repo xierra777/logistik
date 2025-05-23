@@ -26,13 +26,10 @@ class Users extends Component
         ]);
 
         if ($this->profile_photo) {
-            // This will store the file in "storage/app/public/profile_photos" 
-            // and return a relative path like "profile_photos/abc.png"
             $photoPath = $this->profile_photo->store('profile_photos', 'public');
         } else {
             $photoPath = null;
         }
-        // Create the new user
         User::create([
             'name'          => $this->name,
             'email'         => $this->email,

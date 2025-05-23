@@ -5,15 +5,20 @@ namespace App\Livewire\Job;
 use Livewire\Component;
 use App\Models\TJob;
 use App\Models\jobContainer;
+use App\Models\shipmentContainers;
+use App\Models\TShipments;
 
 class ViewJob extends Component
 {
 
     public $job;
     public $type_job = '';
+    public array $selectedShipments = [];
     public $organizationFields = [];
+    public array $selectedAssignedShipments = [];
     public $modalContainer = true;
     public $containerType, $noOfPackages, $containerReleaseNo, $containerReleaseDate, $typeOfPackages, $grossWeight, $typeOfGrossWeight, $volumeWeight, $typeOfVolumeWeight, $volume, $chargableWeight, $containerRemarks, $containerNo, $containerSealNo, $noOfPallet, $netOfWeight, $typeNetOfWeight, $totalWeight, $typeOfTotalWeight, $hsCode, $hsCodeDesc;
+
 
     public function mount($id)
     {
@@ -35,6 +40,54 @@ class ViewJob extends Component
 
         ];
     }
+    public function detachSelectedShipments()
+    {
+        if (empty($this->selectedAssignedShipments)) {
+            return;
+        }
+
+        TShipments::whereIn('id', $this->selectedAssignedShipments)
+            ->update(['id_job' => null]);
+        shipmentContainers::whereIn('id_shipments', $this->selectedAssignedShipments)
+            ->update(['id_jobContainer' => null]);
+        $this->job->refresh();
+        $this->selectedAssignedShipments = [];
+        $this->dispatch('close-detach-assigned');
+    }
+
+    public function assignSelectedShipments()
+    {
+        if (empty($this->selectedShipments)) {
+            return;
+        }
+        $jobContainer = JobContainer::firstOrCreate([
+            'id_job' => $this->job->id,
+        ]);
+        TShipments::whereIn('id', $this->selectedShipments)
+            ->update(['id_job' => $this->job->id]);
+        $shipmentContainers = shipmentContainers::whereIn('id_shipments', $this->selectedShipments)->get();
+
+        foreach ($shipmentContainers as $container) {
+            $container->update([
+                'id_jobContainer' => $jobContainer->id,
+            ]);
+        }
+        $this->job->refresh();
+        $this->selectedShipments = [];
+        $this->dispatch('close-detach-shipment');
+    }
+
+
+    public function getAssignedShipmentsProperty()
+    {
+        return $this->job->shipments;
+    }
+
+    public function getOrphanShipmentsProperty()
+    {
+        return TShipments::whereNull('id_job')->get();
+    }
+
     public function createContainer()
     {
         $container = [

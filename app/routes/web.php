@@ -20,8 +20,10 @@ use App\Livewire\Job\CreateJob;
 use App\Livewire\Job\EditJob;
 use App\Livewire\Job\ListJob;
 use App\Livewire\Job\ViewJob;
-
-use App\Livewire\Shipment\CreateShipments;
+use App\Livewire\Shipment\ContainerShipment;
+use App\Livewire\Shipment\CreateShipment;
+use App\Livewire\Shipment\ListShipment;
+use App\Livewire\Shipment\ViewShipment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
@@ -45,10 +47,7 @@ Route::get('/chart-of-accounts', ChartOfAccounts::class)->middleware([
     'auth',
     'verified'
 ]);
-Route::get('create-job', CreateJob::class)->middleware([
-    'auth',
-    'verified'
-])->name('Createjob');
+
 Route::get('/data/airports-ajax', function () {
     $token = 'dfa43c42-594a-44ed-8752-0909a8dfba7e';
     $search = request('q', '');
@@ -58,7 +57,6 @@ Route::get('/data/airports-ajax', function () {
     $normalized = strtolower(substr($search, 0, 3)); // ambil prefix 3 huruf
     $cacheKey = "aviowiki-airports:{$normalized}:page:{$page}";
 
-    $start = microtime(true);
 
     $data = Cache::remember($cacheKey, now()->addMinutes(5), function () use ($token, $search, $page, $size) {
         $response = Http::withToken($token)->get('https://api.aviowiki.com/free/airports/search', [
@@ -92,11 +90,33 @@ Route::get('/data/airports-ajax', function () {
     ]);
 });
 
-Route::get('create-shipments', CreateShipments::class)->middleware([
+Route::get('view-shipment/{id}/container-shipment/{container_id}', ContainerShipment::class)
+    ->middleware(['auth', 'verified'])
+    ->name('shipment.container');
+
+// Route Shipment
+
+Route::get('create-shipment', CreateShipment::class)->middleware([
     'auth',
     'verified'
-])->name('create-shipments');
+])->name('create-shipment');
 
+Route::get('list-shipment', ListShipment::class)->middleware([
+    'auth',
+    'verified'
+])->name('listShipment');
+Route::get('view-shipment/{id}', ViewShipment::class)->middleware([
+    'auth',
+    'verified'
+])->name('viewShipment');
+
+// End Shipment Route
+
+// Route Job Route
+Route::get('create-job', CreateJob::class)->middleware([
+    'auth',
+    'verified'
+])->name('Createjob');
 Route::get('edit-job', EditJob::class)->middleware([
     'auth',
     'verified'
@@ -111,7 +131,7 @@ Route::get('view-job/{id}', ViewJob::class)->middleware([
     'auth',
     'verified'
 ])->name('viewJob');
-
+// End Job Route
 
 
 

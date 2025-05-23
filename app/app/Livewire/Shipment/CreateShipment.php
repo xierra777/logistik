@@ -6,14 +6,14 @@ use Livewire\Component;
 use App\Models\TJob;
 use App\Models\Customer;
 use App\Models\jobContainer;
+use App\Models\shipmentContainers;
+use App\Models\TShipments;
 use Carbon\Carbon;
-use Livewire\Attributes\On;
 use App\Models\User;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
 
-class CreateShipments extends Component
+class CreateShipment extends Component
 {
     public $step = 1;
     public $shipmentType_job = '';
@@ -31,7 +31,7 @@ class CreateShipments extends Component
 
 
     // Detail Shipment
-    public $shipmentCustomerCodeJob, $shipmentBillLadingDate, $shipmentPort_of_loading, $shipmentPort_of_final, $shipmentPlace_of_receipt, $shipmentPort_of_receipt, $shipmentPort_of_discharge, $shipmentPlace_of_delivery, $shipmentOcean_vessel_feeder, $shipmentEstimearrival, $shipmentEstimedelivery, $shipmentPayableAtJob, $shipmentServices_type, $shipmentIncoTerms, $shipmentFreightTypeJob, $shipmentCross_trade, $shipmentRemarksJobDetailJobs;
+    public $shipmentCustomerCodeJob, $shipmentBillLadingDate, $shipmentPort_of_loading, $shipmentPort_of_final, $shipmentPlace_of_receipt, $shipmentPort_of_receipt, $shipmentPort_of_discharge, $shipmentPlace_of_delivery, $shipmentOcean_vessel_feeder, $shipmentEstimearrival, $shipmentEstimedelivery, $shipmentPayableAtJob, $shipmentServices_type, $shipmentIncoTerms, $shipmentFreightTypeJob = "Prepaid", $shipmentCross_trade, $shipmentRemarksJobDetailJobs;
 
     // Container Detail
     public $shipmentFlightVesselName, $shipmentFlightVesselNo, $shipmentNoOfPackages, $shipmentContainerDeliveryAgent, $shipmentGrossWeight, $shipmentVolumeWeight, $shipmentVolume, $shipmentChargableWeight, $ShipmentHsCode, $shipmentContainerRemarks, $shipmentHsCodeDesc, $shipmentTypeOfVolumeWeight, $shipmentTypeOfGrossWeight, $shipmentTypeOfPackages, $typeOfShipmentVolume, $shipmentHsCode;
@@ -61,6 +61,8 @@ class CreateShipments extends Component
     }
     public function nextStep()
     {
+        // dd($this->shipmentType_job);
+
         $this->validateCurrentStep();
         $this->step++;
     }
@@ -71,24 +73,20 @@ class CreateShipments extends Component
         $client = $this->clients->firstWhere('id', $this->shipmentClient_id);
         return $client;
     }
-    public function updatedShipmentType_job()
+    public function updatedShipmentTypejob()
     {
-        $this->generateJobName();
+        $this->generateShipmentName();
         // $this->deliveryAgent = null;
         // $this->originAgent = null;
-        // // Reset juga semua input yang gak relevan dengan type_job
     }
-    public function generateJobName()
+    public function generateShipmentName()
     {
-        // Mendapatkan format tanggal dengan YYMMDD
         $startOfMonth = Carbon::now()->startOfMonth();
         $endOfMonth = Carbon::now()->endOfMonth();
-
         $countThisMonth = TJob::whereBetween('created_at', [$startOfMonth, $endOfMonth])->count();
-
         $sequence = str_pad($countThisMonth + 1, 3, '0', STR_PAD_LEFT);
         $ctry = 'ID';
-        $date = now()->format('ym'); // Format: 202505 (bulan dan tahun)
+        $date = now()->format('ym');
 
         switch ($this->shipmentType_job) {
             case 'ocean_fcl_export':
@@ -113,11 +111,11 @@ class CreateShipments extends Component
                 $suffix = 'BRNJKT';
                 break;
         }
-        $prefix = "BRN{$suffix}";
 
-        // Format job_name otomatis berdasarkan prefix dan tanggal
+        $prefix = "BRN{$suffix}";
         $this->shipment_id = "{$ctry}{$prefix}{$date}{$sequence}";
     }
+
     private function validateCurrentStep()
     {
         switch ($this->step) {
@@ -201,8 +199,6 @@ class CreateShipments extends Component
     public function ocean_fcl_export()
     {
         $container = [
-            'shipmentFlightVesselName'     => $this->shipmentFlightVesselName,
-            'shipmentFlightVesselNo'       => $this->shipmentFlightVesselNo,
             'shipmentNoOfPackages'         => $this->shipmentNoOfPackages,
             'shipmentContainerDeliveryAgent' => $this->shipmentContainerDeliveryAgent,
             'shipmentGrossWeight'          => $this->shipmentGrossWeight,
@@ -216,8 +212,11 @@ class CreateShipments extends Component
             'shipmentTypeOfGrossWeight'    => $this->shipmentTypeOfGrossWeight,
             'shipmentTypeOfPackages'       => $this->shipmentTypeOfPackages,
             'typeOfShipmentVolume'         => $this->typeOfShipmentVolume,
+            'containerShipmentCarrierAirline' => $this->containerShipmentCarrierAirline,
         ];
         $payload = [
+            'shipmentFlightVesselName'     => $this->shipmentFlightVesselName,
+            'shipmentFlightVesselNo'       => $this->shipmentFlightVesselNo,
             'shipmentCustomerCodeJob'      => $this->shipmentCustomerCodeJob,
             'shipmentBillLadingDate'       => $this->shipmentBillLadingDate,
             'shipmentPort_of_loading'      => $this->shipmentPort_of_loading,
@@ -237,31 +236,35 @@ class CreateShipments extends Component
             'shipmentRemarksJobDetailJobs' => $this->shipmentRemarksJobDetailJobs,
         ];
 
-        dd([
-            'shipmentClient_id' => $this->shipmentClient_id,
-            'shipmentType_job' => $this->shipmentType_job,
-            'shipment_id' => $this->shipment_id,
-            'shipmentClient_address' => $this->shipmentClient_address,
-            'shipmentShipper_id' => $this->shipmentShipper_id,
-            'shipmentConsignee_id' => $this->shipmentConsignee_id,
-            'shipmentNotify_id' => $this->shipmentNotify_id,
-            'data' => $payload,
-            'container' => $container
-        ]);
+        // dd([
+        //     'shipmentClient_id' => $this->shipmentClient_id,
+        //     'shipmentType_job' => $this->shipmentType_job,
+        //     'shipment_id' => $this->shipment_id,
+        //     'shipmentClient_address' => $this->shipmentClient_address,
+        //     'shipmentShipper_id' => $this->shipmentShipper_id,
+        //     'shipmentConsignee_id' => $this->shipmentConsignee_id,
+        //     'shipmentNotify_id' => $this->shipmentNotify_id,
+        //     'data' => $payload,
+        //     'container' => $container
+        // ]);
 
 
-        $job = TJob::create([
-            'job_id'            => $this->job_id,
-            'type_job'          => $this->type_job,
+        $shipment = TShipments::create([
+            'shipmentsTypeJob'          => $this->shipmentType_job,
+            'shipment_id'              => $this->shipment_id,
+            'shipmentClient_id'        => $this->shipmentClient_id,
+            'shipmentShipper_id'     => $this->shipmentShipper_id,
+            'shipmentConsignee_id'    => $this->shipmentConsignee_id,
             'shipmentNotify_id'         => $this->shipmentNotify_id,
-            'dagentsJob'        => $this->deliveryAgent,
-            'shipmentEmployee_id' => $this->shipmentEmployee_id,
-            'data'              => $payload,
+            'shipmentClient_address'    => $this->shipmentClient_address,
+            'shipmentCarrierAirline'      => $this->shipmentCarrierAirline,
+            'employee_id        ' => $this->shipmentEmployee_id,
+            'dataShipments'              => $payload,
         ]);
 
-        jobContainer::create([
-            'id_job' =>  $job->id,
-            'containers' => $container
+        shipmentContainers::create([
+            'id_shipments' => $shipment->id,
+            'containersData' => $container,
         ]);
 
         return redirect()->route('listJob')->with('success', [
@@ -281,7 +284,7 @@ class CreateShipments extends Component
             $carriers = Customer::whereJsonContains('roles', 'carrier')->get();
         }
 
-        return view('livewire.shipment.create-shipments', [
+        return view('livewire.shipment.create-shipment', [
             'carriers' => $carriers,
             'airlines' => $airlines,
         ]);

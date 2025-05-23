@@ -17,4 +17,8 @@ class jobContainer extends Model
     {
         return $this->belongsTo(TJob::class, 'id_job');
     }
+    public function shipment()
+    {
+        return $this->hasMany(shipmentContainers::class, 'id_jobContainer');
+    }
 }

@@ -4,10 +4,10 @@ namespace App\Livewire\Shipment;
 
 use Livewire\Component;
 
-class EditShipments extends Component
+class EditShipment extends Component
 {
     public function render()
     {
-        return view('livewire.shipment.edit-shipments');
+        return view('livewire.shipment.edit-shipment');
     }
 }

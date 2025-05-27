@@ -4,6 +4,7 @@
             <div x-data="{
     step: @entangle('step'),
     type_job: @entangle('shipmentType_job') ,
+
     init() {
      this.$watch('type_job', value => {
                 console.log('Job type changed to:', value);
@@ -20,6 +21,7 @@
                     window.PortSelect2.init('.port-select', this.type_job);
                 });            
         });
+
           this.$nextTick(() => {
                 window.PortSelect2.init('.port-select', this.type_job);
             });
@@ -110,15 +112,15 @@
             @if($step === 2)
             <!-- STEP 2: Isi Detail Job -->
             <div x-show="step === 2" x-transition x-cloak>
-                <h2 class="text-lg font-semibold mb-3">Detail Job: {{ strtoupper(str_replace('_', ' ', $shipmentType_job)) }}</h2>
+                <h2 class="text-lg font-semibold mb-3">Detail Shipments: {{ strtoupper(str_replace('_', ' ', $shipmentType_job)) }}</h2>
 
                 @switch($shipmentType_job)
-                @case('ocean_fcl_export')
+                @case('ocean_fcl_export' || 'ocean_fcl_import')
 
                 <div>
                     <div class="grid grid-cols-1 md:grid-cols-2 mb-3">
                         <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Job Type</label>
+                            <label>Shipments Type</label>
                             <input type="text" value="{{ strtoupper(str_replace('_', ' ', $shipmentType_job)) }}" readonly
                                 class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0">
                             @error('shipmentType_job')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
@@ -152,20 +154,21 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                        <div class="mb-4 " wire:ignore>
+                        <div class="mb-4 flex flex-col space-y-3 rounded-md">
                             <label for="shipmentClient_address">Client Address</label>
-                            <select name="shipmentClient_address" id="shipmentClient_address" wire:model="shipmentClient_address">
-                                <option value="">Pilih alamat</option>
-                                @foreach($shipmentClient_address as $a)
+                            <select class="border border-gray-300 rounded-lg" name="shipmentClient_address" id="" wire:model="shipmentClient_address">
+                                @foreach($shipmentClientAddresses as $a)
                                 <option value="{{ $a->address }}">{{ $a->address }}</option>
                                 @endforeach
                             </select>
                             @error('shipmentClient_address')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 col-span-2 gap-3 mb-4">
                             <div class="flex flex-col space-y-3 rounded-md w-full" wire:ignore>
                                 <label class="font-bold">Shipper</label>
                                 <select wire:model="shipmentShipper_id" id="shipmentShipper_id" class="border p-2 rounded ">
+                                    <option value=""></option>
                                     @foreach($shippers as $s)
                                     <option value="{{ $s->id }}">{{ $s->name }}</option>
                                     @endforeach
@@ -202,9 +205,7 @@
                             <select name="shipmentCarrierAirline" id="shipmentCarrierAirline" wire:model="shipmentCarrierAirline" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                 <option value="">Select Carrier</option>
                                 @foreach($carriers as $cr)
-                                @if(in_array('carrier', $cr->roles))
                                 <option value="{{ $cr->id }}">{{ $cr->name }}</option>
-                                @endif
                                 @endforeach
                             </select>
                         </div>
@@ -213,10 +214,8 @@
                             <label for="shipmentDeliveryAgent">Delivery Agent</label>
                             <select name="shipmentDeliveryAgent" id="shipmentDeliveryAgent" wire:model="shipmentDeliveryAgent" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 select2">
                                 <option value="">Select agent</option>
-                                @foreach($dagentsJob as $da)
-                                @if(in_array('agent', $cr->roles))
+                                @foreach($deliveryAgent as $da)
                                 <option value="{{ $da->id }}">{{ $da->name }}</option>
-                                @endif
                                 @endforeach
                             </select>
                         </div>
@@ -224,10 +223,8 @@
                             <label for="shipmentCarrierAgent">Carrier Agent</label>
                             <select name="shipmentCarrierAgent" id="shipmentCarrierAgent" wire:model="shipmentCarrierAgent" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 select2">
                                 <option value="">Select agent</option>
-                                @foreach($dagentsJob as $da)
-                                @if(in_array('agent', $cr->roles))
-                                <option value="{{ $da->id }}">{{ $da->name }}</option>
-                                @endif
+                                @foreach($carrierAgent as $ca)
+                                <option value="{{ $ca->id }}">{{ $ca->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -612,10 +609,8 @@
                             <select name="shipmentContainerDeliveryAgent" id="shipmentContainerDeliveryAgent" wire:model="shipmentContainerDeliveryAgent"
                                 class="block w-full rounded-md border-gray-300 shadow-sm">
                                 <option value="">Select agent</option>
-                                @foreach($dagentsJob as $da)
-                                @if(in_array('agent', $da->roles)) {{-- Ganti $cr jadi $da --}}
+                                @foreach($deliveryAgent as $da)
                                 <option value="{{ $da->id }}">{{ $da->name }}</option>
-                                @endif
                                 @endforeach
                             </select>
                         </div>
@@ -701,131 +696,136 @@
             @elseif($step === 4)
             <!-- STEP 4: Conclusion -->
             <div x-show="step === 4" x-cloak x-transition>
-                <h2 class="text-lg font-semibold mb-3">Kesimpulan</h2>
                 <div class="space-y-2">
-                    <div class="font-bold text-2xl text-center mb-4">Detail Shipments</div>
+                    <div class="font-bold text-2xl text-center mb-4">
+                        <h2 class="m-2">Detail Shipments</h2>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div class="space-y-6">
-                            <div class="flex flex-items grid grid-cols-3 ">
-                                <p class="col-span-1"><strong>Tipe Shipments</strong> </p>
-                                <p class="col-span-2">: {{ strtoupper(str_replace('_', ' ', $shipmentType_job)) }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Client </strong></p>
-                                <p class="col-span-2">: {{$this->clientName->name}}</p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Client Address</strong></p>
-                                <p class="col-span-2">: {{$this->clientName->address}}</p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>No. Shipments </strong> </p>
-                                <p class="col-span-2">: {{ $shipment_id }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>MBL:</strong> </p>
-                                <p class="col-span-2">: </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>MBL DATE</strong> </p>
-                                <p class="col-span-2">: </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Port Of loading</strong> </p>
-                                <p class="col-span-2">: {{ $shipmentPort_of_loading }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Place Of Receipt</strong> </p>
-                                <p class="col-span-2">: {{ $shipmentPlace_of_receipt }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Port Of Discharge</strong> </p>
-                                <p class="col-span-2">: {{ $shipmentPort_of_discharge }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>place Of Delivery</strong> </p>
-                                <p class="col-span-2">: {{ $shipmentPlace_of_delivery }} </p>
-                            </div>
+                        <div class="flex flex-items grid grid-cols-3 ">
+                            <p class="col-span-1"><strong>Tipe Shipments</strong> </p>
+                            <p class="col-span-2">: {{ strtoupper(str_replace('_', ' ', $shipmentType_job)) }} </p>
                         </div>
-                        <div class="space-y-6 ">
-                            @switch('type_job')
-                            @case('ocean_fcl_export'|| 'ocean_lcl_export' )
-                            <div class="flex flex-items grid grid-cols-3 ">
-                                <p class="col-span-1"><strong>Delivery Agents</strong> </p>
-                                <p class="col-span-2">: </p>
-                            </div>
-                            @break
-                            @case('ocean_fcl_import'|| 'ocean_lcl_import')
-                            <div class="flex flex-items grid grid-cols-3 ">
-                                <p class="col-span-1"><strong>Origin Agents</strong> </p>
-                                <p class="col-span-2">: </p>
-                            </div>
-                            @break
-                            @case('air_outbound' || 'air_inbound')
-                            @break
-                            @default
-                            <p>hmm smell like something cheaps over here</p>
-                            @endswitch
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Services Type</strong> </p>
-                                <p class="col-span-2">: {{ $shipmentServices_type }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Inco Terms</strong> </p>
-                                <p class="col-span-2">: {{ $shipmentIncoTerms }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>ETA / Estimate Time Arrival </strong> </p>
-                                <p class="col-span-2">: {{ \Carbon\Carbon::parse($shipmentEstimearrival)->format('d M Y H:i') }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>ETD / Estimate Time Departure</strong> </p>
-                                <p class="col-span-2">: {{ \Carbon\Carbon::parse($shipmentEstimedelivery)->format('d M Y H:i') }} </p>
-                            </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Client </strong></p>
+                            <p class="col-span-2">: {{$this->clientName->name ?? '-'}}</p>
                         </div>
-
-                        <div class="space-y-6">
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Carrier</strong> </p>
-                                <p class="col-span-2">: {{ $shipmentCarrierAirline }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3 ">
-                                <p class="col-span-1"><strong>Vessel Name</strong> </p>
-                                <p class="col-span-2">: {{ $shipmentFlightVesselName }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3 ">
-                                <p class="col-span-1"><strong>flightVesselNo</strong> </p>
-                                <p class="col-span-2">: {{ $shipmentFlightVesselNo }} </p>
-                            </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>No. Shipments </strong> </p>
+                            <p class="col-span-2">: {{ $shipment_id }} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3 ">
+                            <p class="col-span-1"><strong>Shipper</strong> </p>
+                            <p class="col-span-2 uppercase">: {{$this->shipperName->name ?? ''}}</p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Consignee</strong> </p>
+                            <p class="col-span-2 uppercase">: {{ $this->consigneeName->name ?? ''}} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Notify</strong> </p>
+                            <p class="col-span-2 uppercase">: {{ $this->notifyName->name ?? ''}} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Carrier</strong> </p>
+                            <p class="col-span-2 uppercase">: {{ $this->carrierName->name ?? '' }} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Carrier Agent</strong> </p>
+                            <p class="col-span-2 uppercase">: {{ $this->carrierAgentName->name ?? '' }} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Delivery Agent</strong> </p>
+                            <p class="col-span-2 uppercase">: {{ $this->deliveryAgentName->name ?? ''}} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Freight</strong> </p>
+                            <p class="col-span-2 uppercase">: {{ $shipmentFreightTypeJob ?? ''}} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Inco Terms</strong> </p>
+                            <p class="col-span-2 uppercase">: {{ $shipmentIncoTerms ?? ''}} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Cross Trade</strong> </p>
+                            <p class="col-span-2 uppercase">: {{ $shipmentCross_trade ?? ''}} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Port of loading</strong> </p>
+                            <p class="col-span-2 uppercase">: {{ $shipmentPort_of_loading ?? '' }} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Port of Receipt</strong> </p>
+                            <p class="col-span-2 uppercase">: {{ $shipmentPort_of_receipt ?? ''}} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Place of receipt</strong> </p>
+                            <p class="col-span-2 uppercase">: {{ $shipmentPlace_of_receipt ?? '' }} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Port of discharge</strong> </p>
+                            <p class="col-span-2 uppercase">: {{ $shipmentPort_of_discharge ?? ''}} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Place of delivery</strong> </p>
+                            <p class="col-span-2 uppercase">: {{ $shipmentPlace_of_delivery ?? ''}} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Port of final</strong> </p>
+                            <p class="col-span-2 uppercase">: {{ $shipmentPort_of_final ?? ''}} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Payable At</strong> </p>
+                            <p class="col-span-2 uppercase">: {{ $shipmentPayableAtJob ?? ''}} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Services Type</strong> </p>
+                            <p class="col-span-2 uppercase">: {{ $shipmentServices_type ?? ''}} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3"><strong>Remarks</strong>
+                            <p class="col-span-2 uppercase">: {{ $shipmentRemarksJobDetailJobs ?? ''}} </p>
                         </div>
                     </div>
                     <div class="font-bold text-2xl text-center mb-4">Container</div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div class="space-y-6">
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>No of Packages</strong> </p>
-                                <p class="col-span-2">: {{ $shipmentNoOfPackages }} {{$shipmentTypeOfPackages}} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Gross Weight</strong> </p>
-                                <p class="col-span-2">: {{ $shipmentGrossWeight }} {{$shipmentTypeOfGrossWeight}} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Volume Weight</strong> </p>
-                                <p class="col-span-2">: {{ $shipmentVolumeWeight }} {{$shipmentTypeOfVolumeWeight}} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Volume</strong> </p>
-                                <p class="col-span-2">: {{ $shipmentVolume }} {{$typeOfShipmentVolume}} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Chargable Weight</strong> </p>
-                                <p class="col-span-2">: {{ $shipmentChargableWeight }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Remarks</strong> </p>
-                                <p class="col-span-2">: {{ $shipmentContainerRemarks }} </p>
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Carrier</strong> </p>
+                            <p class="col-span-2">: {{ $this->containerCarrierName->name }}</p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Carrier</strong> </p>
+                            <p class="col-span-2">: {{ $this->containerCarrierName->name }}</p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Vessel Name</strong> </p>
+                            <p class="col-span-2">: {{ $shipmentFlightVesselName }}</p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Voyage</strong> </p>
+                            <p class="col-span-2">: {{ $shipmentFlightVesselNo }}</p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>No of Packages</strong> </p>
+                            <p class="col-span-2">: {{ $shipmentNoOfPackages }} {{$shipmentTypeOfPackages}} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Gross Weight</strong> </p>
+                            <p class="col-span-2">: {{ $shipmentGrossWeight }} {{$shipmentTypeOfGrossWeight}} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Volume Weight</strong> </p>
+                            <p class="col-span-2">: {{ $shipmentVolumeWeight }} {{$shipmentTypeOfVolumeWeight}} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Volume</strong> </p>
+                            <p class="col-span-2">: {{ $shipmentVolume }} {{$typeOfShipmentVolume}} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Chargable Weight</strong> </p>
+                            <p class="col-span-2">: {{ $shipmentChargableWeight }} </p>
+                        </div>
+                        <div class="flex flex-items grid grid-cols-3">
+                            <p class="col-span-1"><strong>Remarks</strong> </p>
+                            <p class="col-span-2">: {{ $shipmentContainerRemarks }} </p>
                         </div>
                     </div>
                 </div>
@@ -891,7 +891,7 @@
             {
                 sel: '#shipmentClient_address',
                 model: 'shipmentClient_address',
-                placeholder: 'Select Client'
+                placeholder: 'Select address'
             },
             {
                 sel: '#shipmentIncoTerms',
@@ -901,7 +901,7 @@
             {
                 sel: '#shipmentServices_type',
                 model: 'shipmentServices_type',
-                placeholder: 'Select Agent '
+                placeholder: 'Select Services Type'
             },
             {
                 sel: '#shipmentCross_trade',
@@ -928,31 +928,31 @@
             {
                 sel: '#shipmentTypeOfPackages',
                 model: 'shipmentTypeOfPackages',
-                placeholder: 'Select Employee '
+                placeholder: 'Select type of packages '
             },
             {
                 sel: '#shipmentContainerDeliveryAgent',
                 model: 'shipmentContainerDeliveryAgent',
-                placeholder: 'Select Employee '
+                placeholder: 'Select Delivery Agent '
             },
             {
                 sel: '#shipmentTypeOfGrossWeight',
                 model: 'shipmentTypeOfGrossWeight',
-                placeholder: 'Select Employee '
+                placeholder: 'Select type of gross weight '
             },
             {
                 sel: '#shipmentTypeOfVolumeWeight',
                 model: 'shipmentTypeOfVolumeWeight',
-                placeholder: 'Select Employee '
+                placeholder: 'Select type of volume weight '
             },
             {
                 sel: '#containerShipmentCarrierAirline',
                 model: 'containerShipmentCarrierAirline',
-                placeholder: 'Select Employee '
+                placeholder: 'Select Carrier '
             }, {
                 sel: '#typeOfShipmentVolume',
                 model: 'typeOfShipmentVolume',
-                placeholder: 'Select Employee '
+                placeholder: 'Select Type Volume'
             },
         ].forEach(({
             sel,
@@ -1034,7 +1034,7 @@
                     // Restore selected
                     if (currentValue) {
                         const label = currentValue;
-                        const id = label.split(' - ')[0]; // "CGK - Indonesia" => "CGK"
+                        const id = label.split(' - ')[0];
                         const option = new Option(label, id, true, true);
                         $(select).append(option).trigger('change');
                     }
@@ -1048,7 +1048,6 @@
                     });
 
                 } else {
-                    // 🚢 SEAPORTS (STATIC JSON + search filter)
                     fetch(endpoint)
                         .then(res => res.json())
                         .then(data => {
@@ -1075,7 +1074,7 @@
                                                     .filter(port => !!port.code)
                                                     .slice(0, 20)
                                                     .map(port => ({
-                                                        id: `${port.code} - ${port.country}`,
+                                                        id: `${port.name}, ${port.country}`,
                                                         text: `${port.name} (${port.code}) - ${port.country}`
                                                     }));
 
@@ -1092,7 +1091,8 @@
 
                             // Restore selected
                             if (currentValue) {
-                                $(select).val(currentValue).trigger('change');
+                                const option = new Option(currentValue, currentValue, true, true);
+                                $(select).append(option).trigger('change');
                             }
 
                             $(select).off('change.lw').on('change.lw', function() {
@@ -1138,9 +1138,9 @@
         window.PortSelect2.init();
         Livewire.hook('message.processed', () => {
             window.reinitSelect2();
+            window.PortSelect2.init();
         });
     });
 </script>
-
 @endscript
 @endpush

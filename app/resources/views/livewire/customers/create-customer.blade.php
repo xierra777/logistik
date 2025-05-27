@@ -58,7 +58,7 @@
         @error('country') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
       </div>
 
-      <div class="mb-4">
+      <div class="mb-4" wire:ignore>
         <label class="block font-medium">Pilih Akun COA</label>
         <select wire:model="coa_id" id="coa_id" class="w-full border rounded p-2">
           <option value="">-- Pilih COA --</option>
@@ -199,11 +199,12 @@
             templateSelection: formatCountry,
             width: "100%"
           }).on("change", function() {
-            let selectedValue = $(this).val(); // e.g., "US - United States"
-            // $wire.set("country", selectedValue, false);
+            let selectedValue = $(this).val();
             $wire.country = selectedValue;
-            // Update Livewire property (assuming you use a hidden input bound to Livewire)
-            // $("#hiddenCountry").val(selectedValue).trigger("input");
+            $wire.country_code = selectedValue.split(" - ")[0];
+            $wire.generateCustomerCode();
+
+
           });
         },
         error: function(xhr, status, error) {

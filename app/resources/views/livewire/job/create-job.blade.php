@@ -3034,7 +3034,7 @@
                                 <p class="col-span-2">: {{ $flightVesselName }} </p>
                             </div>
                             <div class="flex flex-items grid grid-cols-3 ">
-                                <p class="col-span-1"><strong>flightVesselNo</strong> </p>
+                                <p class="col-span-1"><strong>Voyage</strong> </p>
                                 <p class="col-span-2">: {{ $flightVesselNo }} </p>
                             </div>
                         </div>
@@ -3377,9 +3377,9 @@
 
                             });
 
-                            // Restore selected
                             if (currentValue) {
-                                $(select).val(currentValue).trigger('change');
+                                const option = new Option(currentValue, currentValue, true, true);
+                                $(select).append(option).trigger('change');
                             }
 
                             $(select).off('change.lw').on('change.lw', function() {

@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('shipment_id')->constrained()->onDelete('cascade');
-            $table->foreignId('invoice_id')->nullable()->constrained()->onDelete('set null');
-            $table->foreignId('customer_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('shipment_id')->nullable()->constrained('t_shipments')->onDelete('cascade');
+            $table->foreignId('job_id')->nullable()->constrained('t_jobs')->onDelete('cascade');
+            $table->foreignId('invoice_id')->nullable()->constrained('invoices')->onDelete('set null');
+            $table->foreignId('customer_id')->nullable()->constrained('customers')->onDelete('set null');
             $table->foreignId('vendor_id')->nullable()->constrained('customers')->onDelete('set null');
+
             $table->string('charge')->nullable();
             $table->string('description')->nullable();
             $table->string('freight')->nullable();
@@ -25,7 +27,6 @@ return new class extends Migration
             $table->string('ofdtype')->nullable();
             $table->text('remarks')->nullable();
 
-            // Sale section
             $table->string('sclient')->nullable();
             $table->string('scurrency')->nullable();
             $table->string('srate')->nullable();

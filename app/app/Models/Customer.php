@@ -32,7 +32,9 @@ class Customer extends Model
 
     public function getCategoryAttribute()
     {
-        return $this->chartOfAccount ? $this->chartOfAccount->term_type : 'unknown';
+        return $this->relationLoaded('chartOfAccount') && $this->chartOfAccount
+            ? $this->chartOfAccount->term_type
+            : 'unknown';
     }
 
     public function addresses()

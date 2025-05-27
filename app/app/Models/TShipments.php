@@ -8,7 +8,6 @@ class TShipments extends Model
 {
     protected $casts = [
         'dataShipments' => 'array',
-        'dataContainers' => 'array',
     ];
 
     protected $fillable = [
@@ -20,9 +19,19 @@ class TShipments extends Model
         'shipmentConsignee_id',
         'shipmentNotify_id',
         'employee_id',
+        'shipmentClient_address',
+        'shipmentCarrierAirline',
+        'shipmentContainerDeliveryAgent',
+        'containerShipmentCarrierAirline',
+        'shipmentCarrierAgent',
+        'shipmentDeliveryAgent',
         'carrier',
         'dataShipments',
     ];
+    public function shipmentTransaction()
+    {
+        return $this->hasMany(Transaction::class, 'shipment_id');
+    }
     public function job()
     {
         return $this->belongsTo(TJob::class, 'id_job');
@@ -38,20 +47,29 @@ class TShipments extends Model
     }
     public function carrierModel()
     {
-        return $this->belongsTo(Customer::class, 'carrier');
+        return $this->belongsTo(Customer::class, 'shipmentCarrierAirline');
+    }
+
+    public function carrierAgent()
+    {
+        return $this->belongsTo(Customer::class, 'shipmentCarrierAgent');
+    }
+    public function deliveryAgent()
+    {
+        return $this->belongsTo(Customer::class, 'shipmentDeliveryAgent');
+    }
+
+    public function containerShipmentCarrier()
+    {
+        return $this->belongsTo(Customer::class, 'containerShipmentCarrierAirline');
+    }
+    public function containerDeliveryAgent()
+    {
+        return $this->belongsTo(Customer::class, 'shipmentContainerDeliveryAgent');
     }
     public function employee()
     {
         return $this->belongsTo(user::class, 'employee_id');
-    }
-
-    public function ogents()
-    {
-        return $this->belongsTo(Customer::class, 'ogentsJob');
-    }
-    public function dagents()
-    {
-        return $this->belongsTo(Customer::class, 'dagentsJob');
     }
     public function shipper()
     {

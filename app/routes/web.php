@@ -15,6 +15,7 @@ use App\Livewire\Customers\ViewCustomer;
 use App\Livewire\Customers\ListCustomer;
 use App\Livewire\Dashboard;
 use App\Livewire\HouseBL;
+use App\Livewire\Job\ContainerJob;
 use App\Livewire\Pdfhbl;
 use App\Livewire\Job\CreateJob;
 use App\Livewire\Job\EditJob;
@@ -90,12 +91,9 @@ Route::get('/data/airports-ajax', function () {
     ]);
 });
 
-Route::get('view-shipment/{id}/container-shipment/{container_id}', ContainerShipment::class)
-    ->middleware(['auth', 'verified'])
-    ->name('shipment.container');
+
 
 // Route Shipment
-
 Route::get('create-shipment', CreateShipment::class)->middleware([
     'auth',
     'verified'
@@ -109,7 +107,9 @@ Route::get('view-shipment/{id}', ViewShipment::class)->middleware([
     'auth',
     'verified'
 ])->name('viewShipment');
-
+Route::get('view-shipment/{id}/container-shipment/{container_id}', ContainerShipment::class)
+    ->middleware(['auth', 'verified'])
+    ->name('shipment.container');
 // End Shipment Route
 
 // Route Job Route
@@ -131,6 +131,9 @@ Route::get('view-job/{id}', ViewJob::class)->middleware([
     'auth',
     'verified'
 ])->name('viewJob');
+Route::get('view-job/{id}/container-job/{jobContainer_id}', ContainerJob::class)
+    ->middleware(['auth', 'verified'])
+    ->name('jobContainer');
 // End Job Route
 
 
@@ -160,6 +163,7 @@ Route::get('/edit-customers/{id}', EditCustomer::class)->middleware([
     'verified'
 ]);
 Route::get('/customers/create', CreateCustomer::class)->middleware(['auth', 'verified'])->name('customers.create');
+
 
 Route::get('/customers', ListCustomer::class)
     ->middleware(['auth', 'verified'])

@@ -23,12 +23,12 @@ return new class extends Migration {
         });
 
         // Tambahkan foreign key untuk self-referencing parent account
-        Schema::table('chart_of_accounts', function (Blueprint $table) {
-            $table->foreign('parent_account_id')
-                ->references('id')
-                ->on('chart_of_accounts')
-                ->onDelete('cascade');
-        });
+        // Schema::table('chart_of_accounts', function (Blueprint $table) {
+        //     $table->foreign('parent_account_id')
+        //         ->references('id')
+        //         ->on('chart_of_accounts')
+        //         ->onDelete('cascade');
+        // });
     }
 
     /**

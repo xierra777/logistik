@@ -14,8 +14,8 @@ class customerAddress extends Model
         'customer_id'
     ];
 
-    public function costumer()
+    public function customer()
     {
-        return $this->belongsTo(Customer::class, 'costumer_id');
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
 }

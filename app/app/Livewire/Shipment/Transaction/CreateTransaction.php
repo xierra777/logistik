@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Livewire\Accounting;
+namespace App\Livewire\Shipment\Transaction;
 
+use App\Livewire\Shipment\ContainerShipment;
 use Livewire\Component;
-use App\Models\Transaction;
+use App\Models\TShipments;
 use App\Models\Customer;
-use App\Models\Shipment;
-use App\Models\Container;
+use App\Models\Transaction;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
-class Tranksaksi extends Component
+class CreateTransaction extends Component
 {
     public $shipmentId;
     public $shipment;
@@ -31,45 +33,45 @@ class Tranksaksi extends Component
     public $svatgstusd = 0, $cvatgstusd = 0;
     public $shwtaxrateusd = 0, $chwtaxrateusd = 0;
     public $vendors, $clients;
+    public $shipmentType;
 
     protected $listeners = ['reloadTransactionData' => 'setShipmentId', 'handleReload'];
 
-    public function setShipmentId($shipmentId)
+    public function setShipmentId($id)
     {
-        $this->shipmentId = $shipmentId;
-        $shipment = Shipment::find($shipmentId);
-        $this->shipmentId = $shipment->id;
+        $this->shipmentId = $id;
+        $shipment = TShipments::find($id);
         $this->updateQty();
     }
 
     public function handleReload($payload)
     {
-        if ($payload['shipmentId'] == $this->shipmentId) {
+        if ($payload['id'] == $this->id) {
             $this->reset();
         }
     }
 
 
-    public function updateQty()
-    {
-        $this->quantity = Container::where('shipment_id', $this->shipmentId)->count();
-    }
+    // public function updateQty()
+    // {
+    //     $this->quantity = ContainerShipment::where('shipment_id', $this->id)->count();
+    // }
 
-    public function mount($shipmentId)
+    public function mount($id)
     {
-        $this->shipmentId = $shipmentId;
-        $customers = Customer::orderBy('name')->get();
-        $shipment = Shipment::find($shipmentId);
+        $this->shipmentId = $id;
+        $customers = customer::orderBy('name')->get();
+        $shipment = TShipments::find($id);
 
         $this->vendors = $customers->where('category', 'CR');
 
         $this->clients = collect([
             $shipment->shipper,
             $shipment->consignee,
-            $shipment->notify_party,
+            $shipment->notify,
         ])->filter();
 
-        $this->updateQty();
+        // $this->updateQty();
     }
 
     // === Simpan Data Transaksi Baru ===
@@ -143,7 +145,7 @@ class Tranksaksi extends Component
 
     public function loadClients()
     {
-        $this->clients = Customer::where('category', 'DR')->orderBy('name')->get();
+        $this->clients = customer::where('category', 'DR')->orderBy('name')->get();
     }
 
     public function closeModal()
@@ -153,9 +155,6 @@ class Tranksaksi extends Component
     }
     public function render()
     {
-        return view('livewire.accounting.tranksaksi', [
-            'clients' => $this->clients,
-            'vendors' => $this->vendors,
-        ]);
+        return view('livewire.shipment.transaction.create-transaction');
     }
 }

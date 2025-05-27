@@ -77,7 +77,8 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">{{ $loop->iteration }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-300">{{ $customer->name }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-300">{{ $customer->country }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-300"> {{ implode(', ', $customer->roles) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-300 font-bold"> {{ implode(', ', array_map(fn($role) => str_replace('_', ' ', $role), $customer->roles)) }}
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium space-x-3">
                                     <button wire:navigate href="/view-customers/{{ $customer->id }}"
                                         class="font-bold text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">

@@ -5,62 +5,107 @@ namespace App\Livewire\Customers;
 use Livewire\Component;
 use App\Models\Customer;
 use App\Models\ChartOfAccount;
-use Livewire\Attributes\Validate;
 use App\Models\customerAddress;
-
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Carbon\Carbon;
 
 class CreateCustomer extends Component
 {
     public $name, $email, $contact, $address, $web, $coa_id;
     public $roles = [];
+    public $country_code;
     public $country;
-    public $customer_id;
+    public $customer_code;
     public $chartOfAccounts;
 
-
     protected $rules = [
-        'name'    => ['required|min:3' => 'balls'],
-        'email'   => 'required|email|unique:customers,email',
-        'roles'   => 'min:1|array',
-        'contact' => 'required',
+        'name' => 'required|min:3|max:255',
+        'email' => 'required|email|unique:customers,email',
+        'contact' => 'required|max:20',
         'address' => 'required',
-        'coa_id'  => 'required|exists:chart_of_accounts,id',
-        'country' => 'required',
-        'web'     => 'required',
+        'web' => 'required|url',
+        'coa_id' => 'required|exists:chart_of_accounts,id',
+        'country_code' => 'required|size:2',
+        'roles' => 'required|array|min:1',
+        'customer_code' => 'required|unique:customers,customer_code'
+    ];
+
+    protected $messages = [
+        'country_code.required' => 'Pilih negara terlebih dahulu',
+        'customer_code.unique' => 'Kode customer sudah digunakan'
     ];
 
     public function mount()
     {
-        $this->chartOfAccounts = ChartOfAccount::orderBy('account_code')->get();
+        $this->chartOfAccounts = Cache::remember('chart-of-accounts', 3600, function () {
+            return ChartOfAccount::orderBy('account_code')->get();
+        });
+    }
+
+    public function updated($property)
+    {
+        if (in_array($property, ['name', 'country_code'])) {
+            $this->generateCustomerCode();
+        }
+    }
+
+    public function generateCustomerCode()
+    {
+        if (!$this->country_code || !$this->name) return;
+
+        $year = Carbon::now()->format('y');
+
+        // 1. Hilangkan PT dan karakter tidak perlu
+        $cleanName = preg_replace([
+            '/PT[\s\.]*/i', // Hapus PT dengan berbagai variasi (pt, Pt, pT, PT., PT , dll)
+            '/[^A-Za-z0-9]/' // Hapus karakter khusus
+        ], ['', ''], $this->name);
+
+        // 2. Hilangkan spasi dan batasi panjang
+        $custPart = strtoupper(
+            substr(
+                str_replace(' ', '', $cleanName) ?: 'CUST',
+                0,
+                5
+            ) // Maksimal 5 karakter
+        );
+
+        $baseCode = $this->country_code . $custPart . $year;
+
+        $lastCode = Customer::where('customer_code', 'like', $baseCode . '-%')
+            ->orderBy('customer_code', 'desc')
+            ->first();
+
+        $number = $lastCode ? (int)explode('-', $lastCode->customer_code)[1] + 1 : 1;
+
+        $this->customer_code = $baseCode . '-' . str_pad($number, 3, '0', STR_PAD_LEFT);
     }
 
     public function save()
     {
-        // $this->validate();
-        // dd($this->name, $this->email, $this->contact, $this->country, $this->address, $this->web, $this->roles);
-        // dd($this->roles);  // This will dump the roles to check if they are being passed correctly.
+
         $customer = Customer::create([
-            'name'    => $this->name,
-            'email'   => $this->email,
+            'name' => $this->name,
+            'email' => $this->email,
             'contact' => $this->contact,
             'country' => $this->country,
-            'web'     => $this->web,
-            'roles'   => $this->roles,
-            'coa_id'  => $this->coa_id,
+            'web' => $this->web,
+            'roles' => $this->roles,
+            'coa_id' => $this->coa_id,
+            'customer_code' => $this->customer_code,
         ]);
 
         customerAddress::create([
-            'address'      => $this->address,
-            'customer_id'  => $customer->id,
+            'address' => $this->address,
+            'customer_id' => $customer->id,
         ]);
 
-
-        return redirect()->route('customers.list')->with('success', [
+        return redirect()->route('customerListt')->with('success', [
             'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.
             'title' => 'Success!', // Toast title
 
         ]);
-        $this->resetForm();
     }
 
     public function render()

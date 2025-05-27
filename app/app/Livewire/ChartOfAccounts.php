@@ -38,7 +38,7 @@ class ChartOfAccounts extends Component
 
     public function edit($id)
     {
-        $coa = ChartOfAccount::findOrFail($id);
+        $coa = ChartOfAccount::select('')->findOrFail($id);
         $this->coa_id = $coa->id;
         $this->account_code = $coa->account_code;
         $this->account_name = $coa->account_name;

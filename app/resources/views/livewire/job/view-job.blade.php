@@ -1,3 +1,5 @@
+@section('title', 'View Jobs')
+
 <div class="p-3 bg-white shadow sm:rounded-lg">
     <div class="text-center p-3 bg-blue-500 rounded-t-lg font-bold">
         <p class="">Details Job</p>
@@ -488,11 +490,11 @@
                             {{$c->containers['netOfWeight'] ?? ''}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            <button href="" class="py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg
+                            <a href="{{ url('view-job/' . $job->id . '/container-job/' . $c->id) }}" class="py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg
                             transform transition duration-200 ease-in-out shadow:hover-cyan-200
                             hover:bg-cyan-400 hover:scale-110 ">
                                 <i class="fa-regular fa-file"></i> See Attachment
-                            </button>
+                            </a>
                         </td>
                     </tr>
                     @empty
@@ -697,7 +699,6 @@
                                             <input type="checkbox" wire:model="selectedShipments" value="{{ $s->id }}" class="form-checkbox text-blue-600 rounded-md">
                                         </td>
                                         <td class="px-4 py-2 text-left">{{ $s->shipment_id }}</td>
-                                        <td></td>
                                         <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_loading'] ?? '-' }}</td>
                                         <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_discharge'] ?? '-' }}</td>
                                         <td class="px-4 py-2 text-left">

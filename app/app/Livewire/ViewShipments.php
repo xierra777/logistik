@@ -17,6 +17,7 @@ class ViewShipments extends Component
     public $transaction; // Your list of transactions
     public $transactionId; // Selected transaction to edit
     public $isEditing = false;
+
     public $refreshKey = null;
 
     protected $listeners = [

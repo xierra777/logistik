@@ -212,18 +212,9 @@
                     </label>
                     <select id="charge" name="charge" wire:model="charge"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value=""></option>
-                        <option value="FCL">FCL</option>
-                        <option value="TERMINAL HANDLING CHARGES : THC">TERMINAL HANDLING CHARGES : THC</option>
-                        <option value=" DOCUMENT CHARGES : DOC FEE">DOCUMENT CHARGES : DOC FEE</option>
-                        <option value="ADMINISTRATION CHARGES">ADMINISTRATION CHARGES</option>
-                        <option value="BL CHARGES">BL FEE</option>
-                        <option value="OTHERS">OTHERS</option>
-                        <option value="STORAGE">STORAGE</option>
-                        <option value="FREIGHT CHARGES">FREIGHT CHARGES OCEAN/AIR</option>
-                        <option value="TRUCKING">TRUCKING</option>
-                        <option value="HANDLING CHARGES">HANDLING CHARGES</option>
-                        <option value="PEB/PIB CHARGES">PEB/PIB CHARGES</option>
+                        @foreach($chargeCoa as $c)
+                        <option value="{{$c->charge_code}}">{{$c->charge_code}}</option>
+                        @endforeach
                     </select>
                 </div>
                 <!-- Description -->

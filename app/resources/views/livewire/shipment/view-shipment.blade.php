@@ -575,8 +575,7 @@
                     x-ref="modalContent">
                     <div class=" flex justify-end mb-4 p-4">
                         <button
-                            wire:click="refreshTransaction"
-                            @click="open = true"
+                            wire:click="refreshTransaction({{ $shipments->id }})" @click="open = true"
                             class="py-3 px-4 bg-blue-600 text-white rounded-lg">
                             Add Cost
                         </button>

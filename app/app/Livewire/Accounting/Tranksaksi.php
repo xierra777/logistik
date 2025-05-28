@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Accounting;
 
+use App\Models\ChargeSetting;
 use Livewire\Component;
 use App\Models\Transaction;
 use App\Models\Customer;
@@ -14,6 +15,7 @@ class Tranksaksi extends Component
     public $shipment;
     public $customer_id;
 
+    public $chargeCoa;
     // === Charge Details ===
     public $charge, $description, $freight, $unit, $ofdtype, $remarks;
     public $quantity = 0;
@@ -60,7 +62,7 @@ class Tranksaksi extends Component
         $this->shipmentId = $shipmentId;
         $customers = Customer::orderBy('name')->get();
         $shipment = Shipment::find($shipmentId);
-
+        $this->chargeCoa = ChargeSetting::get();
         $this->vendors = $customers->where('category', 'CR');
 
         $this->clients = collect([

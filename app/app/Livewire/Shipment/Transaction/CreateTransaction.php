@@ -9,9 +9,12 @@ use App\Models\Customer;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Models\ChargeSetting;
 
 class CreateTransaction extends Component
 {
+    public $chargeCoa;
+
     public $shipmentId;
     public $shipment;
     public $customer_id;
@@ -60,16 +63,11 @@ class CreateTransaction extends Component
     public function mount($id)
     {
         $this->shipmentId = $id;
-        $customers = customer::orderBy('name')->get();
+        $customers = customer::select('id', 'name')->orderBy('name')->get();
         $shipment = TShipments::find($id);
+        $this->chargeCoa = ChargeSetting::select('id', 'charge_code', 'charge_name')->get();
 
-        $this->vendors = $customers->where('category', 'CR');
-
-        $this->clients = collect([
-            $shipment->shipper,
-            $shipment->consignee,
-            $shipment->notify,
-        ])->filter();
+        $this->vendors = $customers->where('category', 'CR');;
 
         // $this->updateQty();
     }
@@ -77,10 +75,11 @@ class CreateTransaction extends Component
     // === Simpan Data Transaksi Baru ===
     public function save()
     {
-        if (!$this->shipmentId) {
-            session()->flash('error', 'Shipment ID tidak ditemukan!');
-            return;
-        }
+        // if (!$this->shipmentId) {
+        //     session()->flash('error', 'Shipment ID tidak ditemukan!');
+        //     return;
+        // }
+        // dd($this->charge);
 
         $vendor = Customer::find($this->cvendor);
         $client = Customer::find($this->sclient);
@@ -139,6 +138,7 @@ class CreateTransaction extends Component
         // $this->loadClients(); 
         $this->dispatch('transactionSaved');
         $this->dispatch('close-modal');
+        $this->chargeCoa = ChargeSetting::select('id', 'charge_code', 'charge_name')->get();
 
         session()->flash('message', 'Transaksi berhasil disimpan!');
     }

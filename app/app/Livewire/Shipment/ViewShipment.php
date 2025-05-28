@@ -22,8 +22,11 @@ class ViewShipment extends Component
             'job',
             'container',
             'client.addresses',
+            'client',
             'shipper.addresses',
+            'shipper',
             'consignee.addresses',
+            'consignee',
             'notify.addresses',
             'deliveryAgent',
             'carrierModel',
@@ -39,10 +42,26 @@ class ViewShipment extends Component
 
         ];
     }
-    public function refreshTransaction()
+    public function refreshTransaction($id)
     {
+
         $this->refreshKey = now()->timestamp;
+
+        // Load shipment lengkap dengan relasi terkait
+        $this->shipments = TShipments::with([
+            'job',
+            'container',
+            'client.addresses',
+            'shipper.addresses',
+            'consignee.addresses',
+            'notify.addresses',
+            'deliveryAgent',
+            'carrierModel',
+            'carrierAgent',
+            'shipmentTransaction',
+        ])->findOrFail($id);
     }
+
     public function getOrganizationsProperty()
     {
         return collect([

@@ -41,22 +41,26 @@
             </select>
             @error('term_type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
-        <div class="mb-4">
+        <div class="mb-4" wire:ignore>
             <label class="block font-medium">Parent Account (Opsional)</label>
-            <select wire:model="parent_account_id" class="w-full border rounded p-2">
+            <select wire:model="parent_account_id" id="parent_account_id" class="w-full border rounded p-2">
                 <option value="">-- Tidak Ada --</option>
                 @foreach ($parents as $parent)
                 <option value="{{ $parent->id }}">{{ $parent->account_code }} - {{ $parent->account_name }}</option>
                 @endforeach
             </select>
         </div>
+        <div class="p-3 flex justify-between">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
+                {{ $isEditing ? 'Update' : 'Simpan' }}
+            </button>
+            <a class="coaSetting bg-blue-500 rounded-md p-3 hover:scale-105 hover:text-white transition duration-300 ease-in-out hover:shadow-cyan-200" href="{{route('coaSetting')}}">Charge Coa Setting</a>
+        </div>
 
-        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
-            {{ $isEditing ? 'Update' : 'Simpan' }}
-        </button>
     </form>
 
     <!-- Tabel untuk Menampilkan Daftar Akun COA -->
+
     <div class="overflow-x-auto">
         <table class="min-w-full border">
             <thead class="bg-gray-200">
@@ -89,3 +93,21 @@
         </table>
     </div>
 </div>
+
+@script()
+<script>
+    $(document).ready(function() {
+        $('#parent_account_id').select2({
+            placeholder: "Select roles",
+            allowClear: true,
+            theme: 'tailwindcss-3'
+        });
+        $('#parent_account_id').on('change', function() {
+            let data = $(this).val();
+            // console.log(data);
+            // $wire.set('roles',data,false);
+            $wire.parent_account_id = data;
+        });
+    });
+</script>
+@endscript

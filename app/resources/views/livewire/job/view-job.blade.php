@@ -1,3 +1,5 @@
+@section('title', 'View Jobs')
+
 <div class="p-3 bg-white shadow sm:rounded-lg">
     <div class="text-center p-3 bg-blue-500 rounded-t-lg font-bold">
         <p class="">Details Job</p>
@@ -488,11 +490,11 @@
                             {{$c->containers['netOfWeight'] ?? ''}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            <button href="" class="py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg
+                            <a href="{{ url('view-job/' . $job->id . '/container-job/' . $c->id) }}" class="py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg
                             transform transition duration-200 ease-in-out shadow:hover-cyan-200
                             hover:bg-cyan-400 hover:scale-110 ">
                                 <i class="fa-regular fa-file"></i> See Attachment
-                            </button>
+                            </a>
                         </td>
                     </tr>
                     @empty
@@ -697,7 +699,6 @@
                                             <input type="checkbox" wire:model="selectedShipments" value="{{ $s->id }}" class="form-checkbox text-blue-600 rounded-md">
                                         </td>
                                         <td class="px-4 py-2 text-left">{{ $s->shipment_id }}</td>
-                                        <td></td>
                                         <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_loading'] ?? '-' }}</td>
                                         <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_discharge'] ?? '-' }}</td>
                                         <td class="px-4 py-2 text-left">
@@ -729,6 +730,143 @@
 
             </div>
 
+        </div>
+    </div>
+    <div class="mt-4 shadow-lg ">
+        <div>
+            <p class="text-center p-3 bg-gray-400 rounded-t-lg font-bold italic border">Transaction still under Construction <br>
+                <span class="text-red-700">...</span>
+            </p>
+            <div class="flex justify-end p-1 ">
+                <div x-data="{ open: false }" @close-modal.window="open = false"
+                    x-ref="modalContent">
+                    <div class=" flex justify-end mb-4 p-4">
+                        <button
+                            wire:click="refreshTransaction"
+                            @click="open = true"
+                            class="py-3 px-4 bg-blue-600 text-white rounded-lg">
+                            Add Cost
+                        </button>
+                    </div>
+
+                    <!-- Background Overlay -->
+                    <div x-cloak x-show="open"
+                        x-transition:enter="transition ease-out duration-300 delay-150"
+                        x-transition:leave="transition ease-in duration-200"
+                        class="fixed inset-0 bg-gray-500 bg-opacity-50 z-40">
+                    </div>
+
+                    <!-- Modal Container -->
+                    <div x-cloak x-show="open"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="scale-90 opacity-0"
+                        x-transition:enter-end="scale-100 opacity-100"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="scale-100 opacity-100"
+                        x-transition:leave-end="scale-90 opacity-0"
+                        class="fixed inset-0 flex items-center justify-center z-50 px-4">
+                        <div class="bg-white rounded-lg shadow-md w-full max-w-7.5xl">
+                            <!-- Modal Header -->
+                            <div class="flex justify-between items-center p-4 border-b">
+                                <h2 class="text-lg font-semibold text-gray-800">Costing</h2>
+                                <button @click="open = false" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <!-- Form -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="table-hover min-w-full divide-y divide-gray-200 dark:divide-neutral-700 text-center">
+                <thead>
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            No
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Description
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Unit
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-orange-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Client
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-orange-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Sale
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-orange-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Amount (IDR)
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-orange-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Dr/Cr
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-blue-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Vendor
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-blue-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Cost
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-blue-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Amount (IDR)
+                        </th>
+                        <th scope="col" class="px-6 py-3 bg-blue-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Dr/Cr
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Freight
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Gross Profit
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="">
+                    <tr>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        </td>
+
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+
+                        </td>
+                    </tr>
+                    <tr wire:loading.remove>
+                        <td colspan="13" class="py-12 text-center">
+                            <div class="flex flex-col text-center items-center justify-center">
+                                <img src="{{ asset('images/nodata.svg') }}"
+                                    alt="No dataShipments illustration"
+                                    class="w-64 h-48 mb-4 opacity-75  dark:opacity-50">
+                                <p class="text-md font-medium text-gray-600 dark:text-neutral-300">
+                                    Mohon Kesediann Menunggu, Modul Masih dalam Pengerjaan
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr wire:loading class="animate-pulse">
+                        <td colspan="6" class="py-12 text-center text-gray-500 dark:text-neutral-400">
+                            Retrieving dataShipments…
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
         </div>
     </div>
     <hr class="border-gray-500 dark:border-neutral-500 mt-5">

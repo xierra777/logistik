@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Accounting\ChartOfAccount;
 
 use Livewire\Component;
 use App\Models\ChartOfAccount;
 
-class ChartOfAccounts extends Component
+class ChartOfAccountDetails extends Component
 {
     public $account_code, $account_name, $account_type, $term_type;
     public $parent_account_id;
@@ -85,10 +85,9 @@ class ChartOfAccounts extends Component
         $this->coa_id = null;
         $this->isEditing = false;
     }
-
     public function render()
     {
-        return view('livewire.chart-of-accounts', [
+        return view('livewire.accounting.chart-of-account.chart-of-account-details', [
             'accounts' => ChartOfAccount::orderBy('account_code')->get(),
             'parents'  => ChartOfAccount::all(),
         ]);

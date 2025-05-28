@@ -17,6 +17,7 @@ class ViewShipments extends Component
     public $transaction; // Your list of transactions
     public $transactionId; // Selected transaction to edit
     public $isEditing = false;
+
     public $refreshKey = null;
 
     protected $listeners = [
@@ -52,10 +53,11 @@ class ViewShipments extends Component
         }
     }
 
-    public function refreshTransaction()
-    {
-        $this->refreshKey = now()->timestamp; // atau Str::uuid() juga bisa
-    }
+    // public function refreshTransaction()
+    // {
+    //     $this->refreshKey = now()->timestamp; // atau Str::uuid() juga bisa
+    //     $this->dispatch('openModal');
+    // }
     public function refreshShipment()
     {
         $this->shipment = Shipment::with(['transactions', 'containers', 'invoices'])

@@ -13,11 +13,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(TShipmentsSeeder::class);
 
         User::factory()->create([
             'name' => 'Fauzan Munif Hillabi',
             'email' => 'info@bernusa.id',
+            'role' => 'admin',
             'password' => 'password',
         ]);
     }

@@ -3,10 +3,13 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Livewire\Accounting\Accountant;
+use App\Livewire\Accounting\ChartOfAccount\ChargeCoaSetting;
+use App\Livewire\Accounting\ChartOfAccount\ChartOfAccountDetails;
+
+
 use App\Livewire\Accounting\PurchaseInvoice;
 use App\Livewire\Accounting\Tranksaksi;
 use App\Livewire\Accounting\SaleInvoice;
-use App\Livewire\ChartOfAccounts;
 use App\Livewire\Users;
 use App\Livewire\JournalEntries;
 use App\Livewire\Customers\CreateCustomer;
@@ -15,6 +18,7 @@ use App\Livewire\Customers\ViewCustomer;
 use App\Livewire\Customers\ListCustomer;
 use App\Livewire\Dashboard;
 use App\Livewire\HouseBL;
+use App\Livewire\Job\ContainerJob;
 use App\Livewire\Pdfhbl;
 use App\Livewire\Job\CreateJob;
 use App\Livewire\Job\EditJob;
@@ -43,10 +47,7 @@ Route::view('shipments', 'shipments.index',)
 Route::view('shipment', 'shipments.create',)
     ->middleware(['auth'])
     ->name('shipment');
-Route::get('/chart-of-accounts', ChartOfAccounts::class)->middleware([
-    'auth',
-    'verified'
-]);
+
 
 Route::get('/data/airports-ajax', function () {
     $token = 'dfa43c42-594a-44ed-8752-0909a8dfba7e';
@@ -90,12 +91,9 @@ Route::get('/data/airports-ajax', function () {
     ]);
 });
 
-Route::get('view-shipment/{id}/container-shipment/{container_id}', ContainerShipment::class)
-    ->middleware(['auth', 'verified'])
-    ->name('shipment.container');
+
 
 // Route Shipment
-
 Route::get('create-shipment', CreateShipment::class)->middleware([
     'auth',
     'verified'
@@ -109,7 +107,9 @@ Route::get('view-shipment/{id}', ViewShipment::class)->middleware([
     'auth',
     'verified'
 ])->name('viewShipment');
-
+Route::get('view-shipment/{id}/container-shipment/{container_id}', ContainerShipment::class)
+    ->middleware(['auth', 'verified'])
+    ->name('shipment.container');
 // End Shipment Route
 
 // Route Job Route
@@ -131,6 +131,9 @@ Route::get('view-job/{id}', ViewJob::class)->middleware([
     'auth',
     'verified'
 ])->name('viewJob');
+Route::get('view-job/{id}/container-job/{jobContainer_id}', ContainerJob::class)
+    ->middleware(['auth', 'verified'])
+    ->name('jobContainer');
 // End Job Route
 
 
@@ -161,6 +164,7 @@ Route::get('/edit-customers/{id}', EditCustomer::class)->middleware([
 ]);
 Route::get('/customers/create', CreateCustomer::class)->middleware(['auth', 'verified'])->name('customers.create');
 
+
 Route::get('/customers', ListCustomer::class)
     ->middleware(['auth', 'verified'])
     ->name('customers.list');
@@ -176,6 +180,16 @@ Route::get('accountant', Accountant::class)
 Route::get('/accounting/tranksaksi', Tranksaksi::class)
     ->middleware(['auth', 'verified'])
     ->name('Tranksaksi');
+
+
+Route::get('charge-coa', ChargeCoaSetting::class)
+    ->middleware(['auth', 'verified'])
+    ->name('coaSetting');
+Route::get('chart-of-accont', ChartOfAccountDetails::class)
+    ->middleware(['auth', 'verified'])
+    ->name('chartOfAccount');
+
+
 
 Route::get('/purchase-invoice/{shipmentId}', PurchaseInvoice::class)
     ->middleware(['auth', 'verified'])

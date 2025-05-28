@@ -97,21 +97,6 @@
             </div>
             <!-- endroles -->
             <div class="relative w-full mb-4 bg">
-                <label for="address" class="block text-sm font-medium text-gray-700">
-                    Alamat <span class="text-red-500">*</span>
-                </label>
-                <input
-                    wire:model="address"
-                    type="text"
-                    id="address"
-                    name="address"
-                    required
-                    class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
-                @error('address')
-                <span class="text-sm text-red-500">{{ $message }}</span>
-                @enderror
-            </div>
-            <div class="relative w-full mb-4 bg">
                 <label for="web" class="block text-sm font-medium text-gray-700">
                     Web <span class="text-red-500">*</span>
                 </label>
@@ -122,6 +107,17 @@
                     name="web"
                     class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
                 @error('web')
+                <span class="text-sm text-red-500">{{ $message }}</span>
+                @enderror
+            </div>
+            <div class="relative w-full mb-4 bg">
+                <label for="address" class="block text-sm font-medium text-gray-700">
+                    Alamat <span class="text-red-500">*</span>
+                </label>
+                <div class="mt-2 block w-full rounded-md border-gray-300 font-bold shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                    <span>NB:Untuk Edit Alamat ada Di view customers</span>
+                </div>
+                @error('address')
                 <span class="text-sm text-red-500">{{ $message }}</span>
                 @enderror
             </div>

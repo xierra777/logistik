@@ -7,6 +7,7 @@ use App\Models\Transaction;
 use App\Observers\TransactionObserver;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Eloquent\Model;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +24,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Transaction::observe(TransactionObserver::class);
+        // Model::preventLazyLoading(true);
     }
 }

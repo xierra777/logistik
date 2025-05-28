@@ -139,7 +139,7 @@
                             <select name="deliveryAgent" id="deliveryAgent_export" wire:model="deliveryAgent" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 select2">
                                 <option value="">Select agent</option>
                                 @foreach($dagentsJob as $da)
-                                @if(in_array('agent', $cr->roles))
+                                @if(in_array('agent', $da->roles))
                                 <option value="{{ $da->id }}">{{ $da->name }}</option>
                                 @endif
                                 @endforeach
@@ -3034,7 +3034,7 @@
                                 <p class="col-span-2">: {{ $flightVesselName }} </p>
                             </div>
                             <div class="flex flex-items grid grid-cols-3 ">
-                                <p class="col-span-1"><strong>flightVesselNo</strong> </p>
+                                <p class="col-span-1"><strong>Voyage</strong> </p>
                                 <p class="col-span-2">: {{ $flightVesselNo }} </p>
                             </div>
                         </div>
@@ -3377,9 +3377,9 @@
 
                             });
 
-                            // Restore selected
                             if (currentValue) {
-                                $(select).val(currentValue).trigger('change');
+                                const option = new Option(currentValue, currentValue, true, true);
+                                $(select).append(option).trigger('change');
                             }
 
                             $(select).off('change.lw').on('change.lw', function() {

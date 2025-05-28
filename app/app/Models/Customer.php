@@ -27,15 +27,20 @@ class Customer extends Model
 
     public function chartOfAccount()
     {
-        return $this->belongsTo(ChartOfAccount::class);
+        return $this->belongsTo(ChartOfAccount::class, 'coa_id');
     }
 
     public function getCategoryAttribute()
     {
-        return $this->coa ? $this->coa->term_type : 'unknown';
+        return $this->relationLoaded('chartOfAccount') && $this->chartOfAccount
+            ? $this->chartOfAccount->term_type
+            : 'unknown';
     }
 
-
+    public function addresses()
+    {
+        return $this->hasMany(customerAddress::class, 'customer_id');
+    }
     public function shipments()
     {
         return $this->hasMany(Shipment::class);

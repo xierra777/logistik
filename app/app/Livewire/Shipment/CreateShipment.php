@@ -12,6 +12,8 @@ use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
+use App\Models\customerAddress;
+use Livewire\Attributes\On;
 
 class CreateShipment extends Component
 {
@@ -19,15 +21,19 @@ class CreateShipment extends Component
     public $shipmentType_job = '';
     public $shipment_id = '';
 
+
     public $shippers;
     public $consignees;
     public $notifys;
     public $clients;
-    public $dagentsJob;
-    public $carriers;
+    public $agentsJob;
+    public $carrierModel;
+    public $deliveryAgent;
+    public $carrierAgent;
+    public $containerShipmentCarrierAirline;
     public $employe;
     public $shipmentEmployee_id;
-    public $shipmentClient_id, $shipmentShipper_id, $shipmentConsignee_id, $shipmentNotify_id, $shipmentCarrierAgent, $shipmentDeliveryAgent, $shipmentCarrierAirline, $shipmentClient_address;
+    public $shipmentClient_id, $shipmentShipper_id, $shipmentConsignee_id, $shipmentNotify_id, $shipmentCarrierAgent, $shipmentDeliveryAgent, $shipmentCarrierAirline, $shipmentClient_address, $shipmentClientAddresses = [];
 
 
     // Detail Shipment
@@ -44,15 +50,28 @@ class CreateShipment extends Component
         $this->shippers = Customer::whereJsonContains('roles', 'shipper')->get();
         $this->consignees = Customer::whereJsonContains('roles', 'consignee')->get();
         $this->notifys = Customer::whereJsonContains('roles', 'notify')->get();
-        $this->dagentsJob = Customer::whereJsonContains('roles', 'agent')->get();
-        $this->carriers = Customer::whereJsonContains('roles', 'carrier')->get();
+        $this->agentsJob = Customer::whereJsonContains('roles', 'agent')->get();
+        $this->deliveryAgent = Customer::whereJsonContains('roles', 'delivery_agent')->get();
+        $this->carrierAgent = Customer::whereJsonContains('roles', 'carrier_agent')->get();
+        $this->carrierModel = Customer::whereJsonContains('roles', 'carrier')->get();
         $this->employe = User::all('id', 'name');
     }
-    public function updatedShipmentClientId()
+    #[On('port-updated')]
+    public function updatePort($model, $value)
     {
-        $client = $this->clients->firstWhere('id', $this->shipmentClient_id);
+        $this->$model = $value;
+    }
 
-        $this->shipmentClient_address = $client?->address ?? '';
+    public function updatedShipmentClientId($value)
+    {
+        $addresses = customerAddress::where('customer_id', $value)->get();
+        $this->shipmentClientAddresses = $addresses;
+
+        if (!empty($addresses)) {
+            $this->shipmentClient_address = $addresses->first()->address ?? null;
+        } else {
+            $this->shipmentClient_address = null;
+        }
     }
 
     public function previousStep()
@@ -61,7 +80,7 @@ class CreateShipment extends Component
     }
     public function nextStep()
     {
-        // dd($this->shipmentType_job);
+        // dd($this->shipmentClient_address);
 
         $this->validateCurrentStep();
         $this->step++;
@@ -73,6 +92,53 @@ class CreateShipment extends Component
         $client = $this->clients->firstWhere('id', $this->shipmentClient_id);
         return $client;
     }
+    public function getShipperNameProperty()
+    {
+        if (!$this->shipmentShipper_id) return '';
+
+        $shipper = $this->shippers->firstWhere('id', $this->shipmentShipper_id);
+        return $shipper;
+    }
+    public function getConsigneeNameProperty()
+    {
+        if (!$this->shipmentConsignee_id) return '';
+
+        $consignee = $this->consignees->firstWhere('id', $this->shipmentConsignee_id);
+        return $consignee;
+    }
+    public function getNotifyNameProperty()
+    {
+        if (!$this->shipmentNotify_id) return '';
+
+        $notify = $this->notifys->firstWhere('id', $this->shipmentNotify_id);
+        return $notify;
+    }
+    public function getCarrierNameProperty()
+    {
+        if (!$this->shipmentCarrierAirline) return '';
+        $carrier = $this->carrierModel->firstWhere('id', $this->shipmentCarrierAirline);
+        return $carrier;
+    }
+    public function getContainerCarrierNameProperty()
+    {
+        if (!$this->containerShipmentCarrierAirline) return '';
+        $containerCarrier = $this->carrierModel->firstWhere('id', $this->containerShipmentCarrierAirline);
+        return $containerCarrier;
+    }
+    public function getCarrierAgentNameProperty()
+    {
+        if (!$this->shipmentCarrierAgent) return '';
+
+        $carrierAgent = $this->carrierAgent->firstWhere('id', $this->shipmentCarrierAgent);
+        return $carrierAgent;
+    }
+    public function getDeliveryAgentNameProperty()
+    {
+        if (!$this->shipmentDeliveryAgent) return '';
+
+        $delivery = $this->deliveryAgent->firstWhere('id', $this->shipmentDeliveryAgent);
+        return $delivery;
+    }
     public function updatedShipmentTypejob()
     {
         $this->generateShipmentName();
@@ -83,7 +149,7 @@ class CreateShipment extends Component
     {
         $startOfMonth = Carbon::now()->startOfMonth();
         $endOfMonth = Carbon::now()->endOfMonth();
-        $countThisMonth = TJob::whereBetween('created_at', [$startOfMonth, $endOfMonth])->count();
+        $countThisMonth = TShipments::whereBetween('created_at', [$startOfMonth, $endOfMonth])->count();
         $sequence = str_pad($countThisMonth + 1, 3, '0', STR_PAD_LEFT);
         $ctry = 'ID';
         $date = now()->format('ym');
@@ -200,7 +266,6 @@ class CreateShipment extends Component
     {
         $container = [
             'shipmentNoOfPackages'         => $this->shipmentNoOfPackages,
-            'shipmentContainerDeliveryAgent' => $this->shipmentContainerDeliveryAgent,
             'shipmentGrossWeight'          => $this->shipmentGrossWeight,
             'shipmentVolumeWeight'         => $this->shipmentVolumeWeight,
             'shipmentVolume'               => $this->shipmentVolume,
@@ -253,12 +318,16 @@ class CreateShipment extends Component
             'shipmentsTypeJob'          => $this->shipmentType_job,
             'shipment_id'              => $this->shipment_id,
             'shipmentClient_id'        => $this->shipmentClient_id,
+            'shipmentClient_address'    => $this->shipmentClient_address,
             'shipmentShipper_id'     => $this->shipmentShipper_id,
             'shipmentConsignee_id'    => $this->shipmentConsignee_id,
             'shipmentNotify_id'         => $this->shipmentNotify_id,
-            'shipmentClient_address'    => $this->shipmentClient_address,
             'shipmentCarrierAirline'      => $this->shipmentCarrierAirline,
-            'employee_id        ' => $this->shipmentEmployee_id,
+            'shipmentContainerDeliveryAgent' => $this->shipmentContainerDeliveryAgent,
+            'containerShipmentCarrierAirline' => $this->containerShipmentCarrierAirline,
+            'shipmentCarrierAgent'      => $this->shipmentCarrierAgent,
+            'shipmentDeliveryAgent'     => $this->shipmentDeliveryAgent,
+            'employee_id' => $this->shipmentEmployee_id,
             'dataShipments'              => $payload,
         ]);
 
@@ -267,7 +336,7 @@ class CreateShipment extends Component
             'containersData' => $container,
         ]);
 
-        return redirect()->route('listJob')->with('success', [
+        return redirect()->route('customers.list')->with('success', [
             'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.
             'title' => 'Success!', // Toast title
 

@@ -197,7 +197,6 @@
 
     <div class="bg-white">
         <!-- Heading Bar -->
-        {{$shipmentId}}
         <div class="bg-green-600 p-3 rounded-t-xl">
             <h2 class="text-white text-lg font-semibold">Charge</h2>
         </div>
@@ -212,8 +211,9 @@
                     </label>
                     <select id="charge" name="charge" wire:model="charge"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <option value=""></option>
                         @foreach($chargeCoa as $c)
-                        <option value="{{$c->charge_code}}">{{$c->charge_code}}</option>
+                        <option value="{{$c->charge_code}}">{{$c->charge_code}} - {{$c->charge_name}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -625,6 +625,19 @@
             // console.log(data);
             // $wire.set('roles',data,false);
             $wire.sclient = data;
+        });
+    });
+    $(document).ready(function() {
+        $('#charge').select2({
+            placeholder: "Select roles",
+            allowClear: true,
+            theme: 'tailwindcss-3'
+        });
+        $('#charge').on('change', function() {
+            let data = $(this).val();
+            // console.log(data);
+            // $wire.set('roles',data,false);
+            $wire.charge = data;
         });
     });
 </script>

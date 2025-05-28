@@ -76,15 +76,28 @@ class Transaction extends Model
     {
         return $this->belongsTo(Shipment::class, 'shipment_id');
     }
-    public function customer()
+    public function client()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class, 'client_id');
     }
     public function vendor()
     {
         return $this->belongsTo(Customer::class, 'vendor_id');
     }
+    public function shipper()
+    {
+        return $this->belongsTo(Customer::class, 'shipper_id');
+    }
 
+    public function consignee()
+    {
+        return $this->belongsTo(Customer::class, 'consignee_id');
+    }
+
+    public function notify()
+    {
+        return $this->belongsTo(Customer::class, 'notify_id');
+    }
     public function invoice()
     {
         return $this->belongsTo(Invoice::class);

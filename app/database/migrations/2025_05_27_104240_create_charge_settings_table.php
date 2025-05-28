@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('charge_settings', function (Blueprint $table) {
             $table->id();
-            $table->string('charge_code')->unique();   // kode charge, misal 'THC', 'FREIGHT'
-            $table->string('charge_name');              // nama charge
-            $table->foreignId('coa_sale_id')->nullable()->constrained('chart_of_accounts')->onDelete('set null');  // COA untuk sales
-            $table->foreignId('coa_cost_id')->nullable()->constrained('chart_of_accounts')->onDelete('set null');  // COA untuk cost
+            $table->string('charge_code')->unique();
+            $table->string('charge_name');
+            $table->foreignId('coa_sale_id')->nullable()->constrained('chart_of_accounts')->onDelete('set null');
+            $table->foreignId('coa_cost_id')->nullable()->constrained('chart_of_accounts')->onDelete('set null');
             $table->timestamps();
         });
     }

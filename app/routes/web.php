@@ -3,10 +3,13 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Livewire\Accounting\Accountant;
+use App\Livewire\Accounting\ChartOfAccount\ChargeCoaSetting;
+use App\Livewire\Accounting\ChartOfAccount\ChartOfAccountDetails;
+
+
 use App\Livewire\Accounting\PurchaseInvoice;
 use App\Livewire\Accounting\Tranksaksi;
 use App\Livewire\Accounting\SaleInvoice;
-use App\Livewire\ChartOfAccounts;
 use App\Livewire\Users;
 use App\Livewire\JournalEntries;
 use App\Livewire\Customers\CreateCustomer;
@@ -44,10 +47,7 @@ Route::view('shipments', 'shipments.index',)
 Route::view('shipment', 'shipments.create',)
     ->middleware(['auth'])
     ->name('shipment');
-Route::get('/chart-of-accounts', ChartOfAccounts::class)->middleware([
-    'auth',
-    'verified'
-])->name('chartOfAccount');
+
 
 Route::get('/data/airports-ajax', function () {
     $token = 'dfa43c42-594a-44ed-8752-0909a8dfba7e';
@@ -180,6 +180,16 @@ Route::get('accountant', Accountant::class)
 Route::get('/accounting/tranksaksi', Tranksaksi::class)
     ->middleware(['auth', 'verified'])
     ->name('Tranksaksi');
+
+
+Route::get('charge-coa', ChargeCoaSetting::class)
+    ->middleware(['auth', 'verified'])
+    ->name('coaSetting');
+Route::get('chart-of-accont', ChartOfAccountDetails::class)
+    ->middleware(['auth', 'verified'])
+    ->name('chartOfAccount');
+
+
 
 Route::get('/purchase-invoice/{shipmentId}', PurchaseInvoice::class)
     ->middleware(['auth', 'verified'])

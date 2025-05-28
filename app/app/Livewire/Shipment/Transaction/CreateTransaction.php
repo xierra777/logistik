@@ -135,18 +135,18 @@ class CreateTransaction extends Component
             'chwtaxrateusd' => $this->chwtaxrateusd,
         ]);
 
-        $this->reset(); // Reset semua field setelah simpan
-        $this->loadClients(); // Refresh data jika perlu
-        $this->dispatch('transactionSaved'); // Emit event ke parent untuk refresh data\n        $this->dispatch('close-modal');  // Tutup modal child
+        $this->reset();
+        // $this->loadClients(); 
+        $this->dispatch('transactionSaved');
         $this->dispatch('close-modal');
 
         session()->flash('message', 'Transaksi berhasil disimpan!');
     }
 
-    public function loadClients()
-    {
-        $this->clients = customer::where('category', 'DR')->orderBy('name')->get();
-    }
+    // public function loadClients()
+    // {
+    //     $this->clients = customer::where('category', 'DR')->orderBy('name')->get();
+    // }
 
     public function closeModal()
     {

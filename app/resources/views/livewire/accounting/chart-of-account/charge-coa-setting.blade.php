@@ -108,7 +108,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr wire:loading.remove>
+                <tr>
                     <td colspan="8" class="py-12 text-center">
                         <div class="flex flex-col items-center justify-center">
                             <img src="{{ asset('images/nodata.svg') }}"
@@ -121,11 +121,6 @@
                                 Start by adding shipments or importing data.
                             </p>
                         </div>
-                    </td>
-                </tr>
-                <tr wire:loading class="animate-pulse">
-                    <td colspan="8" class="py-12 text-center text-gray-500 dark:text-neutral-400">
-                        Retrieving data…
                     </td>
                 </tr>
                 @endforelse

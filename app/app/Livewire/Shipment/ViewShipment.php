@@ -4,6 +4,7 @@ namespace App\Livewire\Shipment;
 
 use Livewire\Component;
 use App\Models\TShipments;
+use App\Models\Transaction;
 
 class ViewShipment extends Component
 {
@@ -18,36 +19,36 @@ class ViewShipment extends Component
     ];
     public function mount($id)
     {
-        $this->shipments = TShipments::with([
-            'job',
-            'container',
-            'client.addresses',
-            'client',
-            'shipper.addresses',
-            'shipper',
-            'consignee.addresses',
-            'consignee',
-            'notify.addresses',
-            'deliveryAgent',
-            'carrierModel',
-            'carrierAgent',
-            'shipmentTransaction',
-        ])->findOrFail($id);
+        $this->loadShipment($id);
+
 
         $this->organizationFields = [
-            'Client' => 'client',
-            'Shipper' => 'shipper',
-            'Consignee' => 'consignee',
-            'Notify Party' => 'notify',
+            'Client' => 'client.addresses',
+            'Shipper' => 'shipper.addresses',
+            'Consignee' => 'consignee.addresses',
+            'Notify Party' => 'notify.addresses',
 
         ];
+    }
+    public function confirmDelete($get_id)
+    {
+        try {
+            Transaction::destroy($get_id);
+            session()->flash('message', 'Shipment deleted successfully!');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error deleting shipment: ' . $e->getMessage());
+        }
     }
     public function refreshTransaction($id)
     {
 
         $this->refreshKey = now()->timestamp;
+        $this->loadShipment($id); // cukup panggil method ini, tidak perlu cari ulang shipment ID
 
-        // Load shipment lengkap dengan relasi terkait
+    }
+
+    public function loadShipment($id)
+    {
         $this->shipments = TShipments::with([
             'job',
             'container',
@@ -61,7 +62,6 @@ class ViewShipment extends Component
             'shipmentTransaction',
         ])->findOrFail($id);
     }
-
     public function getOrganizationsProperty()
     {
         return collect([

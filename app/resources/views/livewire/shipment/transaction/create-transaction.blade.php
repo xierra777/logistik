@@ -17,6 +17,7 @@
                 maximumFractionDigits: 2
             }).format(value);
         },
+        
         ccurrency: @entangle('ccurrency'),
         crate: @entangle('crate'),
         camount: @entangle('camount_qty'),
@@ -140,6 +141,7 @@
 
         // Initialization
         init() {
+      window.reinitSelect2();
             this.$watch('cfcyAmount', value => @this.set('cfcyamount', value));
             this.$watch('camount', value => @this.set('camount_qty', value));
             this.$watch('formatNumber(ctaxamount)', value => @this.set('cvatgstamount', value));
@@ -192,7 +194,8 @@
                     this.srate = 0;
                 });
         }
-    }">
+    }" x-init="init(); $nextTick(() => window.reinitSelect2())"
+    x-cloak>
 
 
     <div class="bg-white">
@@ -205,7 +208,7 @@
             <!-- Row 1 -->
             <div class="grid grid-cols-3 gap-3">
                 <!-- Charge -->
-                <div>
+                <div wire:ignore>
                     <label for="charge" class="block text-sm font-medium text-gray-700">
                         Charge<span class="text-red-500">*</span>
                     </label>
@@ -222,11 +225,14 @@
                     <label for="description" class="block text-sm font-medium text-gray-700">
                         Description / Name<span class="text-red-500">*</span>
                     </label>
-                    <input type="text" id="description" name="description" wire:model="description" placeholder=""
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                    <div class="flex gap-2">
+                        <input type="text" id="description" name="description" wire:model="description" placeholder=""
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"><span wire:loading></span>
+                    </div>
+
                 </div>
                 <!-- Freight -->
-                <div>
+                <div wire:ignore>
                     <label for="freight" class="block text-sm font-medium text-gray-700">
                         Freight<span class="text-red-500">*</span>
                     </label>
@@ -240,7 +246,7 @@
             <!-- Row 2 -->
             <div class="grid grid-cols-3 gap-4">
                 <!-- Unit -->
-                <div>
+                <div wire:ignore>
                     <label for="unit" class="block text-sm font-medium text-gray-700">
                         Unit<span class="text-red-500">*</span>
                     </label>
@@ -259,7 +265,7 @@
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
                 </div>
                 <!-- OFD Type -->
-                <div>
+                <div wire:ignore>
                     <label for="cofdtype" class="block text-sm font-medium text-gray-700">
                         OFD Type
                     </label>
@@ -296,7 +302,7 @@
                     <select wire:model="sclient" id="sclient" class="w-full border rounded-md border-gray-300 p-2">
                         <option value="">-- Pilih Client --</option>
                         @foreach($clients ?? [] as $client)
-                        <option wire:key="{{$client}}" value="{{ $client->id }}">{{ $client->name }}</option>
+                        <option wire:key="{{$client}}" value="{{ $client->id }}">{{$client->customer_code}} - {{ $client->name }}</option>
                         @endforeach
                     </select>
                     @error('sclient') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -454,12 +460,12 @@
             <!-- Row 1 -->
             <div class="grid grid-cols-3 gap-4">
                 <!-- Vendor -->
-                <div class="mb-4">
+                <div class="mb-4" wire:ignore>
                     <label class="block font-medium">Pilih Vendor</label>
-                    <select wire:model="cvendor" class="w-full border rounded-md border-gray-300 p-2">
+                    <select wire:model="cvendor" id="cvendor" class="w-full border rounded-md border-gray-300 p-2">
                         <option value="">-- Pilih Vendor --</option>
-                        @foreach($vendors ?? [] as $vendor)
-                        <option wire:key="{{$vendor}}" value="{{ $vendor->id }}">{{ $vendor->name }}</option>
+                        @foreach($vendors as $vendor)
+                        <option wire:key="{{$vendor}}" value="{{ $vendor->id }}">{{$vendor->customer_code}} - {{ $vendor->name }}</option>
                         @endforeach
                     </select>
                     @error('vendor') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -612,33 +618,69 @@
         </button>
     </div>
 </form>
+@push('script')
 @script()
 <script>
-    $(document).ready(function() {
-        $('#sclient').select2({
-            placeholder: "Select roles",
-            allowClear: true,
-            theme: 'tailwindcss-3'
+    window.reinitSelect2 = () => {
+        [{
+                sel: '#sclient',
+                model: 'sclient',
+                placeholder: 'Select Client '
+            }, {
+                sel: '#charge',
+                model: 'charge',
+                placeholder: 'Select Charge'
+            }, {
+                sel: '#cvendor',
+                model: 'cvendor',
+                placeholder: 'Select Vendor'
+            },
+            {
+                sel: '#freight',
+                model: 'freight',
+                placeholder: 'Select Freight'
+            },
+            {
+                sel: '#cofdtype',
+                model: 'ofdtype',
+                placeholder: 'Select OFD  Type'
+            }, {
+                sel: '#unit',
+                model: 'unit',
+                placeholder: 'Select Unit'
+            },
+        ].forEach(({
+            sel,
+            model,
+            placeholder
+        }) => {
+            const $el = $(sel);
+            if (!$el.length) return;
+
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+
+            $el.select2({
+                placeholder,
+                allowClear: true,
+                theme: 'tailwindcss-3',
+                width: '100%',
+            });
+
+            // Watch for Livewire updates
+            Livewire.hook('message.processed', () => {
+                if ($el.val() !== $wire[model]) {
+                    $el.val($wire[model]).trigger('change.select2');
+                }
+            });
+            $el.off('change.lw').on('change.lw', function() {
+                const value = $(this).val();
+                $wire.set(model, value);
+                console.log(value);
+            });
         });
-        $('#sclient').on('change', function() {
-            let data = $(this).val();
-            // console.log(data);
-            // $wire.set('roles',data,false);
-            $wire.sclient = data;
-        });
-    });
-    $(document).ready(function() {
-        $('#charge').select2({
-            placeholder: "Select roles",
-            allowClear: true,
-            theme: 'tailwindcss-3'
-        });
-        $('#charge').on('change', function() {
-            let data = $(this).val();
-            // console.log(data);
-            // $wire.set('roles',data,false);
-            $wire.charge = data;
-        });
-    });
+    };
 </script>
 @endscript
+@endpush

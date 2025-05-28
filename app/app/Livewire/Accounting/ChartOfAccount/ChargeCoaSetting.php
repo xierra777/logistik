@@ -36,7 +36,7 @@ class ChargeCoaSetting extends Component
     {
         return view(
             'livewire.accounting.chart-of-account.charge-coa-setting',
-            ['accounts' => ChargeSetting::orderBy('charge_code')->get(),]
+            ['accounts' => ChargeSetting::orderBy('charge_code')->with('coaSale', 'coaCost')->get(),]
         );
     }
 }

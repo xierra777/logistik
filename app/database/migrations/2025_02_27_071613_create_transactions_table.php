@@ -18,7 +18,8 @@ return new class extends Migration
             $table->foreignId('invoice_id')->nullable()->constrained('invoices')->onDelete('set null');
             $table->foreignId('customer_id')->nullable()->constrained('customers')->onDelete('set null');
             $table->foreignId('vendor_id')->nullable()->constrained('customers')->onDelete('set null');
-
+            $table->foreignId('coa_sale_id')->nullable()->constrained('chart_of_accounts')->onDelete('set null');
+            $table->foreignId('coa_cost_id')->nullable()->constrained('chart_of_accounts')->onDelete('set null');
             $table->string('charge')->nullable();
             $table->string('description')->nullable();
             $table->string('freight')->nullable();

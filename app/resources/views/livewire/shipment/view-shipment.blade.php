@@ -575,13 +575,12 @@
                 <div x-data="{ open: false }" @close-modal.window="open = false"
                     x-ref="modalContent">
                     <div class=" flex justify-end mb-4 p-4 gap-2">
-                        <button
-                            href=""
+                        <a
+                            href="{{ route('saleInvoice', ['id' => $shipments->id]) }}"
                             class="py-3 px-4 bg-green-600 text-white rounded-lg">
                             Print Invoice
-                        </button>
+                        </a>
                         <button
-                            href=""
                             class="py-3 px-4 bg-red-600 text-white rounded-lg">
                             Print PI
                         </button>

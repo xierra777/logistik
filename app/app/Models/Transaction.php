@@ -72,34 +72,27 @@ class Transaction extends Model
     {
         return $this->belongsTo(ChartOfAccount::class, 'coa_cost_id');
     }
+    public function customer()
+    {
+        return $this->belongsTo(customer::class, 'customer_id');
+    }
     public function shipment()
     {
         return $this->belongsTo(Shipment::class, 'shipment_id');
     }
-    public function client()
-    {
-        return $this->belongsTo(Customer::class, 'client_id');
-    }
+
     public function vendor()
     {
         return $this->belongsTo(Customer::class, 'vendor_id');
     }
-    public function shipper()
-    {
-        return $this->belongsTo(Customer::class, 'shipper_id');
-    }
 
-    public function consignee()
-    {
-        return $this->belongsTo(Customer::class, 'consignee_id');
-    }
-
-    public function notify()
-    {
-        return $this->belongsTo(Customer::class, 'notify_id');
-    }
     public function invoice()
     {
         return $this->belongsTo(Invoice::class);
+    }
+    public function getGpAttribute()
+    {
+        $toFloat = fn($v) => floatval(str_replace(',', '.', str_replace('.', '', $v)));
+        return $toFloat($this->samountidr) * $toFloat($this->quantity) - $toFloat($this->camountidr) * $toFloat($this->quantity);
     }
 }

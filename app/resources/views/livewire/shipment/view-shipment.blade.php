@@ -306,6 +306,7 @@
                 <button @click="openContainer = true" class="py-3 px-4 bg-green-600 text-white rounded-lg">
                     Add Container
                 </button>
+
             </div>
             <div x-cloak x-show="openContainer"
                 x-transition:enter="transition ease-out duration-300 delay-150"
@@ -573,12 +574,23 @@
             <div class="flex justify-end p-1 ">
                 <div x-data="{ open: false }" @close-modal.window="open = false"
                     x-ref="modalContent">
-                    <div class=" flex justify-end mb-4 p-4">
+                    <div class=" flex justify-end mb-4 p-4 gap-2">
+                        <button
+                            href=""
+                            class="py-3 px-4 bg-green-600 text-white rounded-lg">
+                            Print Invoice
+                        </button>
+                        <button
+                            href=""
+                            class="py-3 px-4 bg-red-600 text-white rounded-lg">
+                            Print PI
+                        </button>
                         <button
                             wire:click="refreshTransaction({{ $shipments->id }})" @click="open = true"
                             class="py-3 px-4 bg-blue-600 text-white rounded-lg">
                             Add Cost
                         </button>
+
                     </div>
 
                     <!-- Background Overlay -->
@@ -625,6 +637,9 @@
                             No
                         </th>
                         <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Action
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Description
                         </th>
                         <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
@@ -669,19 +684,48 @@
                             {{ $loop->iteration }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            <button
+                                type="button"
+                                @click="$dispatch('confirm-delete', { get_id: {{ $transaction->id }} })"
+                                class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
+                                Delete
+                            </button>
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $transaction->description }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                        </td>
-
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-
+                            {{ $transaction->unit }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-
+                            {{$transaction->customer->name ?? ''}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-
+                            {{ $transaction->quantity }} x {{$transaction->samount_qty}}x{{$transaction->srate}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $transaction->samountidr ?? '' }}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$transaction->sdrcr}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$transaction->vendor->name ?? ''}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $transaction->quantity }} x {{$transaction->camount_qty}}x{{$transaction->crate}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$transaction->camountidr}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$transaction->cdrcr}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 uppercase whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$transaction->freight}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium font-bold {{ $transaction->gp < 0 ? 'text-red-500' : 'text-green-700' }}">
+                            {{ number_format($transaction->gp, 2, ',', '.') }}
                         </td>
                     </tr>
                     @empty
@@ -705,6 +749,7 @@
                     @endforelse
                 </tbody>
             </table>
+            <x-confirm-delete />
         </div>
     </div>
 

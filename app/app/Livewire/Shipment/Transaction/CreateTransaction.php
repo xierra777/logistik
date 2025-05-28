@@ -10,6 +10,7 @@ use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\ChargeSetting;
+use App\Models\shipmentContainers;
 
 class CreateTransaction extends Component
 {
@@ -18,6 +19,8 @@ class CreateTransaction extends Component
     public $shipmentId;
     public $shipment;
     public $customer_id;
+    public $coaSaleId;
+    public $coaCostId;
 
     // === Charge Details ===
     public $charge, $description, $freight, $unit, $ofdtype, $remarks;
@@ -44,7 +47,7 @@ class CreateTransaction extends Component
     {
         $this->shipmentId = $id;
         $shipment = TShipments::find($id);
-        $this->updateQty();
+        // $this->updateQty();
     }
 
     public function handleReload($payload)
@@ -57,21 +60,52 @@ class CreateTransaction extends Component
 
     // public function updateQty()
     // {
-    //     $this->quantity = ContainerShipment::where('shipment_id', $this->id)->count();
+    //     $this->quantity = ContainerShipment::where('shipment_id', $id)->count();
     // }
 
     public function mount($id)
     {
         $this->shipmentId = $id;
-        $customers = customer::select('id', 'name')->orderBy('name')->get();
-        $shipment = TShipments::find($id);
-        $this->chargeCoa = ChargeSetting::select('id', 'charge_code', 'charge_name')->get();
+        $customers = customer::orderBy('name')->get();
+        $shipment = TShipments::with([
+            'client',
+            'shipper',
+            'consignee',
+            'notify',
+            'carrierModel',
+            'deliveryAgent',
+        ])->find($id);
 
-        $this->vendors = $customers->where('category', 'CR');;
+        $this->clients = collect([
+            $shipment->client,
+            $shipment->shipper,
+            $shipment->consignee,
+            $shipment->notify,
+            $shipment->carrierModel,
+            $shipment->deliveryAgent,
+        ])->filter()->unique();
+        $this->chargeCoa = ChargeSetting::get();
+
+        $this->vendors = customer::where('category', 'creditor')->orderBy('name')->get();
 
         // $this->updateQty();
     }
+    // public function updateQty() {
+    //     $samount_qty = shipmentContainers::where('')
+    // }
+    public function updatedCharge($value)
+    {
+        $charge = ChargeSetting::where('charge_code', $value)->first();
 
+        if ($charge) {
+            $this->coaSaleId = $charge->coa_sale_id;
+            $this->coaCostId = $charge->coa_cost_id;
+            $this->description = $charge->charge_name;
+        } else {
+            $this->coaSaleId = null;
+            $this->coaCostId = null;
+        }
+    }
     // === Simpan Data Transaksi Baru ===
     public function save()
     {
@@ -80,6 +114,7 @@ class CreateTransaction extends Component
         //     return;
         // }
         // dd($this->charge);
+
 
         $vendor = Customer::find($this->cvendor);
         $client = Customer::find($this->sclient);
@@ -93,6 +128,8 @@ class CreateTransaction extends Component
             'quantity' => $this->quantity,
             'ofdtype' => $this->ofdtype,
             'remarks' => $this->remarks,
+            'coa_sale_id' => $this->coaSaleId,
+            'coa_cost_id' => $this->coaCostId,
             // Sale
             'customer_id' => $client?->id,
             'sclient' => $client?->name,
@@ -138,9 +175,9 @@ class CreateTransaction extends Component
         // $this->loadClients(); 
         $this->dispatch('transactionSaved');
         $this->dispatch('close-modal');
-        $this->chargeCoa = ChargeSetting::select('id', 'charge_code', 'charge_name')->get();
-
+        $this->chargeCoa = ChargeSetting::get();
         session()->flash('message', 'Transaksi berhasil disimpan!');
+        $this->vendors = customer::where('category', 'creditor')->orderBy('name')->get();
     }
 
     // public function loadClients()

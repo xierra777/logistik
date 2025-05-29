@@ -22,4 +22,16 @@ class shipmentContainers extends Model
     {
         return $this->belongsTo(jobContainer::class, 'id_jobContainer');
     }
+    public function getShipmentNoOfPackagesAttribute()
+    {
+        return isset($this->containersData['shipmentNoOfPackages'])
+            ? (int)$this->containersData['shipmentNoOfPackages']
+            : 0;
+    }
+    public function getShipmentGrossWeightAttribute()
+    {
+        return isset($this->containersData['shipmentGrossWeight'])
+            ? (int)$this->containersData['shipmentGrossWeight']
+            : 0;
+    }
 }

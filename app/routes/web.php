@@ -197,7 +197,7 @@ Route::get('/purchase-invoice/{shipmentId}', PurchaseInvoice::class)
 
 Route::get('/sale-invoice/{shipmentId}', SaleInvoice::class)
     ->middleware(['auth', 'verified'])
-    ->name('sale-invoice');
+    ->name('saleInvoice');
 Route::get('/csrf-token', function (Request $request) {
     return response()->json(['csrf_token' => csrf_token()]);
 })->name('csrf-token');

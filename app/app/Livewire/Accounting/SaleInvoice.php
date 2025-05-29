@@ -3,7 +3,7 @@
 namespace App\Livewire\Accounting;
 
 use Livewire\Component;
-use App\Models\{Customer, Container, Invoice, Transaction, Shipment};
+use App\Models\{Customer, Container, Invoice, shipmentContainers, Transaction, TShipments};
 use Spatie\Browsershot\Browsershot;
 use Illuminate\Support\Facades\View;
 use Carbon\Carbon;
@@ -23,14 +23,13 @@ class SaleInvoice extends Component
 
     public function mount($shipmentId = null)
     {
-        $this->shipmentId = $shipmentId;
-        $this->shipments = Shipment::where('id', $shipmentId)->get();
+        $this->shipments = TShipments::where('id', $shipmentId)->get();
 
         if (empty($this->invoice_number)) {
             $this->invoice_number = $this->generateInvoiceNumber();
         }
 
-        $shipment = Shipment::with(['shipper', 'consignee', 'notify'])->find($shipmentId);
+        $shipment = TShipments::with(['shipper', 'consignee', 'notify'])->find($shipmentId);
 
         $customerNames = collect([
             $shipment->shipper?->name,
@@ -39,7 +38,7 @@ class SaleInvoice extends Component
         ])->filter();
 
         $this->clients = Customer::whereIn('name', $customerNames)->get();
-        $this->containers = Container::all();
+        $this->containers = shipmentContainers::all();
 
         if ($shipmentId) {
             $this->loadTransactions();
@@ -55,7 +54,7 @@ class SaleInvoice extends Component
             return;
         }
 
-        $shipment = Shipment::with('containers', 'transactions')->findOrFail($this->shipmentId);
+        $shipment = TShipments::with('container', 'shipmentTransaction')->findOrFail($this->shipmentId);
         $customer = Customer::findOrFail($this->customer_id);
         $totalPcs = $shipment->containers->sum('pcs');
         $totalgw  = $shipment->containers->sum('gross_weight');
@@ -197,11 +196,11 @@ class SaleInvoice extends Component
             return;
         }
 
-        $shipment = Shipment::with('containers')->findOrFail($this->shipmentId);
+        $shipment = TShipments::with('container.jobContainer')->findOrFail($this->shipmentId);
         $customer = Customer::findOrFail($this->customer_id);
-        $totalPcs = $shipment->containers->sum('pcs');
-        $totalgw  = $shipment->containers->sum('gross_weight');
-
+        $totalPcs = $shipment->container->sum('shipmentNoOfPackages');
+        $totalgw  = $shipment->container->sum('shipmentGrossWeight');
+        // dd($shipment->container->first()->jobContainer->containers);
         // inisialisasi summary
         $summary = [
             'subtotal' => 0,
@@ -317,8 +316,6 @@ class SaleInvoice extends Component
 
         $this->pdfData = base64_encode($pdfContent);
         $this->dispatch('open-pdf-preview', pdf: 'data:application/pdf;base64,' . $this->pdfData);
-        // dd($summary);  // Debug summary sebelum format
-
     }
 
 
@@ -351,7 +348,7 @@ class SaleInvoice extends Component
                     ->where('customer_id', $this->customer_id)
                     ->get();
                 // Hitung total pcs dari containers di shipment
-                $shipment = Shipment::with('containers')->find($this->shipmentId);
+                $shipment = TShipments::with('container')->find($this->shipmentId);
                 if ($shipment && $shipment->containers) {
                     $this->totalPcs = $shipment->containers->sum('pcs');
                     $this->totalgw = $shipment->containers->sum('gross_weight');

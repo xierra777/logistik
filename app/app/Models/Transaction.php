@@ -64,6 +64,10 @@ class Transaction extends Model
         'coa_cost_id'
     ];
 
+    public function journalEntries()
+    {
+        return $this->hasMany(JournalEntry::class, 'transaction_id');
+    }
     public function coaSale()
     {
         return $this->belongsTo(ChartOfAccount::class, 'coa_sale_id');

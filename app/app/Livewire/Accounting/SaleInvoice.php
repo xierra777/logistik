@@ -5,6 +5,9 @@ namespace App\Livewire\Accounting;
 use Livewire\Component;
 use App\Models\{Customer, Container, Invoice, shipmentContainers, Transaction, TShipments};
 use Spatie\Browsershot\Browsershot;
+
+use Illuminate\Database\Eloquent\Collection;
+
 use Illuminate\Support\Facades\View;
 use Carbon\Carbon;
 
@@ -13,24 +16,26 @@ class SaleInvoice extends Component
     public string $finalCurrency = 'IDR'; // default
     public $invoice_number, $shipmentId, $customer_id, $date, $due_date, $total_amount = 0;
     public $notes, $currency, $pdfData = '';
-    public $shipments, $customers, $transactions, $containers, $clients;
+    public $customers, $transactions, $containers, $clients;
     public $totalPcs = 0;
     public $totalgw = 0;
     public $shipment;
+    public $dataShip;
 
     protected $listeners = ['setShipmentId'];
 
 
-    public function mount($shipmentId = null)
+    public function mount($shipmentId)
     {
-        $this->shipments = TShipments::where('id', $shipmentId)->get();
 
         if (empty($this->invoice_number)) {
             $this->invoice_number = $this->generateInvoiceNumber();
         }
+        $shipment = TShipments::with(['shipper', 'consignee', 'notify'])->findOrFail($shipmentId);
+        // $shipmentId = TShipments::get();
+        // dd($shipmentId);
 
-        $shipment = TShipments::with(['shipper', 'consignee', 'notify'])->find($shipmentId);
-
+        // dd($dataShip);
         $customerNames = collect([
             $shipment->shipper?->name,
             $shipment->consignee?->name,
@@ -45,21 +50,18 @@ class SaleInvoice extends Component
         }
     }
 
-    // Di method generatePDF()
     public function generatePDF()
     {
-        // validasi
         if (!$this->shipmentId || !$this->customer_id || $this->transactions->isEmpty()) {
             session()->flash('error', 'No data available for preview.');
             return;
         }
 
-        $shipment = TShipments::with('container', 'shipmentTransaction')->findOrFail($this->shipmentId);
-        $customer = Customer::findOrFail($this->customer_id);
-        $totalPcs = $shipment->containers->sum('pcs');
-        $totalgw  = $shipment->containers->sum('gross_weight');
+        $shipment = TShipments::with('container', 'shipmentTransaction', 'job')->findOrFail($this->shipmentId);
+        $customer = customer::findOrFail($this->customer_id);
+        $totalPcs = $shipment->container->sum('shipmentNoOfPackages');
+        $totalgw  = $shipment->container->sum('shipmentGrossWeight');
 
-        // inisialisasi summary
         $summary = [
             'subtotal' => 0,
             'vat'      => 0,
@@ -72,7 +74,6 @@ class SaleInvoice extends Component
             $qty      = (int) $trx->quantity;
             $rate     = (float) ($trx->srate ?? 1);
 
-            // === 1) hitung nilai asli per transaksi ===
             $amount = $currency === 'IDR'
                 ? (float) $this->parseIndoNumber($trx->samountidr)
                 : (float) $trx->sfcyamount;
@@ -88,13 +89,10 @@ class SaleInvoice extends Component
             $subtotal = $qty * $amount;
             $total    = $subtotal + $vat + $wht;
 
-            // simpan utk row-table
             $trx->subtotal = $subtotal;
             $trx->vat      = $vat;
             $trx->wht      = $wht;
             $trx->total    = $total;
-
-            // === 2) konversi ke finalCurrency ===
             if ($currency !== $this->finalCurrency) {
                 if ($currency === 'IDR' && $this->finalCurrency === 'USD') {
                     $cSub   = $subtotal / $rate;
@@ -105,19 +103,15 @@ class SaleInvoice extends Component
                     $cVat   = $vat      * $rate;
                     $cWht   = $wht      * $rate;
                 } else {
-                    // fallback—kalau ada mata uang lain, bisa extend di sini
                     $cSub = $subtotal;
                     $cVat = $vat;
                     $cWht = $wht;
                 }
             } else {
-                // sama dengan finalCurrency, no conversion
                 $cSub = $subtotal;
                 $cVat = $vat;
                 $cWht = $wht;
             }
-
-            // accumulate summary
             $summary['subtotal'] += $cSub;
             $summary['vat']      += $cVat;
             $summary['wht']      += $cWht;
@@ -161,23 +155,15 @@ class SaleInvoice extends Component
             'finalCurrency'        => $this->finalCurrency,
             'invoice_number'       => $this->invoice_number,
         ];
-
-        // Get current date (Optional - can be used for the document or logs)
         $now = Carbon::now();
-
-        // Render the HTML view
         $html = view('livewire.accounting.invoice-pdf', $data)->render();
-
-        // Generate PDF content using Browsershot
         $pdfContent = Browsershot::html($html)
-            ->setChromePath('/usr/bin/google-chrome') // Make sure this is correct
+            ->setChromePath('/usr/bin/google-chrome')
             ->format('A3')
             ->margins(5, 5, 5, 5)
             ->showBackground()
             ->setOption('args', ['--no-sandbox'])
             ->pdf();
-
-        // Return PDF content as a download response
         return response()->streamDownload(
             fn() => print($pdfContent),
             "Invoice-{$this->invoice_number}-{$now}.pdf"
@@ -190,18 +176,16 @@ class SaleInvoice extends Component
 
     public function previewPDF()
     {
-        // validasi
         if (!$this->shipmentId || !$this->customer_id || $this->transactions->isEmpty()) {
             session()->flash('error', 'No data available for preview.');
             return;
         }
 
-        $shipment = TShipments::with('container.jobContainer')->findOrFail($this->shipmentId);
+        $shipment = TShipments::with('container.jobContainer', 'job')->findOrFail($this->shipmentId);
         $customer = Customer::findOrFail($this->customer_id);
         $totalPcs = $shipment->container->sum('shipmentNoOfPackages');
         $totalgw  = $shipment->container->sum('shipmentGrossWeight');
         // dd($shipment->container->first()->jobContainer->containers);
-        // inisialisasi summary
         $summary = [
             'subtotal' => 0,
             'vat'      => 0,
@@ -214,7 +198,6 @@ class SaleInvoice extends Component
             $qty      = (int) $trx->quantity;
             $rate     = (float) ($trx->srate ?? 1);
 
-            // === 1) hitung nilai asli per transaksi ===
             $amount = $currency === 'IDR'
                 ? (float) $this->parseIndoNumber($trx->samountidr)
                 : (float) $trx->sfcyamount;
@@ -230,13 +213,11 @@ class SaleInvoice extends Component
             $subtotal = $qty * $amount;
             $total    = $subtotal + $vat + $wht;
 
-            // simpan utk row-table
             $trx->subtotal = $subtotal;
             $trx->vat      = $vat;
             $trx->wht      = $wht;
             $trx->total    = $total;
 
-            // === 2) konversi ke finalCurrency ===
             if ($currency !== $this->finalCurrency) {
                 if ($currency === 'IDR' && $this->finalCurrency === 'USD') {
                     $cSub   = $subtotal / $rate;
@@ -247,26 +228,22 @@ class SaleInvoice extends Component
                     $cVat   = $vat      * $rate;
                     $cWht   = $wht      * $rate;
                 } else {
-                    // fallback—kalau ada mata uang lain, bisa extend di sini
                     $cSub = $subtotal;
                     $cVat = $vat;
                     $cWht = $wht;
                 }
             } else {
-                // sama dengan finalCurrency, no conversion
                 $cSub = $subtotal;
                 $cVat = $vat;
                 $cWht = $wht;
             }
 
-            // accumulate summary
             $summary['subtotal'] += $cSub;
             $summary['vat']      += $cVat;
             $summary['wht']      += $cWht;
             $summary['total']    += ($cSub + $cVat + $cWht);
         }
 
-        // format summary untuk blade
         $formattedSummary = [
             'subtotal' => number_format(
                 $summary['subtotal'],
@@ -366,7 +343,7 @@ class SaleInvoice extends Component
             'invoices'  => Invoice::where('shipment_id', $this->shipmentId)
                 ->with(['shipment.containers', 'customer', 'transactions'])
                 ->get(),
-            'shipments' => $this->shipments,
+            'shipment' => TShipments::find($this->shipmentId),
         ]);
     }
 }

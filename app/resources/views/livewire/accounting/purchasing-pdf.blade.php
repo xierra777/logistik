@@ -51,7 +51,7 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">MAWB/MBL No.</p>
-                    <p class="col-span-3">: {{$shipment->shipment_id}}</p>
+                    <p class="col-span-3">: {{$shipment->job?->data['jobBillLadingNo']}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Shipper</p>
@@ -63,7 +63,10 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">ETA/ETD</p>
-                    <p class="col-span-3">: {{$shipment->estimearrival}}/{{$shipment->estimedelivery}}</p>
+                    <p class="col-span-3">: {{ $shipment->dataShipments['shipmentEstimearrival'] ? \Carbon\Carbon::parse($shipment->dataShipments['shipmentEstimearrival'])->format('d M Y') : '-' }}
+                        /
+                        {{ $shipment->dataShipments['shipmentEstimedelivery'] ? \Carbon\Carbon::parse($shipment->dataShipments['shipmentEstimedelivery'])->format('d M Y') : '-' }}
+                    </p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">HAWB/HBL No.</p>
@@ -71,11 +74,11 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Total No. of Pcs</p>
-                    <p class="col-span-3">: {{$totalPcs}} {{$shipment->containers->first()->pack_type ?? '' }}</p>
+                    <p class="col-span-3 uppercase font-bold">: {{$totalPcs}} {{$shipment->container->first()->containersData['shipmentTypeOfPackages'] ?? '' }}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Total G.Weight</p>
-                    <p class="col-span-3">: {{$totalgw}} {{$shipment->containers->first()->unit ?? '' }}</p>
+                    <p class="col-span-3">: {{$totalgw}} {{$shipment->container->first()->containersData['shipmentTypeOfGrossWeight'] }}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Total Volume</p>
@@ -94,27 +97,27 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Job No.</p>
-                    <p class="col-span-3">: {{$shipment->shipment_no}}</p>
+                    <p class="col-span-3">: {{$shipment->job->job_id ?? ''}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Shipment No.</p>
-                    <p class="col-span-3">: </p>
+                    <p class="col-span-3">: {{$shipment->shipment_id}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Place Of Receipt</p>
-                    <p class="col-span-3">: {{$shipment->place_of_receipt}}</p>
+                    <p class="col-span-3">: {{$shipment->dataShipments['shipmentPlace_of_receipt']}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Port Of Loading</p>
-                    <p class="col-span-3">: {{$shipment->port_of_loading}}</p>
+                    <p class="col-span-3">: {{$shipment->dataShipments['shipmentPort_of_loading']}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Port Of Dischage</p>
-                    <p class="col-span-3">: {{$shipment->port_of_discharge}}</p>
+                    <p class="col-span-3">: {{$shipment->dataShipments['shipmentPort_of_discharge']}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Vessel/Voyage</p>
-                    <p class="col-span-3">: {{$shipment->ocean_vessel_mother}}</p>
+                    <p class="col-span-3">: {{$shipment->dataShipments['shipmentFlightVesselName']}} / {{$shipment->dataShipments['shipmentFlightVesselNo']}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Reference No.</p>
@@ -122,11 +125,11 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Currency</p>
-                    <p class="col-span-3">: </p>
+                    <p class="col-span-3">: {{$finalCurrency}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Narration</p>
-                    <p class="col-span-3">: </p>
+                    <p class="col-span-3">: (Liners)</p>
                 </div>
             </div>
             <div class="col-span-4 border h-4 bg-blue-900  border-blue-900"></div>
@@ -147,16 +150,16 @@
                         </tr>
                     </thead>
                     <tbody class="align-top">
-                        @foreach($shipment->containers as $container)
+                        @foreach($shipment->container as $c)
                         <tr class="text-center">
-                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-left">{{ $container->container_id }}</td>
-                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center">{{ $container->container_type }}</td>
-                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center">{{ $container->pcs }}</td>
-                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center">{{ $container->pack_type }}</td>
-                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center">{{ $container->gross_weight }}</td>
-                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center">{{ $container->unit }}</td>
-                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center">{{ $container->measurement }}</td>
-                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center"></td>
+                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-left">{{ $c->jobContainer->containers['containerNo'] ?? '' }}</td>
+                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center">{{ $c->jobContainer->containers['containerType'] ?? '' }}</td>
+                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center">{{ $c->containersData['shipmentNoOfPackages'] }}</td>
+                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center">{{ $c->containersData['shipmentTypeOfPackages'] }}</td>
+                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center">{{ $c->containersData['shipmentGrossWeight'] }}</td>
+                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center">{{ $c->containersData['shipmentTypeOfGrossWeight'] }}</td>
+                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center">{{ $c->containersData['shipmentVolume'] }}</td>
+                            <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center">{{ $c->containersData['shipmentVolumeWeight'] }}</td>
                             <td class="px-1 whitespace-nowrap  border-r border-l border-gray-900 text-center"></td>
                         </tr>
                         @endforeach
@@ -189,7 +192,7 @@
                                 {{ $transaction->crate }}
                                 @endif
                             </td>
-                            <td class="px-2 border-r border-l border-gray-900 text-xs">
+                            <td class="px-2 border-r border-l border-gray-900 ">
                                 <div class="flex justify-between w-full">
                                     <span class="text-left">
                                         {{ $transaction->ccurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}

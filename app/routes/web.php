@@ -193,7 +193,7 @@ Route::get('chart-of-accont', ChartOfAccountDetails::class)
 
 Route::get('/purchase-invoice/{shipmentId}', PurchaseInvoice::class)
     ->middleware(['auth', 'verified'])
-    ->name('purchase-invoice');
+    ->name('purchaseInvoice');
 
 Route::get('/sale-invoice/{shipmentId}', SaleInvoice::class)
     ->middleware(['auth', 'verified'])

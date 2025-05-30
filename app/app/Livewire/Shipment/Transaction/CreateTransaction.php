@@ -10,6 +10,8 @@ use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\ChargeSetting;
+use App\Models\ChartOfAccount;
+use App\Models\JournalEntry;
 use App\Models\shipmentContainers;
 
 class CreateTransaction extends Component
@@ -119,7 +121,7 @@ class CreateTransaction extends Component
         $vendor = Customer::find($this->cvendor);
         $client = Customer::find($this->sclient);
 
-        Transaction::create([
+        $transaction = Transaction::create([
             'shipment_id' => $this->shipmentId,
             'charge' => $this->charge,
             'description' => $this->description,
@@ -170,6 +172,39 @@ class CreateTransaction extends Component
             'shwtaxrateusd' => $this->shwtaxrateusd,
             'chwtaxrateusd' => $this->chwtaxrateusd,
         ]);
+
+        $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
+        $costCoa = ChartOfAccount::find($transaction->coa_cost_id);
+        // dd([
+        //     'sale_term' => $saleCoa?->term_type,
+        //     'cost_term' => $costCoa?->term_type,
+        //     'sale_amount' => $transaction->samountidr,
+        //     'cost_amount' => $transaction->camountidr,
+        // ]);
+
+        // === JURNAL SALE ===
+        if ($transaction->samountidr && $saleCoa) {
+            JournalEntry::create([
+                'transaction_id' => $transaction->id,
+                'coa_id'         => $saleCoa->id,
+                'debit'          => $saleCoa->term_type === 'DR' ? $transaction->samountidr : 0,
+                'credit'         => $saleCoa->term_type === 'CR' ? $transaction->samountidr : 0,
+                'description'    => "Sale transaction #{$transaction->id}",
+                'date'           => now(),
+            ]);
+        }
+
+        // === JURNAL COST ===
+        if ($transaction->camountidr && $costCoa) {
+            JournalEntry::create([
+                'transaction_id' => $transaction->id,
+                'coa_id'         => $costCoa->id,
+                'debit'          => $costCoa->term_type === 'DR' ? $transaction->camountidr : 0,
+                'credit'         => $costCoa->term_type === 'CR' ? $transaction->camountidr : 0,
+                'description'    => "Cost transaction #{$transaction->id}",
+                'date'           => now(),
+            ]);
+        }
 
         $this->reset();
         // $this->loadClients(); 

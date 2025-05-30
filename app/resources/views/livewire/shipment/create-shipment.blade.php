@@ -711,7 +711,7 @@
                         </div>
                         <div class="flex flex-items grid grid-cols-3">
                             <p class="col-span-1"><strong>No. Shipments </strong> </p>
-                            <p class="col-span-2">: {{ $shipment_id }} </p>
+                            <p class="col-span-2 font-bold">: {{ $shipment_id }} </p>
                         </div>
                         <div class="flex flex-items grid grid-cols-3 ">
                             <p class="col-span-1"><strong>Shipper</strong> </p>
@@ -789,12 +789,12 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div class="flex flex-items grid grid-cols-3">
                             <p class="col-span-1"><strong>Carrier</strong> </p>
-                            <p class="col-span-2">: {{ $this->containerCarrierName->name }}</p>
+                            <p class="col-span-2">: {{ $this->containerCarrierName->name ?? ''}}</p>
                         </div>
-                        <div class="flex flex-items grid grid-cols-3">
+                        <!-- <div class="flex flex-items grid grid-cols-3">
                             <p class="col-span-1"><strong>Carrier</strong> </p>
-                            <p class="col-span-2">: {{ $this->containerCarrierName->name }}</p>
-                        </div>
+                            <p class="col-span-2">: {{ $this->containerCarrierName->name ?? ''}}</p>
+                        </div> -->
                         <div class="flex flex-items grid grid-cols-3">
                             <p class="col-span-1"><strong>Vessel Name</strong> </p>
                             <p class="col-span-2">: {{ $shipmentFlightVesselName }}</p>

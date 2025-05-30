@@ -51,7 +51,7 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">MAWB/MBL No.</p>
-                    <p class="col-span-3">: {{$shipment->shipment_id}}</p>
+                    <p class="col-span-3">: {{$shipment->job?->data['jobBillLadingNo']}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Shipper</p>
@@ -59,11 +59,14 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Consignee</p>
-                    <p class="col-span-3">: {{$shipment->consignee?->name}}</p>
+                    <p class="col-span-3">: {{$shipment->consignee?->name }}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">ETA/ETD</p>
-                    <p class="col-span-3">: {{$shipment->dataShipments['shipmentEstimearrival']}} / {{$shipment->dataShipments['shipmentEstimedelivery']}}</p>
+                    <p class="col-span-3">: {{ $shipment->dataShipments['shipmentEstimearrival'] ? \Carbon\Carbon::parse($shipment->dataShipments['shipmentEstimearrival'])->format('d M Y') : '-' }}
+                        /
+                        {{ $shipment->dataShipments['shipmentEstimedelivery'] ? \Carbon\Carbon::parse($shipment->dataShipments['shipmentEstimedelivery'])->format('d M Y') : '-' }}
+                    </p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">HAWB/HBL No.</p>
@@ -71,11 +74,11 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Total No. of Pcs</p>
-                    <p class="col-span-3 uppercase font-bold">: {{$totalPcs}} {{$shipment->container->first()->containersData['shipmentTypeOfPackages'] ?? '' }}</p>
+                    <p class="col-span-3 uppercase font-bold">: {{$totalPcs}} {{$shipment->container->first()->containersData['shipmentTypeOfPackages'] }}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Total G.Weight</p>
-                    <p class="col-span-3">: {{$totalgw}} {{$shipment->container->first()->containersData['shipmentTypeOfGrossWeight'] ?? '' }}</p>
+                    <p class="col-span-3">: {{$totalgw}} {{$shipment->container->first()->containersData['shipmentTypeOfGrossWeight'] }}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Total Volume</p>
@@ -94,7 +97,7 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Job No.</p>
-                    <p class="col-span-3">: {{$shipment->shipment_id}}</p>
+                    <p class="col-span-3">: {{$shipment->job?->job_id}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold">Shipment No.</p>

@@ -9,7 +9,7 @@ class JournalEntry extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['coa_id', 'debit', 'credit', 'description'];
+    protected $fillable = ['transaction_id', 'coa_id', 'debit', 'credit', 'description', 'date'];
 
     public function chartOfAccount()
     {

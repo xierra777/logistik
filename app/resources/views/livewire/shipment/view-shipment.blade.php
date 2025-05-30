@@ -576,14 +576,15 @@
                     x-ref="modalContent">
                     <div class=" flex justify-end mb-4 p-4 gap-2">
                         <a
-                            href="{{ route('saleInvoice', ['id' => $shipments->id]) }}"
+                            href="{{ route('saleInvoice', ['shipmentId' => $shipments->id]) }}"
                             class="py-3 px-4 bg-green-600 text-white rounded-lg">
                             Print Invoice
                         </a>
-                        <button
+                        <a
+                            href="{{route('purchaseInvoice',['shipmentId' => $shipments->id])}}"
                             class="py-3 px-4 bg-red-600 text-white rounded-lg">
                             Print PI
-                        </button>
+                        </a>
                         <button
                             wire:click="refreshTransaction({{ $shipments->id }})" @click="open = true"
                             class="py-3 px-4 bg-blue-600 text-white rounded-lg">

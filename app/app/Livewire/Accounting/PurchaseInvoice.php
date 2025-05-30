@@ -3,7 +3,7 @@
 namespace App\Livewire\Accounting;
 
 use Livewire\Component;
-use App\Models\{Customer, Container, Invoice, Transaction, Shipment};
+use App\Models\{Customer, Invoice, shipmentContainers, Transaction, TShipments};
 use Spatie\Browsershot\Browsershot;
 use Illuminate\Support\Facades\View;
 use carbon\Carbon;
@@ -22,7 +22,7 @@ class PurchaseInvoice extends Component
     public function mount($shipmentId = null)
     {
         $this->shipmentId = $shipmentId;
-        $this->shipments = Shipment::where('id', $shipmentId)->get();
+        $this->shipments = TShipments::where('id', $shipmentId)->get();
 
         if (empty($this->invoice_number)) {
             $this->invoice_number = $this->generateInvoiceNumber();
@@ -30,7 +30,7 @@ class PurchaseInvoice extends Component
 
         // Ambil daftar vendor dari transaksi yang sudah ada
         $this->vendors = Customer::whereIn('id', Transaction::whereNotNull('vendor_id')->pluck('vendor_id'))->get();
-        $this->containers = Container::all();
+        $this->containers = shipmentContainers::all();
 
         if ($shipmentId) {
             $this->loadTransactions();
@@ -44,14 +44,12 @@ class PurchaseInvoice extends Component
             return;
         }
 
+        $shipment = TShipments::with('container', 'shipmentTransaction', 'job')->findOrFail($this->shipmentId);
+        $customer = Customer::findOrFail($this->vendor_id);
 
-        $shipment = Shipment::with('containers')->findOrFail($this->shipmentId);
-        $customer = Transaction::findOrFail($this->vendor_id);
-        $totalPcs = $shipment->containers->sum('pcs');
+        $totalPcs = $shipment->container->sum('shipmentNoOfPackages');
+        $totalgw  = $shipment->container->sum('shipmentGrossWeight');
 
-
-
-        // inisialisasi summary
         $summary = [
             'subtotal' => 0,
             'vat'      => 0,
@@ -64,23 +62,19 @@ class PurchaseInvoice extends Component
             $qty      = (int) ($trx->quantity ?? 0);
             $rate     = (float) ($trx->crate ?? 1);
 
-            // amount asli
+            // Hitung amount asli
             $amount = $currency === 'IDR'
                 ? (float) $this->parseIndoNumber($trx->camountidr)
                 : (float) $trx->cfcyamount;
 
-            // VAT
             $vat = $currency === 'IDR'
                 ? (float) ($trx->cvatgstamount ?? 0)
-                : (float) ($trx->cvatgstusd    ?? 0);
+                : (float) ($trx->cvatgstusd ?? 0);
 
-            // WHT
-            if ($currency === 'IDR') {
-                $wht = (float) ($trx->cwhtaxamount ?? 0);
-            } else {
-                // contoh: konversi dari IDR amount ke USD
-                $wht = ((float) ($trx->cwhtaxamount ?? 0)) / $rate;
-            }
+            // Hitung WHT, konversi jika bukan IDR
+            $wht = $currency === 'IDR'
+                ? (float) ($trx->cwhtaxamount ?? 0)
+                : ((float) ($trx->cwhtaxamount ?? 0)) / $rate;
 
             $subtotal = $qty * $amount;
             $total    = $subtotal + $vat + $wht;
@@ -88,84 +82,73 @@ class PurchaseInvoice extends Component
             $trx->subtotal = $subtotal;
             $trx->total    = $total;
 
-
-            // === 2) konversi ke finalCurrency ===
+            // Konversi ke finalCurrency jika berbeda
             if ($currency !== $this->finalCurrency) {
                 if ($currency === 'IDR' && $this->finalCurrency === 'USD') {
-                    $cSub   = $subtotal / $rate;
-                    $cVat   = $vat      / $rate;
-                    $cWht   = $wht      / $rate;
+                    $cSub = $subtotal / $rate;
+                    $cVat = $vat / $rate;
+                    $cWht = $wht / $rate;
                 } elseif ($currency === 'USD' && $this->finalCurrency === 'IDR') {
-                    $cSub   = $subtotal * $rate;
-                    $cVat   = $vat      * $rate;
-                    $cWht   = $wht      * $rate;
+                    $cSub = $subtotal * $rate;
+                    $cVat = $vat * $rate;
+                    $cWht = $wht * $rate;
                 } else {
-                    // fallback—kalau ada mata uang lain, bisa extend di sini
+                    // fallback jika mata uang lain
                     $cSub = $subtotal;
                     $cVat = $vat;
                     $cWht = $wht;
                 }
             } else {
-                // sama dengan finalCurrency, no conversion
                 $cSub = $subtotal;
                 $cVat = $vat;
                 $cWht = $wht;
             }
 
-            // accumulate summary
+            // Akumulasi summary
             $summary['subtotal'] += $cSub;
             $summary['vat']      += $cVat;
             $summary['wht']      += $cWht;
-            $summary['total']    += ($cSub + $cVat + $cWht);
+            $summary['total']    += $cSub + $cVat + $cWht;
         }
 
-        // format summary untuk blade
-        $formattedSummary = [
-            'subtotal' => number_format(
-                $summary['subtotal'],
+        // Format summary untuk blade
+        $formattedSummary = [];
+        foreach (['subtotal', 'vat', 'wht', 'total'] as $key) {
+            $formattedSummary[$key] = number_format(
+                $summary[$key],
                 2,
                 $this->finalCurrency === 'IDR' ? ',' : '.',
                 $this->finalCurrency === 'IDR' ? '.' : ','
-            ),
-            'vat'      => number_format(
-                $summary['vat'],
-                2,
-                $this->finalCurrency === 'IDR' ? ',' : '.',
-                $this->finalCurrency === 'IDR' ? '.' : ','
-            ),
-            'wht'      => number_format(
-                $summary['wht'],
-                2,
-                $this->finalCurrency === 'IDR' ? ',' : '.',
-                $this->finalCurrency === 'IDR' ? '.' : ','
-            ),
-            'total'    => number_format(
-                $summary['total'],
-                2,
-                $this->finalCurrency === 'IDR' ? ',' : '.',
-                $this->finalCurrency === 'IDR' ? '.' : ','
-            ),
-        ];
+            );
+        }
+
         $data = compact('shipment', 'customer') + [
             'invoice_number' => $this->invoice_number,
             'transactions'   => $this->transactions,
-            'totalPcs'       => $this->totalPcs,
+            'totalPcs'       => $totalPcs,
+            'totalgw'        => $totalgw,
             'currency'       => $customer->currency,
+            'formattedSummary' => $formattedSummary,
+            'finalCurrency'  => $this->finalCurrency,
         ];
-        $now = Carbon::now(); // mendapatkan instance Carbon untuk tanggal dan waktu saat ini
-        echo $now->format('d-m-Y'); // misal: "24-03-2025"
+
+        $now = Carbon::now();
         $html = view('livewire.accounting.purchasing-pdf', $data)->render();
 
         $pdfContent = Browsershot::html($html)
-            ->setChromePath('/usr/bin/google-chrome') // Make sure this is correct
+            ->setChromePath('/usr/bin/google-chrome')
             ->format('A3')
             ->margins(5, 5, 5, 5)
             ->showBackground()
             ->setOption('args', ['--no-sandbox'])
             ->pdf();
 
-        return response()->streamDownload(fn() => print($pdfContent), "Invoice-{$this->invoice_number}.pdf");
+        return response()->streamDownload(
+            fn() => print($pdfContent),
+            "Invoice-{$this->invoice_number}-{$now->format('YmdHis')}.pdf"
+        );
     }
+
     public function previewPDF()
     {
         if (!$this->shipmentId || !$this->vendor_id || $this->transactions->isEmpty()) {
@@ -173,10 +156,10 @@ class PurchaseInvoice extends Component
             return;
         }
 
-        $shipment = Shipment::with('containers')->findOrFail($this->shipmentId);
+        $shipment = TShipments::with('container', 'shipmentTransaction', 'job')->findOrFail($this->shipmentId);
         $customer = Customer::findOrFail($this->vendor_id);
-        $totalPcs = $shipment->containers->sum('pcs');
-        $totalgw  = $shipment->containers->sum('gross_weight');
+        $totalPcs = $shipment->container->sum('shipmentNoOfPackages');
+        $totalgw  = $shipment->container->sum('shipmentGrossWeight');
 
         // inisialisasi summary
         $summary = [
@@ -274,8 +257,8 @@ class PurchaseInvoice extends Component
         $data = compact('shipment', 'customer') + [
             'invoice_number' => $this->invoice_number,
             'transactions'   => $this->transactions,
-            'totalPcs'  => $this->totalPcs,
-            'totalgw'  => $this->totalgw,
+            'totalPcs'  => $totalPcs,
+            'totalgw'  => $totalgw,
             'finalCurrency'        => $this->finalCurrency,
             'formattedSummary'     => $formattedSummary,
             'currency'       => $customer->country,

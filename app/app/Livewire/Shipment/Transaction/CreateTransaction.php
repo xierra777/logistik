@@ -183,28 +183,49 @@ class CreateTransaction extends Component
         // ]);
 
         // === JURNAL SALE ===
+        // Fungsi helper untuk konversi string Indo ke float
+        $indoStringToFloat = function (string $value): float {
+            // hapus titik ribuan, ganti koma jadi titik desimal
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
+            return floatval($value);
+        };
+
+        // Ambil relasi coaSale dan coaCost dari ChargeSetting agar dapat akses term_type
+        $chargeSetting = ChartOfAccount::find($transaction->coa_sale_id);
+        $saleCoa = $chargeSetting?->coaSale;
+        $costCoa = $chargeSetting?->coaCost;
+
+        // JURNAL SALE
         if ($transaction->samountidr && $saleCoa) {
+            $saleAmount = $indoStringToFloat($transaction->samountidr);
+            $totalSale = $saleAmount * $transaction->quantity;
+
             JournalEntry::create([
                 'transaction_id' => $transaction->id,
-                'coa_id'         => $saleCoa->id,
-                'debit'          => $saleCoa->term_type === 'DR' ? $transaction->samountidr : 0,
-                'credit'         => $saleCoa->term_type === 'CR' ? $transaction->samountidr : 0,
-                'description'    => "Sale transaction #{$transaction->id}",
-                'date'           => now(),
+                'coa_id' => $saleCoa->id,
+                'debit' => $saleCoa->term_type === 'DR' ? $totalSale : 0,
+                'credit' => $saleCoa->term_type === 'CR' ? $totalSale : 0,
+                'description' => "Sale transaction #{$transaction->id}",
+                'date' => now(),
             ]);
         }
 
-        // === JURNAL COST ===
+        // JURNAL COST
         if ($transaction->camountidr && $costCoa) {
+            $costAmount = $indoStringToFloat($transaction->camountidr);
+            $totalCost = $costAmount * $transaction->quantity;
+
             JournalEntry::create([
                 'transaction_id' => $transaction->id,
-                'coa_id'         => $costCoa->id,
-                'debit'          => $costCoa->term_type === 'DR' ? $transaction->camountidr : 0,
-                'credit'         => $costCoa->term_type === 'CR' ? $transaction->camountidr : 0,
-                'description'    => "Cost transaction #{$transaction->id}",
-                'date'           => now(),
+                'coa_id' => $costCoa->id,
+                'debit' => $costCoa->term_type === 'DR' ? $totalCost : 0,
+                'credit' => $costCoa->term_type === 'CR' ? $totalCost : 0,
+                'description' => "Cost transaction #{$transaction->id}",
+                'date' => now(),
             ]);
         }
+
 
         $this->reset();
         // $this->loadClients(); 
@@ -222,8 +243,8 @@ class CreateTransaction extends Component
 
     public function closeModal()
     {
-        $this->resetFields();
-        $this->dispatch('open = false'); // untuk Alpine.js tutup modal
+        // $this->resetFields();
+        $this->dispatch('close-modal'); // untuk Alpine.js tutup modal
     }
     public function render()
     {

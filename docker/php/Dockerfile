@@ -1,6 +1,6 @@
-FROM php:8.2-cli
+FROM php:8.2-fpm
 
-# Install dependencies & PHP extensions
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
@@ -21,24 +21,23 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     software-properties-common \
-    && docker-php-ext-install pdo pdo_mysql zip \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g npm \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    && docker-php-ext-install pdo pdo_mysql zip
 
-# ✅ Install Google Chrome Stable
+# Install Node.js 18 & NPM
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g npm
+
+# ✅ Install Google Chrome (for Puppeteer)
 RUN curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google.gpg \
     && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
     && apt-get update && apt-get install -y google-chrome-stable
 
-# ✅ Install puppeteer-core (tanpa Chrome)
+# ✅ Install puppeteer-core (without bundled Chromium)
 RUN npm install -g puppeteer
-RUN npm run build
 
-# Set workdir
+# Set working directory
 WORKDIR /var/www
 
-# Jalankan Laravel
-ENTRYPOINT []
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# Expose port (jika perlu debugging atau untuk fpm external)
+EXPOSE 9000

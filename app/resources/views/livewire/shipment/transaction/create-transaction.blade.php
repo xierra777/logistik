@@ -20,7 +20,7 @@
         
         ccurrency: @entangle('ccurrency'),
         crate: @entangle('crate'),
-        camount: @entangle('camount_qty'),
+        camount: @entangle('camount_qty'), 
         cincludedtax: @entangle('cincludedtax'),
         cvatgst: @entangle('cvatgst'),
         cwhtaxrate: @entangle('cwhtaxrate'),    
@@ -610,7 +610,7 @@
 
     <!-- Modal Footer (Buttons) -->
     <div class="flex justify-end mt-4 gap-2 p-4 border-t color-gray-200">
-        <button type="button" class="px-4 py-2 bg-gray-500 text-white rounded-lg" @click="$refs.modalContent.scrollTo({ top: 0, behavior: 'smooth' })">
+        <button type="button" wire:click="closeModal" class="px-4 py-2 bg-gray-500 text-white rounded-lg" @click="$refs.modalContent.scrollTo({ top: 0, behavior: 'smooth' })">
             Cancel
         </button>
         <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">

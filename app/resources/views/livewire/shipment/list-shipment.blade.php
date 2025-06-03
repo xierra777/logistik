@@ -14,10 +14,9 @@
     </div>
     <div class="flex justify-end">
         <div class="flex flex-col items-center gap-2" wire:ignore>
-            <div class="flex space-x-2 mb-4 rounded-lg border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-2">
+            <div class="flex space-x-2 text-center rounded-lg border border-gray-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-2">
                 <input type="date" wire:model.live="start_date"
                     class="block w-full sm:w-48 text-sm rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300">
-                <span class="text-gray-500 dark:text-neutral-400">to</span>
                 <input type="date" wire:model.live="end_date"
                     class="block w-full sm:w-48 text-sm rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:text-neutral-300">
             </div>
@@ -108,7 +107,7 @@
                                 </button>
                                 <button
                                     wire:navigate
-                                    href=""
+                                    href="{{ route('updateShipment', ['id' => $s->id]) }}"
                                     class="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300">
                                     Update
                                 </button>

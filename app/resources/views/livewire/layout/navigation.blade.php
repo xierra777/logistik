@@ -40,7 +40,7 @@ new class extends Component
                     </x-nav-link>
                 </div> -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex ">
-                    <x-nav-link :href="route('listShipment')" :active="request()->routeIs('listShipment','viewShipment','createShipment')">
+                    <x-nav-link :href="route('listShipment')" :active="request()->routeIs('listShipment','viewShipment','create-shipment')">
                         {{ __('Shipments') }}
                     </x-nav-link>
                 </div>
@@ -55,7 +55,7 @@ new class extends Component
                     </x-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('user.list')" :active="request()->routeIs('user.list')">
+                    <x-nav-link :href="route('userList')" :active="request()->routeIs('userList')">
                         {{ __('Data Employee') }}
                     </x-nav-link>
                 </div>

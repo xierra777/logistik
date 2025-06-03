@@ -89,52 +89,53 @@
                 {{$shipments->dataShipments['shipmentRemarksJobDetailJobs'] ?? ''}}
             </p>
         </div>
+        <!-- Tentuin Jobnya air apa ocean -->
         @if($shipments->job)
         <div class="col-span-3 border bg-sky-300 border-gray-300 mt-3">
             <div class="grid grid-cols-1 md:grid-cols-3 ">
                 <div class="flex flex-col">
                     <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">Job No </p>
                     <p class="text-center text-red-500 border font-bold text-md border-gray-900 px-4 py-2">
-                        <a href="{{  $shipments->job ? route('viewJob', ['id' => $shipments->job->id]) : '#' }}"> {{$shipments->job->job_id ?? '-'}}</a>
+                        <a href="{{  $shipments->job ? route('viewJob', ['id' => $shipments->job->id]) : '#' }}"> {{$shipments->job->job_id ?? '-'}} / {{ $shipments->job->created_at->format('d-M-Y') }}
+                        </a>
                     </p>
                 </div>
                 <div class="flex flex-col">
-                    <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">POL </p>
+                    <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">Vessel Code </p>
                     <p class="text-center border border-gray-900 px-4 py-2">
-                        {{$shipments->dataShipments['shipmentPort_of_loading'] ?? '-'}}.
+                        {{$shipments->job->data['flightVesselName'] ?? '-'}} {{$shipments->job->data['flightVesselNo']}}
                     </p>
                 </div>
                 <div class="flex flex-col">
-                    <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">POD </p>
-                    <p class="text-center text-gray-500 border  border-gray-900 px-4 py-2">
-                        {{$shipments->job->data['place_of_delivery'] ?? '-'}}.
+                    <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">Carrier</p>
+                    <p class="text-center border  border-gray-900 px-4 py-2">
+                        {{$shipments->job->carrierModel->name ?? '-'}}
+                    </p>
+                </div>
+
+                <div class="flex flex-col">
+                    <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">MBL No</p>
+                    <p class="text-center border font-bold text-md border-gray-900 px-4 py-2">
+                        {{$shipments->job->data['jobBillLadingNo'] ?? '-'}}
                     </p>
                 </div>
                 <div class="flex flex-col">
-                    <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">Job No </p>
-                    <p class="text-center text-red-500 border font-bold text-md border-gray-900 px-4 py-2">
-                        @isset($shipments->job)
-                        <a href="{{ route('viewJob', ['id' => $shipments->job->id]) }}"> {{$shipments->job->job_id ?? '-'}}</a>
-                        @else
-                        @endisset
-                    </p>
-                </div>
-                <div class="flex flex-col">
-                    <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">POL </p>
+                    <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">ETD</p>
                     <p class="text-center border border-gray-900 px-4 py-2">
-                        {{$shipments->job->data['port_of_loading'] ?? '-'}}.
+                        {{ optional(optional($shipments->job)->data['estimedelivery'] ? \Carbon\Carbon::parse($shipments->job->data['estimedelivery']) : null)->format('d-M-Y') ?? '-' }}
                     </p>
                 </div>
                 <div class="flex flex-col">
-                    <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">POD </p>
-                    <p class="text-center text-gray-500 border  border-gray-900 px-4 py-2">
-                        {{$shipments->job->data['place_of_delivery'] ?? '-'}}.
+                    <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">ETA</p>
+                    <p class="text-center  border  border-gray-900 px-4 py-2">
+                        {{ optional(optional($shipments->job)->data['estimearrival'] ? \Carbon\Carbon::parse($shipments->job->data['estimearrival']) : null)->format('d-M-Y') ?? '-' }}
                     </p>
                 </div>
             </div>
         </div>
         @else
         @endif
+        <!-- End Tentuin Jobnya air apa ocean -->
     </div>
     <div class="flex justify-start p-1">
         <button class="bg-green-500 rounded-lg p-1  transform transition duration-200 ease-in-out hover:bg-green-400 text-white hover:text-gray-400 hover:scale-105 text-sm transform-transition">Create BL</button>

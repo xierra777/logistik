@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Users;
 
 use App\Models\User;
 use Livewire\WithFileUploads;
@@ -9,7 +9,7 @@ use Livewire\WithPagination;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
-class Users extends Component
+class UserList extends Component
 {
     use WithFileUploads, WithPagination;
 
@@ -55,15 +55,7 @@ class Users extends Component
         $this->profile_photo = null;
     }
 
-    public function render()
-    {
-        // Fetch paginated users within the render method
-        $users = User::latest()->paginate($this->perPage);
 
-        return view('livewire.users', [
-            'users' => $users
-        ]);
-    }
 
     public function confirmDelete($get_id)
     {
@@ -86,5 +78,14 @@ class Users extends Component
         } catch (\Exception $e) {
             session()->flash('error', 'Error deleting user: ' . $e->getMessage());
         }
+    }
+
+
+    public function render()
+    {
+        $users = User::latest()->paginate($this->perPage);
+        return view('livewire.users.user-list', [
+            'users' => $users
+        ]);
     }
 }

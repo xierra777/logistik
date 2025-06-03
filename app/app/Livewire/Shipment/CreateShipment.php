@@ -336,9 +336,9 @@ class CreateShipment extends Component
             'containersData' => $container,
         ]);
 
-        return redirect()->route('customers.list')->with('success', [
-            'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.
-            'title' => 'Success!', // Toast title
+        return redirect()->route('listShipment')->with('success', [
+            'icon' => 'success',
+            'title' => 'Success!',
 
         ]);
     }

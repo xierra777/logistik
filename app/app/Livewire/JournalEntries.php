@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\Shipment;
+use App\Models\TShipments;
 
 class JournalEntries extends Component
 {
@@ -11,7 +11,7 @@ class JournalEntries extends Component
 
     public function mount()
     {
-        $this->shipments = Shipment::all();
+        $this->shipments = TShipments::all();
     }
 
     public function render()

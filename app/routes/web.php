@@ -144,7 +144,7 @@ Route::get('view-job/{id}/container-job/{jobContainer_id}', ContainerJob::class)
 Route::get('user', UserList::class)
     ->middleware(['auth', 'verified'])
     ->name('userList');
-Route::get('userView/{id}', UserView::class)
+Route::get('user-view/{id}', UserView::class)
     ->middleware(['auth', 'verified'])
     ->name('userView');
 // End Users Route

@@ -160,12 +160,12 @@
                         <td class="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800 dark:text-neutral-300">{{ $user->email }}</td>
 
                         <td class="px-6 py-4 text-center whitespace-nowrap text-end text-sm font-medium space-x-3">
-                            <button wire:navigate href="{{route('userView',[$user->id])}}"
+                            <a wire:navigate href="{{route('userView',[$user->id])}}"
                                 class="font-bold text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
                                 View
-                            </button>
-                            <button wire:navigate href="/edit-users/{{ $user->id }}"
-                                class="font-bold text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300">
+                            </a>
+                            <button wire:click="opencase({{ $user->id }})"
+                                class=" font-bold text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300">
                                 Update
                             </button>
                             <button type="button"
@@ -214,4 +214,42 @@
             </select>
         </div>
     </div>
+    @if ($showEditModal)
+    <div class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg w-full max-w-md relative">
+            <button wire:click="$set('showEditModal', false)"
+                class="absolute top-2 right-2 text-gray-600 hover:text-black">✕</button>
+
+            <h2 class="text-lg font-bold mb-4">Edit User</h2>
+
+            <div class="mb-4">
+                <label class="block">Name</label>
+                <input type="text" wire:model.defer="name" class="w-full border px-3 py-2 rounded" />
+            </div>
+
+            <div class="mb-4">
+                <label class="block">Email</label>
+                <input type="email" wire:model.defer="email" class="w-full border px-3 py-2 rounded" />
+            </div>
+
+            <div class="mb-4">
+                <label class="block">Role</label>
+                <input type="text" wire:model.defer="role" class="w-full border px-3 py-2 rounded" />
+            </div>
+
+            <div class="mb-4">
+                <label class="block">Password (kosongkan jika tidak ubah)</label>
+                <input type="password" wire:model.defer="password" class="w-full border px-3 py-2 rounded" />
+            </div>
+
+            <div class="mb-4">
+                <label class="block">Profile Photo</label>
+                <input type="file" wire:model="profile_photo" class="w-full" />
+            </div>
+
+            <button wire:click="update"
+                class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded font-bold">Save</button>
+        </div>
+    </div>
+    @endif
 </div>

@@ -7,9 +7,10 @@ use Livewire\Component;
 
 class UserView extends Component
 {
+    public $users;
     public function mount($id)
     {
-        $users = User::get($id);
+        $this->users = User::find($id);
     }
     public function render()
     {

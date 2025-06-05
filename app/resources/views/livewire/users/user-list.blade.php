@@ -143,21 +143,23 @@
                 <tbody>
                     @forelse($users as $user)
                     <tr class="hover:bg-gray-50 dark:hover:bg-neutral-800 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">{{ $loop->iteration }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-center font-medium text-gray-800 dark:text-neutral-200">{{ $loop->iteration }}</td>
 
                         <!-- Profile Picture -->
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <td class="px-6 py-4 whitespace-nowrap text-center align-middle text-sm">
                             @if ($user->profile_photo)
-                            <img src="{{ asset('storage/' . $user->profile_photo) }}" class="w-14 h-14 object-cover rounded-full" alt="Profile Picture">
+                            <img src="{{ asset('storage/' . $user->profile_photo) }}"
+                                class="w-14 h-14 object-cover rounded-full mx-auto"
+                                alt="Profile Picture">
                             @else
                             <span class="text-gray-500">No Image</span>
                             @endif
                         </td>
 
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-300">{{ $user->name }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800 dark:text-neutral-300">{{ $user->email }}</td>
+                        <td class="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800 dark:text-neutral-300">{{ $user->name }}</td>
+                        <td class="px-6 py-4 text-center whitespace-nowrap text-sm text-gray-800 dark:text-neutral-300">{{ $user->email }}</td>
 
-                        <td class="px-6 py-4 whitespace-nowrap text-end text-sm font-medium space-x-3">
+                        <td class="px-6 py-4 text-center whitespace-nowrap text-end text-sm font-medium space-x-3">
                             <button wire:navigate href="{{route('userView',[$user->id])}}"
                                 class="font-bold text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
                                 View

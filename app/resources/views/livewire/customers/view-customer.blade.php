@@ -105,7 +105,8 @@
                                 <div class="p-3">
                                     <div>
                                         <label for="address" class="block text-sm font-medium text-gray-700">Address</label>
-                                        <input type="text" id="address" wire:model="address"
+                                        <textarea name="" id="address" wire:model="address"></textarea>
+                                        <input type="text" id=""
                                             class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-500 focus:border-blue-500"
                                             placeholder="Enter address">
                                         @error('address') <span class="text-red-500">{{ $message }}</span> @enderror

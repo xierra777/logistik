@@ -1,3 +1,4 @@
 <div>
-    {{-- In work, do what you enjoy. --}}
+    <textarea name="" id=""></textarea>
+    {{$users->name}}
 </div>

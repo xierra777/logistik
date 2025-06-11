@@ -1,200 +1,190 @@
 <form wire:submit.prevent="save" class="py-5 px-3 max-h-[80vh] overflow-y-auto space-y-3  [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:hidden"
     x-data="{
-        scurrency: @entangle('scurrency'),
-        srate: @entangle('srate'),
-        amount: @entangle('samount_qty'),
-        sincludedtax: @entangle('sincludedtax'),
-        svatgst: @entangle('svatgst'),
-        swhtaxrate: @entangle('swhtaxrate'),
-        fcyAmount: @entangle('sfcyamount'),
-        samountidr: @entangle('samountidr'),
-        camountidr : @entangle('camountidr'),
-        // Number formatting function
-        formatNumber(value) {
-            if (isNaN(value) || value === null || value === undefined) return '';
-            return new Intl.NumberFormat('de-DE', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            }).format(value);
-        },
-        
-        ccurrency: @entangle('ccurrency'),
-        crate: @entangle('crate'),
-        camount: @entangle('camount_qty'), 
-        cincludedtax: @entangle('cincludedtax'),
-        cvatgst: @entangle('cvatgst'),
-        cwhtaxrate: @entangle('cwhtaxrate'),    
-        ctaxamount: @entangle ('cvatgstamount'),
-        get fcyAmount() {
-        const isTaxIncluded = (this.sincludedtax || 'No').trim() === 'Yes';
-        const rateNum = parseFloat(
-                        (this.svatgst || '0')
-                            .replace('%', '')
-                            .replace(',', '.')
-                    ) || 0;
-        const baseIdr = this.amount ;
-            if (isTaxIncluded) {
-        return parseFloat((baseIdr / (1 + rateNum / 100)).toFixed(3));
-            } else {
-                return baseIdr;
-            }
-       },
-        get samountidr() {
-            // Apakah tax included?
-            const isTaxIncluded = (this.sincludedtax || 'No').trim() === 'Yes';
+    // --- Source Section (Sales/Income) ---
+    scurrency: @entangle('scurrency'),
+    srate: @entangle('srate'),
+    amount: @entangle('samount_qty'),
+    sincludedtax: @entangle('sincludedtax'),
+    svatgst: @entangle('svatgst'),
+    swhtaxrate: @entangle('swhtaxrate'),
+    fcyAmount: @entangle('sfcyamount'),
+    samountidr: @entangle('samountidr'),
 
-            // Bersihkan rate VAT jadi angka murni
-            const rateNum = parseFloat(
-                (this.svatgst || '0')
-                    .replace('%', '')
-                    .replace(',', '.')
-            ) || 0;
+    // --- Cost Section (Purchasing/Expense) ---
+    ccurrency: @entangle('ccurrency'),
+    crate: @entangle('crate'),
+    camount: @entangle('camount_qty'),
+    cincludedtax: @entangle('cincludedtax'),
+    cvatgst: @entangle('cvatgst'),
+    cwhtaxrate: @entangle('cwhtaxrate'),
+    camountidr: @entangle('camountidr'),
+    ctaxamount: @entangle('cvatgstamount'),
 
-            // Base IDR tanpa pajak
-            const baseIdr = this.srate * (parseFloat(this.amount) || 0);
+    // --- Internal State (Non-binding) ---
+    samountIdrRaw: 0,
+    camountIdrRaw: 0,
 
-            if (isTaxIncluded) {
-                // Jika tax include, gross = base + VAT
-                return baseIdr / (1 + rateNum / 100);
-            } else {
-                return baseIdr;
-            }
-        },
+    // --- UI Display Formatting ---
+    get samountIdrDisplay() {
+        return this.formatNumber(this.samountIdrRaw);
+    },
+    get camountIdrDisplay() {
+        return this.formatNumber(this.camountIdrRaw);
+    },
+    formatNumber(value) {
+        if (isNaN(value) || value === null || value === undefined) return '';
+        return new Intl.NumberFormat('de-DE', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(value);
+    },
 
-        get gp() {
-            return this.samountidr - this.camountidr;
-        },
-        get whtaxAmount() {
-            const rateString = (this.swhtaxrate || '0').replace('%', '').replace(',', '.');
-            const rate = parseFloat(rateString) || 0;
-            return this.samountidr * (rate / 100);
-        },
-        get vatAmount() {
-                    const rateString = (this.svatgst || '0').replace('%', '').replace(',', '.');
-                    const rate = parseFloat(rateString) || 0;
-                    return this.samountidr * (rate / 100);
-        },
-        get vatAmountUsd() {
-                    const rateString = (this.svatgst || '0').replace('%', '').replace(',', '.');
-                    const rate = parseFloat(rateString) || 0;
-                    return this.fcyAmount * (rate / 100);
-        },
-        get swhtaxamountusd() {
-            const rateString = (this.swhtaxrate || '0').replace('%', '').replace(',', '.');
-            const rate = parseFloat(rateString) || 0;
-            return this.fcyAmount * (rate / 100);
-        },
-        get totalTax() {
-            return this.vatAmount + this.whtaxAmount;
-        },
-        // Computed properties
-        get cfcyAmount() {
-           const isTaxIncluded = (this.cincludedtax || 'No').trim() === 'Yes';
-        const rateNum = parseFloat(
-                        (this.cvatgst || '0')
-                            .replace('%', '')
-                            .replace(',', '.')
-                    ) || 0;
-        const baseIdr = this.camount ;
-            if (isTaxIncluded) {
-        return parseFloat((baseIdr / (1 + rateNum / 100)).toFixed(3));
-            } else {
-                return baseIdr;
-            }
-       },
-        get camountidr() {
-         // Apakah tax included?
-            const isTaxIncluded = (this.cincludedtax || 'No').trim() === 'Yes';
+    // --- Source Calculations ---
+    get fcyAmount() {
+        const included = (this.sincludedtax || 'No').trim() === 'Yes';
+        const rate = parseFloat((this.svatgst || '0').replace('%', '').replace(',', '.')) || 0;
+        return included ? parseFloat((this.amount / (1 + rate / 100)).toFixed(3)) : this.amount;
+    },
+    get samountIdrComputed() {
+    const included = (this.sincludedtax || 'No').trim() === 'Yes';
+    const rate = parseFloat((this.svatgst || '0').replace('%', '').replace(',', '.')) || 0;
+    const base = this.srate * (parseFloat(this.amount) || 0);
 
-            // Bersihkan rate VAT jadi angka murni
-            const rateNum = parseFloat(
-                (this.cvatgst || '0')
-                    .replace('%', '')
-                    .replace(',', '.')
-            ) || 0;
+    const round = (num, decimals = 2) =>
+        Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
 
-            const baseIdr = this.crate * (parseFloat(this.camount) || 0);
+    const result = round(included ? base / (1 + rate / 100) : base);
 
-            if (isTaxIncluded) {
-                // Jika tax include, gross = base + VAT
-                return baseIdr / (1 + rateNum / 100);
-            } else {
-                return baseIdr;
-            }
-        },
+    this.samountIdrRaw = result;
+    this.$nextTick(() => @this.set('samountidr', result));
 
-        get ctaxable() {
-            // Clean tax rate (handle values like '1,1%')
-            const rateString = (this.cvatgst || '0').replace('%', '').replace(',', '.');
-            const rate = parseFloat(rateString) || 0;
-            return this.camountidr * (rate / 100);
-        },
-        get cwhtaxamount() {
-            // Clean tax rate (handle values like '1,1%')
-            const rateString = (this.cwhtaxrate || '0').replace('%', '').replace(',', '.');
-            const rate = parseFloat(rateString) || 0;
-            return this.camountidr * (rate / 100);
-        },
-        get ctaxamount() {
-            return this.ctaxable + this.cwhtaxamount;
-        },
+    return result;
+},
 
-        // Initialization
-        init() {
-      window.reinitSelect2();
-            this.$watch('cfcyAmount', value => @this.set('cfcyamount', value));
-            this.$watch('camount', value => @this.set('camount_qty', value));
-            this.$watch('formatNumber(ctaxamount)', value => @this.set('cvatgstamount', value));
-            this.$watch('formatNumber(ctaxable)', value => @this.set('ctaxableamount', value));
-            this.$watch('formatNumber(camountidr)', value => @this.set('camountidr', value));
-            this.$watch('formatNumber(cwhtaxamount)', value => @this.set('cwhtaxamount', value));
-            this.$watch('ccurrency', value => this.fetchExchangRate(value));
-            this.fetchExchangRate(this.ccurrency);
-            this.$watch('formatNumber(gp)', value => @this.set('sgrossprofit', value));
-            this.$watch('fcyAmount', value =>  @this.set('sfcyamount', value));    
-            this.$watch('amount', value => @this.set('samount_qty', value));
-            this.$watch('formatNumber(vatAmount)', value => @this.set('svatgstamount', value));
-            this.$watch('formatNumber(totalTax)', value => @this.set('staxableamount', value));
-            this.$watch('formatNumber(whtaxAmount)', value => @this.set('swhtaxamount', value));
-            this.$watch('formatNumber(vatAmountUsd)', value => @this.set('svatgstusd', value));
-            this.$watch('formatNumber(samountidr)', value => @this.set('samountidr', value));
-            this.$watch('formatNumber(gp)', value => @this.set('sgrossprofit', value));
-            this.$watch('scurrency', value => this.fetchExchangeRate(value));
-            this.fetchExchangeRate(this.scurrency);
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                },
-        fetchExchangRate(currency) {
-            if (!currency || currency.trim().length < 3) {
-                this.crate = 0;
-                return;
-            }
-            let curr = currency.trim().toUpperCase();
-            fetch(`https://api.exchangerate-api.com/v4/latest/${curr}`)
-                .then(response => response.json())
-                .then(data => {
-                    this.crate = data.rates?.IDR || 0;
-                })
-                .catch(error => {
-                    console.error('Error fetching exchange rate:', error);
-                    this.crate = 0;
-                });
-        },
-        fetchExchangeRate(currency) {
-            if (!currency || currency.trim().length < 3) {
-                this.srate = 0;
-                return;
-            }
-            let curr = currency.trim().toUpperCase();
-            fetch(`https://api.exchangerate-api.com/v4/latest/${curr}`)
-                .then(response => response.json())
-                .then(data => {
-                    this.srate = data.rates?.IDR || 0;
-                })
-                .catch(error => {
-                    console.error('Error fetching exchange rate:', error);
-                    this.srate = 0;
-                });
+    get whtaxAmount() {
+        const rate = parseFloat((this.swhtaxrate || '0').replace('%', '').replace(',', '.')) || 0;
+        return this.samountIdrRaw * (rate / 100);
+    },
+    get vatAmount() {
+        const rate = parseFloat((this.svatgst || '0').replace('%', '').replace(',', '.')) || 0;
+        return this.samountIdrRaw * (rate / 100);
+    },
+    get vatAmountUsd() {
+        const rate = parseFloat((this.svatgst || '0').replace('%', '').replace(',', '.')) || 0;
+        return this.fcyAmount * (rate / 100);
+    },
+    get swhtaxamountusd() {
+        const rate = parseFloat((this.swhtaxrate || '0').replace('%', '').replace(',', '.')) || 0;
+        return this.fcyAmount * (rate / 100);
+    },
+    get totalTax() {
+        return this.vatAmount + this.whtaxAmount;
+    },
+
+    // --- Cost Calculations ---
+    get camountIdrComputed() {
+        const included = (this.cincludedtax || 'No').trim() === 'Yes';
+        const rate = parseFloat((this.cvatgst || '0').replace('%', '').replace(',', '.')) || 0;
+        const base = this.crate * (parseFloat(this.camount) || 0);
+        const result = included ? base / (1 + rate / 100) : base;
+        this.camountIdrRaw = result;
+        this.$nextTick(() => @this.set('camountidr', result));
+        return result;
+    },
+    get cfcyAmount() {
+        const included = (this.cincludedtax || 'No').trim() === 'Yes';
+        const rate = parseFloat((this.cvatgst || '0').replace('%', '').replace(',', '.')) || 0;
+        return included ? parseFloat((this.camount / (1 + rate / 100)).toFixed(3)) : this.camount;
+    },
+    get ctaxable() {
+        const rate = parseFloat((this.cvatgst || '0').replace('%', '').replace(',', '.')) || 0;
+        return this.camountIdrRaw * (rate / 100);
+    },
+    get cwhtaxamount() {
+        const rate = parseFloat((this.cwhtaxrate || '0').replace('%', '').replace(',', '.')) || 0;
+        return this.camountIdrRaw * (rate / 100);
+    },
+    get ctaxamount() {
+        return this.ctaxable + this.cwhtaxamount;
+    },
+
+    // --- Gross Profit ---
+    get gp() {
+        return this.samountIdrRaw - this.camountIdrRaw;
+    },
+
+    // --- Initialization ---
+    init() {
+        window.reinitSelect2();
+
+        // Watch for recalculation
+        this.$watch('srate', () => this.samountIdrComputed);
+        this.$watch('amount', () => this.samountIdrComputed);
+        this.$watch('sincludedtax', () => this.samountIdrComputed);
+        this.$watch('svatgst', () => this.samountIdrComputed);
+
+        this.$watch('crate', () => this.camountIdrComputed);
+        this.$watch('camount', () => this.camountIdrComputed);
+        this.$watch('cincludedtax', () => this.camountIdrComputed);
+        this.$watch('cvatgst', () => this.camountIdrComputed);
+
+        // Sync back to Livewire
+        this.$watch('cfcyAmount', value => @this.set('cfcyamount', value));
+        this.$watch('camount', value => @this.set('camount_qty', value));
+        this.$watch('ctaxamount', value => @this.set('cvatgstamount', value));
+        this.$watch('ctaxable', value => @this.set('ctaxableamount', value));
+        this.$watch('cwhtaxamount', value => @this.set('cwhtaxamount', value));
+
+        this.$watch('formatNumber(gp)', value => @this.set('sgrossprofit', value));
+        this.$watch('amount', value => @this.set('samount_qty', value));
+        this.$watch('fcyAmount', value => @this.set('sfcyamount', value));
+        this.$watch('vatAmount', value => @this.set('svatgstamount', value));
+        this.$watch('totalTax', value => @this.set('staxableamount', value));
+        this.$watch('whtaxAmount', value => @this.set('swhtaxamount', value));
+        this.$watch('vatAmountUsd', value => @this.set('svatgstusd', value));
+
+        // Fetch currency rates
+        this.$watch('scurrency', value => this.fetchExchangeRate(value));
+        this.fetchExchangeRate(this.scurrency);
+
+        this.$watch('ccurrency', value => this.fetchExchangRate(value));
+        this.fetchExchangRate(this.ccurrency);
+
+        this.$nextTick(() => {
+            this.samountIdrComputed;
+            this.camountIdrComputed;
+        });
+    },
+
+    // --- Currency API Fetching ---
+    fetchExchangeRate(currency) {
+        if (!currency || currency.trim().length < 3) {
+            this.srate = 0;
+            return;
         }
-    }" x-init="init(); $nextTick(() => window.reinitSelect2())"
+        fetch(`https://api.exchangerate-api.com/v4/latest/${currency.trim().toUpperCase()}`)
+            .then(res => res.json())
+            .then(data => this.srate = data.rates?.IDR || 0)
+            .catch(err => {
+                console.error('Error fetching source rate:', err);
+                this.srate = 0;
+            });
+    },
+    fetchExchangRate(currency) {
+        if (!currency || currency.trim().length < 3) {
+            this.crate = 0;
+            return;
+        }
+        fetch(`https://api.exchangerate-api.com/v4/latest/${currency.trim().toUpperCase()}`)
+            .then(res => res.json())
+            .then(data => this.crate = data.rates?.IDR || 0)
+            .catch(err => {
+                console.error('Error fetching cost rate:', err);
+                this.crate = 0;
+            });
+    }
+}"
+    x-init="init(); $nextTick(() => window.reinitSelect2())"
     x-cloak>
 
 
@@ -368,10 +358,10 @@
                     <select id="svatgst" name="svatgst" x-model="svatgst" wire:model="svatgst"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                         <option value="">Select Tax</option>
+                        <option value="1%">1%</option>
                         <option value="1,1%">1.1%</option>
                         <option value="11%">11%</option>
                         <option value="12%">12%</option>
-                        <option value="1%">1%</option>
                     </select>
                 </div>
                 <div>
@@ -391,13 +381,13 @@
                     <div>
                         <label for="svatgstusd" class="block text-sm font-medium text-gray-700">VAT TAX (USD)</label>
                         <input type="text" id="svatgstusd" name="svatgstusd"
-                            :value="formatNumber(vatAmountUsd)" wire:model="svatgstusd"
+                            :value="formatNumber(vatAmountUsd)"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div>
                         <label for="shwtaxrateusd" class="block text-sm font-medium text-gray-700">WHT TAX (USD)</label>
                         <input type="text" id="shwtaxrateusd" name="shwtaxrateusd"
-                            :value="formatNumber(swhtaxamountusd)" wire:model="shwtaxrateusd"
+                            :value="formatNumber(swhtaxamountusd)"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                 </div>
@@ -413,13 +403,13 @@
                 <div>
                     <label for="swhtaxamount" class="block text-sm font-medium text-gray-700">W/H Tax Amount</label>
                     <input type="text" id="swhtaxamount" name="swhtaxamount"
-                        :value="formatNumber(whtaxAmount)" wire:model="swhtaxamount"
+                        :value="formatNumber(whtaxAmount)"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <div>
                     <label for="staxableamount" class="block text-sm font-medium text-gray-700">Total TAX</label>
                     <input type="text" id="staxableamount" name="staxableamount"
-                        :value="formatNumber(totalTax)" wire:model="staxableamount"
+                        :value="formatNumber(totalTax)"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
             </div>
@@ -534,13 +524,13 @@
                 <!-- FCY Amount -->
                 <div>
                     <label for="cfcyamount" class="block text-sm font-medium text-gray-700">FCY Amount</label>
-                    <input type="text" id="cfcyamount" name="cfcyamount" wire:model="cfcyamount" :value="cfcyAmount"
+                    <input type="text" id="cfcyamount" name="cfcyamount" :value="cfcyAmount"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <!-- Amount (IDR) -->
                 <div>
                     <label for="camountidr" class="block text-sm font-medium text-gray-700">Amount (IDR)</label>
-                    <input type="text" id="camountidr" name="camountidr" wire:model="camountidr" placeholder="" :value="formatNumber(camountidr)"
+                    <input type="text" id="camountidr" name="camountidr" placeholder="" :value="formatNumber(camountidr)"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
             </div>
@@ -574,7 +564,7 @@
                 <!-- Taxable Amount -->
                 <div>
                     <label for="ctaxableamount" class="block text-sm font-medium text-gray-700">VAT TAX</label>
-                    <input type="text" id="ctaxableamount" name="ctaxableamount" wire:model="ctaxableamount"
+                    <input type="text" id="ctaxableamount" name="ctaxableamount"
                         :value="formatNumber(ctaxable)"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
@@ -592,14 +582,14 @@
                 <!-- VAT/GST Amount -->
                 <div>
                     <label for="cvatgstamount" class="block text-sm font-medium text-gray-700">TOTAL TAX</label>
-                    <input type="text" id="cvatgstamount" name="cvatgstamount" wire:model="cvatgstamount" :value="formatNumber(ctaxamount)"
+                    <input type="text" id="cvatgstamount" name="cvatgstamount" :value="formatNumber(ctaxamount)"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="0">
                 </div>
 
                 <!-- W/H TAX AMOUNT -->
                 <div>
                     <label for="cwhtaxamount" class="block text-sm font-medium text-gray-700">W/H TAX</label>
-                    <input type="text" id="cwhtaxamount" name="cwhtaxamount" wire:model="cwhtaxamount" :value="formatNumber(cwhtaxamount)"
+                    <input type="text" id="cwhtaxamount" name="cwhtaxamount" :value="formatNumber(cwhtaxamount)"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="0">
                 </div>
             </div>

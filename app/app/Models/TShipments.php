@@ -27,6 +27,8 @@ class TShipments extends Model
         'shipmentDeliveryAgent',
         'carrier',
         'dataShipments',
+        'created_by',
+        'updated_by',
     ];
     public function shipmentTransaction()
     {

@@ -17,6 +17,8 @@ class TJob extends Model
         'ogentsJob',
         'dagentsJob',
         'data',
+        'created_by',
+        'updated_by',
     ];
 
     public function shipments()

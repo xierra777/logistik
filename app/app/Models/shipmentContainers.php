@@ -12,6 +12,8 @@ class shipmentContainers extends Model
         'id_jobContainer',
         'id_shipments',
         'containersData',
+        'created_by',
+        'updated_by',
     ];
 
     public function shipment()

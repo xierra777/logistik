@@ -100,6 +100,7 @@ class CreateJob extends Component
     public function updatedTypeJob()
     {
         $this->generateJobName();
+        $this->generateCustCode();
         // $this->deliveryAgent = null;
         // $this->originAgent = null;
         // // Reset juga semua input yang gak relevan dengan type_job
@@ -191,9 +192,23 @@ class CreateJob extends Component
                 session()->flash('error', 'Job type not recognized.');
         }
     }
+    public function generateCustCode()
+    {
+        if (!$this->client_id) {
+            $this->customerCodeJob = null;
+            return;
+        }
+
+        $client = Customer::find($this->client_id);
+        if (!$client) {
+            $this->customerCodeJob = null;
+            return;
+        }
+
+        $this->customerCodeJob = $client->customer_code;
+    }
     public function generateJobName()
     {
-        // Mendapatkan format tanggal dengan YYMMDD
         $startOfMonth = Carbon::now()->startOfMonth();
         $endOfMonth = Carbon::now()->endOfMonth();
 

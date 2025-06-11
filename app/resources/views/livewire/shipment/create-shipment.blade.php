@@ -597,9 +597,17 @@
                                     <select id="shipmentTypeOfPackages" class="block w-full rounded-md border-gray-300 shadow-sm">
                                         <option value=""></option>
                                         <option value="packages">Packages</option>
-                                        <option value="cartoon">Cartoon</option>
-                                        <option value="roll">Roll</option>
-                                        <option value="pallet">Pallet</option>
+                                        <option value="cartons">Cartons</option>
+                                        <option value="rolls">Rolls</option>
+                                        <option value="pallets">Pallets</option>
+                                        <option value="crates">Crates</option>
+                                        <option value="boxes">Boxes</option>
+                                        <option value="drums">Drums</option>
+                                        <option value="bags">Bags</option>
+                                        <option value="bundles">Bundles</option>
+                                        <option value="containers">Containers</option>
+                                        <option value="pieces">Pieces</option>
+
                                     </select>
                                 </div>
                             </div>
@@ -1063,18 +1071,18 @@
                                         fetch(endpoint)
                                             .then(res => res.json())
                                             .then(data => {
-                                                const term = params.data.term?.toLowerCase() || '';
+                                                const term = params.data.term?.toUpperCase() || '';
                                                 const results = data
                                                     .filter(port => {
-                                                        const name = port.name?.toLowerCase() || '';
-                                                        const code = port.code?.toLowerCase() || '';
-                                                        const country = port.country?.toLowerCase() || '';
+                                                        const name = port.name?.toUpperCase() || '';
+                                                        const code = port.code?.toUpperCase() || '';
+                                                        const country = port.country?.toUpperCase() || '';
                                                         return name.includes(term) || code.includes(term) || country.includes(term);
                                                     })
                                                     .filter(port => !!port.code)
                                                     .slice(0, 20)
                                                     .map(port => ({
-                                                        id: `${port.name}, ${port.country}`,
+                                                        id: `${port.name.toUpperCase()}, ${port.country.toUpperCase()}`,
                                                         text: `${port.name} (${port.code}) - ${port.country}`
                                                     }));
 

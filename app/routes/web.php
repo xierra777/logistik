@@ -81,8 +81,8 @@ Route::get('/data/airports-ajax', function () {
     return response()->json([
         'results' => collect($data['content'])->filter(fn($airport) => !empty($airport['iata']))->map(function ($airport) {
             return [
-                'id' => $airport['iata'],
-                'text' => "{$airport['name']} ({$airport['iata']}) - {$airport['country']['name']}"
+                'id' => strtoupper("{$airport['name']} ({$airport['iata']})"),
+                'text' => strtoupper("{$airport['name']} ({$airport['iata']}) - {$airport['country']['name']}")
             ];
         })->values(), // important!
         'pagination' => [

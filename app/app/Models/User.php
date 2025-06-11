@@ -23,6 +23,10 @@ class User extends Authenticatable
         'password',
         'role',
         'profile_photo',
+        'created_by',
+        'updated_by',
+        'session_id', // tambahkan ini
+
     ];
 
     /**

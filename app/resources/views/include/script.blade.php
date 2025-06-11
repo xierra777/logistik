@@ -3,7 +3,6 @@
 @livewireScripts
 
 {{-- Custom JS: Preline, CSRF token handling, SweetAlert --}}
-<script src="{{ asset('js/preline.js') }}"></script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -74,3 +73,11 @@
         }
     });
 </script>
+<script>
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('login-success', () => {
+            window.location.reload();
+        });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>

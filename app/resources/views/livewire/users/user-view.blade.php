@@ -1,11 +1,13 @@
 <div x-data="{ open: false }" class="p-3">
     <div class="grid grid-cols-1 md:grid-cols-2 border min-h-[800px] p-3">
         <div class="flex items-center justify-center border">
-            <img
-                src="{{ asset('storage/' . $users->profile_photo) }}"
-                alt="Profile Photo"
-                class=" w-auto object-contain cursor-pointer"
-                @click="open = true" />
+            <div class="w-[300px] h-[400px] bg-gray-100 flex items-center justify-center overflow-hidden">
+                <img
+                    src="{{ asset('storage/' . $users->profile_photo) }}"
+                    alt="Profile Photo"
+                    class="max-w-full max-h-full object-contain"
+                    @click="open = true" />
+            </div>
         </div>
         <div class="p-4">
             <h2 class="text-center mb-4 font-bold">Employee Details</h2>

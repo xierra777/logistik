@@ -19,6 +19,8 @@ class Invoice extends Model
         'total_vat',
         'total_wht',
         'grand_total',
+        'created_by',
+        'updated_by',
     ];
 
     public function shipment()

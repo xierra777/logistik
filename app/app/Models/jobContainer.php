@@ -10,7 +10,9 @@ class jobContainer extends Model
 
     protected $fillable = [
         'id_job',
-        'containers'
+        'containers',
+        'created_by',
+        'updated_by',
     ];
 
     public function job()

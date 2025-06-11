@@ -512,6 +512,12 @@
                             No Activity / Container No
                         </th>
                         <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            No Of Packages
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Gross Weight
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Volume
                         </th>
                         <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
@@ -527,6 +533,12 @@
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$c->jobContainer->containers['containerNo'] ?? ''}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$c->jobContainer->containers['shipmentNoOfPackages'] ?? ''}} {{$c->jobContainer->containers['shipmentTypeOfPackages'] ?? ''}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$c->containersData['shipmentGrossWeight'] ?? ''}} {{$c->containersData['shipmentTypeOfGrossWeight'] ?? ''}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$c->containersData['shipmentNoOfPackages'] ?? ''}}
@@ -705,7 +717,7 @@
                             {{ $transaction->quantity }} x {{$transaction->samount_qty}}x{{$transaction->srate}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->samountidr ?? '' }}
+                            {{ $transaction->samountidr_formatted ?? '' }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->sdrcr}}
@@ -717,7 +729,7 @@
                             {{ $transaction->quantity }} x {{$transaction->camount_qty}}x{{$transaction->crate}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$transaction->camountidr}}
+                            {{$transaction->camountidr_formatted}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->cdrcr}}

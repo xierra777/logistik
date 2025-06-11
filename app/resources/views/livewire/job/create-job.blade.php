@@ -3399,8 +3399,9 @@
                                                     .filter(port => !!port.code)
                                                     .slice(0, 20)
                                                     .map(port => ({
-                                                        id: `${port.code} - ${port.country}`,
-                                                        text: `${port.name} (${port.code}) - ${port.country}`
+                                                        id: `${port.code} - ${port.country}`.toUpperCase(),
+                                                        text: `${port.name} (${port.code}) - ${port.country}`.toUpperCase()
+
                                                     }));
 
                                                 success({

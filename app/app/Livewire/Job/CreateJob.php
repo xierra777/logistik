@@ -11,7 +11,7 @@ use Carbon\Carbon;
 use Livewire\Attributes\On;
 use App\Models\User;
 use Illuminate\Database\QueryException;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CreateJob extends Component
@@ -279,7 +279,6 @@ class CreateJob extends Component
         $data = [
             'jobBillLadingNo'     => $this->jobBillLadingNo,
             'jobBillLadingDate'   => $this->jobBillLadingDate,
-            'customerCodeJob'     => $this->customerCodeJob, //akandibuat query
             'servicesType'        => $this->servicesType,
             'incoTerms'           => $this->incoTerms,
             'flightVesselName'    => $this->flightVesselName,
@@ -323,12 +322,16 @@ class CreateJob extends Component
             'dagentsJob'        => $this->deliveryAgent,
             'carrierAirline'    => $this->carrierAirline,
             'employee_id'       => $this->jobEmployee,
+            'customerCodeJob'     => $this->customerCodeJob,
             'data'              => $data,
+            'created_by'        => Auth::user()->id
         ]);
 
         jobContainer::create([
             'id_job' =>  $job->id,
-            'containers' => $container
+            'containers' => $container,
+            'created_by'        => Auth::user()->id
+
         ]);
 
         return redirect()->route('listJob')->with('success', [
@@ -366,7 +369,6 @@ class CreateJob extends Component
         $data = [
             'jobBillLadingNo'              => $this->jobBillLadingNo,
             'jobBillLadingDate'            => $this->jobBillLadingDate,
-            'customerCodeJob'     => $this->customerCodeJob, //akandibuat query
             'servicesType'        => $this->servicesType,
             'incoTerms'           => $this->incoTerms,
             'flightVesselName'    => $this->flightVesselName,
@@ -410,12 +412,17 @@ class CreateJob extends Component
             'oagentsJob'          => $this->originAgent,
             'carrierAirline'      => $this->carrierAirline,
             'employee_id'         => $this->jobEmployee,
+            'customerCodeJob'     => $this->customerCodeJob, //akandibuat query
             'data'                => $data,
+            'created_by'        => Auth::user()->id
+
         ]);
 
         jobContainer::create([
             'id_job' =>  $job->id,
-            'containers' => $container
+            'containers' => $container,
+            'created_by'        => Auth::user()->id
+
         ]);
 
         return redirect()->route('listJob')->with('success', [

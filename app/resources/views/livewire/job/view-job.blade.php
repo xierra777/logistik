@@ -32,25 +32,25 @@
         </div>
         <div class="flex flex-col"> <!-- Disini Custome  -->
             <p class="text-center bg-gray-300 px-3 py-1">Customer Code Job </p>
-            <p class="text-center font-bold px-4 py-2"> {{ $job->data['customerCodeJob'] }}</p>
+            <p class="text-center font-bold px-4 py-2"> {{ $job->customerCodeJob }}</p>
         </div>
         @if($type_job === 'ocean_fcl_export')
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">MBL No </p>
-            <p class="text-center font-bold px-4 py-2"> {{ $job->data['jobBillLadingNo'] }}</p>
+            <p class="text-center font-bold px-4 py-2"> {{ $job->jobBillLadingNo }}</p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">MBL Date </p>
-            <p class="text-center px-4 py-2"> {{ $job->data['jobBillLadingDate'] }}</p>
+            <p class="text-center px-4 py-2"> {{ $job->jobBillLadingDate }}</p>
         </div>
         @elseif($type_job === 'air_outbound')
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">MAWB No </p>
-            <p class="text-center font-bold px-4 py-2"> {{ $job->data['jobBillLadingNo'] }}</p>
+            <p class="text-center font-bold px-4 py-2"> {{ $job->jobBillLadingNo }}</p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">MAWB Date </p>
-            <p class="text-center px-4 py-2"> {{ $job->data['jobBillLadingDate'] }}</p>
+            <p class="text-center px-4 py-2"> {{ $job->jobBillLadingDate }}</p>
         </div>
         @endif
 

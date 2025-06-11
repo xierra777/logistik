@@ -39,6 +39,7 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+
     /**
      * Get the attributes that should be cast.
      *
@@ -50,5 +51,23 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function createdUsers()
+    {
+        return $this->hasMany(User::class, 'created_by');
+    }
+    public function creatorUpdated()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function creatorUpdatedUsers()
+    {
+        return $this->hasMany(User::class, 'updated_by');
     }
 }

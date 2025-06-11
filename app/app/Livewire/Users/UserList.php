@@ -2,20 +2,22 @@
 
 namespace App\Livewire\Users;
 
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Livewire\WithFileUploads;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+
 
 class UserList extends Component
 {
     use WithFileUploads, WithPagination;
 
-    public $name, $email, $password, $profile_photo, $role;
+    public $name, $email, $password, $profile_photo, $role, $existing_photo;
     public $perPage = 5;
-    public $showEditModal = false;
     public $selectedUserId;
     public function save()
     {
@@ -38,6 +40,7 @@ class UserList extends Component
             'password'      => Hash::make($this->password),
             'role'          => $this->role,
             'profile_photo' => $photoPath,
+            'created_by'    => Auth::user()->id,
         ]);
 
         // dd($photoPath);
@@ -58,15 +61,21 @@ class UserList extends Component
 
     public function opencase($id)
     {
-        $this->showEditModal = true;
         $user = User::findOrFail($id);
         $this->selectedUserId = $id;
         $this->name = $user->name;
         $this->email = $user->email;
         $this->role = $user->role;
-        $this->password = ''; // kosongkan password saat edit
-        $this->showEditModal = true;
+        // Reset upload baru
+        $this->profile_photo = null;
+
+        // Simpan foto existing
+        $this->existing_photo = $user->profile_photo;
+
+        $this->password = '';
     }
+
+
     public function update()
     {
         $this->validate([
@@ -88,14 +97,14 @@ class UserList extends Component
         $user->name = $this->name;
         $user->email = $this->email;
         $user->role = $this->role;
-
+        $user->updated_by = Auth::user()->id;
         if ($this->password) {
             $user->password = Hash::make($this->password);
         }
 
-        $user->save();
+        $user->update();
 
-        $this->showEditModal = false;
+        $this->dispatch('close-edit');
         session()->flash('message', 'User updated successfully!');
         $this->resetForm();
     }
@@ -104,31 +113,46 @@ class UserList extends Component
     public function confirmDelete($get_id)
     {
         try {
+            logger('Masuk delete: ' . $get_id);
             $user = User::find($get_id);
 
             if ($user) {
-                // Hapus foto profil jika ada
+                logger('User ditemukan: ' . $user->id);
+
                 if ($user->profile_photo) {
+                    logger('Menghapus foto: ' . $user->profile_photo);
                     Storage::disk('public')->delete($user->profile_photo);
                 }
-
-                // Hapus data user
+                DB::table('t_jobs')
+                    ->where('employee_id', $user->id)
+                    ->update([
+                        'employee_id' => null,
+                    ]);
+                DB::table('t_shipments')
+                    ->where('employee_id', $user->id)
+                    ->update([
+                        'employee_id' => null,
+                    ]);
                 $user->delete();
+                logger('User berhasil dihapus dari DB');
 
                 session()->flash('message', 'User deleted successfully!');
             } else {
+                logger('User tidak ditemukan');
                 session()->flash('error', 'User not found!');
             }
         } catch (\Exception $e) {
+            logger('Error: ' . $e->getMessage());
             session()->flash('error', 'Error deleting user: ' . $e->getMessage());
         }
     }
 
 
 
+
     public function render()
     {
-        $users = User::latest()->paginate($this->perPage);
+        $users = User::with('creator')->latest()->paginate($this->perPage);
         return view('livewire.users.user-list', [
             'users' => $users
         ]);

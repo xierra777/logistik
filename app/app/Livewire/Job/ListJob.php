@@ -28,7 +28,7 @@ class ListJob extends Component
         $query = TJob::with('client')->latest(); // orderBy created_at desc
 
         if ($this->start_date && $this->end_date) {
-            $query->whereBetween('created_at', [
+            $query->whereBetween("data->jobBillLadingDate", [
                 $this->start_date,
                 $this->end_date
             ]);

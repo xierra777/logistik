@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('job_id')->unique();
             $table->string('type_job');
-            $table->foreignId('client_id')->nullable()->constrained('customers');
-            $table->foreignId('carrierAirline')->nullable()->constrained('customers');
-            $table->foreignId('dagentsJob')->nullable()->constrained('customers');
-            $table->foreignId('ogentsJob')->nullable()->constrained('customers');
-            $table->foreignId('employee_id')->nullable()->constrained('users');
+            $table->foreignId('client_id')->nullable()->constrained('customers')->nullOnDelete('set null');
+            $table->foreignId('carrierAirline')->nullable()->constrained('customers')->nullOnDelete('set null');;
+            $table->foreignId('dagentsJob')->nullable()->constrained('customers')->nullOnDelete('set null');;
+            $table->foreignId('ogentsJob')->nullable()->constrained('customers')->nullOnDelete('set null');;
+            $table->foreignId('employee_id')->nullable()->constrained('users')->nullOnDelete('set null');;
             $table->json('data');
             $table->timestamps();
         });

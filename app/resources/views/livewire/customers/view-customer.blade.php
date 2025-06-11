@@ -212,7 +212,7 @@
 
         <hr class="border border-gray-300 m-5">
         <div class="mt-5 flex  justify-end m-2">
-            <a href="{{ route('customers.list') }}"
+            <a href="{{ route('listCust') }}"
                 class="py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg 
                transform transition duration-200 ease-in-out shadow:hover-cyan-200
                hover:bg-cyan-400 hover:scale-110  ">

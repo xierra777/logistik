@@ -165,18 +165,18 @@ Route::get('/journal-entries', JournalEntries::class)->middleware([
 Route::get('/view-customers/{id}', ViewCustomer::class)->middleware([
     'auth',
     'verified'
-]);
+])->name('viewCust');
 
 Route::get('/edit-customers/{id}', EditCustomer::class)->middleware([
     'auth',
     'verified'
-]);
-Route::get('/customers/create', CreateCustomer::class)->middleware(['auth', 'verified'])->name('customers.create');
+])->name('editCust');
+Route::get('/customers/create', CreateCustomer::class)->middleware(['auth', 'verified'])->name('createCust');
 
 
 Route::get('/customers', ListCustomer::class)
     ->middleware(['auth', 'verified'])
-    ->name('customers.list');
+    ->name('listCust');
 
 
 Route::get('accountant', Accountant::class)

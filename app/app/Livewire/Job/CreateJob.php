@@ -11,7 +11,7 @@ use Carbon\Carbon;
 use Livewire\Attributes\On;
 use App\Models\User;
 use Illuminate\Database\QueryException;
-
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CreateJob extends Component
@@ -32,7 +32,7 @@ class CreateJob extends Component
     public array $ports = [];
 
     // Bagian Ocean
-    public $jobBillLadingdNo = "", $customerCodeJob,
+    public $jobBillLadingdNo = "", $houseJobBillLadingNo, $houseJobBillLadingDate, $customerCodeJob,
         $carrierAirline, $servicesType = "", $incoTerms,
         $flightVesselName = "",
         $ocean_vessel_feeder = "",
@@ -277,27 +277,20 @@ class CreateJob extends Component
             'hsCodeDesc'          => $this->hsCodeDesc,
         ];
         $data = [
-            'jobBillLadingNo'     => $this->jobBillLadingNo,
-            'jobBillLadingDate'   => $this->jobBillLadingDate,
-            'customerCodeJob'     => $this->customerCodeJob, //akandibuat query
+
             'servicesType'        => $this->servicesType,
             'incoTerms'           => $this->incoTerms,
             'flightVesselName'    => $this->flightVesselName,
             'flightVesselNo'      => $this->flightVesselNo,
-
             'ocean_vessel_feeder' => $this->ocean_vessel_feeder, //hidden right here
             'cross_trade'         => $this->cross_trade, //buat relasinya besok soalnya diquery nanti
             'harzardousType'      => $this->hazardousType, //kemungkinan query
             'hazardousClassType'  => $this->hazardousClassType,
-
             'payableAtJob'        => $this->payableAtJob, //Kemungkinan Query Terjadi
             'freightTypeJob'      => $this->freightTypeJob,
             'remarksJobDetailJobs' => $this->remarksJobDetailJobs,
-
             'estimearrival'       => $this->estimearrival,
             'estimedelivery'      => $this->estimedelivery,
-
-
             'place_of_receipt'    => $this->place_of_receipt,
             'port_of_discharge'   => $this->port_of_discharge,
             'port_of_final'       => $this->port_of_final,
@@ -323,12 +316,20 @@ class CreateJob extends Component
             'dagentsJob'        => $this->deliveryAgent,
             'carrierAirline'    => $this->carrierAirline,
             'employee_id'       => $this->jobEmployee,
+            'customerCodeJob'     => $this->customerCodeJob,
+            'jobBillLadingNo'     => $this->jobBillLadingNo,
+            'jobBillLadingDate'   => $this->jobBillLadingDate,
+            'houseJobBillLadingNo' => $this->houseJobBillLadingNo,
+            'houseJobBillLadingDate' => $this->houseJobBillLadingDate,
             'data'              => $data,
+            'created_by'        => Auth::user()->id
         ]);
 
         jobContainer::create([
             'id_job' =>  $job->id,
-            'containers' => $container
+            'containers' => $container,
+            'created_by'        => Auth::user()->id
+
         ]);
 
         return redirect()->route('listJob')->with('success', [
@@ -340,350 +341,8 @@ class CreateJob extends Component
 
         session()->flash('message', 'Ocean FCL Export job created successfully.');
     }
-    public function ocean_fcl_import()
-    {
-        $container = [
-            'containerType'       => $this->containerType,
-            'containerReleaseNo'  => $this->containerReleaseNo,
-            'containerNo'         => $this->containerNo,
-            'containerReleaseDate' => $this->containerReleaseDate,
-            'noOfPackages'        => $this->noOfPackages,
-            'typeOfPackages'      => $this->typeOfPackages,
-            'grossWeight'         => $this->grossWeight,
-            'typeOfGrossWeight'   => $this->typeOfGrossWeight,
-            'volumeWeight'        => $this->volumeWeight,
-            'typeOfVolumeWeight'  => $this->typeOfVolumeWeight,
-            'volume'              => $this->volume,
-            'containerSealNo'     => $this->containerSealNo,
-            'noOfPallet'          => $this->noOfPallet,
-            'netOfWeight'         => $this->netOfWeight,
-            'typeNetOfWeight'     => $this->typeNetOfWeight,
-            'totalWeight'         => $this->totalWeight,
-            'typeOfTotalWeight'   => $this->typeOfTotalWeight,
-            'hsCode'              => $this->hsCode,
-            'hsCodeDesc'          => $this->hsCodeDesc,
-        ];
-        $data = [
-            'jobBillLadingNo'              => $this->jobBillLadingNo,
-            'jobBillLadingDate'            => $this->jobBillLadingDate,
-            'customerCodeJob'     => $this->customerCodeJob, //akandibuat query
-            'servicesType'        => $this->servicesType,
-            'incoTerms'           => $this->incoTerms,
-            'flightVesselName'    => $this->flightVesselName,
-            'flightVesselNo'      => $this->flightVesselNo,
-
-            'ocean_vessel_feeder' => $this->ocean_vessel_feeder, //hidden right here
-            'cross_trade'         => $this->cross_trade, //buat relasinya besok soalnya diquery nanti
-            'harzardousType'      => $this->hazardousType, //kemungkinan query
-            'hazardousClassType'  => $this->hazardousClassType,
-
-            'payableAtJob'        => $this->payableAtJob, //Kemungkinan Query Terjadi
-            'freightTypeJob'      => $this->freightTypeJob,
-            'remarksJobDetailJobs' => $this->remarksJobDetailJobs,
-
-            'estimearrival'       => $this->estimearrival,
-            'estimedelivery'      => $this->estimedelivery,
 
 
-            'place_of_receipt'    => $this->place_of_receipt,
-            'port_of_discharge'   => $this->port_of_discharge,
-            'port_of_final'       => $this->port_of_final,
-            'port_of_receipt'     => $this->port_of_receipt,
-            'place_of_delivery'   => $this->place_of_delivery,
-            'port_of_loading'     => $this->port_of_loading,
-        ];
-        // dd([
-        //     'shipper_id' => $this->shipper_id,
-        //     'consignee_id' => $this->consignee_id,
-        //     'notify_id' => $this->notify_id,
-        //     'type_job' => $this->type_job,
-        //     'job_name' => $this->job_name,
-        //     'data' => $data,
-        //     'container' => $container
-        // ]);
-
-
-        $job = TJob::create([
-            'job_id'              => $this->job_id,
-            'type_job'            => $this->type_job,
-            'client_id'           => $this->client_id,
-            'oagentsJob'          => $this->originAgent,
-            'carrierAirline'      => $this->carrierAirline,
-            'employee_id'         => $this->jobEmployee,
-            'data'                => $data,
-        ]);
-
-        jobContainer::create([
-            'id_job' =>  $job->id,
-            'containers' => $container
-        ]);
-
-        return redirect()->route('listJob')->with('success', [
-            'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.
-            'title' => 'Success!', // Toast title
-
-        ]);
-
-        session()->flash('message', 'Ocean FCL Export job created successfully.');
-    }
-    public function ocean_lcl_export()
-    {
-        $container = [
-            'containerType'       => $this->containerType,
-            'containerReleaseNo'  => $this->containerReleaseNo,
-            'containerNo'         => $this->containerNo,
-            'containerReleaseDate' => $this->containerReleaseDate,
-            'noOfPackages'        => $this->noOfPackages,
-            'typeOfPackages'      => $this->typeOfPackages,
-            'grossWeight'         => $this->grossWeight,
-            'typeOfGrossWeight'   => $this->typeOfGrossWeight,
-            'volumeWeight'        => $this->volumeWeight,
-            'typeOfVolumeWeight'  => $this->typeOfVolumeWeight,
-            'volume'              => $this->volume,
-            'containerSealNo'     => $this->containerSealNo,
-            'noOfPallet'          => $this->noOfPallet,
-            'netOfWeight'         => $this->netOfWeight,
-            'typeNetOfWeight'     => $this->typeNetOfWeight,
-            'totalWeight'         => $this->totalWeight,
-            'typeOfTotalWeight'   => $this->typeOfTotalWeight,
-            'hsCode'              => $this->hsCode,
-            'hsCodeDesc'          => $this->hsCodeDesc,
-        ];
-        $data = [
-            'jobBillLadingNo'              => $this->jobBillLadingNo,
-            'jobBillLadingDate'            => $this->jobBillLadingDate,
-            'customerCodeJob'     => $this->customerCodeJob, //akandibuat query
-            'servicesType'        => $this->servicesType,
-            'incoTerms'           => $this->incoTerms,
-            'flightVesselName'    => $this->flightVesselName,
-            'flightVesselNo'      => $this->flightVesselNo,
-
-            'ocean_vessel_feeder' => $this->ocean_vessel_feeder, //hidden right here
-            'cross_trade'         => $this->cross_trade, //buat relasinya besok soalnya diquery nanti
-            'harzardousType'      => $this->hazardousType, //kemungkinan query
-            'hazardousClassType'  => $this->hazardousClassType,
-
-            'payableAtJob'        => $this->payableAtJob, //Kemungkinan Query Terjadi
-            'freightTypeJob'      => $this->freightTypeJob,
-            'remarksJobDetailJobs' => $this->remarksJobDetailJobs,
-
-            'estimearrival'       => $this->estimearrival,
-            'estimedelivery'      => $this->estimedelivery,
-
-
-            'place_of_receipt'    => $this->place_of_receipt,
-            'port_of_discharge'   => $this->port_of_discharge,
-            'port_of_final'       => $this->port_of_final,
-            'port_of_receipt'     => $this->port_of_receipt,
-            'place_of_delivery'   => $this->place_of_delivery,
-            'port_of_loading'     => $this->port_of_loading,
-        ];
-        // dd([
-        //     'shipper_id' => $this->shipper_id,
-        //     'consignee_id' => $this->consignee_id,
-        //     'notify_id' => $this->notify_id,
-        //     'type_job' => $this->type_job,
-        //     'job_name' => $this->job_name,
-        //     'data' => $data,
-        //     'container' => $container
-        // ]);
-
-
-        $job = TJob::create([
-            'job_id'            => $this->job_id,
-            'type_job'          => $this->type_job,
-            'client_id'         => $this->client_id,
-            'dagentsJob'        => $this->deliveryAgent,
-            'carrierAirline'    => $this->carrierAirline,
-            'employee_id'       => $this->jobEmployee,
-            'data'              => $data,
-        ]);
-
-        jobContainer::create([
-            'id_job' =>  $job->id,
-            'containers' => $container
-        ]);
-
-        return redirect()->route('listJob')->with('success', [
-            'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.
-            'title' => 'Success!', // Toast title
-
-        ]);
-
-        session()->flash('message', 'Ocean FCL Export job created successfully.');
-    }
-    public function air_outbound()
-    {
-        $container = [
-            'containerType'       => $this->containerType,
-            'containerReleaseNo'  => $this->containerReleaseNo,
-            // 'containerNo'         => $this->containerNo,
-            'containerReleaseDate' => $this->containerReleaseDate,
-            'noOfPackages'        => $this->noOfPackages,
-            'typeOfPackages'      => $this->typeOfPackages,
-            'grossWeight'         => $this->grossWeight,
-            'typeOfGrossWeight'   => $this->typeOfGrossWeight,
-            'volumeWeight'        => $this->volumeWeight,
-            'typeOfVolumeWeight'  => $this->typeOfVolumeWeight,
-            'volume'              => $this->volume,
-            // 'containerSealNo'     => $this->containerSealNo,
-            'noOfPallet'          => $this->noOfPallet,
-            'netOfWeight'         => $this->netOfWeight,
-            'typeNetOfWeight'     => $this->typeNetOfWeight,
-            'totalWeight'         => $this->totalWeight,
-            'typeOfTotalWeight'   => $this->typeOfTotalWeight,
-            'hsCode'              => $this->hsCode,
-            'hsCodeDesc'          => $this->hsCodeDesc,
-        ];
-        $data = [
-            'jobBillLadingNo'    => $this->jobBillLadingNo,
-            'jobBillLadingDate'  => $this->jobBillLadingDate,
-            'customerCodeJob'     => $this->customerCodeJob, //akandibuat query
-            'servicesType'        => $this->servicesType,
-            'incoTerms'           => $this->incoTerms,
-            'flightVesselName'    => $this->flightVesselName,
-            'flightVesselNo'      => $this->flightVesselNo,
-
-            'ocean_vessel_feeder' => $this->ocean_vessel_feeder, //hidden right here
-            'cross_trade'         => $this->cross_trade, //buat relasinya besok soalnya diquery nanti
-            'harzardousType'      => $this->hazardousType, //kemungkinan query
-            'hazardousClassType'  => $this->hazardousClassType,
-
-            'payableAtJob'        => $this->payableAtJob, //Kemungkinan Query Terjadi
-            'freightTypeJob'      => $this->freightTypeJob,
-            'remarksJobDetailJobs' => $this->remarksJobDetailJobs,
-
-            'estimearrival'       => $this->estimearrival,
-            'estimedelivery'      => $this->estimedelivery,
-
-
-            'place_of_receipt'    => $this->place_of_receipt,
-            'port_of_discharge'   => $this->port_of_discharge,
-            'port_of_final'       => $this->port_of_final,
-            'port_of_receipt'     => $this->port_of_receipt,
-            'place_of_delivery'   => $this->place_of_delivery,
-            'port_of_loading'     => $this->port_of_loading,
-        ];
-        // dd([
-        //     'shipper_id' => $this->shipper_id,
-        //     'consignee_id' => $this->consignee_id,
-        //     'notify_id' => $this->notify_id,
-        //     'type_job' => $this->type_job,
-        //     'job_name' => $this->job_name,
-        //     'data' => $data,
-        //     'container' => $container
-        // ]);
-
-
-        $job = TJob::create([
-            'job_id'              => $this->job_id,
-            'type_job'            => $this->type_job,
-            'client_id'           => $this->client_id,
-            'dagentsJob'          => $this->deliveryAgent,
-            'carrierAirline'      => $this->carrierAirline,
-            'employee_id'         => $this->jobEmployee,
-            'data'                => $data,
-        ]);
-
-        jobContainer::create([
-            'id_job' =>  $job->id,
-            'containers' => $container
-        ]);
-
-        return redirect()->route('listJob')->with('success', [
-            'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.
-            'title' => 'Success!', // Toast title
-
-        ]);
-
-        session()->flash('message', 'Ocean FCL Export job created successfully.');
-    }
-    public function air_inbound()
-    {
-        $container = [
-            'containerType'       => $this->containerType,
-            'containerReleaseNo'  => $this->containerReleaseNo,
-            // 'containerNo'         => $this->containerNo,
-            'containerReleaseDate' => $this->containerReleaseDate,
-            'noOfPackages'        => $this->noOfPackages,
-            'typeOfPackages'      => $this->typeOfPackages,
-            'grossWeight'         => $this->grossWeight,
-            'typeOfGrossWeight'   => $this->typeOfGrossWeight,
-            'volumeWeight'        => $this->volumeWeight,
-            'typeOfVolumeWeight'  => $this->typeOfVolumeWeight,
-            'volume'              => $this->volume,
-            // 'containerSealNo'     => $this->containerSealNo,
-            'noOfPallet'          => $this->noOfPallet,
-            'netOfWeight'         => $this->netOfWeight,
-            'typeNetOfWeight'     => $this->typeNetOfWeight,
-            'totalWeight'         => $this->totalWeight,
-            'typeOfTotalWeight'   => $this->typeOfTotalWeight,
-            'hsCode'              => $this->hsCode,
-            'hsCodeDesc'          => $this->hsCodeDesc,
-        ];
-        $data = [
-            'jobBillLadingNo'     => $this->jobBillLadingNo,
-            'jobBillLadingDate'   => $this->jobBillLadingDate,
-            'customerCodeJob'     => $this->customerCodeJob, //akandibuat query
-            'servicesType'        => $this->servicesType,
-            'incoTerms'           => $this->incoTerms,
-            'flightVesselName'    => $this->flightVesselName,
-            'flightVesselNo'      => $this->flightVesselNo,
-
-            'ocean_vessel_feeder' => $this->ocean_vessel_feeder, //hidden right here
-            'cross_trade'         => $this->cross_trade, //buat relasinya besok soalnya diquery nanti
-            'harzardousType'      => $this->hazardousType, //kemungkinan query
-            'hazardousClassType'  => $this->hazardousClassType,
-
-            'payableAtJob'        => $this->payableAtJob, //Kemungkinan Query Terjadi
-            'freightTypeJob'      => $this->freightTypeJob,
-            'remarksJobDetailJobs' => $this->remarksJobDetailJobs,
-
-            'estimearrival'       => $this->estimearrival,
-            'estimedelivery'      => $this->estimedelivery,
-
-
-            'place_of_receipt'    => $this->place_of_receipt,
-            'port_of_discharge'   => $this->port_of_discharge,
-            'port_of_final'       => $this->port_of_final,
-            'port_of_receipt'     => $this->port_of_receipt,
-            'place_of_delivery'   => $this->place_of_delivery,
-            'port_of_loading'     => $this->port_of_loading,
-        ];
-        // dd([
-        //     'shipper_id' => $this->shipper_id,
-        //     'consignee_id' => $this->consignee_id,
-        //     'notify_id' => $this->notify_id,
-        //     'type_job' => $this->type_job,
-        //     'job_name' => $this->job_name,
-        //     'data' => $data,
-        //     'container' => $container
-        // ]);
-
-
-        $job = TJob::create([
-            'job_id'              => $this->job_id,
-            'type_job'            => $this->type_job,
-            'client_id'           => $this->client_id,
-            'oagentsJob'          => $this->originAgent,
-            'carrierAirline'      => $this->carrierAirline,
-            'employee_id'         => $this->jobEmployee,
-            'data'                => $data,
-        ]);
-
-        jobContainer::create([
-            'id_job' =>  $job->id,
-            'containers' => $container
-        ]);
-
-        return redirect()->route('listJob')->with('success', [
-            'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.
-            'title' => 'Success!', // Toast title
-
-        ]);
-
-        session()->flash('message', 'Ocean FCL Export job created successfully.');
-    }
 
     public function render()
     {

@@ -85,26 +85,50 @@
                 @switch($type_job)
                 @case('ocean_fcl_export')
                 <div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 mb-3">
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Client</label>
-                            <input type="text" value="{{ $this->clientName }}" readonly
-                                class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0"
+                    <div class="grid grid-cols-1 md:grid-cols-3 mb-3 gap-x-4">
+                        {{-- Client --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Client</label>
+                            <input
+                                type="text"
+                                value="{{ $this->clientName }}"
+                                readonly
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none "
                                 placeholder="Nama client akan muncul otomatis">
-                            @error('container_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                            @error('container_no')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Job Type</label>
-                            <input type="text" value="{{ strtoupper(str_replace('_', ' ', $type_job)) }}" readonly
-                                class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0">
-                            @error('seal_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+
+                        {{-- Job Type --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Job Type</label>
+                            <input
+                                type="text"
+                                value="{{ strtoupper(str_replace('_', ' ', $type_job)) }}"
+                                readonly
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none">
+                            @error('seal_no')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Customer Code No</label>
-                            <input type="text" wire:model="customerCodeJob" class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0" readonly>
-                            @error('customerCodeJob')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+
+                        {{-- Customer Code --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Customer Code No</label>
+                            <input
+                                type="text"
+                                wire:model="customerCodeJob"
+                                readonly
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none ">
+                            @error('customerCodeJob')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
+                            <p class="text-xs text-gray-500 italic mt-1">Note: adjustable as needed</p>
                         </div>
                     </div>
+
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
                         <div class="flex flex-col space-y-3 rounded-md">
                             <label>No. Job</label>
@@ -120,6 +144,19 @@
                             <label>MBL Date</label>
                             <input type="date" wire:model="jobBillLadingDate" placeholder="Enter Shipment ID" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('jobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                        <div></div>
+                        <div class="flex flex-col space-y-3 rounded-md">
+                            <label>HBL No</label>
+                            <input type="text" wire:model="houseJobBillLadingNo" placeholder="Enter MBL" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('houseJobBillLadingNo')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="flex flex-col space-y-3 rounded-md">
+                            <label>HBL Date</label>
+                            <input type="date" wire:model="houseJobBillLadingDate" placeholder="Enter HBL DATE" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('houseJobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">

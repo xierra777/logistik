@@ -3,10 +3,12 @@
 namespace App\Livewire;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Livewire\WithFileUploads;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class Users extends Component
 {
@@ -36,6 +38,7 @@ class Users extends Component
             'password'      => Hash::make($this->password),
             'role'          => $this->role,
             'profile_photo' => $photoPath,
+            'created_by'    => Auth::user()->id,
         ]);
 
         // dd($photoPath);
@@ -67,10 +70,23 @@ class Users extends Component
     public function confirmDelete($get_id)
     {
         try {
-            User::destroy($get_id);
-            session()->flash('message', 'Shipment deleted successfully!');
+            $user = User::find($get_id);
+
+            if ($user) {
+                // Hapus foto profil jika ada
+                if ($user->profile_photo) {
+                    Storage::disk('public')->delete($user->profile_photo);
+                }
+
+                // Hapus data user
+                $user->delete();
+
+                session()->flash('message', 'User deleted successfully!');
+            } else {
+                session()->flash('error', 'User not found!');
+            }
         } catch (\Exception $e) {
-            session()->flash('error', 'Error deleting shipment: ' . $e->getMessage());
+            session()->flash('error', 'Error deleting user: ' . $e->getMessage());
         }
     }
 }

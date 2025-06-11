@@ -16,7 +16,10 @@ class TJob extends Model
         'client_id',
         'ogentsJob',
         'dagentsJob',
+        'customerCodeJob',
         'data',
+        'created_by',
+        'updated_by',
     ];
 
     public function shipments()

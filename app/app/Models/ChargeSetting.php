@@ -11,6 +11,8 @@ class ChargeSetting extends Model
         'charge_name',
         'coa_sale_id',
         'coa_cost_id',
+        'created_by',
+        'updated_by',
     ];
 
     public function coaSale()

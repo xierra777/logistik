@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
+use Illuminate\Support\Facades\DB;
 
 class LoginForm extends Form
 {
@@ -39,6 +40,24 @@ class LoginForm extends Form
         }
 
         RateLimiter::clear($this->throttleKey());
+
+        // Logout dari semua device lain
+        $this->logoutOtherDevices();
+        request()->session()->regenerate();
+    }
+
+    /**
+     * Logout user dari semua device lain
+     */
+    protected function logoutOtherDevices(): void
+    {
+        $user = Auth::user();
+
+        // Hapus semua session lain kecuali yang sekarang
+        DB::table(config('session.table', 'sessions'))
+            ->where('user_id', $user->id)
+            ->where('id', '!=', request()->session()->getId())
+            ->delete();
     }
 
     /**
@@ -67,6 +86,6 @@ class LoginForm extends Form
      */
     protected function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->email).'|'.request()->ip());
+        return Str::transliterate(Str::lower($this->email) . '|' . request()->ip());
     }
 }

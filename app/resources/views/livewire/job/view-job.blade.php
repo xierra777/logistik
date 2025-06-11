@@ -288,7 +288,7 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     <div class="flex flex-col space-y-2 col-span-2" wire:ignore>
                                         <label>Container Type</label>
-                                        <select name="" id="containerType" class="w-full block rounded-md border border-gray-300">
+                                        <select name="" id="containerType" wire:model="containerType" class="w-full block rounded-md border border-gray-300">
                                             <option value=""></option>
                                             <option value="20'DG">20'DG</option>
                                             <option value="20'FT">20'FT</option>

@@ -34,7 +34,7 @@
                     <option value="job_id">Job ID</option>
                     <option value="client">Client</option>
                     <option value="type_job">Type Job</option>
-
+                    <option value="customerCodeJob">Customer Code</option>
                 </select>
                 <input type="text"
                     wire:model.live="searchTerm"
@@ -61,7 +61,7 @@
             <table class="min-w-max w-full table-auto divide-y divide-gray-200 dark:divide-neutral-700">
                 <thead class="bg-gray-50 dark:bg-neutral-800">
                     <tr>
-                        @foreach (['Job No', 'Client', 'Department', 'POL', 'POD', 'ETD', 'ETA', 'Action'] as $th)
+                        @foreach (['Job No','Customer Code', 'Client', 'Department', 'POL', 'POD', 'ETD', 'ETA', 'Action'] as $th)
                         <th scope="col" class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase dark:text-neutral-400 text-left">
                             {{ $th }}
                         </th>
@@ -76,6 +76,9 @@
                             <a href="{{ route('viewJob', ['id' => $j->id]) }}">
                                 {{ $j->job_id }}
                             </a>
+                        </td>
+                        <td class="px-4 py-4 text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$j->customerCodeJob}}
                         </td>
                         <td class="px-4 py-4 text-sm text-gray-800 dark:text-neutral-300">
                             <a href="{{ 'view-customers/' . $j->client_id }}"

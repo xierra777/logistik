@@ -10,7 +10,6 @@ use App\Livewire\Accounting\ChartOfAccount\ChartOfAccountDetails;
 use App\Livewire\Accounting\PurchaseInvoice;
 use App\Livewire\Accounting\Tranksaksi;
 use App\Livewire\Accounting\SaleInvoice;
-use App\Livewire\Users;
 use App\Livewire\JournalEntries;
 use App\Livewire\Customers\CreateCustomer;
 use App\Livewire\Customers\EditCustomer;
@@ -26,8 +25,11 @@ use App\Livewire\Job\ListJob;
 use App\Livewire\Job\ViewJob;
 use App\Livewire\Shipment\ContainerShipment;
 use App\Livewire\Shipment\CreateShipment;
+use App\Livewire\Shipment\EditShipment;
 use App\Livewire\Shipment\ListShipment;
 use App\Livewire\Shipment\ViewShipment;
+use App\Livewire\Users\UserList;
+use App\Livewire\Users\UserView;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
@@ -47,8 +49,6 @@ Route::view('shipments', 'shipments.index',)
 Route::view('shipment', 'shipments.create',)
     ->middleware(['auth'])
     ->name('shipment');
-
-
 Route::get('/data/airports-ajax', function () {
     $token = 'dfa43c42-594a-44ed-8752-0909a8dfba7e';
     $search = request('q', '');
@@ -81,8 +81,8 @@ Route::get('/data/airports-ajax', function () {
     return response()->json([
         'results' => collect($data['content'])->filter(fn($airport) => !empty($airport['iata']))->map(function ($airport) {
             return [
-                'id' => $airport['iata'],
-                'text' => "{$airport['name']} ({$airport['iata']}) - {$airport['country']['name']}"
+                'id' => strtoupper("{$airport['name']} ({$airport['iata']})"),
+                'text' => strtoupper("{$airport['name']} ({$airport['iata']}) - {$airport['country']['name']}")
             ];
         })->values(), // important!
         'pagination' => [
@@ -91,13 +91,15 @@ Route::get('/data/airports-ajax', function () {
     ]);
 });
 
-
-
 // Route Shipment
 Route::get('create-shipment', CreateShipment::class)->middleware([
     'auth',
     'verified'
 ])->name('create-shipment');
+Route::get('update-shipment/{id}', EditShipment::class)->middleware([
+    'auth',
+    'verified'
+])->name('updateShipment');
 
 Route::get('list-shipment', ListShipment::class)->middleware([
     'auth',
@@ -138,7 +140,14 @@ Route::get('view-job/{id}/container-job/{jobContainer_id}', ContainerJob::class)
 
 
 
-
+// Users route
+Route::get('user', UserList::class)
+    ->middleware(['auth', 'verified'])
+    ->name('userList');
+Route::get('user-view/{id}', UserView::class)
+    ->middleware(['auth', 'verified'])
+    ->name('userView');
+// End Users Route
 
 
 Route::get('/house-b-l/{shipmentId}', HouseBL::class)
@@ -156,22 +165,19 @@ Route::get('/journal-entries', JournalEntries::class)->middleware([
 Route::get('/view-customers/{id}', ViewCustomer::class)->middleware([
     'auth',
     'verified'
-]);
+])->name('viewCust');
 
 Route::get('/edit-customers/{id}', EditCustomer::class)->middleware([
     'auth',
     'verified'
-]);
-Route::get('/customers/create', CreateCustomer::class)->middleware(['auth', 'verified'])->name('customers.create');
+])->name('editCust');
+Route::get('/customers/create', CreateCustomer::class)->middleware(['auth', 'verified'])->name('createCust');
 
 
 Route::get('/customers', ListCustomer::class)
     ->middleware(['auth', 'verified'])
-    ->name('customers.list');
+    ->name('listCust');
 
-Route::get('users', Users::class)
-    ->middleware(['auth', 'verified'])
-    ->name('user.list');
 
 Route::get('accountant', Accountant::class)
     ->middleware(['auth', 'verified'])

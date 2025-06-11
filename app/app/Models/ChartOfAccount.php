@@ -14,7 +14,9 @@ class ChartOfAccount extends Model
         'account_name',
         'term_type',
         'account_type',
-        'parent_account_id'
+        'parent_account_id',
+        'created_by',
+        'updated_by',
     ];
 
     public function customers()

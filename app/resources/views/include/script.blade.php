@@ -3,7 +3,6 @@
 @livewireScripts
 
 {{-- Custom JS: Preline, CSRF token handling, SweetAlert --}}
-<script src="{{ asset('js/preline.js') }}"></script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -55,8 +54,6 @@
 </script>
 @endif
 
-<!-- Add Lodash -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
 <!-- Add Dropzone -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
 
@@ -74,3 +71,11 @@
         }
     });
 </script>
+<script>
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('login-success', () => {
+            window.location.reload();
+        });
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>

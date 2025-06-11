@@ -9,6 +9,7 @@ use App\Models\customerAddress;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class CreateCustomer extends Component
 {
@@ -21,20 +22,14 @@ class CreateCustomer extends Component
 
     protected $rules = [
         'name' => 'required|min:3|max:255',
-        'email' => 'required|email|unique:customers,email',
-        'contact' => 'required|max:20',
+        'email' => 'required',
         'address' => 'required',
-        'web' => 'required|url',
         'coa_id' => 'required|exists:chart_of_accounts,id',
         'country_code' => 'required|size:2',
         'roles' => 'required|array|min:1',
         'customer_code' => 'required|unique:customers,customer_code'
     ];
 
-    protected $messages = [
-        'country_code.required' => 'Pilih negara terlebih dahulu',
-        'customer_code.unique' => 'Kode customer sudah digunakan'
-    ];
 
     public function mount()
     {
@@ -79,11 +74,13 @@ class CreateCustomer extends Component
 
         $number = $lastCode ? (int)explode('-', $lastCode->customer_code)[1] + 1 : 1;
 
-        $this->customer_code = $baseCode . '-' . str_pad($number, 3, '0', STR_PAD_LEFT);
+        $this->customer_code = $baseCode . str_pad($number, 3, '0', STR_PAD_LEFT);
     }
 
     public function save()
     {
+
+        $this->validate();
 
         $customer = Customer::create([
             'name' => $this->name,
@@ -94,6 +91,7 @@ class CreateCustomer extends Component
             'roles' => $this->roles,
             'coa_id' => $this->coa_id,
             'customer_code' => $this->customer_code,
+            'created_by' => Auth::user()->id
         ]);
 
         customerAddress::create([
@@ -101,7 +99,7 @@ class CreateCustomer extends Component
             'customer_id' => $customer->id,
         ]);
 
-        return redirect()->route('customerListt')->with('success', [
+        return redirect()->route('listCust')->with('success', [
             'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.
             'title' => 'Success!', // Toast title
 

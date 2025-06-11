@@ -61,7 +61,9 @@ class Transaction extends Model
         'totalcost',
         // COA columns
         'coa_sale_id',
-        'coa_cost_id'
+        'coa_cost_id',
+        'created_by',
+        'updated_by',
     ];
 
     public function journalEntries()
@@ -94,9 +96,13 @@ class Transaction extends Model
     {
         return $this->belongsTo(Invoice::class);
     }
-    public function getGpAttribute()
+
+    public function getSamountidrFormattedAttribute()
     {
-        $toFloat = fn($v) => floatval(str_replace(',', '.', str_replace('.', '', $v)));
-        return $toFloat($this->samountidr) * $toFloat($this->quantity) - $toFloat($this->camountidr) * $toFloat($this->quantity);
+        return number_format($this->samountidr, 2, ',', '.');
+    }
+    public function getCamountidrFormattedAttribute()
+    {
+        return number_format($this->camountidr, 2, ',', '.');
     }
 }

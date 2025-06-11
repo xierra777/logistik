@@ -11,7 +11,9 @@ class customerAddress extends Model
 
     protected $fillable = [
         'address',
-        'customer_id'
+        'customer_id',
+        'created_by',
+        'updated_by',
     ];
 
     public function customer()

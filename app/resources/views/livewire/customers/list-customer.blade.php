@@ -5,7 +5,7 @@
             {{ __('Customers') }}
         </h2>
     </x-slot>
-    <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto justify-end">
+    <div class="flex flex-col pb-3 sm:flex-row gap-3 w-full sm:w-auto justify-end">
         <a href="/customers/create"
             class="py-3 px-9 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none dark:text-blue-400 dark:hover:bg-blue-900 dark:focus:bg-blue-900">
             Tambah data

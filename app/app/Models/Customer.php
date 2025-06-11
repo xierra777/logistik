@@ -18,7 +18,9 @@ class Customer extends Model
         'web',
         'email',
         'roles',
-        'coa_id'
+        'coa_id',
+        'created_by',
+        'updated_by',
     ];
 
     protected $casts = [

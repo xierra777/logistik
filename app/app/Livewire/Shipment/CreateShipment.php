@@ -10,7 +10,7 @@ use App\Models\shipmentContainers;
 use App\Models\TShipments;
 use Carbon\Carbon;
 use App\Models\User;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\customerAddress;
 use Livewire\Attributes\On;
@@ -329,11 +329,15 @@ class CreateShipment extends Component
             'shipmentDeliveryAgent'     => $this->shipmentDeliveryAgent,
             'employee_id' => $this->shipmentEmployee_id,
             'dataShipments'              => $payload,
+            'created_by'        => Auth::user()->id
+
         ]);
 
         shipmentContainers::create([
             'id_shipments' => $shipment->id,
             'containersData' => $container,
+            'created_by'        => Auth::user()->id
+
         ]);
 
         return redirect()->route('listShipment')->with('success', [

@@ -80,8 +80,6 @@ class CreateShipment extends Component
     }
     public function nextStep()
     {
-        // dd($this->shipmentClient_address);
-
         $this->validateCurrentStep();
         $this->step++;
     }

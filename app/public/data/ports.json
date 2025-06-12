@@ -475,5 +475,5 @@
     { "id": 474, "name": "Bari", "country": "Italy", "code": "ITBRI" },
     { "id": 475, "name": "Brindisi", "country": "Italy", "code": "ITBDS" },
     { "id": 476, "name": "Ancona", "country": "Italy", "code": "ITAOI" },
-    { "id": 477, "name": "Ravenna" }
+    { "id": 477, "name": "Ravenna" ,"country" : "Ravenna"}
 ]

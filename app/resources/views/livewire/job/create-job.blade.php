@@ -3314,7 +3314,7 @@
     window.PortSelect2 = {
         init(selector = '.port-select', type_job = 'air_outbound') {
             const isAir = type_job.startsWith('air');
-            const endpoint = isAir ? '/data/airports-ajax' : '/data/ports.json';
+            const endpoint = isAir ? '/data/airports-ajax' : `/data/ports.json?t=${new Date().toISOString().slice(0, 16)}`;
 
             document.querySelectorAll(selector).forEach(select => {
                 const model = select.getAttribute('wire:model');

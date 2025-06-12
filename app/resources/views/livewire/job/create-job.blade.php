@@ -119,7 +119,6 @@
                             <input
                                 type="text"
                                 wire:model="customerCodeJob"
-                                readonly
                                 class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none ">
                             @error('customerCodeJob')
                             <div class="text-red-500 text-sm">{{ $message }}</div>

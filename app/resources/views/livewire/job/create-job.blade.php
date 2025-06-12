@@ -2537,24 +2537,23 @@
                                 <select id="typeOfPackages" class="block w-full rounded-md border-gray-300 shadow-sm">
                                     <option value=""></option>
                                     <option value="packages">Packages</option>
-                                    <option value="carton">Carton</option>
-                                    <option value="box">Box</option>
-                                    <option value="crate">Crate</option>
-                                    <option value="bag">Bag</option>
-                                    <option value="bale">Bale</option>
-                                    <option value="drum">Drum</option>
-                                    <option value="pallet">Pallet</option>
-                                    <option value="roll">Roll</option>
-                                    <option value="tube">Tube</option>
-                                    <option value="can">Can</option>
-                                    <option value="bottle">Bottle</option>
-                                    <option value="barrel">Barrel</option>
-                                    <option value="reel">Reel</option>
-                                    <option value="tray">Tray</option>
-                                    <option value="case">Case</option>
-                                    <option value="sack">Sack</option>
-                                    <option value="container">Container</option>
-
+                                    <option value="cartons">Cartons</option>
+                                    <option value="boxes">Boxes</option>
+                                    <option value="crates">Crates</option>
+                                    <option value="bags">Bags</option>
+                                    <option value="bales">Bales</option>
+                                    <option value="drums">Drums</option>
+                                    <option value="pallets">Pallets</option>
+                                    <option value="rolls">Rolls</option>
+                                    <option value="tubes">Tubes</option>
+                                    <option value="cans">Cans</option>
+                                    <option value="bottles">Bottles</option>
+                                    <option value="barrels">Barrels</option>
+                                    <option value="reels">Reels</option>
+                                    <option value="trays">Trays</option>
+                                    <option value="cases">Cases</option>
+                                    <option value="sacks">Sacks</option>
+                                    <option value="containers">Containers</option>
                                 </select>
                             </div>
 

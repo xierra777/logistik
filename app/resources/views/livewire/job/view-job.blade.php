@@ -290,10 +290,27 @@
                                         <label>Container Type</label>
                                         <select name="" id="containerType" wire:model="containerType" class="w-full block rounded-md border border-gray-300">
                                             <option value=""></option>
-                                            <option value="20'DG">20'DG</option>
-                                            <option value="20'FT">20'FT</option>
-                                            <option value="20'HQ">20'HQ</option>
-                                            <option value="40'Standard">40'Standard</option>
+                                            <option value="20'DC">20'DC - 20 ft Dry Container</option>
+                                            <option value="20'HC">20'HC - 20 ft High Cube</option>
+                                            <option value="20'OT">20'OT - 20 ft Open Top</option>
+                                            <option value="20'FR">20'FR - 20 ft Flat Rack</option>
+                                            <option value="20'RF">20'RF - 20 ft Reefer</option>
+                                            <option value="20'TK">20'TK - 20 ft Tank</option>
+                                            <option value="20'VH">20'VH - 20 ft Ventilated</option>
+                                            <option value="20'PL">20'PL - 20 ft Platform</option>
+                                            <option value="40'DC">40'DC - 40 ft Dry Container</option>
+                                            <option value="40'HC">40'HC - 40 ft High Cube</option>
+                                            <option value="40'OT">40'OT - 40 ft Open Top</option>
+                                            <option value="40'FR">40'FR - 40 ft Flat Rack</option>
+                                            <option value="40'RF">40'RF - 40 ft Reefer</option>
+                                            <option value="40'TK">40'TK - 40 ft Tank</option>
+                                            <option value="40'VH">40'VH - 40 ft Ventilated</option>
+                                            <option value="40'PL">40'PL - 40 ft Platform</option>
+                                            <option value="45'HC">45'HC - 45 ft High Cube</option>
+                                            <option value="45'RF">45'RF - 45 ft Reefer</option>
+                                            <option value="45'PL">45'PL - 45 ft Platform</option>
+                                            <option value="FCL">FCL - Full Container Load</option>
+                                            <option value="LCL">LCL - Less than Container Load</option>
                                         </select>
                                         @error('container_type')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                                     </div>
@@ -320,9 +337,23 @@
                                         <select id="typeOfPackages" class="block w-full rounded-md border-gray-300 shadow-sm">
                                             <option value=""></option>
                                             <option value="packages">Packages</option>
-                                            <option value="cartoon">Cartoon</option>
-                                            <option value="roll">Roll</option>
-                                            <option value="pallet">Pallet</option>
+                                            <option value="cartons">Cartons</option>
+                                            <option value="boxes">Boxes</option>
+                                            <option value="crates">Crates</option>
+                                            <option value="bags">Bags</option>
+                                            <option value="bales">Bales</option>
+                                            <option value="drums">Drums</option>
+                                            <option value="pallets">Pallets</option>
+                                            <option value="rolls">Rolls</option>
+                                            <option value="tubes">Tubes</option>
+                                            <option value="cans">Cans</option>
+                                            <option value="bottles">Bottles</option>
+                                            <option value="barrels">Barrels</option>
+                                            <option value="reels">Reels</option>
+                                            <option value="trays">Trays</option>
+                                            <option value="cases">Cases</option>
+                                            <option value="sacks">Sacks</option>
+                                            <option value="containers">Containers</option>
                                         </select>
                                     </div>
 

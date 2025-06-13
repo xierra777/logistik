@@ -10,7 +10,7 @@
     { "id": 9, "name": "Pontianak", "country": "Indonesia", "code": "IDPNK" },
     { "id": 10, "name": "Padang", "country": "Indonesia", "code": "IDPDG" },
     { "id": 11, "name": "Jeddah", "country": "Saudi Arabia", "code": "SAJED" },
-    { "id": 12, "name": "King Abdulaziz Port Dammam", "country": "Saudi Arabia", "code": "SADMM" },
+    { "id": 12, "name": "Dammam", "country": "Saudi Arabia", "code": "SADMM" },
     { "id": 13, "name": "Yanbu", "country": "Saudi Arabia", "code": "SAYNB" },
     { "id": 14, "name": "Jubail", "country": "Saudi Arabia", "code": "SAJUB" },
     { "id": 15, "name": "Jizan", "country": "Saudi Arabia", "code": "SAJIZ" },

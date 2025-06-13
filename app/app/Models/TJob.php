@@ -10,6 +10,10 @@ class TJob extends Model
 
     protected $fillable = [
         'job_id',
+        'jobBillLadingNo',
+        'jobBillLadingDate',
+        'houseJobBillLadingNo',
+        'houseJobBillLadingDate',
         'type_job',
         'carrierAirline',
         'employee_id',

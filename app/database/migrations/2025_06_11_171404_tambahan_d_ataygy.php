@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::table('t_jobs', function (Blueprint $table) {
             $table->string('jobBillLadingNo')->nullable()->after('type_job');
-            $table->string('jobBillLadingDate')->nullable()->after('type_job');
+            $table->date('jobBillLadingDate')->nullable()->after('type_job');
             $table->string('houseJobBillLadingNo')->nullable()->after('type_job');
-            $table->string('houseJobBillLadingDate')->nullable()->after('type_job');
+            $table->date('houseJobBillLadingDate')->nullable()->after('type_job');
         });
     }
 
@@ -24,6 +24,13 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('t_jobs', function (Blueprint $table) {
+            $table->dropColumn([
+                'jobBillLadingNo',
+                'jobBillLadingDate',
+                'houseJobBillLadingNo',
+                'houseJobBillLadingDate'
+            ]);
+        });
     }
 };

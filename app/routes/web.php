@@ -119,7 +119,7 @@ Route::get('create-job', CreateJob::class)->middleware([
     'auth',
     'verified'
 ])->name('Createjob');
-Route::get('edit-job', EditJob::class)->middleware([
+Route::get('edit-job/{id}', EditJob::class)->middleware([
     'auth',
     'verified'
 ])->name('EditJob');

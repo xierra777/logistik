@@ -7,6 +7,7 @@ use App\Models\TJob;
 use App\Models\jobContainer;
 use App\Models\shipmentContainers;
 use App\Models\TShipments;
+use Illuminate\Support\Facades\Auth;
 
 class ViewJob extends Component
 {
@@ -115,6 +116,7 @@ class ViewJob extends Component
         jobContainer::create([
             'id_job' => $this->job->id,
             'containers' => $container,
+            'created_by' => Auth::user()->id
         ]);
         $this->reset([
             'containerType',

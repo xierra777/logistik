@@ -103,18 +103,18 @@
                         </td>
                         <td class="px-4 py-4 text-sm text-right">
                             <div class="flex justify-center space-x-3 font-bold">
-                                <button
+                                <a
                                     wire:navigate
                                     href="{{ route('viewJob', ['id' => $j->id]) }}"
                                     class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
                                     View
-                                </button>
-                                <button
+                                </a>
+                                <a
                                     wire:navigate
-                                    href=""
+                                    href="{{ route('EditJob', ['id' => $j->id]) }}"
                                     class="text-yellow-600 hover:text-yellow-800 dark:text-yellow-400 dark:hover:text-yellow-300">
                                     Update
-                                </button>
+                                </a>
                                 <button
                                     type="button"
                                     @click="$dispatch('confirm-delete', { get_id: {{ $j->id }} })"

@@ -1,226 +1,180 @@
 <?php
 
+
 namespace App\Livewire\Job;
 
 use App\Models\TJob;
 use Livewire\Component;
 use App\Models\Customer;
+use App\Models\Container;
+use App\Models\jobContainer;
 use Carbon\Carbon;
 use Livewire\Attributes\On;
+use App\Models\User;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 
 class EditJob extends Component
 {
     public $step = 1;
-    public $type_job;
+    public $type_job = '';
     public $job_name;
-    public $job_id = "";
+    public $job_id = '';
 
     public $clients;
-    public $shippers;
-    public $consignees;
-    public $notifies;
-
+    public $dagentsJob;
+    public $ogentsJob;
+    public $carriers;
+    public $employe;
     public $client_id;
-    public $shipper_id;
-    public $consignee_id;
-    public $notify_id;
+    public $deliveryAgent = "";
+    public $originAgent = "";
+    public array $ports = [];
 
     // Bagian Ocean
-    public $shipment_id = "", $shipment_no,
-        $liners = "", $servicesType = "",
+    public $jobBillLadingdNo = "", $houseJobBillLadingNo, $houseJobBillLadingDate, $customerCodeJob,
+        $carrierAirline, $servicesType = "", $incoTerms,
+        $flightVesselName = "",
         $ocean_vessel_feeder = "",
-        $ocean_vessel_mother = "",
         $port_of_discharge = "",
         $place_of_receipt = "",
+        $place_of_delivery = "",
         $port_of_loading = "",
+        $port_of_final = "",
+        $port_of_receipt = "",
         $description = "",
         $estimearrival,
-        $estimedelivery;
+        $estimedelivery, $flightVesselNo, $cross_trade, $hazardousType, $hazardousClassType, $payableAtJob, $freightTypeJob, $remarksJobDetailJobs;
+    public $jobEmployee;
+    // Bagian Air
+    public $jobBillLadingNo, $jobBillLadingDate, $airlinesJob;
+    // Container Section
+    public $containerType, $noOfPackages, $containerReleaseNo, $containerReleaseDate, $typeOfPackages, $grossWeight, $typeOfGrossWeight, $volumeWeight, $typeOfVolumeWeight, $volume, $chargableWeight, $containerRemarks, $containerNo, $containerSealNo, $noOfPallet, $netOfWeight, $typeNetOfWeight, $totalWeight, $typeOfTotalWeight, $hsCode, $hsCodeDesc;
 
-    public $container_number = "";
-    public $container_size = "";
-    public $container_id = "";
 
-
-    public function mount()
-    {
-
-        $this->clients = Customer::whereJsonContains('roles', 'client')->get();
-        $this->shippers = Customer::whereJsonContains('roles', 'shipper')->get();
-        $this->consignees = Customer::whereJsonContains('roles', 'consignee')->get();
-        $this->notifies = Customer::whereJsonContains('roles', 'notify')->get();
-    }
-    protected $listeners = ['portUpdated'];
-
-    public function portUpdated($model, $value)
-    {
-        $this->{$model} = $value;
-    }
     public function nextStep()
     {
-        $this->validateCurrentStep();
         $this->step++;
-        $this->dispatch('reinit-select2');
     }
-    public function updatedTypeJob()
+
+    public function getClientNameProperty()
     {
-        $this->generateJobName();
-        $this->dispatch('reinit-select2');
+        if (!$this->client_id) return '';
+
+        $client = $this->clients->firstWhere('id', $this->client_id);
+        return $client ? $client->name : '';
+    }
+    public function getDagentNameProperty()
+    {
+        if (!$this->deliveryAgent) return '';
+
+        $agent = $this->dagentsJob->firstWhere('id', $this->deliveryAgent);
+        return $agent?->name ?? '';
+    }
+
+    public function getOgentNameProperty()
+    {
+        if (!$this->outputAgent) return '';
+
+        $agent = $this->ogentsJob->firstWhere('id', $this->outputAgent);
+        return $agent?->name ?? '';
     }
 
     public function previousStep()
     {
         $this->step--;
-        $this->dispatch('reinit-select2');
     }
-
-    private function validateCurrentStep()
+    public function mount($id)
     {
-        switch ($this->step) {
-            case 1:
-                $this->validate([
-                    'type_job' => 'required',
-                    'client_id' => 'required',
-                ]);
-                break;
+        $job = TJob::with('TjobContainer')->findOrFail($id);
 
-            case 2:
-                $rules = [];
+        // Load basic job data
+        $this->job_id = $job->job_id;
+        $this->type_job = $job->type_job;
+        $this->client_id = $job->client_id;
+        $this->deliveryAgent = $job->dagentsJob;
+        $this->carrierAirline = $job->carrierAirline;
+        $this->jobEmployee = $job->employee_id;
+        $this->customerCodeJob = $job->customerCodeJob;
+        $this->jobBillLadingNo = $job->jobBillLadingNo;
+        $this->jobBillLadingDate = $job->jobBillLadingDate;
+        $this->houseJobBillLadingNo = $job->houseJobBillLadingNo;
+        $this->houseJobBillLadingDate = $job->houseJobBillLadingDate;
 
-                switch ($this->type_job) {
-                    case 'ocean_fcl_export':
-                        $rules = [
-                            'job_name' => 'required',
-                            'shipment_no' => 'required',
-                            'shipment_id' => 'required'
-                        ];
-                        break;
-
-                    case 'trucking':
-                        $rules = ['trucking_detail' => 'required'];
-                        break;
-
-                    // Tambahkan case untuk tipe job lainnya
-                    default:
-                        $rules = [];
-                        break;
+        // Load data object
+        if ($job->data) {
+            foreach ($job->data as $key => $value) {
+                if (property_exists($this, $key)) {
+                    $this->$key = $value;
                 }
-
-                $this->validate($rules);
-                break;
-
-            case 3:
-                $this->validate([
-                    'container_number' => 'required',
-                    'container_size' => 'required'
-                ]);
-                break;
+            }
         }
+
+        // Load container data
+        if ($job->jobContainer && $job->jobContainer->containers) {
+            foreach ($job->jobContainer->containers as $key => $value) {
+                if (property_exists($this, $key)) {
+                    $this->$key = $value;
+                }
+            }
+        }
+
+        // Load lookup data
+        $this->clients = Customer::whereJsonContains('roles', 'client')->get();
+        $this->dagentsJob = Customer::whereJsonContains('roles', 'agent')->get();
+        $this->ogentsJob = Customer::whereJsonContains('roles', 'agent')->get();
+        $this->carriers = Customer::whereJsonContains('roles', 'carrier')->get();
+        $this->employe = User::all('id', 'name');
     }
 
     public function submitForm()
     {
-        switch ($this->type_job) {
-            case 'ocean_fcl_export':
-                $this->ocean_fcl_export();
-                break;
-            case 'ocean_fcl_import':
-                $this->ocean_fcl_import();
-                break;
-            case 'air_export':
-                $this->airExport();
-                break;
-            case 'trucking':
-                $this->trucking();
-                break;
-            default:
-                session()->flash('error', 'Job type not recognized.');
+        DB::beginTransaction();
+        try {
+            $job = TJob::findOrFail($this->job_id);
+
+            $container = [
+                'containerType' => $this->containerType,
+                // ... rest of container data
+            ];
+
+            $data = [
+                'servicesType' => $this->servicesType,
+                // ... rest of job data
+            ];
+
+            $job->update([
+                'type_job' => $this->type_job,
+                'client_id' => $this->client_id,
+                'dagentsJob' => $this->deliveryAgent,
+                'carrierAirline' => $this->carrierAirline,
+                'employee_id' => $this->jobEmployee,
+                'customerCodeJob' => $this->customerCodeJob,
+                'jobBillLadingNo' => $this->jobBillLadingNo,
+                'jobBillLadingDate' => $this->jobBillLadingDate,
+                'houseJobBillLadingNo' => $this->houseJobBillLadingNo,
+                'houseJobBillLadingDate' => $this->houseJobBillLadingDate,
+                'data' => $data,
+                'updated_by' => Auth::user()->id
+            ]);
+
+            $job->jobContainer()->update([
+                'containers' => $container,
+                'updated_by' => Auth::user()->id
+            ]);
+
+            DB::commit();
+            return redirect()->route('listJob')->with('success', [
+                'icon' => 'success',
+                'title' => 'Updated Successfully!'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollback();
+            session()->flash('error', 'Error updating job: ' . $e->getMessage());
         }
     }
-    public function generateJobName()
-    {
-        // Mendapatkan format tanggal dengan YYMMDD
-        $startOfMonth = Carbon::now()->startOfMonth();
-        $endOfMonth = Carbon::now()->endOfMonth();
 
-        $countThisMonth = TJob::whereBetween('created_at', [$startOfMonth, $endOfMonth])->count();
-
-        $sequence = str_pad($countThisMonth + 1, 3, '0', STR_PAD_LEFT);
-
-        $type = strtoupper(str_replace('_', '-', $this->type_job));
-        $date = now()->format('Ym'); // Format: 202505 (bulan dan tahun)
-
-        switch ($this->type_job) {
-            case 'ocean_fcl_export':
-                $prefix = 'BRNJKTFE';
-                break;
-            case 'ocean_fcl_import':
-                $prefix = 'BRNJKTFI';
-                break;
-            case 'trucking':
-                $prefix = 'BRNJKTTR';
-                break;
-            case 'air_export':
-                $prefix = 'BRNJKTAE';
-                break;
-            case 'air_import':
-                $prefix = 'BRNJKTAI';
-                break;
-            case 'logistics':
-                $prefix = 'BRNJKTLG';
-                break;
-            default:
-                $prefix = 'BRNJKT';  // Default prefix jika type_job tidak dikenali
-                break;
-        }
-
-        // Format job_name otomatis berdasarkan prefix dan tanggal
-        $this->job_name = "{$prefix}{$date}{$sequence}";
-    }
-
-    public function ocean_fcl_export()
-    {
-        $payload = [
-            // Data payload khusus untuk Ocean FCL Export
-            'shipment_id'         => $this->shipment_id,
-            'shipment_no'         => $this->shipment_no,
-            'servicesType'        => $this->servicesType,
-            'liners'              => $this->liners,
-            'ocean_vessel_feeder' => $this->ocean_vessel_feeder,
-            'ocean_vessel_mother' => $this->ocean_vessel_mother,
-            'estimearrival'       => $this->estimearrival,
-            'estimedelivery'      => $this->estimedelivery,
-            'place_of_receipt'    => $this->place_of_receipt,
-            'port_of_discharge'   => $this->port_of_discharge,
-            'port_of_loading'     => $this->port_of_loading,
-            'description'         => $this->description,
-        ];
-        dd([
-            'shipper_id' => $this->shipper_id,
-            'consignee_id' => $this->consignee_id,
-            'notify_id' => $this->notify_id,
-            'type_job' => $this->type_job,
-            'job_name' => $this->job_name,
-            'data' => $payload,
-        ]);
-
-
-        TJob::create([
-            'job_id' => $this->job_id,
-            'job_name' => $this->job_name,
-            'type_job' => $this->type_job,
-            'shipper_id' => $this->shipper_id,
-            'consignee_id' => $this->consignee_id,
-            'notify_id' => $this->notify_id,
-            'shipment_no' => $this->shipment_no,
-            'shipment_id' => $this->shipment_id,
-            'data'  => $payload,
-
-        ]);
-        session()->flash('message', 'Ocean FCL Export job created successfully.');
-    }
-    public function render()
-    {
-        return view('livewire.job.edit-job');
-    }
+    // Keep other existing methods...
 }

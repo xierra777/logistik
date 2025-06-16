@@ -18,10 +18,10 @@
             <p class="text-center bg-gray-300 px-3 py-1">Delivery Agent </p>
             <p class="text-center  px-4 py-2 font-bold"> {{$job->dagents->name}}</p>
         </div>
-        @elseif($type_job === 'ocean_fcl_import')
+        @elseif($type_job === 'ocean_fcl_import'|| $type_job === 'air_inbound')
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Origin Agent </p>
-            <p class="text-center px-4 py-2"> {{$job->oagents->name}}</p>
+            <p class="text-center px-4 py-2"> {{$job->ogents->name ?? ''}}</p>
         </div>
         @else
         Default Agent
@@ -68,7 +68,7 @@
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1"> Employee </p>
-            <p class="text-center px-4 py-2"> {{ $job->employee->name }}</p>
+            <p class="text-center px-4 py-2"> {{ $job->employee->name ?? ''}}</p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Remarks </p>
@@ -478,6 +478,7 @@
                 </div>
             </div>
         </div>
+        @if($type_job === 'ocean_fcl_export' ||$type_job === 'ocean_fcl_import' )
         <div class="overflow-x-auto">
             <table class="table-hover min-w-full divide-y divide-gray-200 dark:divide-neutral-700 text-center">
                 <thead>
@@ -553,6 +554,84 @@
                 </tbody>
             </table>
         </div>
+        @elseif($type_job === 'air_outbound'|| $type_job === 'air_inbound')
+        <div class="overflow-x-auto">
+            <table class="table-hover min-w-full divide-y divide-gray-200 dark:divide-neutral-700 text-center">
+                <thead>
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            No
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Gross Weight
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Net Weight
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            Volume
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                            See Attach
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="">
+                    @forelse($job->TjobContainer as $c)
+                    <tr>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $loop->iteration  * 10 }}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$c->containers['grossWeight'] ?? ''}}{{$c->containers['typeOfGrossWeight'] ?? ''}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$c->containers['netOfWeight'] ?? ''}} {{$c->containers['typeNetOfWeight'] ?? ''}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$c->containers['volume'] ?? ''}}
+                            @if($c->containers['volume'])
+                            CBM
+                            @else
+                            @endif
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            <a href="{{ url('view-job/' . $job->id . '/container-job/' . $c->id) }}" class="py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg
+                            transform transition duration-200 ease-in-out shadow:hover-cyan-200
+                            hover:bg-cyan-400 hover:scale-110 ">
+                                <i class="fa-regular fa-file"></i> See Attachment
+                            </a>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr wire:loading.remove>
+                        <td colspan=" 7" class="py-12 text-center">
+                            <div class="flex flex-col items-center justify-center">
+                                <img src="{{ asset('images/nodata.svg') }}"
+                                    alt="No data illustration"
+                                    class="w-64 h-48 mb-4 opacity-75 dark:opacity-50">
+                                <p class="text-lg font-medium text-gray-600 dark:text-neutral-300">
+                                    No Contaner found!
+                                </p>
+                                <p class="text-sm text-gray-500 dark:text-neutral-500 text-center">
+                                    Start Add container
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr wire:loading class="animate-pulse">
+                        <td colspan="6" class="py-12 text-center text-gray-500 dark:text-neutral-400">
+                            Retrieving data…
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        @else
+        Default Agent
+        @endif
+
 
     </div>
     <div class="mt-3 mb-4 shadow-xl">
@@ -773,7 +852,7 @@
                     x-ref="modalContent">
                     <div class=" flex justify-end mb-4 p-4">
                         <button
-                            wire:click="refreshTransaction"
+                            wire:click="refreshTransaction({{ $job->id }})"
                             @click="open = true"
                             class="py-3 px-4 bg-blue-600 text-white rounded-lg">
                             Add Cost
@@ -808,7 +887,9 @@
                                 </button>
                             </div>
                             <!-- Form -->
-
+                            <livewire:job.transactions.create-transactions
+                                :id="$job->id"
+                                :key="'transaction' . $job->id . '-' . now()->timestamp" />
                         </div>
                     </div>
                 </div>

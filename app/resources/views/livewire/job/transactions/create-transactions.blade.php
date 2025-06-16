@@ -190,6 +190,8 @@
 
     <div class="bg-white">
         <!-- Heading Bar -->
+
+
         <div class="bg-green-600 p-3 rounded-t-xl">
             <h2 class="text-white text-lg font-semibold">Charge</h2>
         </div>
@@ -243,7 +245,10 @@
                     <select id="unit" name="unit" wire:model="unit"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         <option value=""></option>
+                        <option value="">-- Pilih --</option>
                         <option value="CONTAINER">PER CONTAINER</option>
+                        <option value="PALLET">PER PALLET</option>
+                        <option value="DOCUMENT">PER DOCUMENT</option>
                     </select>
                 </div>
                 <!-- Quantity -->

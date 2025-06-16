@@ -13,6 +13,7 @@ class ViewJob extends Component
 {
 
     public $job;
+    public $refreshKey;
     public $type_job = '';
     public array $selectedShipments = [];
     public $organizationFields = [];
@@ -23,14 +24,7 @@ class ViewJob extends Component
 
     public function mount($id)
     {
-        $this->job = TJob::with([
-            'client',
-            'TjobContainer',
-            'carrierModel',      // relasi ke Customer
-            'ogents',
-            'dagents',
-            'employee',
-        ])->findOrFail($id);
+        $this->loadJob($id); // cukup panggil method ini, tidak perlu cari ulang shipment ID
 
         $this->type_job = $this->job->type_job; // <-- Assign langsung dari relasi job
         $this->organizationFields = [
@@ -40,6 +34,24 @@ class ViewJob extends Component
             'Notify Party' => 'notify',
 
         ];
+    }
+    public function refreshTransaction($id)
+    {
+
+        $this->refreshKey = now()->timestamp;
+        $this->loadJob($id); // cukup panggil method ini, tidak perlu cari ulang shipment ID
+
+    }
+    public function loadJob($id)
+    {
+        $this->job = TJob::with([
+            'client',
+            'TjobContainer',
+            'carrierModel',      // relasi ke Customer
+            'ogents',
+            'dagents',
+            'employee',
+        ])->findOrFail($id);
     }
     public function detachSelectedShipments()
     {

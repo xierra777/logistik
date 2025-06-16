@@ -67,6 +67,9 @@
 </body>
 <footer>
     <!-- Footer content can go here -->
+    <div class="text-center py-4 text-gray-500 text-sm">
+        &copy; {{ date('Y') }} A . All rights reserved.
+    </div>
 </footer>
 
 </html>

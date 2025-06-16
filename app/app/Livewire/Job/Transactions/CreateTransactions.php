@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Shipment\Transaction;
+namespace App\Livewire\Job\Transactions;
 
 use App\Livewire\Shipment\ContainerShipment;
 use Livewire\Component;
@@ -11,21 +11,22 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\ChargeSetting;
 use App\Models\ChartOfAccount;
+use App\Models\jobContainer;
 use App\Models\JournalEntry;
-use App\Models\shipmentContainers;
+use App\Models\TJob;
 
-class CreateTransaction extends Component
+class CreateTransactions extends Component
 {
     public $chargeCoa;
 
-    public $shipmentId;
-    public $shipment;
+    public $jobId;
+    public $job;
     public $customer_id;
     public $coaSaleId;
     public $coaCostId;
 
     // === Charge Details ===
-    public $charge, $description, $freight, $unit, $ofdtype, $remarks;
+    public $charge, $description, $freight, $unit = 'CONTAINER', $ofdtype, $remarks;
     public $quantity = 0;
 
     // === Sale Details ===
@@ -45,30 +46,50 @@ class CreateTransaction extends Component
 
     public function mount($id)
     {
-        $this->shipmentId = $id;
-        $customers = customer::orderBy('name')->get();
-        $shipment = TShipments::with([
-            'client',
-            'shipper',
-            'consignee',
-            'notify',
-            'carrierModel',
-            'deliveryAgent',
-        ])->find($id);
+        $this->jobId = $id;
+        $job = TJob::with(['client'])->find($id);
 
         $this->clients = collect([
-            $shipment->client,
-            $shipment->shipper,
-            $shipment->consignee,
-            $shipment->notify,
-            $shipment->carrierModel,
-            $shipment->deliveryAgent,
+            $job->client,
+            $job->shipper,
+            $job->consignee,
+            $job->notify,
+            $job->carrierModel,
+            $job->deliveryAgent,
         ])->filter()->unique();
+        if (!$job) {
+            throw new \Exception("Job with ID {$id} not found");
+        }
+
+        $customers = Customer::orderBy('name')->get();
+
         $this->chargeCoa = ChargeSetting::get();
+        $this->updatedUnit($this->unit);
 
-        $this->vendors = customer::where('category', 'creditor')->orderBy('name')->get();
+        $this->vendors = Customer::where('category', 'creditor')->orderBy('name')->get();
+    }
+    public function updatedUnit($value)
+    {
+        if (!$this->job) {
+            $this->job = TJob::with('TjobContainer', 'shipments')->find($this->jobId);
+        }
 
-        // $this->updateQty();
+        switch ($value) {
+            case 'CONTAINER':
+                $this->quantity = $this->job->TjobContainer->count(); // atau hitung dari container relasi
+                break;
+
+            case 'PALLET':
+                $this->quantity = 0; // method custom
+                break;
+
+            case 'DOCUMENT':
+                $this->quantity =  $this->job->shipments->count();
+                break;
+
+            default:
+                $this->quantity = 0;
+        }
     }
 
     public function updatedCharge($value)
@@ -84,14 +105,15 @@ class CreateTransaction extends Component
             $this->coaCostId = null;
         }
     }
-    // === Simpan Data Transaksi Baru ===
+
+    // === Save Transaction ===
     public function save()
     {
         $vendor = Customer::find($this->cvendor);
         $client = Customer::find($this->sclient);
 
         $transaction = Transaction::create([
-            'shipment_id' => $this->shipmentId,
+            // 'job_id' => $this->jobId, // Use jobId instead of shipmentId
             'charge' => $this->charge,
             'description' => $this->description,
             'freight' => $this->freight,
@@ -142,30 +164,31 @@ class CreateTransaction extends Component
             'chwtaxrateusd' => $this->chwtaxrateusd,
         ]);
 
-        $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
-        $costCoa = ChartOfAccount::find($transaction->coa_cost_id);
-        // dd([
-        //     'sale_term' => $saleCoa?->term_type,
-        //     'cost_term' => $costCoa?->term_type,
-        //     'sale_amount' => $transaction->samountidr,
-        //     'cost_amount' => $transaction->camountidr,
-        // ]);
+        // Create journal entries
+        $this->createJournalEntries($transaction);
 
-        // === JURNAL SALE ===
-        // Fungsi helper untuk konversi string Indo ke float
+        // Reset form and refresh data
+        $this->resetForm();
+        $this->dispatch('transactionSaved');
+        $this->dispatch('close-modal');
+
+        session()->flash('message', 'Transaksi berhasil disimpan!');
+    }
+
+    private function createJournalEntries($transaction)
+    {
+        // Helper function to convert Indonesian formatted numbers to float
         $indoStringToFloat = function (string $value): float {
-            // hapus titik ribuan, ganti koma jadi titik desimal
             $value = str_replace('.', '', $value);
             $value = str_replace(',', '.', $value);
             return floatval($value);
         };
 
-        // Ambil relasi coaSale dan coaCost dari ChargeSetting agar dapat akses term_type
-        $chargeSetting = ChartOfAccount::find($transaction->coa_sale_id);
-        $saleCoa = $chargeSetting?->coaSale;
-        $costCoa = $chargeSetting?->coaCost;
+        // Get COA for sale and cost
+        $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
+        $costCoa = ChartOfAccount::find($transaction->coa_cost_id);
 
-        // JURNAL SALE
+        // Create sale journal entry
         if ($transaction->samountidr && $saleCoa) {
             $saleAmount = $indoStringToFloat($transaction->samountidr);
             $totalSale = $saleAmount * $transaction->quantity;
@@ -180,7 +203,7 @@ class CreateTransaction extends Component
             ]);
         }
 
-        // JURNAL COST
+        // Create cost journal entry
         if ($transaction->camountidr && $costCoa) {
             $costAmount = $indoStringToFloat($transaction->camountidr);
             $totalCost = $costAmount * $transaction->quantity;
@@ -194,29 +217,69 @@ class CreateTransaction extends Component
                 'date' => now(),
             ]);
         }
-
-
-        $this->reset();
-        // $this->loadClients(); 
-        $this->dispatch('transactionSaved');
-        $this->dispatch('close-modal');
-        $this->chargeCoa = ChargeSetting::get();
-        session()->flash('message', 'Transaksi berhasil disimpan!');
-        $this->vendors = customer::where('category', 'creditor')->orderBy('name')->get();
     }
 
-    // public function loadClients()
-    // {
-    //     $this->clients = customer::where('category', 'DR')->orderBy('name')->get();
-    // }
+    private function resetForm()
+    {
+        $this->reset([
+            'charge',
+            'description',
+            'freight',
+            'unit',
+            'ofdtype',
+            'remarks',
+            'quantity',
+            'sclient',
+            'scurrency',
+            'srate',
+            'samount_qty',
+            'sincludedtax',
+            'sfcyamount',
+            'samountidr',
+            'sdrcr',
+            'svatgst',
+            'staxableamount',
+            'svatgstamount',
+            'swhtaxrate',
+            'swhtaxamount',
+            'sremarks',
+            'sgrossprofit',
+            'cvendor',
+            'creferenceno',
+            'cdate',
+            'cdrcr',
+            'ccurrency',
+            'crate',
+            'camount_qty',
+            'cincludedtax',
+            'cfcyamount',
+            'camountidr',
+            'cvatgst',
+            'cvatgstamount',
+            'ctaxableamount',
+            'cremarks',
+            'cwhtaxrate',
+            'cwhtaxamount',
+            'svatgstusd',
+            'cvatgstusd',
+            'shwtaxrateusd',
+            'chwtaxrateusd'
+        ]);
+
+        // Reload fresh data
+        $this->chargeCoa = ChargeSetting::get();
+        $this->vendors = Customer::where('category', 'creditor')->orderBy('name')->get();
+    }
 
     public function closeModal()
     {
-        // $this->resetFields();
-        $this->dispatch('close-modal'); // untuk Alpine.js tutup modal
+        $this->dispatch('close-modal');
     }
     public function render()
     {
-        return view('livewire.shipment.transaction.create-transaction');
+        return view('livewire.job.transactions.create-transactions');
     }
+
+    // Update quantity based on containers associated with the job
+
 }

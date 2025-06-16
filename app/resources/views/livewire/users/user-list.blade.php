@@ -5,9 +5,9 @@
             {{ __('Management Users') }}
         </h2>
     </x-slot>
-    <div x-data="{ open: false }" @close-modal.window="open = false">
+    <div x-data="{ open: false }" @close-modal.window="open = false" @keydown.escape.window="open = false">
         <!-- Button to open modal -->
-        <div class="flex justify-end gap-2 mb-4 justify-end">
+        <div class="flex justify-end gap-2 mb-4 justify-end" @click.away="open = false">
             <button @click="open = true" class="py-3 px-4 bg-blue-600 text-white rounded-lg">
                 Add Users
             </button>

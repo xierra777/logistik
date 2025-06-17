@@ -104,9 +104,15 @@
                     @endforeach
                 </div>
                 @error('type_job')<div class="text-red-500 mt-2">{{ $message }}</div>@enderror
-                <button wire:click.prevent="nextStep" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                    Lanjut
-                </button>
+                <div class="flex justify-between ">
+                    <a href="{{route('listShipment')}}" class="mt-4 px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">
+                        back
+                    </a>
+                    <button wire:click.prevent="nextStep" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        Lanjut
+                    </button>
+                </div>
+
 
             </div>
             @if($step === 2)

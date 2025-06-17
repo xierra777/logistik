@@ -19,9 +19,9 @@
             <input type="text" wire:model="account_name" class="w-full border rounded p-2" placeholder="Masukkan nama akun">
             @error('account_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
-        <div class="mb-4">
+        <div class="mb-4" wire:ignore>
             <label class="block font-medium">Account Type</label>
-            <select wire:model="account_type" class="w-full border rounded p-2">
+            <select wire:model="account_type" id="account_type" class="w-full border rounded p-2">
                 <option value="">-- Pilih Tipe Akun --</option>
                 <option value="Asset">Asset</option>
                 <option value="Liability">Liability</option>
@@ -34,7 +34,7 @@
         <!-- Tambahan Dropdown untuk Term Type (DR/CR) -->
         <div class="mb-4">
             <label class="block font-medium">Term Type</label>
-            <select wire:model="term_type" class="w-full border rounded p-2">
+            <select wire:model="term_type" id="term_type" class="w-full border rounded p-2">
                 <option value="">-- Pilih Term Type --</option>
                 <option value="CR">Credit (CR)</option>
                 <option value="DR">Debit (DR)</option>
@@ -107,6 +107,32 @@
             // console.log(data);
             // $wire.set('roles',data,false);
             $wire.parent_account_id = data;
+        });
+    });
+    $(document).ready(function() {
+        $('#account_type').select2({
+            placeholder: "Select roles",
+            allowClear: true,
+            theme: 'tailwindcss-3'
+        });
+        $('#account_type').on('change', function() {
+            let data = $(this).val();
+            // console.log(data);
+            // $wire.set('roles',data,false);
+            $wire.account_type = data;
+        });
+    });
+    $(document).ready(function() {
+        $('#term_type').select2({
+            placeholder: "Select roles",
+            allowClear: true,
+            theme: 'tailwindcss-3'
+        });
+        $('#term_type').on('change', function() {
+            let data = $(this).val();
+            // console.log(data);
+            // $wire.set('roles',data,false);
+            $wire.term_type = data;
         });
     });
 </script>

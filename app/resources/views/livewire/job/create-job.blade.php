@@ -72,10 +72,14 @@
                     @endforeach
                 </div>
                 @error('type_job')<div class="text-red-500 mt-2">{{ $message }}</div>@enderror
-                <button wire:click.prevent="nextStep" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                    Lanjut
-                </button>
-
+                <div class="flex justify-between ">
+                    <a href="{{route('listJob')}}" class="mt-4 px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">
+                        back
+                    </a>
+                    <button wire:click.prevent="nextStep" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        Lanjut
+                    </button>
+                </div>
             </div>
             @if($step === 2)
             <!-- STEP 2: Isi Detail Job -->
@@ -175,9 +179,7 @@
                             <select name="deliveryAgent" id="deliveryAgent_export" wire:model="deliveryAgent" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 select2">
                                 <option value="">Select agent</option>
                                 @foreach($dagentsJob as $da)
-                                @if(in_array('agent', $da->roles))
                                 <option value="{{ $da->id }}">{{ $da->name }}</option>
-                                @endif
                                 @endforeach
                             </select>
                         </div>
@@ -508,26 +510,49 @@
                 @break
                 @case('ocean_fcl_import')
                 <div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 mb-3">
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Client</label>
-                            <input type="text" value="{{ $this->clientName }}" readonly
-                                class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0"
+                    <div class="grid grid-cols-1 md:grid-cols-3 mb-3 gap-x-4">
+                        {{-- Client --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Client</label>
+                            <input
+                                type="text"
+                                value="{{ $this->clientName }}"
+                                readonly
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none "
                                 placeholder="Nama client akan muncul otomatis">
-                            @error('container_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                            @error('container_no')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Job Type</label>
-                            <input type="text" value="{{ strtoupper(str_replace('_', ' ', $type_job)) }}" readonly
-                                class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0">
-                            @error('seal_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+
+                        {{-- Job Type --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Job Type</label>
+                            <input
+                                type="text"
+                                value="{{ strtoupper(str_replace('_', ' ', $type_job)) }}"
+                                readonly
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none">
+                            @error('seal_no')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Customer Code No</label>
-                            <input type="text" wire:model="customerCodeJob" class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0" readonly>
-                            @error('customerCodeJob')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+
+                        {{-- Customer Code --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Customer Code No</label>
+                            <input
+                                type="text"
+                                wire:model="customerCodeJob"
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none ">
+                            @error('customerCodeJob')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
+                            <p class="text-xs text-gray-500 italic mt-1">Note: adjustable as needed</p>
                         </div>
                     </div>
+
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
                         <div class="flex flex-col space-y-3 rounded-md">
                             <label>No. Job</label>
@@ -545,6 +570,19 @@
                             @error('jobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                        <div></div>
+                        <div class="flex flex-col space-y-3 rounded-md">
+                            <label>HBL No</label>
+                            <input type="text" wire:model="houseJobBillLadingNo" placeholder="Enter MBL" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('houseJobBillLadingNo')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="flex flex-col space-y-3 rounded-md">
+                            <label>HBL Date</label>
+                            <input type="date" wire:model="houseJobBillLadingDate" placeholder="Enter HBL DATE" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('houseJobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div class="mb-4" wire:ignore>
                             <label for="carrier">Carrier</label>
@@ -558,13 +596,11 @@
                             </select>
                         </div>
                         <div class="mb-4" wire:ignore>
-                            <label for="originAgent">Origin Agent</label>
-                            <select name="originAgent" id="originAgent_import" wire:model="originAgent" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 select2">
+                            <label for="originAgent_import">Origin Agent</label>
+                            <select name="originAgent_import" id="originAgent_import" wire:model="originAgent" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 select2">
                                 <option value="">Select agent</option>
-                                @foreach($ogentsJob as $da)
-                                @if(in_array('agent', $cr->roles))
+                                @foreach($dagentsJob as $da)
                                 <option value="{{ $da->id }}">{{ $da->name }}</option>
-                                @endif
                                 @endforeach
                             </select>
                         </div>
@@ -856,7 +892,7 @@
                         <div wire:ignore>
                             <div>
                                 <label for="jobEmployee">Employee</label>
-                                <select name="jobEmployee" id="jobEmployee" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                <select name="jobEmployee" id="jobEmployee" wire:model="jobEmployee" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                     <option value=""></option>
                                     @foreach($employe as $e)
                                     <option value="{{ $e->id }}">{{ $e->name }}</option>
@@ -901,26 +937,49 @@
                 @break
                 @case('ocean_lcl_export')
                 <div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 mb-3">
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Client</label>
-                            <input type="text" value="{{ $this->clientName }}" readonly
-                                class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0"
+                    <div class="grid grid-cols-1 md:grid-cols-3 mb-3 gap-x-4">
+                        {{-- Client --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Client</label>
+                            <input
+                                type="text"
+                                value="{{ $this->clientName }}"
+                                readonly
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none "
                                 placeholder="Nama client akan muncul otomatis">
-                            @error('container_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                            @error('container_no')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Job Type</label>
-                            <input type="text" value="{{ strtoupper(str_replace('_', ' ', $type_job)) }}" readonly
-                                class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0">
-                            @error('seal_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+
+                        {{-- Job Type --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Job Type</label>
+                            <input
+                                type="text"
+                                value="{{ strtoupper(str_replace('_', ' ', $type_job)) }}"
+                                readonly
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none">
+                            @error('seal_no')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Customer Code No</label>
-                            <input type="text" wire:model="customerCodeJob" class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0" readonly>
-                            @error('customerCodeJob')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+
+                        {{-- Customer Code --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Customer Code No</label>
+                            <input
+                                type="text"
+                                wire:model="customerCodeJob"
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none ">
+                            @error('customerCodeJob')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
+                            <p class="text-xs text-gray-500 italic mt-1">Note: adjustable as needed</p>
                         </div>
                     </div>
+
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
                         <div class="flex flex-col space-y-3 rounded-md">
                             <label>No. Job</label>
@@ -936,6 +995,19 @@
                             <label>MBL Date</label>
                             <input type="date" wire:model="jobBillLadingDate" placeholder="Enter Shipment ID" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('jobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                        <div></div>
+                        <div class="flex flex-col space-y-3 rounded-md">
+                            <label>HBL No</label>
+                            <input type="text" wire:model="houseJobBillLadingNo" placeholder="Enter MBL" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('houseJobBillLadingNo')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="flex flex-col space-y-3 rounded-md">
+                            <label>HBL Date</label>
+                            <input type="date" wire:model="houseJobBillLadingDate" placeholder="Enter HBL DATE" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('houseJobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -955,9 +1027,7 @@
                             <select name="deliveryAgent" id="deliveryAgent_export" wire:model="deliveryAgent" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 select2">
                                 <option value="">Select agent</option>
                                 @foreach($dagentsJob as $da)
-                                @if(in_array('agent', $cr->roles))
                                 <option value="{{ $da->id }}">{{ $da->name }}</option>
-                                @endif
                                 @endforeach
                             </select>
                         </div>
@@ -1249,7 +1319,7 @@
                         <div wire:ignore>
                             <div>
                                 <label for="jobEmployee">Employee</label>
-                                <select name="jobEmployee" id="jobEmployee" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                <select name="jobEmployee" id="jobEmployee" wire:model="jobEmployee" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                     <option value=""></option>
                                     @foreach($employe as $e)
                                     <option value="{{ $e->id }}">{{ $e->name }}</option>
@@ -1288,26 +1358,49 @@
                 @break
                 @case('ocean_lcl_import')
                 <div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 mb-3">
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Client</label>
-                            <input type="text" value="{{ $this->clientName }}" readonly
-                                class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0"
+                    <div class="grid grid-cols-1 md:grid-cols-3 mb-3 gap-x-4">
+                        {{-- Client --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Client</label>
+                            <input
+                                type="text"
+                                value="{{ $this->clientName }}"
+                                readonly
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none "
                                 placeholder="Nama client akan muncul otomatis">
-                            @error('container_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                            @error('container_no')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Job Type</label>
-                            <input type="text" value="{{ strtoupper(str_replace('_', ' ', $type_job)) }}" readonly
-                                class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0">
-                            @error('seal_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+
+                        {{-- Job Type --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Job Type</label>
+                            <input
+                                type="text"
+                                value="{{ strtoupper(str_replace('_', ' ', $type_job)) }}"
+                                readonly
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none">
+                            @error('seal_no')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Customer Code No</label>
-                            <input type="text" wire:model="customerCodeJob" class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0" readonly>
-                            @error('customerCodeJob')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+
+                        {{-- Customer Code --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Customer Code No</label>
+                            <input
+                                type="text"
+                                wire:model="customerCodeJob"
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none ">
+                            @error('customerCodeJob')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
+                            <p class="text-xs text-gray-500 italic mt-1">Note: adjustable as needed</p>
                         </div>
                     </div>
+
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
                         <div class="flex flex-col space-y-3 rounded-md">
                             <label>No. Job</label>
@@ -1323,6 +1416,19 @@
                             <label>MBL Date</label>
                             <input type="date" wire:model="jobBillLadingDate" placeholder="Enter Shipment ID" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('jobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                        <div></div>
+                        <div class="flex flex-col space-y-3 rounded-md">
+                            <label>HBL No</label>
+                            <input type="text" wire:model="houseJobBillLadingNo" placeholder="Enter MBL" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('houseJobBillLadingNo')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="flex flex-col space-y-3 rounded-md">
+                            <label>HBL Date</label>
+                            <input type="date" wire:model="houseJobBillLadingDate" placeholder="Enter HBL DATE" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('houseJobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -1341,10 +1447,8 @@
                             <label for="originAgent">Origin Agent</label>
                             <select name="originAgent" id="originAgent_import" wire:model="originAgent" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 select2">
                                 <option value="">Select agent</option>
-                                @foreach($ogentsJob as $da)
-                                @if(in_array('agent', $cr->roles))
-                                <option value="{{ $da->id }}">{{ $da->name }}</option>
-                                @endif
+                                @foreach($ogentsJob as $oj)
+                                <option value="{{ $oj->id }}">{{ $oj->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -1636,7 +1740,7 @@
                         <div wire:ignore>
                             <div>
                                 <label for="jobEmployee">Employee</label>
-                                <select name="jobEmployee" id="jobEmployee" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                <select name="jobEmployee" id="jobEmployee" wire:model="jobEmployee" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                     <option value=""></option>
                                     @foreach($employe as $e)
                                     <option value="{{ $e->id }}">{{ $e->name }}</option>
@@ -1675,26 +1779,49 @@
                 @break
                 @case('air_outbound')
                 <div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 mb-3">
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Client</label>
-                            <input type="text" value="{{ $this->clientName }}" readonly
-                                class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0"
+                    <div class="grid grid-cols-1 md:grid-cols-3 mb-3 gap-x-4">
+                        {{-- Client --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Client</label>
+                            <input
+                                type="text"
+                                value="{{ $this->clientName }}"
+                                readonly
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none "
                                 placeholder="Nama client akan muncul otomatis">
-                            @error('container_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                            @error('container_no')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Job Type</label>
-                            <input type="text" value="{{ strtoupper(str_replace('_', ' ', $type_job)) }}" readonly
-                                class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0">
-                            @error('seal_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+
+                        {{-- Job Type --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Job Type</label>
+                            <input
+                                type="text"
+                                value="{{ strtoupper(str_replace('_', ' ', $type_job)) }}"
+                                readonly
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none">
+                            @error('seal_no')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Customer Code No</label>
-                            <input type="text" wire:model="customerCodeJob" class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0" readonly>
-                            @error('customerCodeJob')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+
+                        {{-- Customer Code --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Customer Code No</label>
+                            <input
+                                type="text"
+                                wire:model="customerCodeJob"
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none ">
+                            @error('customerCodeJob')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
+                            <p class="text-xs text-gray-500 italic mt-1">Note: adjustable as needed</p>
                         </div>
                     </div>
+
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
                         <div class="flex flex-col space-y-3 rounded-md">
                             <label>No. Job</label>
@@ -1703,25 +1830,35 @@
                         </div>
                         <div class="flex flex-col space-y-3 rounded-md">
                             <label>MAWB No</label>
-                            <input type="text" wire:model="jobBillLadingNo" placeholder="Enter MAWB" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            <input type="text" wire:model="jobBillLadingNo" placeholder="Enter MBL" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('jobBillLadingNo')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                         <div class="flex flex-col space-y-3 rounded-md">
                             <label>MAWB Date</label>
-                            <input type="date" wire:model="jobBillLadingDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            <input type="date" wire:model="jobBillLadingDate" placeholder="Enter Shipment ID" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('jobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                        <div></div>
+                        <div class="flex flex-col space-y-3 rounded-md">
+                            <label>HAWB No</label>
+                            <input type="text" wire:model="houseJobBillLadingNo" placeholder="Enter MBL" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('houseJobBillLadingNo')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="flex flex-col space-y-3 rounded-md">
+                            <label>HAWB Date</label>
+                            <input type="date" wire:model="houseJobBillLadingDate" placeholder="Enter HBL DATE" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('houseJobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div class="mb-4" wire:ignore>
-                            <label for="airlinesJob">
-                                Select Airline
-                            </label>
-                            <select name="airlinesJob" id="airlinesJob" wire:model="carrierAirline"
-                                class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                <option value=""></option>
-                                @foreach($airlines as $airline)
-                                <option value="{{ $airline->id }}">{{ $airline->name }}</option>
+                            <label for="airline">Flight</label>
+                            <select name="airline" id="airline" wire:model="carrierAirline" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                <option value="">Select Carrier</option>
+                                @foreach($airlines as $ai)
+                                <option value="{{ $ai->id }}">{{ $ai->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -1729,9 +1866,9 @@
                             <label for="deliveryAgent">Delivery Agent</label>
                             <select name="deliveryAgent" id="deliveryAgent_export" wire:model="deliveryAgent" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 select2">
                                 <option value="">Select agent</option>
-                                @foreach($dagentsJob as $da)
-                                @if(in_array('agent', $da->roles))
-                                <option value="{{ $da->id }}">{{ $da->name }}</option>
+                                @foreach($ogentsJob as $oa)
+                                @if(in_array('agent', $oa->roles))
+                                <option value="{{ $oa->id }}">{{ $oa->name }}</option>
                                 @endif
                                 @endforeach
                             </select>
@@ -2024,7 +2161,7 @@
                         <div wire:ignore>
                             <div>
                                 <label for="jobEmployee">Employee</label>
-                                <select name="jobEmployee" id="jobEmployee" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                <select name="jobEmployee" id="jobEmployee" wire:model="jobEmployee" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                     <option value=""></option>
                                     @foreach($employe as $e)
                                     <option value="{{ $e->id }}">{{ $e->name }}</option>
@@ -2063,26 +2200,49 @@
                 @break
                 @case('air_inbound')
                 <div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 mb-3">
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Client</label>
-                            <input type="text" value="{{ $this->clientName }}" readonly
-                                class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0"
+                    <div class="grid grid-cols-1 md:grid-cols-3 mb-3 gap-x-4">
+                        {{-- Client --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Client</label>
+                            <input
+                                type="text"
+                                value="{{ $this->clientName }}"
+                                readonly
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none "
                                 placeholder="Nama client akan muncul otomatis">
-                            @error('container_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                            @error('container_no')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Job Type</label>
-                            <input type="text" value="{{ strtoupper(str_replace('_', ' ', $type_job)) }}" readonly
-                                class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0">
-                            @error('seal_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+
+                        {{-- Job Type --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Job Type</label>
+                            <input
+                                type="text"
+                                value="{{ strtoupper(str_replace('_', ' ', $type_job)) }}"
+                                readonly
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none">
+                            @error('seal_no')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Customer Code No</label>
-                            <input type="text" wire:model="customerCodeJob" class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0" readonly>
-                            @error('customerCodeJob')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+
+                        {{-- Customer Code --}}
+                        <div class="flex flex-col space-y-2">
+                            <label class="text-sm font-medium text-gray-700">Customer Code No</label>
+                            <input
+                                type="text"
+                                wire:model="customerCodeJob"
+                                class="text-sm font-bold w-full border-2 border-gray-300 rounded-md focus:ring-0 focus:outline-none ">
+                            @error('customerCodeJob')
+                            <div class="text-red-500 text-sm">{{ $message }}</div>
+                            @enderror
+                            <p class="text-xs text-gray-500 italic mt-1">Note: adjustable as needed</p>
                         </div>
                     </div>
+
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
                         <div class="flex flex-col space-y-3 rounded-md">
                             <label>No. Job</label>
@@ -2091,25 +2251,35 @@
                         </div>
                         <div class="flex flex-col space-y-3 rounded-md">
                             <label>MAWB No</label>
-                            <input type="text" wire:model="jobBillLadingNo" placeholder="Enter MAWB" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            <input type="text" wire:model="jobBillLadingNo" placeholder="Enter MBL" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('jobBillLadingNo')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                         <div class="flex flex-col space-y-3 rounded-md">
                             <label>MAWB Date</label>
-                            <input type="date" wire:model="jobBillLadingDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            <input type="date" wire:model="jobBillLadingDate" placeholder="Enter Shipment ID" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                             @error('jobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                        <div></div>
+                        <div class="flex flex-col space-y-3 rounded-md">
+                            <label>HAWB No</label>
+                            <input type="text" wire:model="houseJobBillLadingNo" placeholder="Enter MBL" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('houseJobBillLadingNo')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="flex flex-col space-y-3 rounded-md">
+                            <label>HAWB Date</label>
+                            <input type="date" wire:model="houseJobBillLadingDate" placeholder="Enter HBL DATE" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('houseJobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div class="mb-4" wire:ignore>
-                            <label for="airlinesJob">
-                                Select Airline
-                            </label>
-                            <select name="airlinesJob" id="airlinesJob" wire:model="carrierAirline"
-                                class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                <option value=""></option>
-                                @foreach($airlines as $airline)
-                                <option value="{{ $airline->id }}">{{ $airline->name }}</option>
+                            <label for="airline">Flight</label>
+                            <select name="airline" id="airline" wire:model="carrierAirline" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                <option value="">Select Carrier</option>
+                                @foreach($airlines as $ai)
+                                <option value="{{ $ai->id }}">{{ $ai->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -2156,17 +2326,17 @@
                     <div class=" grid grid-cols-1 md:grid-cols-3 gap-3">
                         <!-- Mother Vessel -->
                         <div class=" mb-4">
-                            <label for=" flight_name">Flight Name</label>
-                            <input type="text" id="flight_name" name="flight_name" wire:model="flight_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            @error('flight_name')
+                            <label for=" flightVesselName">Flight Name</label>
+                            <input type="text" id="flightVesselName" name="flightVesselName" wire:model="flightVesselName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('flightVesselName')
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                             @enderror
                         </div>
 
                         <div class="mb-4">
-                            <label for="flight_no">Flight No</label>
-                            <input type="text" id="flight_no" name="flight_no" wire:model="flight_no" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            @error('flight_no')
+                            <label for="flightVesselNo">Flight No</label>
+                            <input type="text" id="flightVesselNo" name="flightVesselNo" wire:model="flightVesselNo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('flightVesselNo')
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                             @enderror
                         </div>
@@ -2412,7 +2582,7 @@
                         <div wire:ignore>
                             <div>
                                 <label for="jobEmployee">Employee</label>
-                                <select name="jobEmployee" id="jobEmployee" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                <select name="jobEmployee" id="jobEmployee" wire:model="jobEmployee" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                     <option value=""></option>
                                     @foreach($employe as $e)
                                     <option value="{{ $e->id }}">{{ $e->name }}</option>
@@ -2467,17 +2637,20 @@
                 <h2 class="text-lg font-semibold mb-3">Container</h2>
                 @switch($type_job)
                 @case('ocean_fcl_export')
+                @case('ocean_fcl_import')
+                @case('ocean_lcl_export')
+                @case('ocean_lcl_import')
                 <div class="p-3">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                         <!-- Client and Job Type Info -->
-                        <div class="flex flex-col space-y-3 rounded-md">
+                        <div class="flex flex-col col-span-2 space-y-3 rounded-md">
                             <label>Client</label>
                             <input type="text" value="{{ $this->clientName }}" readonly
                                 class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0"
                                 placeholder="Nama client akan muncul otomatis">
                             @error('container_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
+                        <div class="flex flex-col col-span-2 space-y-3 rounded-md">
                             <label>Job Type</label>
                             <input type="text" value="{{ strtoupper(str_replace('_', ' ', $type_job)) }}"
                                 class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0">
@@ -2485,198 +2658,189 @@
                         </div>
 
                         <!-- Left Column -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div class="flex flex-col space-y-2 col-span-2" wire:ignore>
-                                <label>Container Type</label>
-                                <select name="" id="containerType" class="w-full block rounded-md border border-gray-300">
-                                    <option value=""></option>
-                                    <option value="20'DC">20'DC - 20 ft Dry Container</option>
-                                    <option value="20'HC">20'HC - 20 ft High Cube</option>
-                                    <option value="20'OT">20'OT - 20 ft Open Top</option>
-                                    <option value="20'FR">20'FR - 20 ft Flat Rack</option>
-                                    <option value="20'RF">20'RF - 20 ft Reefer</option>
-                                    <option value="20'TK">20'TK - 20 ft Tank</option>
-                                    <option value="20'VH">20'VH - 20 ft Ventilated</option>
-                                    <option value="20'PL">20'PL - 20 ft Platform</option>
-                                    <option value="40'DC">40'DC - 40 ft Dry Container</option>
-                                    <option value="40'HC">40'HC - 40 ft High Cube</option>
-                                    <option value="40'OT">40'OT - 40 ft Open Top</option>
-                                    <option value="40'FR">40'FR - 40 ft Flat Rack</option>
-                                    <option value="40'RF">40'RF - 40 ft Reefer</option>
-                                    <option value="40'TK">40'TK - 40 ft Tank</option>
-                                    <option value="40'VH">40'VH - 40 ft Ventilated</option>
-                                    <option value="40'PL">40'PL - 40 ft Platform</option>
-                                    <option value="45'HC">45'HC - 45 ft High Cube</option>
-                                    <option value="45'RF">45'RF - 45 ft Reefer</option>
-                                    <option value="45'PL">45'PL - 45 ft Platform</option>
-                                    <option value="FCL">FCL - Full Container Load</option>
-                                    <option value="LCL">LCL - Less than Container Load</option>
-                                </select>
-                                @error('container_type')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Container Release No.</label>
-                                <input type="text" placeholder="Enter Container No  " wire:model="containerReleaseNo"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                @error('container_size')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Release date</label>
-                                <input type="date" wire:model="containerReleaseDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                @error('')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                            </div>
+                        <div class="flex flex-col space-y-2 col-span-2" wire:ignore>
+                            <label>Container Type</label>
+                            <select name="" id="containerType" wire:model="containerType" class="w-full block rounded-md border border-gray-300">
+                                <option value=""></option>
+                                <option value="20'DC">20'DC - 20 ft Dry Container</option>
+                                <option value="20'HC">20'HC - 20 ft High Cube</option>
+                                <option value="20'OT">20'OT - 20 ft Open Top</option>
+                                <option value="20'FR">20'FR - 20 ft Flat Rack</option>
+                                <option value="20'RF">20'RF - 20 ft Reefer</option>
+                                <option value="20'TK">20'TK - 20 ft Tank</option>
+                                <option value="20'VH">20'VH - 20 ft Ventilated</option>
+                                <option value="20'PL">20'PL - 20 ft Platform</option>
+                                <option value="40'DC">40'DC - 40 ft Dry Container</option>
+                                <option value="40'HC">40'HC - 40 ft High Cube</option>
+                                <option value="40'OT">40'OT - 40 ft Open Top</option>
+                                <option value="40'FR">40'FR - 40 ft Flat Rack</option>
+                                <option value="40'RF">40'RF - 40 ft Reefer</option>
+                                <option value="40'TK">40'TK - 40 ft Tank</option>
+                                <option value="40'VH">40'VH - 40 ft Ventilated</option>
+                                <option value="40'PL">40'PL - 40 ft Platform</option>
+                                <option value="45'HC">45'HC - 45 ft High Cube</option>
+                                <option value="45'RF">45'RF - 45 ft Reefer</option>
+                                <option value="45'PL">45'PL - 45 ft Platform</option>
+                                <option value="FCL">FCL - Full Container Load</option>
+                                <option value="LCL">LCL - Less than Container Load</option>
+                            </select>
+                            @error('container_type')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <label>Container No.</label>
+                            <input type="text" placeholder="Enter Container No" wire:model="containerNo"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <label>Seal No.</label>
+                            <input type="text" placeholder="Enter Seal No" wire:model="containerSealNo"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <label>Container Release No.</label>
+                            <input type="text" placeholder="Enter Container No " wire:model="containerReleaseNo"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('container_size')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <label>Release date</label>
+                            <input type="date" wire:model="containerReleaseDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-span-2"></div>
+                        <!-- Package Info -->
+                        <div class="flex flex-col space-y-2">
+                            <label>No Of Packages</label>
+                            <input type="text" wire:model="noOfPackages" placeholder="Enter No Of Packages"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        </div>
+                        <div class="flex flex-col space-y-2" wire:ignore>
+                            <label>Type Of Packages</label>
+                            <select id="typeOfPackages" wire:model="typeOfPackages" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <option value=""></option>
+                                <option value="packages">Packages</option>
+                                <option value="cartons">Cartons</option>
+                                <option value="rolls">Rolls</option>
+                                <option value="pallets">Pallets</option>
+                                <option value="crates">Crates</option>
+                                <option value="boxes">Boxes</option>
+                                <option value="drums">Drums</option>
+                                <option value="bags">Bags</option>
+                                <option value="bundles">Bundles</option>
+                                <option value="containers">Containers</option>
+                                <option value="pieces">Pieces</option>
+                                <option value="bales">Bales</option>
 
-                            <!-- Package Info -->
-                            <div class="flex flex-col space-y-2">
-                                <label>No Of Packages</label>
-                                <input type="text" wire:model="noOfPackages" placeholder="Enter No Of Packages"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2" wire:ignore>
-                                <label>Type Of Packages</label>
-                                <select id="typeOfPackages" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value=""></option>
-                                    <option value="packages">Packages</option>
-                                    <option value="cartons">Cartons</option>
-                                    <option value="boxes">Boxes</option>
-                                    <option value="crates">Crates</option>
-                                    <option value="bags">Bags</option>
-                                    <option value="bales">Bales</option>
-                                    <option value="drums">Drums</option>
-                                    <option value="pallets">Pallets</option>
-                                    <option value="rolls">Rolls</option>
-                                    <option value="tubes">Tubes</option>
-                                    <option value="cans">Cans</option>
-                                    <option value="bottles">Bottles</option>
-                                    <option value="barrels">Barrels</option>
-                                    <option value="reels">Reels</option>
-                                    <option value="trays">Trays</option>
-                                    <option value="cases">Cases</option>
-                                    <option value="sacks">Sacks</option>
-                                    <option value="containers">Containers</option>
-                                </select>
-                            </div>
-
-                            <div class="flex flex-col space-y-2">
-                                <label>Gross Weight</label>
-                                <input type="text" placeholder="Enter Gross weight" wire:model="grossWeight"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2" wire:ignore>
-                                <label>Type Of Gross Weight</label>
-                                <select id="typeOfGrossWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value=""></option>
-                                    <option value="KGS">KGS</option>
-                                </select>
-                            </div>
-
-                            <div class="flex flex-col space-y-2">
-                                <label>Volume Weight</label>
-                                <input type="text" wire:model="volumeWeight" placeholder="Enter Gross weight"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2" wire:ignore>
-                                <label>Type Of Volume Weight</label>
-                                <select id="typeOfVolumeWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value=""></option>
-                                    <option value="KGS">KGS</option>
-                                </select>
-                            </div>
-
-                            <!-- Volume Info -->
-                            <div class="flex flex-col space-y-2">
-                                <label>Volume</label>
-                                <div class="flex">
-                                    <input type="text" wire:model="volume" placeholder="Enter volume"
-                                        class="block w-full rounded-l-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                    <span class="inline-flex items-center px-3 border border-l-0 border-gray-300 bg-gray-100 text-gray-600 rounded-r-md">
-                                        CBM
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Chargeable Weight</label>
-                                <input type="text" placeholder="Enter Chargeable Weight" wire:model="chargableWeight"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-
-                            <!-- Remarks -->
-                            <div class="flex flex-col space-y-2 col-span-2">
-                                <label>Remarks</label>
-                                <textarea placeholder="Enter remarks" rows="3" wire:model="containerRemarks"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
-                            </div>
+                            </select>
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <label>No of Pallet</label>
+                            <input type="text" placeholder="Enter No Of Pallet" wire:model="noOfPallet"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        </div>
+                        <div></div>
+                        <div class="flex flex-col space-y-2">
+                            <label>Gross Weight</label>
+                            <input type="text" placeholder="Enter Gross weight" wire:model="grossWeight"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        </div>
+                        <div class="flex flex-col space-y-2" wire:ignore>
+                            <label>Type Of Gross Weight</label>
+                            <select id="typeOfGrossWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <option value=""></option>
+                                <option value="KGS">KGS</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <label>Net Of Weight</label>
+                            <input type="text" placeholder="Enter Net Of Weight" wire:model="netOfWeight"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        </div>
+                        <div class="flex flex-col space-y-2" wire:ignore>
+                            <label>Type Of Net Of Weight</label>
+                            <select id="typeNetOfWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <option value=""></option>
+                                <option value="KGS">KGS</option>
+                            </select>
+                        </div>
+                        <!-- Weight Info -->
+                        <div class="flex flex-col space-y-2">
+                            <label>Volume Weight</label>
+                            <input type="text" wire:model="volumeWeight" placeholder="Enter Gross weight"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        </div>
+                        <div class="flex flex-col space-y-2" wire:ignore>
+                            <label>Type Of Volume Weight</label>
+                            <select id="typeOfVolumeWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <option value=""></option>
+                                <option value="KGS">KGS</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <label>Total Weight</label>
+                            <input type="text" placeholder="Enter Net Of Weight" wire:model="totalWeight"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        </div>
+                        <div class="flex flex-col space-y-2" wire:ignore>
+                            <label>Type Of Weight</label>
+                            <select id="typeOfTotalWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <option value=""></option>
+                                <option value="KGS">KGS</option>
+                            </select>
                         </div>
 
-                        <!-- Right Column -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div class="flex flex-col space-y-2">
-                                <label>Container No.</label>
-                                <input type="text" placeholder="Enter Container No" wire:model="containerNo"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        <!-- Volume Weight Info -->
+
+
+                        <!-- Volume Info -->
+                        <div class="flex flex-col space-y-2">
+                            <label>Volume</label>
+                            <div class="flex">
+                                <input type="text" wire:model="volume" placeholder="Enter volume"
+                                    class="block w-full rounded-l-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                <span class="inline-flex items-center px-3 border border-l-0 border-gray-300 bg-gray-100 text-gray-600 rounded-r-md">
+                                    CBM
+                                </span>
                             </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Seal No.</label>
-                                <input type="text" placeholder="Enter Seal No" wire:model="containerSealNo"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>No of Pallet</label>
-                                <input type="text" placeholder="Enter No Of Pallet" wire:model="noOfPallet"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div></div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Net Of Weight</label>
-                                <input type="text" placeholder="Enter Net Of Weight" wire:model="netOfWeight"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2" wire:ignore>
-                                <label>Type Of Packages</label>
-                                <select id="typeNetOfWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value=""></option>
-                                    <option value="KGS">KGS</option>
-                                </select>
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Total Weight</label>
-                                <input type="text" placeholder="Enter Net Of Weight" wire:model="totalWeight"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2" wire:ignore>
-                                <label>Type Of Weight</label>
-                                <select id="typeOfTotalWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value=""></option>
-                                    <option value="KGS">KGS</option>
-                                </select>
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>HS Code</label>
-                                <input type="text" placeholder="Enter HS Code" wire:model="hsCode"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div></div>
-                            <div class="flex flex-col space-y-2 col-span-2">
-                                <label>HS Description</label>
-                                <textarea placeholder="Enter Hs Description" rows="3" wire:model="hsCodeDesc"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
-                            </div>
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <label>Chargeable Weight</label>
+                            <input type="text" placeholder="Enter Chargeable Weight" wire:model="chargableWeight"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        </div>
+
+                        <div class="flex flex-col space-y-2">
+                            <label>HS Code</label>
+                            <input type="text" placeholder="Enter HS Code" wire:model="hsCode"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        </div>
+                        <div></div>
+                        <div class="flex flex-col space-y-2 col-span-2">
+                            <label>Remarks</label>
+                            <textarea placeholder="Enter remarks" rows="3" wire:model="containerRemarks"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
+                        </div>
+                        <div class="flex flex-col space-y-2 col-span-2">
+                            <label>HS Description</label>
+                            <textarea placeholder="Enter Hs Description" rows="3" wire:model="hsCodeDesc"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
                         </div>
                     </div>
                 </div>
                 @break
-                @case('ocean_fcl_export')
+                @case('air_outbound')
+                @case('air_inbound')
                 <div class="p-3">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                         <!-- Client and Job Type Info -->
-                        <div class="flex flex-col space-y-3 rounded-md">
+                        <div class="flex flex-col col-span-2 space-y-3 rounded-md">
                             <label>Client</label>
                             <input type="text" value="{{ $this->clientName }}" readonly
                                 class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0"
                                 placeholder="Nama client akan muncul otomatis">
                             @error('container_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
+                        <div class="flex flex-col col-span-2 space-y-3 rounded-md">
                             <label>Job Type</label>
                             <input type="text" value="{{ strtoupper(str_replace('_', ' ', $type_job)) }}"
                                 class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0">
@@ -2684,321 +2848,134 @@
                         </div>
 
                         <!-- Left Column -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div class="flex flex-col space-y-2 col-span-2" wire:ignore>
-                                <label>Container Type</label>
-                                <select name="" id="containerType" class="w-full block rounded-md border border-gray-300">
-                                    <option value=""></option>
-                                    <option value="20'DG">20'DG</option>
-                                    <option value="20'FT">20'FT</option>
-                                    <option value="20'HQ">20'HQ</option>
-                                    <option value="40'Standard">40'Standard</option>
-                                </select>
-                                @error('container_type')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Container Release No.</label>
-                                <input type="text" placeholder="Enter Container No  " wire:model="containerReleaseNo"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                @error('container_size')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Release date</label>
-                                <input type="date" wire:model="containerReleaseDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                @error('')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                            </div>
+                        <div class="flex flex-col space-y-2">
+                            <label>Container Release No.</label>
+                            <input type="text" placeholder="Enter Container No " wire:model="containerReleaseNo"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('container_size')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <label>Release date</label>
+                            <input type="date" wire:model="containerReleaseDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="col-span-2"></div>
+                        <!-- Package Info -->
+                        <div class="flex flex-col space-y-2">
+                            <label>No Of Packages</label>
+                            <input type="text" wire:model="noOfPackages" placeholder="Enter No Of Packages"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        </div>
+                        <div class="flex flex-col space-y-2" wire:ignore>
+                            <label>Type Of Packages</label>
+                            <select id="typeOfPackages" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <option value=""></option>
+                                <option value="packages">Packages</option>
+                                <option value="cartons">Cartons</option>
+                                <option value="rolls">Rolls</option>
+                                <option value="pallets">Pallets</option>
+                                <option value="crates">Crates</option>
+                                <option value="boxes">Boxes</option>
+                                <option value="drums">Drums</option>
+                                <option value="bags">Bags</option>
+                                <option value="bundles">Bundles</option>
+                                <option value="containers">Containers</option>
+                                <option value="pieces">Pieces</option>
+                                <option value="bales">Bales</option>
 
-                            <!-- Package Info -->
-                            <div class="flex flex-col space-y-2">
-                                <label>No Of Packages</label>
-                                <input type="text" wire:model="noOfPackages" placeholder="Enter No Of Packages"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2" wire:ignore>
-                                <label>Type Of Packages</label>
-                                <select id="typeOfPackages" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value=""></option>
-                                    <option value="packages">Packages</option>
-                                    <option value="cartoon">Cartoon</option>
-                                    <option value="roll">Roll</option>
-                                    <option value="pallet">Pallet</option>
-                                </select>
-                            </div>
-
-                            <!-- Weight Info -->
-                            <div class="flex flex-col space-y-2">
-                                <label>Gross Weight</label>
-                                <input type="text" placeholder="Enter Gross weight" wire:model="grossWeight"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2" wire:ignore>
-                                <label>Type Of Gross Weight</label>
-                                <select id="typeOfGrossWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value=""></option>
-                                    <option value="KGS">KGS</option>
-                                </select>
-                            </div>
-
-                            <!-- Volume Weight Info -->
-                            <div class="flex flex-col space-y-2">
-                                <label>Volume Weight</label>
-                                <input type="text" wire:model="volumeWeight" placeholder="Enter Gross weight"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2" wire:ignore>
-                                <label>Type Of Volume Weight</label>
-                                <select id="typeOfVolumeWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value=""></option>
-                                    <option value="KGS">KGS</option>
-                                </select>
-                            </div>
-
-                            <!-- Volume Info -->
-                            <div class="flex flex-col space-y-2">
-                                <label>Volume</label>
-                                <div class="flex">
-                                    <input type="text" wire:model="volume" placeholder="Enter volume"
-                                        class="block w-full rounded-l-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                    <span class="inline-flex items-center px-3 border border-l-0 border-gray-300 bg-gray-100 text-gray-600 rounded-r-md">
-                                        CBM
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Chargeable Weight</label>
-                                <input type="text" placeholder="Enter Chargeable Weight" wire:model="chargableWeight"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-
-                            <!-- Remarks -->
-                            <div class="flex flex-col space-y-2 col-span-2">
-                                <label>Remarks</label>
-                                <textarea placeholder="Enter remarks" rows="3" wire:model="containerRemarks"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
-                            </div>
+                            </select>
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <label>No of Pallet</label>
+                            <input type="text" placeholder="Enter No Of Pallet" wire:model="noOfPallet"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        </div>
+                        <div></div>
+                        <div class="flex flex-col space-y-2">
+                            <label>Gross Weight</label>
+                            <input type="text" placeholder="Enter Gross weight" wire:model="grossWeight"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        </div>
+                        <div class="flex flex-col space-y-2" wire:ignore>
+                            <label>Type Of Gross Weight</label>
+                            <select id="typeOfGrossWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <option value=""></option>
+                                <option value="KGS">KGS</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <label>Net Of Weight</label>
+                            <input type="text" placeholder="Enter Net Of Weight" wire:model="netOfWeight"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        </div>
+                        <div class="flex flex-col space-y-2" wire:ignore>
+                            <label>Type Of Net Of Weight</label>
+                            <select id="typeNetOfWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <option value=""></option>
+                                <option value="KGS">KGS</option>
+                            </select>
+                        </div>
+                        <!-- Weight Info -->
+                        <div class="flex flex-col space-y-2">
+                            <label>Volume Weight</label>
+                            <input type="text" wire:model="volumeWeight" placeholder="Enter Gross weight"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        </div>
+                        <div class="flex flex-col space-y-2" wire:ignore>
+                            <label>Type Of Volume Weight</label>
+                            <select id="typeOfVolumeWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <option value=""></option>
+                                <option value="KGS">KGS</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <label>Total Weight</label>
+                            <input type="text" placeholder="Enter Net Of Weight" wire:model="totalWeight"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                        </div>
+                        <div class="flex flex-col space-y-2" wire:ignore>
+                            <label>Type Of Weight</label>
+                            <select id="typeOfTotalWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                <option value=""></option>
+                                <option value="KGS">KGS</option>
+                            </select>
                         </div>
 
-                        <!-- Right Column -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div class="flex flex-col space-y-2">
-                                <label>Container No.</label>
-                                <input type="text" placeholder="Enter Container No" wire:model="containerNo"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Seal No.</label>
-                                <input type="text" placeholder="Enter Seal No" wire:model="containerSealNo"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>No of Pallet</label>
-                                <input type="text" placeholder="Enter No Of Pallet" wire:model="noOfPallet"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div></div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Net Of Weight</label>
-                                <input type="text" placeholder="Enter Net Of Weight" wire:model="netOfWeight"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2" wire:ignore>
-                                <label>Type Of Packages</label>
-                                <select id="typeNetOfWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value=""></option>
-                                    <option value="KGS">KGS</option>
-                                </select>
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Total Weight</label>
-                                <input type="text" placeholder="Enter Net Of Weight" wire:model="totalWeight"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2" wire:ignore>
-                                <label>Type Of Weight</label>
-                                <select id="typeOfTotalWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value=""></option>
-                                    <option value="KGS">KGS</option>
-                                </select>
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>HS Code</label>
-                                <input type="text" placeholder="Enter HS Code" wire:model="hsCode"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div></div>
-                            <div class="flex flex-col space-y-2 col-span-2">
-                                <label>HS Description</label>
-                                <textarea placeholder="Enter Hs Description" rows="3" wire:model="hsCodeDesc"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
+                        <!-- Volume Weight Info -->
+
+
+                        <!-- Volume Info -->
+                        <div class="flex flex-col space-y-2">
+                            <label>Volume</label>
+                            <div class="flex">
+                                <input type="text" wire:model="volume" placeholder="Enter volume"
+                                    class="block w-full rounded-l-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                <span class="inline-flex items-center px-3 border border-l-0 border-gray-300 bg-gray-100 text-gray-600 rounded-r-md">
+                                    CBM
+                                </span>
                             </div>
                         </div>
-                    </div>
-                </div>
-                @break
-                @case('air_outbound' || 'air_inbound')
-                <div class="p-3">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <!-- Client and Job Type Info -->
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Client</label>
-                            <input type="text" value="{{ $this->clientName }}" readonly
-                                class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0"
-                                placeholder="Nama client akan muncul otomatis">
-                            @error('container_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                        </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>Job Type</label>
-                            <input type="text" value="{{ strtoupper(str_replace('_', ' ', $type_job)) }}"
-                                class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0">
-                            @error('seal_no')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        <div class="flex flex-col space-y-2">
+                            <label>Chargeable Weight</label>
+                            <input type="text" placeholder="Enter Chargeable Weight" wire:model="chargableWeight"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                         </div>
 
-                        <!-- Left Column -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div class="flex flex-col space-y-2 col-span-2" wire:ignore>
-                                <label>Container Type</label>
-                                <select name="" id="containerType" class="w-full block rounded-md border border-gray-300">
-                                    <option value=""></option>
-                                    <option value="20'DG">20'DG</option>
-                                    <option value="20'FT">20'FT</option>
-                                    <option value="20'HQ">20'HQ</option>
-                                    <option value="40'Standard">40'Standard</option>
-                                    <option value="40HQ">40HQ</option>
-                                    <option value="40'standard">40'Standard</option>
-                                    <option value="AKE">AKE</option>
-                                    <option value="AMA">AMA</option>
-                                    <option value="PMC">PMC</option>
-                                    <option value="PAG">PAG</option>
-                                </select>
-                                @error('container_type')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Container Release No.</label>
-                                <input type="text" placeholder="Enter Container No  " wire:model="containerReleaseNo"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                @error('container_size')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Release date</label>
-                                <input type="date" wire:model="containerReleaseDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                @error('')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                            </div>
-
-                            <!-- Package Info -->
-                            <div class="flex flex-col space-y-2">
-                                <label>No Of Packages</label>
-                                <input type="text" wire:model="noOfPackages" placeholder="Enter No Of Packages"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2" wire:ignore>
-                                <label>Type Of Packages</label>
-                                <select id="typeOfPackages" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value=""></option>
-                                    <option value="packages">Packages</option>
-                                    <option value="cartoon">Cartoon</option>
-                                    <option value="roll">Roll</option>
-                                    <option value="pallet">Pallet</option>
-                                </select>
-                            </div>
-
-                            <!-- Weight Info -->
-                            <div class="flex flex-col space-y-2">
-                                <label>Gross Weight</label>
-                                <input type="text" placeholder="Enter Gross weight" wire:model="grossWeight"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2" wire:ignore>
-                                <label>Type Of Gross Weight</label>
-                                <select id="typeOfGrossWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value=""></option>
-                                    <option value="KGS">KGS</option>
-                                </select>
-                            </div>
-
-                            <!-- Volume Weight Info -->
-                            <div class="flex flex-col space-y-2">
-                                <label>Volume Weight</label>
-                                <input type="text" wire:model="volumeWeight" placeholder="Enter Gross weight"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2" wire:ignore>
-                                <label>Type Of Volume Weight</label>
-                                <select id="typeOfVolumeWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value=""></option>
-                                    <option value="KGS">KGS</option>
-                                </select>
-                            </div>
-
-                            <!-- Volume Info -->
-                            <div class="flex flex-col space-y-2">
-                                <label>Volume</label>
-                                <div class="flex">
-                                    <input type="text" wire:model="volume" placeholder="Enter volume"
-                                        class="block w-full rounded-l-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                    <span class="inline-flex items-center px-3 border border-l-0 border-gray-300 bg-gray-100 text-gray-600 rounded-r-md">
-                                        CBM
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Chargeable Weight</label>
-                                <input type="text" placeholder="Enter Chargeable Weight" wire:model="chargableWeight"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-
-                            <!-- Remarks -->
-                            <div class="flex flex-col space-y-2 col-span-2">
-                                <label>Remarks</label>
-                                <textarea placeholder="Enter remarks" rows="3" wire:model="containerRemarks"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
-                            </div>
+                        <div class="flex flex-col space-y-2">
+                            <label>HS Code</label>
+                            <input type="text" placeholder="Enter HS Code" wire:model="hsCode"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                         </div>
-
-                        <!-- Right Column -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 space-y-2">
-                            <div class="flex flex-col space-y-2"></div>
-                            <div class="flex flex-col space-y-2"></div>
-                            <div class="flex flex-col space-y-2">
-                                <label>No of Pallet</label>
-                                <input type="text" placeholder="Enter No Of Pallet" wire:model="noOfPallet"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div></div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Net Of Weight</label>
-                                <input type="text" placeholder="Enter Net Of Weight" wire:model="netOfWeight"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2" wire:ignore>
-                                <label>Type Of Packages</label>
-                                <select id="typeNetOfWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value=""></option>
-                                    <option value="KGS">KGS</option>
-                                </select>
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>Total Weight</label>
-                                <input type="text" placeholder="Enter Net Of Weight" wire:model="totalWeight"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div class="flex flex-col space-y-2" wire:ignore>
-                                <label>Type Of Weight</label>
-                                <select id="typeOfTotalWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                    <option value=""></option>
-                                    <option value="KGS">KGS</option>
-                                </select>
-                            </div>
-                            <div class="flex flex-col space-y-2">
-                                <label>HS Code</label>
-                                <input type="text" placeholder="Enter HS Code" wire:model="hsCode"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            </div>
-                            <div></div>
-                            <div class="flex flex-col space-y-2 col-span-2">
-                                <label>HS Description</label>
-                                <textarea placeholder="Enter Hs Description" rows="3" wire:model="hsCodeDesc"
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
-                            </div>
+                        <div></div>
+                        <div class="flex flex-col space-y-2 col-span-2">
+                            <label>Remarks</label>
+                            <textarea placeholder="Enter remarks" rows="3" wire:model="containerRemarks"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
+                        </div>
+                        <div class="flex flex-col space-y-2 col-span-2">
+                            <label>HS Description</label>
+                            <textarea placeholder="Enter Hs Description" rows="3" wire:model="hsCodeDesc"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
                         </div>
                     </div>
                 </div>
@@ -3034,9 +3011,24 @@
                                 <p class="col-span-2">: {{ $jobBillLadingNo }} </p>
                             </div>
                             <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>HBL No. </strong> </p>
+                                <p class="col-span-2">: {{ $houseJobBillLadingNo }} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>HBL No. </strong> </p>
+                                <p class="col-span-2">: {{ $houseJobBillLadingDate }} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>MBL:</strong> </p>
+                                <p class="col-span-2">: {{ $jobBillLadingNo }} </p>
+                            </div>
+                            <div class="flex flex-items grid grid-cols-3">
                                 <p class="col-span-1"><strong>MBL DATE</strong> </p>
                                 <p class="col-span-2">: {{ $jobBillLadingDate }} </p>
                             </div>
+
+                        </div>
+                        <div class="space-y-6 ">
                             <div class="flex flex-items grid grid-cols-3">
                                 <p class="col-span-1"><strong>Port Of loading</strong> </p>
                                 <p class="col-span-2">: {{ $port_of_loading }} </p>
@@ -3053,34 +3045,18 @@
                                 <p class="col-span-1"><strong>place Of Delivery</strong> </p>
                                 <p class="col-span-2">: {{ $place_of_delivery }} </p>
                             </div>
-                        </div>
-                        <div class="space-y-6 ">
-                            @switch('type_job')
-                            @case('ocean_fcl_export'|| 'ocean_lcl_export' )
+                            @if(in_array($type_job, ['ocean_fcl_export', 'ocean_lcl_export', 'air_outbound']))
                             <div class="flex flex-items grid grid-cols-3 ">
                                 <p class="col-span-1"><strong>Delivery Agents</strong> </p>
                                 <p class="col-span-2">: {{ $this->dagentName}} </p>
                             </div>
-                            @break
-                            @case('ocean_fcl_import'|| 'ocean_lcl_import')
+                            @elseif(in_array($type_job, ['ocean_fcl_import', 'ocean_lcl_import', 'air_inbound']))
                             <div class="flex flex-items grid grid-cols-3 ">
                                 <p class="col-span-1"><strong>Origin Agents</strong> </p>
-                                <p class="col-span-2">: {{ $this->oagentsJob }} </p>
-                            </div>flightVesselNo
-                            @break
-                            @case('air_outbound' || 'air_inbound')
-                            @break
-                            @default
-                            <p>hmm smell like something cheaps over here</p>
-                            @endswitch
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Services Type</strong> </p>
-                                <p class="col-span-2">: {{ $servicesType }} </p>
+                                <p class="col-span-2">: {{ $this->ogentName }} </p>
                             </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Inco Terms</strong> </p>
-                                <p class="col-span-2">: {{ $incoTerms }} </p>
-                            </div>
+                            @else
+                            @endif
                             <div class="flex flex-items grid grid-cols-3">
                                 <p class="col-span-1"><strong>ETA / Estimate Time Arrival </strong> </p>
                                 <p class="col-span-2">: {{ \Carbon\Carbon::parse($estimearrival)->format('d M Y H:i') }} </p>
@@ -3092,9 +3068,11 @@
                         </div>
 
                         <div class="space-y-6">
+                            @if(in_array($type_job, ['ocean_fcl_export', 'ocean_lcl_export', 'ocean_fcl_import','ocean_lcl_import']))
+
                             <div class="flex flex-items grid grid-cols-3">
                                 <p class="col-span-1"><strong>Carrier</strong> </p>
-                                <p class="col-span-2">: {{ $carrierAirline }} </p>
+                                <p class="col-span-2">: {{ $this->carrierAirlineName }} </p>
                             </div>
                             <div class="flex flex-items grid grid-cols-3 ">
                                 <p class="col-span-1"><strong>Vessel Name</strong> </p>
@@ -3104,84 +3082,30 @@
                                 <p class="col-span-1"><strong>Voyage</strong> </p>
                                 <p class="col-span-2">: {{ $flightVesselNo }} </p>
                             </div>
-                        </div>
-                    </div>
-                    <div class="font-bold text-2xl text-center mb-4">Container</div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="space-y-6">
+                            @elseif(in_array($type_job, [ 'air_outbound', 'air_inbound']))
+
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>Airlines</strong> </p>
+                                <p class="col-span-2">: {{ $this->carrierAirlineName }} </p>
+                            </div>
                             <div class="flex flex-items grid grid-cols-3 ">
-                                <p class="col-span-1"><strong>Type Container</strong> </p>
-                                <p class="col-span-2">: {{$containerType}} </p>
+                                <p class="col-span-1"><strong>Flight Name</strong> </p>
+                                <p class="col-span-2">: {{ $flightVesselName }} </p>
                             </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Container Release No </strong></p>
-                                <p class="col-span-2">: {{ $containerReleaseNo }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Container Release Date </strong> </p>
-                                <p class="col-span-2">: {{ $containerReleaseDate }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>No of Packages</strong> </p>
-                                <p class="col-span-2">: {{ $noOfPackages }} {{$typeOfPackages}} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Gross Weight</strong> </p>
-                                <p class="col-span-2">: {{ $grossWeight }} {{$typeOfGrossWeight}} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Volume Weight</strong> </p>
-                                <p class="col-span-2">: {{ $volumeWeight }} {{$typeOfVolumeWeight}} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Volume</strong> </p>
-                                <p class="col-span-2">: {{ $volume }} CBM </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Chargable Weight</strong> </p>
-                                <p class="col-span-2">: {{ $chargableWeight }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Remarks</strong> </p>
-                                <p class="col-span-2">: {{ $containerRemarks }} </p>
-                            </div>
-                        </div>
-                        <div class="space-y-6">
                             <div class="flex flex-items grid grid-cols-3 ">
-                                <p class="col-span-1"><strong>Container No.</strong> </p>
-                                <p class="col-span-2">: {{$containerNo}} </p>
+                                <p class="col-span-1"><strong>Flight No</strong> </p>
+                                <p class="col-span-2">: {{ $flightVesselNo }} </p>
+                            </div>
+                            @else
+                            @endif
+
+                            <div class="flex flex-items grid grid-cols-3">
+                                <p class="col-span-1"><strong>Services Type</strong> </p>
+                                <p class="col-span-2">: {{ $servicesType }} </p>
                             </div>
                             <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Container Release No </strong></p>
-                                <p class="col-span-2">: {{ $containerSealNo }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Container Release Date </strong> </p>
-                                <p class="col-span-2">: {{ $containerReleaseDate }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>No of Packages</strong> </p>
-                                <p class="col-span-2">: {{ $noOfPackages }} {{$typeOfPackages}} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Gross Weight</strong> </p>
-                                <p class="col-span-2">: {{ $grossWeight }} {{$typeOfGrossWeight}} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Volume Weight</strong> </p>
-                                <p class="col-span-2">: {{ $volumeWeight }} {{$typeOfVolumeWeight}} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Volume</strong> </p>
-                                <p class="col-span-2">: {{ $volume }} CBM </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Chargable Weight</strong> </p>
-                                <p class="col-span-2">: {{ $chargableWeight }} </p>
-                            </div>
-                            <div class="flex flex-items grid grid-cols-3">
-                                <p class="col-span-1"><strong>Remarks</strong> </p>
-                                <p class="col-span-2">: {{ $containerRemarks }} </p>
+                                <p class="col-span-1"><strong>Inco Terms</strong> </p>
+                                <p class="col-span-2">: {{ $incoTerms }} </p>
                             </div>
                         </div>
                     </div>
@@ -3219,12 +3143,6 @@
                 sel: '#client_id',
                 model: 'client_id',
                 placeholder: 'Select Client'
-            },
-
-            {
-                sel: '#airlinesJob',
-                model: 'carrierAirline',
-                placeholder: 'Select Airlines'
             },
             {
                 sel: '#incoTerms',
@@ -3395,7 +3313,7 @@
 
                     // Bind change
                     $(select).off('change.lw').on('change.lw', function() {
-                        const selectedLabel = $(this).select2('data')[0]?.text;
+                        const selectedLabel = $(this).select2('data')[0]?.id;
                         if (model && typeof $wire !== 'undefined') {
                             $wire.set(model, selectedLabel);
                         }

@@ -34,6 +34,10 @@ class TJob extends Model
     {
         return $this->hasMany(jobContainer::class, 'id_job');
     }
+    public function jobTransactions()
+    {
+        return $this->hasMany(Transaction::class, 'job_id');
+    }
     public function client()
     {
         return $this->belongsTo(Customer::class, 'client_id');
@@ -45,18 +49,6 @@ class TJob extends Model
     public function dagents()
     {
         return $this->belongsTo(Customer::class, 'dagentsJob');
-    }
-    public function shipper()
-    {
-        return $this->belongsTo(Customer::class, 'shipper_id');
-    }
-    public function consignee()
-    {
-        return $this->belongsTo(Customer::class, 'consignee_id');
-    }
-    public function notify()
-    {
-        return $this->belongsTo(Customer::class, 'notify_id');
     }
     public function carrierModel()
     {

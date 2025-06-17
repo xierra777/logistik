@@ -13,6 +13,8 @@ class ViewShipment extends Component
     public $type_shipments = '';
     public $organizationFields = [];
     public $refreshKey = null;
+    public $containerType, $noOfPackages, $containerReleaseNo, $containerReleaseDate, $typeOfPackages, $grossWeight, $typeOfGrossWeight, $volumeWeight, $typeOfVolumeWeight, $volume, $chargableWeight, $containerRemarks, $containerNo, $containerSealNo, $noOfPallet, $netOfWeight, $typeNetOfWeight, $totalWeight, $typeOfTotalWeight, $hsCode, $hsCodeDesc;
+
     protected $listeners = [
         'transactionSaved' => 'refreshShipment',
 
@@ -20,7 +22,6 @@ class ViewShipment extends Component
     public function mount($id)
     {
         $this->loadShipment($id);
-
 
         $this->organizationFields = [
             'Client' => 'client.addresses',
@@ -56,7 +57,7 @@ class ViewShipment extends Component
             'shipper.addresses',
             'consignee.addresses',
             'notify.addresses',
-            'deliveryAgent',
+            'deliveryAgent.addresses',
             'carrierModel',
             'carrierAgent',
             'shipmentTransaction',
@@ -64,6 +65,7 @@ class ViewShipment extends Component
     }
     public function getOrganizationsProperty()
     {
+
         return collect([
             [
                 'label' => 'Client',

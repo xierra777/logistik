@@ -10,6 +10,7 @@ class Transaction extends Model
 
     protected $fillable = [
         'shipment_id',
+        'job_id',
         'customer_id',  // Tambahkan field ini
         'vendor_id',  // Tambahkan field ini
         'invoice_id',

@@ -11,7 +11,8 @@
             showCancelButton: true,
             confirmButtonColor: '#3085d8',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, Keep it',
             }).then((result) => {
             if (result.isConfirmed) {
                 $wire.confirmDelete(get_id).then(result =>{
@@ -30,7 +31,3 @@
         });
     ">
 </div>
-
-<script>
-
-</script>

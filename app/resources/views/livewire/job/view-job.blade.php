@@ -13,18 +13,22 @@
             <p class="text-center bg-gray-300 px-3 py-1">Job No </p>
             <p class="text-center px-4 py-2"> {{ $job->job_id }}</p>
         </div>
-        @if($type_job === 'ocean_fcl_export' ||$type_job === 'air_outbound' )
+        @if($type_job === 'ocean_fcl_export' ||$type_job === 'air_outbound' || $type_job === 'ocean_lcl_export')
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Delivery Agent </p>
             <p class="text-center  px-4 py-2 font-bold"> {{$job->dagents->name}}</p>
         </div>
-        @elseif($type_job === 'ocean_fcl_import'|| $type_job === 'air_inbound')
+        @elseif($type_job === 'ocean_fcl_import'|| $type_job === 'air_inbound' || $type_job === 'ocean_lcl_import')
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Origin Agent </p>
             <p class="text-center px-4 py-2"> {{$job->ogents->name ?? ''}}</p>
         </div>
         @else
-        Default Agent
+        <div class="flex flex-col">
+            <p class="text-center bg-gray-300 px-3 py-1">Default Agent </p>
+            <p class="text-center px-4 py-2"> Default Agent</p>
+        </div>
+
         @endif
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Client </p>
@@ -34,7 +38,7 @@
             <p class="text-center bg-gray-300 px-3 py-1">Customer Code Job </p>
             <p class="text-center font-bold px-4 py-2"> {{ $job->customerCodeJob }}</p>
         </div>
-        @if($type_job === 'ocean_fcl_export')
+        @if($type_job === 'ocean_fcl_export' || $type_job === 'ocean_fcl_import' || $type_job === 'ocean_lcl_import' || $type_job === 'ocean_lcl_export')
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">MBL No </p>
             <p class="text-center font-bold px-4 py-2"> {{ $job->jobBillLadingNo }}</p>
@@ -43,7 +47,15 @@
             <p class="text-center bg-gray-300 px-3 py-1">MBL Date </p>
             <p class="text-center px-4 py-2"> {{ $job->jobBillLadingDate }}</p>
         </div>
-        @elseif($type_job === 'air_outbound')
+        <div class="flex flex-col">
+            <p class="text-center bg-gray-300 px-3 py-1">HBL No </p>
+            <p class="text-center font-bold px-4 py-2"> {{ $job->houseJobBillLadingNo }}</p>
+        </div>
+        <div class="flex flex-col">
+            <p class="text-center bg-gray-300 px-3 py-1">HBL Date </p>
+            <p class="text-center px-4 py-2"> {{ $job->houseJobBillLadingDate }}</p>
+        </div>
+        @elseif($type_job === 'air_outbound' || $type_job === 'air_inbound')
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">MAWB No </p>
             <p class="text-center font-bold px-4 py-2"> {{ $job->jobBillLadingNo }}</p>
@@ -51,6 +63,14 @@
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">MAWB Date </p>
             <p class="text-center px-4 py-2"> {{ $job->jobBillLadingDate }}</p>
+        </div>
+        <div class="flex flex-col">
+            <p class="text-center bg-gray-300 px-3 py-1">HAWB No </p>
+            <p class="text-center font-bold px-4 py-2"> {{ $job->houseJobBillLadingNo }}</p>
+        </div>
+        <div class="flex flex-col">
+            <p class="text-center bg-gray-300 px-3 py-1">HAWB Date </p>
+            <p class="text-center px-4 py-2"> {{ $job->houseJobBillLadingDate }}</p>
         </div>
         @endif
 
@@ -83,6 +103,7 @@
     </div>
     <div>
         <div class="grid grid-cols-1 md:grid-cols-3 shadow-lg">
+            @if($type_job === 'ocean_fcl_export' || $type_job === 'ocean_fcl_import')
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">Carrier </p>
                 <p class="text-center px-4 py-2"> {{ $job->carrierModel->name ?? '-' }}</p>
@@ -95,6 +116,20 @@
                 <p class="text-center bg-gray-300 px-3 py-1">Voyage </p>
                 <p class="text-center px-4 py-2"> {{ $job->data['flightVesselNo'] }}</p>
             </div>
+            @elseif($type_job === 'air_outbound' || $type_job === 'air_inbound')
+            <div class="flex flex-col">
+                <p class="text-center bg-gray-300 px-3 py-1">Airlines </p>
+                <p class="text-center px-4 py-2"> {{ $job->carrierModel->name ?? '-' }}</p>
+            </div>
+            <div class="flex flex-col">
+                <p class="text-center bg-gray-300 px-3 py-1">Flight Name </p>
+                <p class="text-center px-4 py-2"> {{ $job->data['flightVesselName'] }}</p>
+            </div>
+            <div class="flex flex-col">
+                <p class="text-center bg-gray-300 px-3 py-1">Flight No </p>
+                <p class="text-center px-4 py-2"> {{ $job->data['flightVesselNo'] }}</p>
+            </div>
+            @endif
 
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">ETA / Estimate Time Arrival </p>
@@ -247,11 +282,14 @@
         <div class="bg-blue-600 rounded-t-lg mt-4 ">
             <p class="text-center mt-4 p-3  font-bold">Containers</p>
         </div>
-        <div x-data="{ openCreateContainer: false }"
+        <div x-data="{ openCreateContainer: false }" x-init="initContainerSelect2()"
             @close-create-container.window="openCreateContainer = false">
 
             <div class="flex justify-end p-3">
-                <button @click="openCreateContainer = true" class="py-3 px-4 bg-green-600 text-white rounded-lg">
+                <button
+                    wire:click="refreshJob"
+                    @click="openCreateContainer = true"
+                    class="py-3 px-4 bg-blue-600 text-white rounded-lg">
                     Add Container
                 </button>
             </div>
@@ -516,10 +554,14 @@
                             {{$c->containers['containerType'] ?? ''}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$c->containers['grossWeight'] ?? ''}}
+                            {{$c->containers['grossWeight'] ?? ''}} {{$c->containers['typeOfGrossWeight'] ?? ''}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$c->containers['netOfWeight'] ?? ''}}
+                            {{$c->containers['volume'] ?? ''}}
+                            @if($c->containers['volume'])
+                            CBM
+                            @else
+                            @endif
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             <a href="{{ url('view-job/' . $job->id . '/container-job/' . $c->id) }}" class="py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg
@@ -1028,3 +1070,167 @@
         </a>
     </div>
 </div>
+@push('script')
+@script()
+<script>
+    window.initContainerSelect2 = () => {
+        // Configuration for all select elements
+        const selectConfigs = [{
+                sel: '#containerType',
+                model: 'containerType',
+                placeholder: 'Select Container Type'
+            },
+            {
+                sel: '#typeOfPackages',
+                model: 'typeOfPackages',
+                placeholder: 'Select Package Type'
+            },
+            {
+                sel: '#typeOfGrossWeight',
+                model: 'typeOfGrossWeight',
+                placeholder: 'Select Weight Unit'
+            },
+            {
+                sel: '#typeOfVolumeWeight',
+                model: 'typeOfVolumeWeight',
+                placeholder: 'Select Volume Weight Unit'
+            },
+            {
+                sel: '#typeNetOfWeight',
+                model: 'typeNetOfWeight',
+                placeholder: 'Select Net Weight Unit'
+            },
+            {
+                sel: '#typeOfTotalWeight',
+                model: 'typeOfTotalWeight',
+                placeholder: 'Select Total Weight Unit'
+            }
+        ];
+
+        selectConfigs.forEach(({
+            sel,
+            model,
+            placeholder
+        }) => {
+            const $el = $(sel);
+            if (!$el.length) return;
+
+            // Destroy existing Select2 if it exists
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+
+            // Initialize Select2 with modal-friendly settings
+            $el.select2({
+                placeholder: placeholder,
+                allowClear: true,
+                width: '100%',
+                theme: 'tailwindcss-3', // Use default theme for better compatibility
+                dropdownParent: $el.closest('.fixed'), // Attach to modal container
+                dropdownAutoWidth: true,
+                escapeMarkup: function(markup) {
+                    return markup;
+                }
+            });
+
+            // Handle Select2 change events
+            $el.off('select2:select.container select2:unselect.container')
+                .on('select2:select.container select2:unselect.container', function(e) {
+                    const value = $(this).val();
+                    if (typeof $wire !== 'undefined' && $wire[model] !== undefined) {
+                        $wire.set(model, value);
+                    }
+                    console.log(`${model} changed to:`, value);
+                });
+
+            // Sync with Livewire property if it exists
+            if (typeof $wire !== 'undefined' && $wire[model] !== undefined) {
+                $el.val($wire[model]).trigger('change.select2');
+            }
+        });
+    };
+
+    // Initialize when document is ready
+    $(document).ready(function() {
+        // Initialize Select2 when modal opens
+        $(document).on('click', '[x-on\\:click="openCreateContainer = true"]', function() {
+            setTimeout(function() {
+                window.initContainerSelect2();
+            }, 300); // Wait for modal animation
+        });
+
+        // Alternative method using Alpine.js event
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('containerForm', () => ({
+                openCreateContainer: false,
+                init() {
+                    this.$watch('openCreateContainer', (value) => {
+                        if (value) {
+                            setTimeout(() => {
+                                window.initContainerSelect2();
+                            }, 250);
+                        }
+                    });
+                }
+            }));
+        });
+    });
+
+    // Livewire hooks
+    if (typeof Livewire !== 'undefined') {
+        // Reinitialize after Livewire updates
+        Livewire.hook('message.processed', () => {
+            setTimeout(() => {
+                window.initContainerSelect2();
+            }, 100);
+        });
+
+        // Handle specific element updates
+        Livewire.hook('element.updated', (el, component) => {
+            if (el.matches('select') || el.querySelector('select')) {
+                setTimeout(() => {
+                    window.initContainerSelect2();
+                }, 100);
+            }
+        });
+
+        // Before Livewire request (cleanup)
+        Livewire.hook('message.sent', () => {
+            // Preserve Select2 values before Livewire processes
+            const values = {};
+            ['#containerType', '#typeOfPackages', '#typeOfGrossWeight',
+                '#typeOfVolumeWeight', '#typeNetOfWeight', '#typeOfTotalWeight'
+            ].forEach(sel => {
+                const $el = $(sel);
+                if ($el.length && $el.hasClass('select2-hidden-accessible')) {
+                    values[sel] = $el.val();
+                }
+            });
+            window.tempSelect2Values = values;
+        });
+
+        // After Livewire response (restore)
+        Livewire.hook('message.received', () => {
+            setTimeout(() => {
+                if (window.tempSelect2Values) {
+                    Object.keys(window.tempSelect2Values).forEach(sel => {
+                        const $el = $(sel);
+                        if ($el.length && window.tempSelect2Values[sel]) {
+                            $el.val(window.tempSelect2Values[sel]).trigger('change.select2');
+                        }
+                    });
+                    delete window.tempSelect2Values;
+                }
+            }, 150);
+        });
+    }
+
+    // Manual initialization function (call this if needed)
+    window.forceInitContainerSelect2 = () => {
+        setTimeout(() => {
+            window.initContainerSelect2();
+        }, 100);
+    };
+</script>
+@endscript
+@endpush

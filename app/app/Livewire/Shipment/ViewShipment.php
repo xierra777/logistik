@@ -57,7 +57,7 @@ class ViewShipment extends Component
             'shipper.addresses',
             'consignee.addresses',
             'notify.addresses',
-            'deliveryAgent',
+            'deliveryAgent.addresses',
             'carrierModel',
             'carrierAgent',
             'shipmentTransaction',
@@ -65,6 +65,7 @@ class ViewShipment extends Component
     }
     public function getOrganizationsProperty()
     {
+
         return collect([
             [
                 'label' => 'Client',

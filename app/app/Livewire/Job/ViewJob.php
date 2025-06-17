@@ -36,6 +36,11 @@ class ViewJob extends Component
 
         ];
     }
+
+    public function refreshJob()
+    {
+        $this->refreshKey = now()->timestamp;
+    }
     public function refreshTransaction($id)
     {
 
@@ -167,35 +172,32 @@ class ViewJob extends Component
     }
     public function getOrganizationsProperty()
     {
+
+        $carrierLabel = in_array($this->type_job, ['air_inbound', 'air_outbound']) ? 'Airlines' : 'Carrier';
+
+
         return collect([
             [
                 'label' => 'Client',
-                'data' => $this->job->client,
+                'data' => optional($this->job->client) ? (object)[
+                    'id' => $this->job->client->id,
+                    'name' => $this->job->client->name,
+                    'email' => $this->job->client->email,
+                    'contact' => $this->job->client->contact,
+                    'address' => optional($this->job->client->addresses->first())->address,
+                ] : null,
             ],
             [
-                'label' => match ($this->type_job) {
-                    'ocean_fcl_export', 'ocean_lcl_export', 'air_outbound' => 'Delivery Agent',
-                    'air_inbound', 'ocean_fcl_import', 'ocean_lcl_import' => 'Origin Agent'
-                },
-                'data' => match ($this->type_job) {
-                    'ocean_fcl_export', 'ocean_lcl_export', 'air_outbound' => $this->job->dagents,
-                    'air_inbound', 'ocean_fcl_import', 'ocean_lcl_import' => $this->job->oagents,
-                    default => null,
-                },
+                'label' => $carrierLabel,
+                'data' => optional($this->job->carrierModel) ? (object)[
+                    'id' => $this->job->carrierModel->id,
+                    'name' => $this->job->carrierModel->name,
+                    'email' => $this->job->carrierModel->email,
+                    'contact' => $this->job->carrierModel->contact,
+                    'address' => optional($this->job->carrierModel->addresses->first())->address,
+                ] : null,
             ],
-            [
-                'label' => 'Shipper',
-                'data' => optional($this->job->shipment)->shipper,
-            ],
-            [
-                'label' => 'Consignee',
-                'data' => optional($this->job->shipment)->consignee,
-            ],
-            [
-                'label' => 'Notify',
-                'data' => optional($this->job->shipment)->notify,
-            ],
-        ])->filter(fn($item) => !is_null($item['data'])); // buang yang null
+        ])->filter(fn($item) => !is_null($item['data']));
     }
 
     public function render()

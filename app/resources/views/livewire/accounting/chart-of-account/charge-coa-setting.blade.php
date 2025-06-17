@@ -1,7 +1,6 @@
 <div class="p-4">
     <div class="p-3 justify-end flex">
-
-        <div x-data="{ open: false }" x-init="
+        <div x-data="{ open: false }" @keydown.escape.window="open = false" x-init="
         window.addEventListener('closeModal', () => { open = false });
         $watch('open', value => {
             if (value) {
@@ -10,7 +9,7 @@
                 });
             }
         });
-     ">
+     " @window.close-modal="open = false">
             <!-- Button to open modal -->
             <div class="flex justify-end gap-2 mb-4 justify-end">
                 <button @click="open = true" class="py-2 px-4 bg-blue-500 hover:bg-blue-600 hover:scale-105 rounded-md hover:text-white  transform transition duration-300 ease-in-out hover:shadow-cyan-200">Add Charge For COA</button>
@@ -67,7 +66,7 @@
 
                         </div>
                         <div class="flex justify-end gap-2 pt-5">
-                            <button type="button" class="px-4 py-2 bg-gray-500 text-white rounded-lg">Cancel</button>
+                            <button type="button" @click="close-modal" class="px-4 py-2 bg-gray-500 text-white rounded-lg">Cancel</button>
                             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Save changes</button>
                         </div>
                     </form>

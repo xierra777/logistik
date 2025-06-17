@@ -50,18 +50,6 @@ class TJob extends Model
     {
         return $this->belongsTo(Customer::class, 'dagentsJob');
     }
-    public function shipper()
-    {
-        return $this->belongsTo(Customer::class, 'shipper_id');
-    }
-    public function consignee()
-    {
-        return $this->belongsTo(Customer::class, 'consignee_id');
-    }
-    public function notify()
-    {
-        return $this->belongsTo(Customer::class, 'notify_id');
-    }
     public function carrierModel()
     {
         return $this->belongsTo(Customer::class, 'carrierAirline');

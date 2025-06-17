@@ -941,24 +941,57 @@
                     </tr>
                 </thead>
                 <tbody class="">
+                    @forelse($job->jobTransactions as $transaction)
                     <tr>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $loop->iteration }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            <button
+                                type="button"
+                                @click="$dispatch('confirm-delete', { get_id: {{ $transaction->id }} })"
+                                class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
+                                Delete
+                            </button>
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                        </td>
-
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-
+                            {{ $transaction->description }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-
+                            {{ $transaction->unit }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-
+                            {{$transaction->customer->name ?? ''}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $transaction->quantity }} x {{$transaction->samount_qty}}x{{$transaction->srate}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $transaction->samountidr_formatted ?? '' }}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$transaction->sdrcr}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$transaction->vendor->name ?? ''}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $transaction->quantity }} x {{$transaction->camount_qty}}x{{$transaction->crate}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$transaction->camountidr_formatted}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$transaction->cdrcr}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 uppercase whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{$transaction->freight}}
+                        </td>
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium font-bold {{ $transaction->gp < 0 ? 'text-red-500' : 'text-green-700' }}">
+                            {{ number_format($transaction->gp, 2, ',', '.') }}
                         </td>
                     </tr>
+                    @empty
                     <tr wire:loading.remove>
                         <td colspan="13" class="py-12 text-center">
                             <div class="flex flex-col text-center items-center justify-center">
@@ -976,9 +1009,12 @@
                             Retrieving dataShipments…
                         </td>
                     </tr>
-
+                    @endforelse
                 </tbody>
             </table>
+            <x-confirm-delete
+                :message="'Are you sure you want to delete this transaction?'"
+                :key="'confirm-delete-job-transaction-' . now()->timestamp" />
         </div>
     </div>
     <hr class="border-gray-500 dark:border-neutral-500 mt-5">

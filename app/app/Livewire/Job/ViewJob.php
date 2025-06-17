@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\TJob;
 use App\Models\jobContainer;
 use App\Models\shipmentContainers;
+use App\Models\Transaction;
 use App\Models\TShipments;
 use Illuminate\Support\Facades\Auth;
 
@@ -47,7 +48,8 @@ class ViewJob extends Component
         $this->job = TJob::with([
             'client',
             'TjobContainer',
-            'carrierModel',      // relasi ke Customer
+            'carrierModel',
+            'jobTransactions',     // relasi ke Customer
             'ogents',
             'dagents',
             'employee',
@@ -89,7 +91,15 @@ class ViewJob extends Component
         $this->selectedShipments = [];
         $this->dispatch('close-detach-shipment');
     }
-
+    public function confirmDelete($get_id)
+    {
+        try {
+            Transaction::destroy($get_id);
+            session()->flash('message', 'Shipment deleted successfully!');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error deleting shipment: ' . $e->getMessage());
+        }
+    }
 
     public function getAssignedShipmentsProperty()
     {

@@ -51,11 +51,6 @@ class CreateTransactions extends Component
 
         $this->clients = collect([
             $job->client,
-            $job->shipper,
-            $job->consignee,
-            $job->notify,
-            $job->carrierModel,
-            $job->deliveryAgent,
         ])->filter()->unique();
         if (!$job) {
             throw new \Exception("Job with ID {$id} not found");
@@ -113,7 +108,7 @@ class CreateTransactions extends Component
         $client = Customer::find($this->sclient);
 
         $transaction = Transaction::create([
-            // 'job_id' => $this->jobId, // Use jobId instead of shipmentId
+            'job_id' => $this->jobId,
             'charge' => $this->charge,
             'description' => $this->description,
             'freight' => $this->freight,
@@ -164,15 +159,13 @@ class CreateTransactions extends Component
             'chwtaxrateusd' => $this->chwtaxrateusd,
         ]);
 
-        // Create journal entries
         $this->createJournalEntries($transaction);
-
-        // Reset form and refresh data
-        $this->resetForm();
+        $this->reset();
         $this->dispatch('transactionSaved');
         $this->dispatch('close-modal');
-
+        $this->chargeCoa = ChargeSetting::get();
         session()->flash('message', 'Transaksi berhasil disimpan!');
+        $this->vendors = customer::where('category', 'creditor')->orderBy('name')->get();
     }
 
     private function createJournalEntries($transaction)

@@ -34,6 +34,10 @@ class TJob extends Model
     {
         return $this->hasMany(jobContainer::class, 'id_job');
     }
+    public function jobTransactions()
+    {
+        return $this->hasMany(Transaction::class, 'job_id');
+    }
     public function client()
     {
         return $this->belongsTo(Customer::class, 'client_id');

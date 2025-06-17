@@ -196,10 +196,10 @@ class CreateTransaction extends Component
         }
 
 
-        $this->reset();
         // $this->loadClients(); 
         $this->dispatch('transactionSaved');
         $this->dispatch('close-modal');
+        $this->reset();
         $this->chargeCoa = ChargeSetting::get();
         session()->flash('message', 'Transaksi berhasil disimpan!');
         $this->vendors = customer::where('category', 'creditor')->orderBy('name')->get();

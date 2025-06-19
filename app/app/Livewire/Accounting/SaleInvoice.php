@@ -75,8 +75,8 @@ class SaleInvoice extends Component
             $rate     = (float) ($trx->srate ?? 1);
 
             $amount = $currency === 'IDR'
-                ? (float) $this->parseIndoNumber($trx->samountidr)
-                : (float) $trx->sfcyamount;
+                ? (int) $trx->samountidr
+                : (int) $trx->sfcyamount;
 
             $vat = $currency === 'IDR'
                 ? (float) ($trx->svatgstamount ?? 0)
@@ -194,20 +194,20 @@ class SaleInvoice extends Component
         ];
 
         foreach ($this->transactions as $trx) {
-            $currency = strtoupper(trim($trx->scurrency));
+            $currency = strtoupper(trim($this->finalCurrency));
             $qty      = (int) $trx->quantity;
             $rate     = (float) ($trx->srate ?? 1);
 
             $amount = $currency === 'IDR'
-                ? (float) $this->parseIndoNumber($trx->samountidr)
+                ? (int) $trx->samountidr
                 : (float) $trx->sfcyamount;
 
             $vat = $currency === 'IDR'
-                ? (float) $this->parseIndoNumber($trx->svatgstamount ?? 0)
+                ? (float) $trx->svatgstamount
                 : (float) ($trx->svatgstusd    ?? 0);
 
             $wht = $currency === 'IDR'
-                ? (float) $this->parseIndoNumber($trx->swhtaxamount   ?? 0)
+                ? (float) $trx->swhtaxamount
                 : (float) ($trx->shwtaxrateusd  ?? 0);
 
             $subtotal = $qty * $amount;

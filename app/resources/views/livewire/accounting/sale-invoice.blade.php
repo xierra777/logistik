@@ -54,20 +54,16 @@
                 <td class="p-2 border">{{ $transaction->quantity }}</td>
                 <td class="p-2 border">{{ $transaction->scurrency }}</td>
                 <td class="p-2 border">
-                    {{ number_format(floatval(str_replace(',', '.', str_replace('.', '', $transaction->samountidr))), 2, ',', '.') }}
+                    {{ number_format($transaction->samountidr, 2, ',', '.') }}
                 </td>
                 <td class="p-2 border">
-                    {{ number_format(floatval(str_replace(',', '.', str_replace('.', '', $transaction->svatgstamount))), 2, ',', '.') }}
+                    {{ number_format($transaction->svatgstamount, 2, ',', '.') }}
                 </td>
                 <td class="p-2 border">
-                    {{ number_format(floatval(str_replace(',', '.', str_replace('.', '', $transaction->swhtaxamount))), 2, ',', '.') }}
+                    {{ number_format($transaction->swhtaxamount, 2, ',', '.') }}
                 </td>
                 <td class="font-bold p-2 border">
-                    {{ number_format(
-                        floatval(str_replace(',', '.', str_replace('.', '', $transaction->samountidr))) +
-                        floatval(str_replace(',', '.', str_replace('.', '', $transaction->svatgstamount))),
-                        2, ',', '.'
-                    ) }}
+                    {{ number_format($transaction->samountidr + $transaction->svatgstamount + $transaction->swhtaxamount, 2, ',', '.') }}
                 </td>
             </tr>
             @endforeach
@@ -76,27 +72,23 @@
             <tr class="font-bold">
                 <td colspan="3" class="p-2 border text-right">Total</td>
                 <td class="p-2 border">
-                    {{ number_format(
-                $transactions->sum(fn($t) => floatval(str_replace(',', '.', str_replace('.', '', $t->samountidr)))),
-                2, ',', '.'
-            ) }}
+                    {{ number_format($transactions->sum('samountidr'), 2, ',', '.') }}
                 </td>
                 <td class="p-2 border">
-                    {{ number_format(
-                $transactions->sum(fn($t) => floatval(str_replace(',', '.', str_replace('.', '', $t->svatgstamount)))),
-                2, ',', '.'
-            ) }}
+                    {{ number_format($transactions->sum('svatgstamount'), 2, ',', '.') }}
                 </td>
-                <td class="p-2 border"></td>
                 <td class="p-2 border">
-                    {{ number_format(
-                $transactions->sum(fn($t) => 
-                    floatval(str_replace(',', '.', str_replace('.', '', $t->samountidr))) + 
-                    floatval(str_replace(',', '.', str_replace('.', '', $t->svatgstamount)))
-                ),
-                2, ',', '.'
-            ) }}
+                    {{ number_format($transactions->sum('swhtaxamount'), 2, ',', '.') }}
                 </td>
+                <td class="font-bold p-2 border">
+                    {{ number_format(
+                        $transactions->sum('samountidr') +
+                        $transactions->sum('svatgstamount') +
+                        $transactions->sum('swhtaxamount'),
+                        2, ',', '.'
+                    ) }}
+                </td>
+
             </tr>
         </tfoot>
     </table>

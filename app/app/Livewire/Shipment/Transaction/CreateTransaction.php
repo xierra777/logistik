@@ -162,8 +162,8 @@ class CreateTransaction extends Component
 
         // Ambil relasi coaSale dan coaCost dari ChargeSetting agar dapat akses term_type
         $chargeSetting = ChartOfAccount::find($transaction->coa_sale_id);
-        $saleCoa = $chargeSetting?->coaSale;
-        $costCoa = $chargeSetting?->coaCost;
+        $saleCoa = $chargeSetting->coaSale;
+        $costCoa = $chargeSetting->coaCost;
 
         // JURNAL SALE
         if ($transaction->samountidr && $saleCoa) {
@@ -197,14 +197,111 @@ class CreateTransaction extends Component
 
 
         // $this->loadClients(); 
+        $this->createJournalEntries($transaction);
+        $this->reset();
         $this->dispatch('transactionSaved');
         $this->dispatch('close-modal');
-        $this->reset();
         $this->chargeCoa = ChargeSetting::get();
         session()->flash('message', 'Transaksi berhasil disimpan!');
         $this->vendors = customer::where('category', 'creditor')->orderBy('name')->get();
     }
+    private function createJournalEntries($transaction)
+    {
+        // Helper function to convert Indonesian formatted numbers to float
+        $indoStringToFloat = function (string $value): float {
+            $value = str_replace('.', '', $value);
+            $value = str_replace(',', '.', $value);
+            return floatval($value);
+        };
 
+        // Get COA for sale and cost
+        $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
+        $costCoa = ChartOfAccount::find($transaction->coa_cost_id);
+
+        // Create sale journal entry
+        if ($transaction->samountidr && $saleCoa) {
+            $saleAmount = $transaction->samountidr;
+            $totalSale = $saleAmount * $transaction->quantity;
+
+            JournalEntry::create([
+                'transaction_id' => $transaction->id,
+                'coa_id' => $saleCoa->id,
+                'debit' => $saleCoa->term_type === 'DR' ? $totalSale : 0,
+                'credit' => $saleCoa->term_type === 'CR' ? $totalSale : 0,
+                'description' => $transaction->job_id !== null
+                    ? "Sale transaction #{$transaction->description}"
+                    : "Sale transaction ({$transaction->shipment_id}) #{$transaction->description}",
+                'date' => now(),
+            ]);
+        }
+
+        // Create cost journal entry
+        if ($transaction->camountidr && $costCoa) {
+            $costAmount = $transaction->camountidr;
+            $totalCost = $costAmount * $transaction->quantity;
+
+            JournalEntry::create([
+                'transaction_id' => $transaction->id,
+                'coa_id' => $costCoa->id,
+                'debit' => $costCoa->term_type === 'DR' ? $totalCost : 0,
+                'credit' => $costCoa->term_type === 'CR' ? $totalCost : 0,
+                'description' => "Cost transaction #{$transaction->description}",
+                'date' => now(),
+            ]);
+        }
+    }
+
+    private function resetForm()
+    {
+        $this->reset([
+            'charge',
+            'description',
+            'freight',
+            'unit',
+            'ofdtype',
+            'remarks',
+            'quantity',
+            'sclient',
+            'scurrency',
+            'srate',
+            'samount_qty',
+            'sincludedtax',
+            'sfcyamount',
+            'samountidr',
+            'sdrcr',
+            'svatgst',
+            'staxableamount',
+            'svatgstamount',
+            'swhtaxrate',
+            'swhtaxamount',
+            'sremarks',
+            'sgrossprofit',
+            'cvendor',
+            'creferenceno',
+            'cdate',
+            'cdrcr',
+            'ccurrency',
+            'crate',
+            'camount_qty',
+            'cincludedtax',
+            'cfcyamount',
+            'camountidr',
+            'cvatgst',
+            'cvatgstamount',
+            'ctaxableamount',
+            'cremarks',
+            'cwhtaxrate',
+            'cwhtaxamount',
+            'svatgstusd',
+            'cvatgstusd',
+            'shwtaxrateusd',
+            'chwtaxrateusd'
+        ]);
+
+        // Reload fresh data
+        $this->chargeCoa = ChargeSetting::get();
+        $this->vendors = Customer::where('category', 'creditor')->orderBy('name')->get();
+    }
     // public function loadClients()
     // {
     //     $this->clients = customer::where('category', 'DR')->orderBy('name')->get();

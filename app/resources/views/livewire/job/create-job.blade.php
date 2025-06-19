@@ -2718,19 +2718,18 @@
                             <label>Type Of Packages</label>
                             <select id="typeOfPackages" wire:model="typeOfPackages" class="block w-full rounded-md border-gray-300 shadow-sm">
                                 <option value=""></option>
-                                <option value="packages">Packages</option>
-                                <option value="cartons">Cartons</option>
-                                <option value="rolls">Rolls</option>
-                                <option value="pallets">Pallets</option>
-                                <option value="crates">Crates</option>
-                                <option value="boxes">Boxes</option>
-                                <option value="drums">Drums</option>
-                                <option value="bags">Bags</option>
-                                <option value="bundles">Bundles</option>
-                                <option value="containers">Containers</option>
-                                <option value="pieces">Pieces</option>
-                                <option value="bales">Bales</option>
-
+                                <option value="PACKAGES">Packages</option>
+                                <option value="CARTONS">Cartons</option>
+                                <option value="ROLLS">Rolls</option>
+                                <option value="PALLETS">Pallets</option>
+                                <option value="CRATES">Crates</option>
+                                <option value="BOXES">Boxes</option>
+                                <option value="DRUMS">Drums</option>
+                                <option value="BAGS">Bags</option>
+                                <option value="BUNDLES">Bundles</option>
+                                <option value="CONTAINERS">Containers</option>
+                                <option value="PIECES">Pieces</option>
+                                <option value="BALES">Bales</option>
                             </select>
                         </div>
                         <div class="flex flex-col space-y-2">
@@ -2870,19 +2869,18 @@
                             <label>Type Of Packages</label>
                             <select id="typeOfPackages" class="block w-full rounded-md border-gray-300 shadow-sm">
                                 <option value=""></option>
-                                <option value="packages">Packages</option>
-                                <option value="cartons">Cartons</option>
-                                <option value="rolls">Rolls</option>
-                                <option value="pallets">Pallets</option>
-                                <option value="crates">Crates</option>
-                                <option value="boxes">Boxes</option>
-                                <option value="drums">Drums</option>
-                                <option value="bags">Bags</option>
-                                <option value="bundles">Bundles</option>
-                                <option value="containers">Containers</option>
-                                <option value="pieces">Pieces</option>
-                                <option value="bales">Bales</option>
-
+                                <option value="PACKAGES">Packages</option>
+                                <option value="CARTONS">Cartons</option>
+                                <option value="ROLLS">Rolls</option>
+                                <option value="PALLETS">Pallets</option>
+                                <option value="CRATES">Crates</option>
+                                <option value="BOXES">Boxes</option>
+                                <option value="DRUMS">Drums</option>
+                                <option value="BAGS">Bags</option>
+                                <option value="BUNDLES">Bundles</option>
+                                <option value="CONTAINERS">Containers</option>
+                                <option value="PIECES">Pieces</option>
+                                <option value="BALES">Bales</option>
                             </select>
                         </div>
                         <div class="flex flex-col space-y-2">

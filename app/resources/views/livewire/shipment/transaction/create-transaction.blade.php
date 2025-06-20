@@ -40,46 +40,66 @@
     },
 
     // --- Source Calculations ---
-    get fcyAmount() {
-        const included = (this.sincludedtax || 'No').trim() === 'Yes';
-        const rate = parseFloat((this.svatgst || '0').replace('%', '').replace(',', '.')) || 0;
-        return included ? parseFloat((this.amount / (1 + rate / 100)).toFixed(3)) : this.amount;
-    },
-    get samountIdrComputed() {
+   get fcyAmount() {
     const included = (this.sincludedtax || 'No').trim() === 'Yes';
-    const rate = parseFloat((this.svatgst || '0').replace('%', '').replace(',', '.')) || 0;
-    const base = this.srate * (parseFloat(this.amount) || 0);
-
+    // Karena option value sudah dalam format decimal (0.11 = 11%)
+    const vatRate = parseFloat(this.svatgst || 0) || 0;
+    const whtRate = parseFloat(this.swhtaxrate || 0)||0;
+    
+    if (included) {
+        // fcyAmount = base FCY (sebelum pajak)
+        const totalTaxRate = vatRate;
+        return parseFloat(((parseFloat(this.amount) || 0) / (1 + totalTaxRate)).toFixed(3));
+    } else {
+        // fcyAmount = amount asli
+        return parseFloat(this.amount) || 0;
+    }
+},
+   get samountIdrComputed() {
+    const included = (this.sincludedtax || 'No').trim() === 'Yes';
+    // Karena option value sudah dalam format decimal (0.11 = 11%)
+    const vatRate = parseFloat(this.svatgst || 0) || 0;
+    const whtRate = parseFloat(this.swhtaxrate || 0) || 0;
+    
     const round = (num, decimals = 2) =>
         Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
 
-    const result = round(included ? base / (1 + rate / 100) : base);
+    let result;
+    
+    if (included) {
+        // Jika tax included:
+        // samountidr = base amount (sebelum pajak)
+        // amount = total amount (termasuk pajak)
+        const totalTaxRate = vatRate;
+        const baseAmount = (this.srate * parseFloat(this.amount || 0)) / (1 + totalTaxRate);
+        result = round(baseAmount);
+    } else {
+        // Jika tax excluded: samountidr = srate × amount
+        const baseAmount = this.srate * (parseFloat(this.amount) || 0);
+        result = round(baseAmount);
+    }
 
     this.samountIdrRaw = result;
     this.$nextTick(() => @this.set('samountidr', result));
-
     return result;
 },
 
     get whtaxAmount() {
-        const rate = parseFloat((this.swhtaxrate || '0').replace('%', '').replace(',', '.')) || 0;
-        return this.samountIdrRaw * (rate / 100);
+        return this.samountIdrRaw * (this.swhtaxrate || 0) || 0;
     },
     get vatAmount() {
-        const rate = parseFloat((this.svatgst || '0').replace('%', '').replace(',', '.')) || 0;
-        return this.samountIdrRaw * (rate / 100);
+      return this.samountIdrRaw * (this.svatgst || 0) || 0;
     },
     get vatAmountUsd() {
-        const rate = parseFloat((this.svatgst || '0').replace('%', '').replace(',', '.')) || 0;
-        return this.fcyAmount * (rate / 100);
+        return this.fcyAmount * (this.svatgst || 0) || 0;
     },
     get swhtaxamountusd() {
-        const rate = parseFloat((this.swhtaxrate || '0').replace('%', '').replace(',', '.')) || 0;
-        return this.fcyAmount * (rate / 100);
+        return this.fcyAmount * (this.swhtaxrate || 0) || 0;
     },
     get totalTax() {
-        return this.vatAmount + this.whtaxAmount;
+        return (this.vatAmount || 0) + (this.whtaxAmount || 0);
     },
+
 
     // --- Cost Calculations ---
     get camountIdrComputed() {
@@ -92,17 +112,26 @@
         return result;
     },
     get cfcyAmount() {
-        const included = (this.cincludedtax || 'No').trim() === 'Yes';
-        const rate = parseFloat((this.cvatgst || '0').replace('%', '').replace(',', '.')) || 0;
-        return included ? parseFloat((this.camount / (1 + rate / 100)).toFixed(3)) : this.camount;
+        const included = (this.sincludedtax || 'No').trim() === 'Yes';
+    // Karena option value sudah dalam format decimal (0.11 = 11%)
+    const cvatRate = parseFloat(this.cvatgst || 0) || 0;
+    const cwhtRate = parseFloat(this.cwhtaxrate || 0) || 0;
+
+    if (included) {
+        // fcyAmount = base FCY (sebelum pajak)
+        const totalTaxRate = cvatRate;
+        return parseFloat(((parseFloat(this.camount) || 0) / (1 + totalTaxRate)).toFixed(3));
+    } else {
+        // fcyAmount = amount asli
+        return parseFloat(this.camount) || 0;
+    }
     },
     get ctaxable() {
-        const rate = parseFloat((this.cvatgst || '0').replace('%', '').replace(',', '.')) || 0;
-        return this.camountIdrRaw * (rate / 100);
+       return this.camountIdrRaw * (this.cvatgst || 0) || 0;
     },
     get cwhtaxamount() {
-        const rate = parseFloat((this.cwhtaxrate || '0').replace('%', '').replace(',', '.')) || 0;
-        return this.camountIdrRaw * (rate / 100);
+        return this.camountIdrRaw * (this.cwhtaxrate || 0) || 0;
+
     },
     get ctaxamount() {
         return this.ctaxable + this.cwhtaxamount;
@@ -190,6 +219,8 @@
 
     <div class="bg-white">
         <!-- Heading Bar -->
+
+
         <div class="bg-green-600 p-3 rounded-t-xl">
             <h2 class="text-white text-lg font-semibold">Charge</h2>
         </div>
@@ -243,7 +274,10 @@
                     <select id="unit" name="unit" wire:model="unit"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         <option value=""></option>
+                        <option value="">-- Pilih --</option>
                         <option value="CONTAINER">PER CONTAINER</option>
+                        <option value="PALLET">PER PALLET</option>
+                        <option value="DOCUMENT">PER DOCUMENT</option>
                     </select>
                 </div>
                 <!-- Quantity -->
@@ -292,7 +326,7 @@
                     <select wire:model="sclient" id="sclient" class="w-full border rounded-md border-gray-300 p-2">
                         <option value="">-- Pilih Client --</option>
                         @foreach($clients ?? [] as $client)
-                        <option wire:key="{{$client}}" value="{{ $client->id }}">{{$client->customer_code}} - {{ $client->name }}</option>
+                        <option value="{{ $client->id }}">{{$client->customer_code}} - {{ $client->name }}</option>
                         @endforeach
                     </select>
                     @error('sclient') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
@@ -358,10 +392,11 @@
                     <select id="svatgst" name="svatgst" x-model="svatgst" wire:model="svatgst"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                         <option value="">Select Tax</option>
-                        <option value="1%">1%</option>
-                        <option value="1,1%">1.1%</option>
-                        <option value="11%">11%</option>
-                        <option value="12%">12%</option>
+                        <option value="0.011">1.1%</option>
+                        <option value="0.012">1.2%</option>
+                        <option value="0.11">11%</option>
+                        <option value="0.12">12%</option>
+
                     </select>
                 </div>
                 <div>
@@ -370,9 +405,9 @@
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         <option value="%">Select Tax</option>
                         <option value="">0</option>
-                        <option value="2%">2%</option>
-                        <option value="2.5%">2,5%</option>
-                        <option value="7.5%">7,5%</option>
+                        <option value="0.02">2%</option>
+                        <option value="0.025">2,5%</option>
+                        <option value="0.075">7,5%</option>
                     </select>
                 </div>
 
@@ -543,10 +578,10 @@
                     <select id="cvatgst" name="cvatgst" wire:model="cvatgst"
                         class="w-full rounded-md border-gray-300 shadow-sm">
                         <option value="">0</option>
-                        <option value="1.1%">1.1%</option>
-                        <option value="1.2%">1.2%</option>
-                        <option value="11%">11%</option>
-                        <option value="12%">12%</option>
+                        <option value="0.011">1.1%</option>
+                        <option value="0.012">1.2%</option>
+                        <option value="0.11">11%</option>
+                        <option value="0.12">12%</option>
                     </select>
                 </div>
                 <!-- W/H TAX RATE -->
@@ -556,9 +591,9 @@
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         <option value="%">Select Tax</option>
                         <option value="">0</option>
-                        <option value="2%">2%</option>
-                        <option value="2.5%">2,5%</option>
-                        <option value="7.5%">7,5%</option>
+                        <option value="0.02">2%</option>
+                        <option value="0.025">2,5%</option>
+                        <option value="0.075">7,5%</option>
                     </select>
                 </div>
                 <!-- Taxable Amount -->

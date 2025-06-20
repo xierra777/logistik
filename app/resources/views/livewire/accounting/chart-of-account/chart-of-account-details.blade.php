@@ -76,7 +76,7 @@
             <tbody>
                 @foreach ($accounts as $account)
                 <tr>
-                    <td class="border px-4 py-2">{{ $account->account_code }}</td>
+                    <td class="border whitespace px-4 py-2">{{ $account->account_code }}</td>
                     <td class="border px-4 py-2">{{ $account->account_name }}</td>
                     <td class="border px-4 py-2">{{ $account->account_type }}</td>
                     <td class="border px-4 py-2">{{ $account->term_type }}</td>
@@ -85,12 +85,45 @@
                     </td>
                     <td class="border px-4 py-2">
                         <button wire:click="edit({{ $account->id }})" class="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
-                        <button wire:click="delete({{ $account->id }})" class="bg-red-600 text-white px-2 py-1 rounded" onclick="confirm('Yakin hapus?') || event.stopImmediatePropagation()">Hapus</button>
+                        <button @click="$dispatch('confirm')" class="bg-red-600 text-white px-2 py-1 rounded">Hapus</button>
                     </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
+    </div>
+    <div
+        x-data="{open : false}"
+        x-show="open"
+        @confirm.window="
+     
+        const get_id= event.detail.get_id
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d8',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, Keep it',
+            }).then((result) => {
+            if (result.isConfirmed) {
+                $wire.confirmDelete(get_id).then(result =>{
+                 Swal.fire(
+                    'Deleted!',
+                    'Account has been deleted.',
+                    'success')
+                 });
+            } else if(result.dismiss === Swal.DismissReason.cancel) {
+                Swal.fire(
+                    'canceled',
+                    'Delete has been cancelled',
+                    'error'
+                )
+            }
+        });
+    ">
     </div>
 </div>
 

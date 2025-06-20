@@ -87,11 +87,9 @@ class CreateTransaction extends Component
     // === Simpan Data Transaksi Baru ===
     public function save()
     {
-        $vendor = Customer::find($this->cvendor);
-        $client = Customer::find($this->sclient);
 
         $transaction = Transaction::create([
-            'shipment_id' => $this->shipmentId,
+            'id_shipment' => $this->shipmentId,
             'charge' => $this->charge,
             'description' => $this->description,
             'freight' => $this->freight,
@@ -102,8 +100,7 @@ class CreateTransaction extends Component
             'coa_sale_id' => $this->coaSaleId,
             'coa_cost_id' => $this->coaCostId,
             // Sale
-            'customer_id' => $client?->id,
-            'sclient' => $client?->name,
+            'sclient' => $this->sclient,
             'scurrency' => $this->scurrency,
             'srate' => $this->srate,
             'samount_qty' => $this->samount_qty,
@@ -119,8 +116,7 @@ class CreateTransaction extends Component
             'sremarks' => $this->sremarks,
             'sgrossprofit' => $this->sgrossprofit,
             // Cost
-            'vendor_id' => $vendor?->id,
-            'cvendor' => $vendor?->name,
+            'cvendor' => $this->cvendor,
             'creferenceno' => $this->creferenceno,
             'cdate' => $this->cdate,
             'cdrcr' => $this->cdrcr,
@@ -140,63 +136,9 @@ class CreateTransaction extends Component
             'cvatgstusd' => $this->cvatgstusd,
             'shwtaxrateusd' => $this->shwtaxrateusd,
             'chwtaxrateusd' => $this->chwtaxrateusd,
+            'reference_type' => 'SHIPMENT',
         ]);
 
-        $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
-        $costCoa = ChartOfAccount::find($transaction->coa_cost_id);
-        // dd([
-        //     'sale_term' => $saleCoa?->term_type,
-        //     'cost_term' => $costCoa?->term_type,
-        //     'sale_amount' => $transaction->samountidr,
-        //     'cost_amount' => $transaction->camountidr,
-        // ]);
-
-        // === JURNAL SALE ===
-        // Fungsi helper untuk konversi string Indo ke float
-        $indoStringToFloat = function (string $value): float {
-            // hapus titik ribuan, ganti koma jadi titik desimal
-            $value = str_replace('.', '', $value);
-            $value = str_replace(',', '.', $value);
-            return floatval($value);
-        };
-
-        // Ambil relasi coaSale dan coaCost dari ChargeSetting agar dapat akses term_type
-        $chargeSetting = ChartOfAccount::find($transaction->coa_sale_id);
-        $saleCoa = $chargeSetting->coaSale;
-        $costCoa = $chargeSetting->coaCost;
-
-        // JURNAL SALE
-        if ($transaction->samountidr && $saleCoa) {
-            $saleAmount = $indoStringToFloat($transaction->samountidr);
-            $totalSale = $saleAmount * $transaction->quantity;
-
-            JournalEntry::create([
-                'transaction_id' => $transaction->id,
-                'coa_id' => $saleCoa->id,
-                'debit' => $saleCoa->term_type === 'DR' ? $totalSale : 0,
-                'credit' => $saleCoa->term_type === 'CR' ? $totalSale : 0,
-                'description' => "Sale transaction #{$transaction->id}",
-                'date' => now(),
-            ]);
-        }
-
-        // JURNAL COST
-        if ($transaction->camountidr && $costCoa) {
-            $costAmount = $indoStringToFloat($transaction->camountidr);
-            $totalCost = $costAmount * $transaction->quantity;
-
-            JournalEntry::create([
-                'transaction_id' => $transaction->id,
-                'coa_id' => $costCoa->id,
-                'debit' => $costCoa->term_type === 'DR' ? $totalCost : 0,
-                'credit' => $costCoa->term_type === 'CR' ? $totalCost : 0,
-                'description' => "Cost transaction #{$transaction->id}",
-                'date' => now(),
-            ]);
-        }
-
-
-        // $this->loadClients(); 
         $this->createJournalEntries($transaction);
         $this->reset();
         $this->dispatch('transactionSaved');
@@ -207,6 +149,8 @@ class CreateTransaction extends Component
     }
     private function createJournalEntries($transaction)
     {
+        $transaction->load('shipment');
+
         // Helper function to convert Indonesian formatted numbers to float
         $indoStringToFloat = function (string $value): float {
             $value = str_replace('.', '', $value);
@@ -218,9 +162,19 @@ class CreateTransaction extends Component
         $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
         $costCoa = ChartOfAccount::find($transaction->coa_cost_id);
 
-        // Create sale journal entry
+        // Validate sale amount and create sale journal entry
         if ($transaction->samountidr && $saleCoa) {
             $saleAmount = $transaction->samountidr;
+
+            // Check if sale amount is 0 or negative
+            if ($saleAmount <= 0) {
+                return [
+                    'success' => false,
+                    'error' => 'Sale amount cannot be zero or negative',
+                    'type' => 'sale_amount_invalid'
+                ];
+            }
+
             $totalSale = $saleAmount * $transaction->quantity;
 
             JournalEntry::create([
@@ -228,27 +182,45 @@ class CreateTransaction extends Component
                 'coa_id' => $saleCoa->id,
                 'debit' => $saleCoa->term_type === 'DR' ? $totalSale : 0,
                 'credit' => $saleCoa->term_type === 'CR' ? $totalSale : 0,
-                'description' => $transaction->job_id !== null
-                    ? "Sale transaction #{$transaction->description}"
-                    : "Sale transaction ({$transaction->shipment_id}) #{$transaction->description}",
+                'description' => "Sale transaction #$transaction->reference_type ({$transaction->shipment->shipment_id}) - {$transaction->description}",
+                'transactionable_type' => $transaction->reference_type,
                 'date' => now(),
+                'created_by' => Auth::id(),
             ]);
         }
 
-        // Create cost journal entry
+        // Validate cost amount and create cost journal entry
         if ($transaction->camountidr && $costCoa) {
             $costAmount = $transaction->camountidr;
+
+            // Check if cost amount is 0 or negative
+            if ($costAmount <= 0) {
+                return [
+                    'success' => false,
+                    'error' => 'Cost amount cannot be zero or negative',
+                    'type' => 'cost_amount_invalid'
+                ];
+            }
+
             $totalCost = $costAmount * $transaction->quantity;
 
             JournalEntry::create([
                 'transaction_id' => $transaction->id,
-                'coa_id' => $costCoa->id,
-                'debit' => $costCoa->term_type === 'DR' ? $totalCost : 0,
-                'credit' => $costCoa->term_type === 'CR' ? $totalCost : 0,
-                'description' => "Cost transaction #{$transaction->description}",
+                'coa_id' => $costCoa->id, // Fixed: was using $saleCoa->id
+                'debit' => $costCoa->term_type === 'DR' ? $totalCost : 0, // Fixed: was using $saleCoa and $totalSale
+                'credit' => $costCoa->term_type === 'CR' ? $totalCost : 0, // Fixed: was using $saleCoa and $totalSale
+                'description' => "Cost transaction #$transaction->reference_type ({$transaction->shipment->shipment_id}) - {$transaction->description}", // Fixed: was using $transaction->shipment instead of $transaction->shipment->shipment_id
+                'transactionable_type' => $transaction->reference_type,
                 'date' => now(),
+                'created_by' => Auth::id(),
             ]);
         }
+
+        // Return success if no errors
+        return [
+            'success' => true,
+            'message' => 'Journal entries created successfully'
+        ];
     }
 
     private function resetForm()

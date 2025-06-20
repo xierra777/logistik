@@ -9,10 +9,9 @@ class Transaction extends Model
     protected $table = 'transactions';
 
     protected $fillable = [
-        'shipment_id',
-        'job_id',
-        'customer_id',  // Tambahkan field ini
-        'vendor_id',  // Tambahkan field ini
+        'id_shipment',
+        'id_job',
+        'reference_type',
         'invoice_id',
         // Charge section
         'charge',
@@ -79,18 +78,23 @@ class Transaction extends Model
     {
         return $this->belongsTo(ChartOfAccount::class, 'coa_cost_id');
     }
-    public function customer()
+    public function transactionClient()
     {
-        return $this->belongsTo(customer::class, 'customer_id');
-    }
-    public function shipment()
-    {
-        return $this->belongsTo(Shipment::class, 'shipment_id');
+        return $this->belongsTo(Customer::class, 'sclient');
     }
 
-    public function vendor()
+    public function shipment()
     {
-        return $this->belongsTo(Customer::class, 'vendor_id');
+        return $this->belongsTo(TShipments::class, 'id_shipment');
+    }
+    public function job()
+    {
+        return $this->belongsTo(TJob::class, 'id_job');
+    }
+
+    public function transactionVendor()
+    {
+        return $this->belongsTo(Customer::class, 'cvendor');
     }
 
     public function invoice()

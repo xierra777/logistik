@@ -9,7 +9,7 @@ class TJob extends Model
     protected $casts = ['data' => 'array'];
 
     protected $fillable = [
-        'job_id',
+        'id_job',
         'jobBillLadingNo',
         'jobBillLadingDate',
         'houseJobBillLadingNo',
@@ -36,7 +36,7 @@ class TJob extends Model
     }
     public function jobTransactions()
     {
-        return $this->hasMany(Transaction::class, 'job_id');
+        return $this->hasMany(Transaction::class, 'id_job');
     }
     public function client()
     {

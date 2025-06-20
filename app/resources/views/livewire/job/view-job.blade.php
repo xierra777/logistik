@@ -945,6 +945,8 @@
                             No
                         </th>
                         <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Description
                         </th>
                         <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
@@ -1003,7 +1005,7 @@
                             {{ $transaction->unit }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$transaction->customer->name ?? ''}}
+                            {{$transaction->transactionClient->name ?? ''}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $transaction->quantity }} x {{$transaction->samount_qty}}x{{$transaction->srate}}
@@ -1015,7 +1017,7 @@
                             {{$transaction->sdrcr}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$transaction->vendor->name ?? ''}}
+                            {{$transaction->transactionVendor->name ?? ''}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $transaction->quantity }} x {{$transaction->camount_qty}}x{{$transaction->crate}}

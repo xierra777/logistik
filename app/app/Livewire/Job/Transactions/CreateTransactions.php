@@ -30,7 +30,7 @@ class CreateTransactions extends Component
     public $quantity = 0;
 
     // === Sale Details ===
-    public $sclient, $scurrency, $srate = 0, $samount_qty = 0, $sincludedtax = "No";
+    public $sclient, $scurrency, $srate = 0, $samount_qty = 0, $sincludedtax = "false";
     public $sfcyamount = 0, $samountidr = 0, $sdrcr, $svatgst = 0, $staxableamount = 0;
     public $svatgstamount = 0, $swhtaxrate, $swhtaxamount = 0, $sremarks, $sgrossprofit = 0;
 
@@ -104,11 +104,9 @@ class CreateTransactions extends Component
     // === Save Transaction ===
     public function save()
     {
-        $vendor = Customer::find($this->cvendor);
-        $client = Customer::find($this->sclient);
 
         $transaction = Transaction::create([
-            'job_id' => $this->jobId,
+            'id_job' => $this->jobId,
             'charge' => $this->charge,
             'description' => $this->description,
             'freight' => $this->freight,
@@ -119,8 +117,7 @@ class CreateTransactions extends Component
             'coa_sale_id' => $this->coaSaleId,
             'coa_cost_id' => $this->coaCostId,
             // Sale
-            'customer_id' => $client?->id,
-            'sclient' => $client?->name,
+            'sclient' => $this->sclient,
             'scurrency' => $this->scurrency,
             'srate' => $this->srate,
             'samount_qty' => $this->samount_qty,
@@ -136,8 +133,7 @@ class CreateTransactions extends Component
             'sremarks' => $this->sremarks,
             'sgrossprofit' => $this->sgrossprofit,
             // Cost
-            'vendor_id' => $vendor?->id,
-            'cvendor' => $vendor?->name,
+            'cvendor' => $this->cvendor,
             'creferenceno' => $this->creferenceno,
             'cdate' => $this->cdate,
             'cdrcr' => $this->cdrcr,
@@ -157,10 +153,11 @@ class CreateTransactions extends Component
             'cvatgstusd' => $this->cvatgstusd,
             'shwtaxrateusd' => $this->shwtaxrateusd,
             'chwtaxrateusd' => $this->chwtaxrateusd,
+            'reference_type' => 'JOB',
         ]);
 
         $this->createJournalEntries($transaction);
-        $this->reset();
+        $this->resetForm();
         $this->dispatch('transactionSaved');
         $this->dispatch('close-modal');
         $this->chargeCoa = ChargeSetting::get();
@@ -170,6 +167,8 @@ class CreateTransactions extends Component
 
     private function createJournalEntries($transaction)
     {
+        $transaction->load('job');
+
         // Helper function to convert Indonesian formatted numbers to float
         $indoStringToFloat = function (string $value): float {
             $value = str_replace('.', '', $value);
@@ -186,28 +185,61 @@ class CreateTransactions extends Component
             $saleAmount = $indoStringToFloat($transaction->samountidr);
             $totalSale = $saleAmount * $transaction->quantity;
 
+            // Jurnal Piutang (A/R) - Debit
+            JournalEntry::create([
+                'transaction_id' => $transaction->id,
+                'coa_id' => $transaction->transactionClient->coa_id, // COA A/R untuk customer
+                'debit' => $totalSale,
+                'credit' => 0,
+                'description' => "Piutang dari transaksi #{$transaction->transactionClient->name} ({$transaction->job->job_id}) - {$transaction->description}",
+                'transactionable_type' => get_class($transaction),
+                'transactionable_id' => $transaction->id,
+                'date' => now(),
+                'created_by' => Auth::id(),
+            ]);
+
+            // Jurnal Pendapatan (Revenue) - Kredit
             JournalEntry::create([
                 'transaction_id' => $transaction->id,
                 'coa_id' => $saleCoa->id,
                 'debit' => $saleCoa->term_type === 'DR' ? $totalSale : 0,
                 'credit' => $saleCoa->term_type === 'CR' ? $totalSale : 0,
-                'description' => "Sale transaction #{$transaction->id}",
+                'description' => "Sale transaction #{$transaction->reference_type} ({$transaction->job->job_id}) - {$transaction->description}",
+                'transactionable_type' => $transaction->reference_type,
+                'transactionable_id' => $transaction->id,
                 'date' => now(),
+                'created_by' => Auth::id(),
             ]);
         }
 
-        // Create cost journal entry
         if ($transaction->camountidr && $costCoa) {
             $costAmount = $indoStringToFloat($transaction->camountidr);
             $totalCost = $costAmount * $transaction->quantity;
 
+            // Jurnal Hutang (A/P) - Kredit
+            JournalEntry::create([
+                'transaction_id' => $transaction->id,
+                'coa_id' => $transaction->transactionVendor->coa_id, // COA A/P untuk vendor
+                'debit' => 0,
+                'credit' => $totalCost,
+                'description' => "Hutang dari transaksi #{$transaction->transactionVendor->name} ({$transaction->job->job_id}) - {$transaction->description}",
+                'transactionable_type' => get_class($transaction),
+                'transactionable_id' => $transaction->id,
+                'date' => now(),
+                'created_by' => Auth::id(),
+            ]);
+
+            // Jurnal Biaya (Expense) - Debit
             JournalEntry::create([
                 'transaction_id' => $transaction->id,
                 'coa_id' => $costCoa->id,
                 'debit' => $costCoa->term_type === 'DR' ? $totalCost : 0,
                 'credit' => $costCoa->term_type === 'CR' ? $totalCost : 0,
-                'description' => "Cost transaction #{$transaction->id}",
+                'description' => "Cost transaction #{$transaction->reference_type} ({$transaction->job->job_id}) - {$transaction->description}",
+                'transactionable_type' => $transaction->reference_type,
+                'transactionable_id' => $transaction->id,
                 'date' => now(),
+                'created_by' => Auth::id(),
             ]);
         }
     }

@@ -22,7 +22,9 @@ class ViewJob extends Component
     public $modalContainer = true;
     public $containerType, $noOfPackages, $containerReleaseNo, $containerReleaseDate, $typeOfPackages, $grossWeight, $typeOfGrossWeight, $volumeWeight, $typeOfVolumeWeight, $volume, $chargableWeight, $containerRemarks, $containerNo, $containerSealNo, $noOfPallet, $netOfWeight, $typeNetOfWeight, $totalWeight, $typeOfTotalWeight, $hsCode, $hsCodeDesc;
 
-
+    protected $listeners = [
+        'transactionSaved' => 'refreshJob',
+    ];
     public function mount($id)
     {
         $this->loadJob($id); // cukup panggil method ini, tidak perlu cari ulang shipment ID
@@ -39,7 +41,7 @@ class ViewJob extends Component
 
     public function refreshJob()
     {
-        $this->refreshKey = now()->timestamp;
+        $this->loadJob($this->job->id);
     }
     public function refreshTransaction($id)
     {

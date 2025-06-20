@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\transactions\costTransactions;
+use App\Models\transactions\salesTransactions;
 use Illuminate\Database\Eloquent\Model;
 
 class TShipments extends Model
@@ -30,10 +32,6 @@ class TShipments extends Model
         'created_by',
         'updated_by',
     ];
-    public function shipmentTransaction()
-    {
-        return $this->hasMany(Transaction::class, 'shipment_id');
-    }
     public function job()
     {
         return $this->belongsTo(TJob::class, 'id_job');
@@ -42,7 +40,10 @@ class TShipments extends Model
     {
         return $this->hasMany(shipmentContainers::class, 'id_shipments');
     }
-
+    public function shipmentTransaction()
+    {
+        return $this->hasMany(Transaction::class, 'id_shipment');
+    }
     public function client()
     {
         return $this->belongsTo(Customer::class, 'shipmentClient_id');

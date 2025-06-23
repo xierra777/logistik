@@ -88,9 +88,7 @@
                     dataLabels: {
                         enabled: false
                     },
-                    stroke: {
-                        curve: 'smooth'
-                    },
+
                     series: [{
                             name: 'Revenue',
                             data: revenueData

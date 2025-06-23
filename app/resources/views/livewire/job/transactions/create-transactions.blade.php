@@ -75,11 +75,11 @@
         // samountidr = base amount (sebelum pajak)
         // amount = total amount (termasuk pajak)
         const totalTaxRate = vatRate;
-        const baseAmount = (this.srate * parseFloat(this.amount || 0)) / (1 + totalTaxRate);
+        const baseAmount = (this.srate * parseFloat(this.fcyAmount || 0)) / (1 + totalTaxRate);
         result = round(baseAmount);
     } else {
         // Jika tax excluded: samountidr = srate × amount
-        const baseAmount = this.srate * (parseFloat(this.amount) || 0);
+        const baseAmount = this.srate * (parseFloat(this.fcyAmount) || 0);
         result = round(baseAmount);
     }
 
@@ -108,9 +108,27 @@
     // --- Cost Calculations ---
     get camountIdrComputed() {
         const included = (this.cincludedtax || 'No').trim() === 'Yes';
-        const rate = parseFloat((this.cvatgst || '0').replace('%', '').replace(',', '.')) || 0;
-        const base = this.crate * (parseFloat(this.camount) || 0);
-        const result = included ? base / (1 + rate / 100) : base;
+        // Karena option value sudah dalam format decimal (0.11 = 11%)
+        const vatRate = parseFloat(this.cvatgst || 0) || 0;
+        const whtRate = parseFloat(this.cwhtaxrate || 0) || 0;
+
+        const round = (num, decimals = 2) =>
+            Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
+
+        let result;
+
+        if (included) {
+            // Jika tax included:
+            // camountidr = base amount (sebelum pajak)
+            // camount = total amount (termasuk pajak)
+            const totalTaxRate = vatRate;
+            const baseAmount = (this.crate * parseFloat(this.cfcyAmount || 0)) / (1 + totalTaxRate);
+            result = round(baseAmount);
+        } else {
+            const baseAmount = this.crate * (parseFloat(this.cfcyAmount) || 0);
+            result = round(baseAmount);
+        }
+
         this.camountIdrRaw = result;
         this.$nextTick(() => @this.set('camountidr', result));
         return result;
@@ -127,7 +145,7 @@
         return parseFloat(((parseFloat(this.camount) || 0) / (1 + totalTaxRate)).toFixed(3));
     } else {
         // fcyAmount = amount asli
-        return parseFloat(this.camount) || 0;
+        return this.quantity * parseFloat(this.camount) || 0;
     }
     },
     get ctaxable() {
@@ -592,7 +610,7 @@ this.resetModal();
                 <!-- FCY Amount -->
                 <div>
                     <label for="cfcyamount" class="block text-sm font-medium text-gray-700">FCY Amount</label>
-                    <input type="text" id="cfcyamount" name="cfcyamount" :value="cfcyAmount"
+                    <input type="text" id="cfcyamount" name="cfcyamount" :value="formatNumber(cfcyAmount)" readonly
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <!-- Amount (IDR) -->

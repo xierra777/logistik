@@ -1011,7 +1011,7 @@
                             {{ $transaction->quantity }} x {{$transaction->samount_qty}}x{{$transaction->srate}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->samountidr_formatted ?? '' }}
+                            {{ number_format($transaction->samountidr, 2, ',', '.') }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->sdrcr}}
@@ -1023,7 +1023,7 @@
                             {{ $transaction->quantity }} x {{$transaction->camount_qty}}x{{$transaction->crate}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$transaction->camountidr_formatted}}
+                            {{number_format($transaction->camountidr, 2, ',', '.')}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->cdrcr}}

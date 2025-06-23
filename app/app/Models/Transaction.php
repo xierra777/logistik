@@ -101,13 +101,4 @@ class Transaction extends Model
     {
         return $this->belongsTo(Invoice::class);
     }
-
-    public function getSamountidrFormattedAttribute()
-    {
-        return number_format($this->samountidr, 2, ',', '.');
-    }
-    public function getCamountidrFormattedAttribute()
-    {
-        return number_format($this->camountidr, 2, ',', '.');
-    }
 }

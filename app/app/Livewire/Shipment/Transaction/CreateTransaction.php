@@ -25,7 +25,7 @@ class CreateTransaction extends Component
     public $coaCostId;
 
     // === Charge Details ===
-    public $charge, $description, $freight, $unit, $ofdtype, $remarks;
+    public $charge, $description, $freight, $unit = 'CONTAINER', $ofdtype, $remarks;
     public $quantity = 0;
 
     // === Sale Details ===
@@ -84,6 +84,30 @@ class CreateTransaction extends Component
             $this->coaCostId = null;
         }
     }
+    public function updatedUnit($value)
+    {
+        if (!$this->shipment) {
+            $this->shipment = TShipments::with('container')->find($this->shipmentId);
+        }
+
+        switch ($value) {
+            case 'CONTAINER':
+                $this->quantity = $this->shipment->container->count(); // atau hitung dari container relasi
+                break;
+
+            case 'PALLET':
+                $this->quantity = 0; // method custom
+                break;
+
+            case 'DOCUMENT':
+                $this->quantity =  $this->shipment->job();
+                break;
+
+            default:
+                $this->quantity = 0;
+        }
+    }
+
     // === Simpan Data Transaksi Baru ===
     public function save()
     {
@@ -137,6 +161,8 @@ class CreateTransaction extends Component
             'shwtaxrateusd' => $this->shwtaxrateusd,
             'chwtaxrateusd' => $this->chwtaxrateusd,
             'reference_type' => 'SHIPMENT',
+            'created_by' => Auth::id(),
+
         ]);
 
         $this->createJournalEntries($transaction);
@@ -162,67 +188,69 @@ class CreateTransaction extends Component
         $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
         $costCoa = ChartOfAccount::find($transaction->coa_cost_id);
 
-        // Validate sale amount and create sale journal entry
+        // Create sale journal entry
         if ($transaction->samountidr && $saleCoa) {
             $saleAmount = $transaction->samountidr;
-
-            // Check if sale amount is 0 or negative
-            if ($saleAmount <= 0) {
-                return [
-                    'success' => false,
-                    'error' => 'Sale amount cannot be zero or negative',
-                    'type' => 'sale_amount_invalid'
-                ];
-            }
-
             $totalSale = $saleAmount * $transaction->quantity;
 
+            // Jurnal Piutang (A/R) - Debit
+            JournalEntry::create([
+                'transaction_id' => $transaction->id,
+                'coa_id' => $transaction->transactionClient->coa_id, // COA A/R untuk customer
+                'debit' => $totalSale,
+                'credit' => 0,
+                'description' => "Piutang dari transaksi #{$transaction->transactionClient->name} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
+                'transactionable_type' => get_class($transaction),
+                'transactionable_id' => $transaction->id,
+                'date' => now(),
+                'created_by' => Auth::id(),
+            ]);
+
+            // Jurnal Pendapatan (Revenue) - Kredit
             JournalEntry::create([
                 'transaction_id' => $transaction->id,
                 'coa_id' => $saleCoa->id,
                 'debit' => $saleCoa->term_type === 'DR' ? $totalSale : 0,
                 'credit' => $saleCoa->term_type === 'CR' ? $totalSale : 0,
-                'description' => "Sale transaction #$transaction->reference_type ({$transaction->shipment->shipment_id}) - {$transaction->description}",
+                'description' => "Sale transaction #{$transaction->reference_type} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
                 'transactionable_type' => $transaction->reference_type,
+                'transactionable_id' => $transaction->id,
                 'date' => now(),
                 'created_by' => Auth::id(),
             ]);
         }
 
-        // Validate cost amount and create cost journal entry
         if ($transaction->camountidr && $costCoa) {
             $costAmount = $transaction->camountidr;
-
-            // Check if cost amount is 0 or negative
-            if ($costAmount <= 0) {
-                return [
-                    'success' => false,
-                    'error' => 'Cost amount cannot be zero or negative',
-                    'type' => 'cost_amount_invalid'
-                ];
-            }
-
             $totalCost = $costAmount * $transaction->quantity;
 
+            // Jurnal Hutang (A/P) - Kredit
             JournalEntry::create([
                 'transaction_id' => $transaction->id,
-                'coa_id' => $costCoa->id, // Fixed: was using $saleCoa->id
-                'debit' => $costCoa->term_type === 'DR' ? $totalCost : 0, // Fixed: was using $saleCoa and $totalSale
-                'credit' => $costCoa->term_type === 'CR' ? $totalCost : 0, // Fixed: was using $saleCoa and $totalSale
-                'description' => "Cost transaction #$transaction->reference_type ({$transaction->shipment->shipment_id}) - {$transaction->description}", // Fixed: was using $transaction->shipment instead of $transaction->shipment->shipment_id
+                'coa_id' => $transaction->transactionVendor->coa_id, // COA A/P untuk vendor
+                'debit' => 0,
+                'credit' => $totalCost,
+                'description' => "Hutang dari transaksi #{$transaction->transactionVendor->name} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
+                'transactionable_type' => get_class($transaction),
+                'transactionable_id' => $transaction->id,
+                'date' => now(),
+                'created_by' => Auth::id(),
+            ]);
+
+            // Jurnal Biaya (Expense) - Debit
+            JournalEntry::create([
+                'transaction_id' => $transaction->id,
+                'coa_id' => $costCoa->id,
+                'debit' => $costCoa->term_type === 'DR' ? $totalCost : 0,
+                'credit' => $costCoa->term_type === 'CR' ? $totalCost : 0,
+                'description' => "Cost transaction #{$transaction->reference_type} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
                 'transactionable_type' => $transaction->reference_type,
+                'transactionable_id' => $transaction->id,
                 'date' => now(),
                 'created_by' => Auth::id(),
             ]);
         }
-
-        // Return success if no errors
-        return [
-            'success' => true,
-            'message' => 'Journal entries created successfully'
-        ];
     }
-
     private function resetForm()
     {
         $this->reset([

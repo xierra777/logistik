@@ -1032,7 +1032,7 @@
                             {{$transaction->freight}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium font-bold {{ $transaction->gp < 0 ? 'text-red-500' : 'text-green-700' }}">
-                            {{ number_format($transaction->gp, 2, ',', '.') }}
+                            {{$transaction->SamountgpFormatted}}
                         </td>
                     </tr>
                     @empty

@@ -101,4 +101,11 @@ class Transaction extends Model
     {
         return $this->belongsTo(Invoice::class);
     }
+
+    public function getSamountgpFormattedAttribute()
+    {
+        $samountidr = is_numeric($this->samountidr) ? $this->samountidr : 0;
+        $camountidr = is_numeric($this->camountidr) ? $this->camountidr : 0;
+        return number_format(($samountidr - $camountidr), 2, ',', '.');
+    }
 }

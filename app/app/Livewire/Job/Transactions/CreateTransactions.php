@@ -154,6 +154,8 @@ class CreateTransactions extends Component
             'shwtaxrateusd' => $this->shwtaxrateusd,
             'chwtaxrateusd' => $this->chwtaxrateusd,
             'reference_type' => 'JOB',
+            'created_by' => Auth::id(),
+
         ]);
 
         $this->createJournalEntries($transaction);
@@ -182,7 +184,7 @@ class CreateTransactions extends Component
 
         // Create sale journal entry
         if ($transaction->samountidr && $saleCoa) {
-            $saleAmount = $indoStringToFloat($transaction->samountidr);
+            $saleAmount = $transaction->samountidr;
             $totalSale = $saleAmount * $transaction->quantity;
 
             // Jurnal Piutang (A/R) - Debit
@@ -213,7 +215,7 @@ class CreateTransactions extends Component
         }
 
         if ($transaction->camountidr && $costCoa) {
-            $costAmount = $indoStringToFloat($transaction->camountidr);
+            $costAmount = $transaction->camountidr;
             $totalCost = $costAmount * $transaction->quantity;
 
             // Jurnal Hutang (A/P) - Kredit

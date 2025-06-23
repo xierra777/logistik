@@ -21,6 +21,7 @@ use App\Livewire\Job\ContainerJob;
 use App\Livewire\Pdfhbl;
 use App\Livewire\Job\CreateJob;
 use App\Livewire\Job\EditJob;
+use App\Livewire\Job\JobCreateShipment;
 use App\Livewire\Job\ListJob;
 use App\Livewire\Job\ViewJob;
 use App\Livewire\Shipment\ContainerShipment;
@@ -138,6 +139,10 @@ Route::get('view-job/{id}', ViewJob::class)->middleware([
 Route::get('view-job/{id}/container-job/{jobContainer_id}', ContainerJob::class)
     ->middleware(['auth', 'verified'])
     ->name('jobContainer');
+
+Route::get('view-job/{id}/shipment-create', JobCreateShipment::class)
+    ->middleware(['auth', 'verified'])
+    ->name('viewJobCreateShipment');
 // End Job Route
 
 

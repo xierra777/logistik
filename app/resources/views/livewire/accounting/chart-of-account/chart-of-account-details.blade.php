@@ -54,7 +54,11 @@
             <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
                 {{ $isEditing ? 'Update' : 'Simpan' }}
             </button>
-            <a class="coaSetting bg-blue-500 rounded-md p-3 hover:scale-105 hover:text-white transition duration-300 ease-in-out hover:shadow-cyan-200" href="{{route('coaSetting')}}">Charge Coa Setting</a>
+            <div>
+                <a class="coaSetting bg-blue-500 rounded-md p-3 hover:scale-105 hover:text-white transition duration-300 ease-in-out hover:shadow-cyan-200" href="{{route('coaSetting')}}">Charge Coa Setting</a>
+                <a class="coaSetting bg-blue-500 rounded-md p-3 hover:scale-105 hover:text-white transition duration-300 ease-in-out hover:shadow-cyan-200" href="{{route('accountant.list')}}">Back</a>
+            </div>
+
         </div>
 
     </form>
@@ -91,6 +95,23 @@
                 @endforeach
             </tbody>
         </table>
+    </div>
+    <!-- Pagination -->
+    @if($accounts->hasPages())
+    <div class="mt-4 px-1.5 flex justify-end">
+        {{ $accounts->links() }}
+    </div>
+    @endif
+
+    <!-- Selector Rows Per Page -->
+    <div class="mt-4">
+        <select wire:model.live="perPage" class="py-1 px-2 bg-gray-100 border rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:border-transparent dark:text-neutral-400 dark:focus:ring-neutral-600">
+            <option value="5">5 Rows</option>
+            <option value="10">10 Rows</option>
+            <option value="25">25 Rows</option>
+            <option value="50">50 Rows</option>
+            <option value="100">100 Rows</option>
+        </select>
     </div>
     <div
         x-data="{open : false}"

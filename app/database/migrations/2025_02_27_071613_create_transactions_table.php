@@ -31,7 +31,7 @@ return new class extends Migration
 
             $table->foreignId('sclient')->nullable()->constrained('customers')->nullOnDelete();
             $table->string('scurrency', 10)->nullable();
-            $table->decimal('srate', 12, 4)->nullable();
+            $table->decimal('srate', 12, 2)->nullable();
             $table->decimal('samount_qty', 16, 2)->nullable();
             $table->string('sincludedtax')->nullable();
             $table->decimal('sfcyamount', 16, 2)->nullable();
@@ -53,7 +53,7 @@ return new class extends Migration
             $table->date('cdate')->nullable();
             $table->string('cdrcr', 5)->nullable(); // debit / credit
             $table->string('ccurrency', 10)->nullable();
-            $table->decimal('crate', 12, 4)->nullable();
+            $table->decimal('crate', 12, 2)->nullable();
             $table->decimal('camount_qty', 16, 2)->nullable();
             $table->string('cincludedtax')->nullable();
             $table->decimal('cfcyamount', 16, 2)->nullable();

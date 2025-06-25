@@ -44,56 +44,53 @@
     },
 
     // --- Source Calculations ---
-   get fcyAmount() {
+  get fcyAmount() {
     const included = (this.sincludedtax || 'No').trim() === 'Yes';
-    // Karena option value sudah dalam format decimal (0.11 = 11%)
     const vatRate = parseFloat(this.svatgst || 0) || 0;
-    const whtRate = parseFloat(this.swhtaxrate || 0)||0;
     
     if (included) {
-        // fcyAmount = base FCY (sebelum pajak)
-        const totalTaxRate = vatRate;
-        return parseFloat(((parseFloat(this.amount) || 0) / (1 + totalTaxRate)).toFixed(3));
+        // Amount sudah include VAT, perlu extract base amount
+        return parseFloat(((parseFloat(this.amount) || 0) / (1 + vatRate)).toFixed(3));
     } else {
-        // fcyAmount = amount asli
-        return this.quantity * parseFloat(this.amount) || 0;
+        // Amount belum include VAT
+        return parseFloat(this.amount) || 0;
     }
 },
-   get samountIdrComputed() {
+
+get samountIdrComputed() {
     const included = (this.sincludedtax || 'No').trim() === 'Yes';
-    // Karena option value sudah dalam format decimal (0.11 = 11%)
     const vatRate = parseFloat(this.svatgst || 0) || 0;
     const whtRate = parseFloat(this.swhtaxrate || 0) || 0;
     
     const round = (num, decimals = 2) =>
         Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
-
-    let result;
+    
+    const fcyAmount = parseFloat(this.fcyAmount) || 0;
+    const rate = parseFloat(this.srate) || 1;
+    
+    let baseAmount;
     
     if (included) {
-        // Jika tax included:
-        // samountidr = base amount (sebelum pajak)
-        // amount = total amount (termasuk pajak)
-        const totalTaxRate = vatRate;
-        const baseAmount = (this.srate * parseFloat(this.fcyAmount || 0)) / (1 + totalTaxRate);
-        result = round(baseAmount);
+        // fcyAmount udah base amount (net of VAT)
+        baseAmount = rate * fcyAmount;
     } else {
-        // Jika tax excluded: samountidr = srate × amount
-        const baseAmount = this.srate * (parseFloat(this.fcyAmount) || 0);
-        result = round(baseAmount);
+        baseAmount = rate * fcyAmount;
     }
-
+    
+    const result = round(baseAmount);
     this.samountIdrRaw = result;
     this.$nextTick(() => @this.set('samountidr', result));
     return result;
 },
 
-    get whtaxAmount() {
-        return this.samountIdrRaw * (this.swhtaxrate || 0) || 0;
-    },
-    get vatAmount() {
-      return this.samountIdrRaw * (this.svatgst || 0) || 0;
-    },
+// Fix property names dan logic
+get whtaxAmount() {
+    return this.samountIdrRaw * (this.swhtaxrate || 0) || 0;
+},
+
+get vatAmount() {
+    return this.samountIdrRaw * (this.svatgst || 0) || 0;
+},
     get vatAmountUsd() {
         return this.fcyAmount * (this.svatgst || 0) || 0;
     },
@@ -419,7 +416,7 @@ this.resetModal();
                 <div>
                     <label for="sfcyamount" class="block text-sm font-medium text-gray-700">FCY Amount</label>
                     <input type="text" id="sfcyamount" name="sfcyamount"
-                        :value="formatNumber(fcyAmount)" readonly wire:model="sfcyamount"
+                        :value="formatNumber(fcyAmount)" readonly
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <div>
@@ -545,7 +542,6 @@ this.resetModal();
                         @endforeach
                     </select>
                     @error('vendor') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                    @error('coa_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 </div>
                 <!-- No Invoice -->
                 <div>

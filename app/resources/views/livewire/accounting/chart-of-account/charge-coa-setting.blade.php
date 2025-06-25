@@ -78,7 +78,7 @@
         <table class="min-w-max w-full table-auto divide-y divide-gray-200 dark:divide-neutral-700">
             <thead class="bg-gray-50 dark:bg-neutral-800">
                 <tr>
-                    @foreach (['No', 'Charge Code', 'Charge Name','COA SALE ID','COA COST ID' ] as $th)
+                    @foreach (['No', 'Charge Code', 'Charge Name','COA SALE ID','COA COST ID','Created By' ] as $th)
                     <th scope="col" class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-center dark:text-neutral-400 text-left">
                         {{ $th }}
                     </th>
@@ -103,7 +103,9 @@
                     </td>
                     <td class="px-4 py-4 text-sm text-gray-800 text-center dark:text-neutral-300 font-bold">
                         {{$acc->coaCost->account_code}} - {{$acc->coaCost->account_name}}
-
+                    </td>
+                    <td class="px-4 py-4 text-sm text-gray-800 text-center dark:text-neutral-300 font-bold">
+                        {{$acc->user->name ?? ''}}
                     </td>
                 </tr>
                 @empty

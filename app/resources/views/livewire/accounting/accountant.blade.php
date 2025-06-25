@@ -12,7 +12,7 @@
                     </div>
                     <div class="w-2/3">
 
-                        <p class="text-gray-700 dark:text-gray-300 text-left font-bold"> <span class="text-2xl font-bold">{{$totaltransaksi}}</span> Transactions
+                        <p class="text-gray-700 dark:text-gray-300 text-left font-bold"> <span class="text-2xl font-bold">{{$coa}}</span> Account
                         </p>
                         <p class="text-justify leading-relaxed">
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus nihil magni distinctio ipsam beatae! Ipsum deserunt illo error nam ea! </p>
@@ -22,8 +22,7 @@
             </a>
         </div>
         <div class="p-4 bg-white dark:bg-gray-800 border-gray-200 border shadow-md rounded-lg flex flex-col items-center text-center">
-            <a href="{{url('/journal-entries')}}">
-
+            <a href="{{route('coaSetting')}}">
                 <h1 class="text-2xl font-bold mb-4">Chart Of Charge Account</h1>
                 <div class="flex items-center space-x-4 ">
                     <div class="h-32 W-32 flex items-center justify-center text-4xl text-blue-600 w-1/3">
@@ -31,7 +30,7 @@
                     </div>
                     <div class="w-2/3">
 
-                        <p class="text-gray-700 dark:text-gray-300 text-left font-bold"> <span class="text-2xl font-bold">{{$totaltransaksi}}</span> Transactions
+                        <p class="text-gray-700 dark:text-gray-300 text-left font-bold"> <span class="text-2xl font-bold">{{$chargeCoa}}</span> Charge Account
                         </p>
                         <p class="text-justify leading-relaxed">
                             Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus nihil magni distinctio ipsam beatae! Ipsum deserunt illo error nam ea! </p>
@@ -59,11 +58,30 @@
                 </div>
             </a>
         </div>
+        <div class="p-4 bg-white dark:bg-gray-800 border-gray-200 border shadow-md rounded-lg flex flex-col items-center text-center">
+            <a href="{{route('listTax')}}">
+
+                <h1 class="text-2xl font-bold mb-4">Tax account</h1>
+                <div class="flex items-center space-x-4 ">
+                    <div class="h-32 W-32 flex items-center justify-center text-4xl text-blue-600 w-1/3">
+                        <i class="fa-solid fa-money-check"></i>
+                    </div>
+                    <div class="w-2/3">
+
+                        <p class="text-gray-700 dark:text-gray-300 text-left font-bold"> <span class="text-2xl font-bold">{{$tax}}</span> Tax Account
+                        </p>
+                        <p class="text-justify leading-relaxed">
+                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Accusamus nihil magni distinctio ipsam beatae! Ipsum deserunt illo error nam ea! </p>
+
+                    </div>
+                </div>
+            </a>
+        </div>
         <div class="p-3">
             <div>
                 <h1 class="text-center font-bold text-2xl">Percentage Profit</h1>
             </div>
-            <div x-data="lineChart()" x-init="initChart()" class="w-full max-w-4xl mx-auto">
+            <div x-data="lineChart()" x-init="initChart()" class="h-120">
                 <div id="lineRevenueChart"></div>
             </div>
         </div>
@@ -80,7 +98,7 @@
                 this.chart = new ApexCharts(document.querySelector("#lineRevenueChart"), {
                     chart: {
                         type: 'area',
-                        height: 350,
+                        height: 150,
                         toolbar: {
                             show: false
                         }

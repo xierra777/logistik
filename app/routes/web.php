@@ -10,6 +10,8 @@ use App\Livewire\Accounting\ChartOfAccount\ChartOfAccountDetails;
 use App\Livewire\Accounting\PurchaseInvoice;
 use App\Livewire\Accounting\Tranksaksi;
 use App\Livewire\Accounting\SaleInvoice;
+use App\Livewire\Accounting\Tax\CreateTax;
+use App\Livewire\Accounting\Tax\ListTax;
 use App\Livewire\JournalEntries;
 use App\Livewire\Customers\CreateCustomer;
 use App\Livewire\Customers\EditCustomer;
@@ -140,7 +142,7 @@ Route::get('view-job/{id}/container-job/{jobContainer_id}', ContainerJob::class)
     ->middleware(['auth', 'verified'])
     ->name('jobContainer');
 
-Route::get('view-job/{id}/shipment-create', JobCreateShipment::class)
+Route::get('view-job/{id}/Create-Shipment', JobCreateShipment::class)
     ->middleware(['auth', 'verified'])
     ->name('viewJobCreateShipment');
 // End Job Route
@@ -167,7 +169,10 @@ Route::get('/journal-entries', JournalEntries::class)->middleware([
     'auth',
     'verified'
 ]);
-
+Route::get('/list-tax', ListTax::class)->middleware([
+    'auth',
+    'verified'
+])->name('listTax');
 
 Route::get('/view-customers/{id}', ViewCustomer::class)->middleware([
     'auth',

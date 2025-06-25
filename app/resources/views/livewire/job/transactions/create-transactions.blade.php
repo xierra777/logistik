@@ -44,62 +44,59 @@
     },
 
     // --- Source Calculations ---
-   get fcyAmount() {
+  get fcyAmount() {
     const included = (this.sincludedtax || 'No').trim() === 'Yes';
-    // Karena option value sudah dalam format decimal (0.11 = 11%)
     const vatRate = parseFloat(this.svatgst || 0) || 0;
-    const whtRate = parseFloat(this.swhtaxrate || 0)||0;
     
     if (included) {
-        // fcyAmount = base FCY (sebelum pajak)
-        const totalTaxRate = vatRate;
-        return parseFloat(((parseFloat(this.amount) || 0) / (1 + totalTaxRate)).toFixed(3));
+        // Amount sudah include VAT, perlu extract base amount
+        return parseFloat(((parseFloat(this.amount) || 0) / (1 + vatRate)).toFixed(3));
     } else {
-        // fcyAmount = amount asli
-        return this.quantity * parseFloat(this.amount) || 0;
+        // Amount belum include VAT
+        return parseFloat(this.amount) || 0;
     }
 },
-   get samountIdrComputed() {
+
+get samountIdrComputed() {
     const included = (this.sincludedtax || 'No').trim() === 'Yes';
-    // Karena option value sudah dalam format decimal (0.11 = 11%)
     const vatRate = parseFloat(this.svatgst || 0) || 0;
     const whtRate = parseFloat(this.swhtaxrate || 0) || 0;
     
     const round = (num, decimals = 2) =>
         Math.round(num * Math.pow(10, decimals)) / Math.pow(10, decimals);
-
-    let result;
+    
+    const fcyAmount = parseFloat(this.fcyAmount) || 0;
+    const rate = parseFloat(this.srate) || 1;
+    
+    let baseAmount;
     
     if (included) {
-        // Jika tax included:
-        // samountidr = base amount (sebelum pajak)
-        // amount = total amount (termasuk pajak)
-        const totalTaxRate = vatRate;
-        const baseAmount = (this.srate * parseFloat(this.fcyAmount || 0)) / (1 + totalTaxRate);
-        result = round(baseAmount);
+        // fcyAmount udah base amount (net of VAT)
+        baseAmount = rate * fcyAmount;
     } else {
-        // Jika tax excluded: samountidr = srate × amount
-        const baseAmount = this.srate * (parseFloat(this.fcyAmount) || 0);
-        result = round(baseAmount);
+        baseAmount = rate * fcyAmount;
     }
-
+    
+    const result = round(baseAmount);
     this.samountIdrRaw = result;
     this.$nextTick(() => @this.set('samountidr', result));
     return result;
 },
 
-    get whtaxAmount() {
-        return this.samountIdrRaw * (this.swhtaxrate || 0) || 0;
-    },
-    get vatAmount() {
-      return this.samountIdrRaw * (this.svatgst || 0) || 0;
-    },
-    get vatAmountUsd() {
-        return this.fcyAmount * (this.svatgst || 0) || 0;
-    },
-    get swhtaxamountusd() {
-        return this.fcyAmount * (this.swhtaxrate || 0) || 0;
-    },
+// Fix property names dan logic
+get whtaxAmount() {
+    return this.samountIdrRaw * (this.swhtaxrate || 0) || 0;
+},
+
+get vatAmount() {
+    return this.samountIdrRaw * (this.svatgst || 0) || 0;
+},
+ get vatAmountUsd() {
+    return this.vatAmount / (parseFloat(this.srate) || 1);
+},
+get swhtaxamountusd() {
+    return this.whtaxAmount / (parseFloat(this.srate) || 1);
+},
     get totalTax() {
         return (this.vatAmount || 0) + (this.whtaxAmount || 0);
     },

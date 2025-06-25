@@ -105,7 +105,7 @@
                 </div>
                 @error('type_job')<div class="text-red-500 mt-2">{{ $message }}</div>@enderror
                 <div class="flex justify-between ">
-                    <a href="{{route('listShipment')}}" class="mt-4 px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">
+                    <a href="{{ route('viewJob', ['id' => $job->id]) }}" class="mt-4 px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700">
                         back
                     </a>
                     <button wire:click.prevent="nextStep" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
@@ -514,7 +514,380 @@
 
                 @break
                 @case('air_outbound')
-                <p>hmmm</p>
+                <div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 mb-3">
+                        <div class="flex flex-col space-y-3 rounded-md">
+                            <label>Shipments Type</label>
+                            <input type="text" value="{{ strtoupper(str_replace('_', ' ', $shipmentType_job)) }}" readonly
+                                class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0">
+                            @error('shipmentType_job')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="flex flex-col space-y-3 rounded-md">
+                            <label>Customer Code No</label>
+                            <input type="text" wire:model="shipmentCustomerCodeJob" class="text-sm font-bold block w-full focus:ring-0 focus:outline-none border-0" readonly>
+                            @error('shipmentCustomerCodeJob')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                        <div class="flex flex-col space-y-3 rounded-md w-full" wire:ignore>
+                            <label class="font-bold">Client</label>
+                            <select wire:model="shipmentClient_id" id="shipmentClient_id" class="border p-2 rounded ">
+                                <option value="">Pilih Client</option>
+                                @foreach($clients as $client)
+                                <option value="{{ $client->id }}">{{ $client->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('shipmentClient_id')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="flex flex-col space-y-3 rounded-md">
+                            <label>No. Shipments</label>
+                            <input type="text" wire:model="shipment_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('shipment_id')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="flex flex-col space-y-3 rounded-md">
+                            <label>Shipment Date</label>
+                            <input type="date" wire:model="shipmentBillLadingDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('shipmentBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                        <div class="mb-4 flex flex-col space-y-3 rounded-md">
+                            <label for="shipmentClient_address">Client Address</label>
+                            <select class="border border-gray-300 rounded-lg" name="shipmentClient_address" id="" wire:model="shipmentClient_address">
+                                @foreach($shipmentClientAddresses as $a)
+                                <option value="{{ $a->address }}">{{ $a->address }}</option>
+                                @endforeach
+                            </select>
+                            @error('shipmentClient_address')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 col-span-2 gap-3 mb-4">
+                            <div class="flex flex-col space-y-3 rounded-md w-full" wire:ignore>
+                                <label class="font-bold">Shipper</label>
+                                <select wire:model="shipmentShipper_id" id="shipmentShipper_id" class="border p-2 rounded ">
+                                    <option value=""></option>
+                                    @foreach($shippers as $s)
+                                    <option value="{{ $s->id }}">{{ $s->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('shipmentShipper_id')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="flex flex-col space-y-3 rounded-md w-full" wire:ignore>
+                                <label class="font-bold">Consignee</label>
+                                <select wire:model="shipmentConsignee_id" id="shipmentConsignee_id" class="border p-2 rounded ">
+                                    <option value=""></option>
+                                    @foreach($consignees as $c)
+                                    <option value="{{ $c->id }}">{{ $c->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('shipmentConsignee_id')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="flex flex-col space-y-3 rounded-md w-full" wire:ignore>
+                                <label class="font-bold">Notify</label>
+                                <select wire:model="shipmentNotify_id" id="shipmentNotify_id" class="border p-2 rounded ">
+                                    <option value=""></option>
+                                    @foreach($notifys as $n)
+                                    <option value="{{ $n->id }}">{{ $n->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('shipmentNotify_id')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="mb-4" wire:ignore>
+                            <label for="shipmentCarrierAirline">Airlines</label>
+                            <select name="shipmentCarrierAirline" id="shipmentCarrierAirline" wire:model="shipmentCarrierAirline" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                <option value="">Select Airlines</option>
+                                @foreach($airlines as $ai)
+                                <option value="{{ $ai->id }}">{{ $ai->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @error('shipmentCarrierAirline')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                        <div class="mb-4" wire:ignore>
+                            <label for="shipmentDeliveryAgent">Delivery Agent</label>
+                            <select name="shipmentDeliveryAgent" id="shipmentDeliveryAgent" wire:model="shipmentDeliveryAgent" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 select2">
+                                <option value="">Select agent</option>
+                                @foreach($deliveryAgent as $da)
+                                <option value="{{ $da->id }}">{{ $da->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-4" wire:ignore>
+                            <label for="shipmentCarrierAgent">Carrier Agent</label>
+                            <select name="shipmentCarrierAgent" id="shipmentCarrierAgent" wire:model="shipmentCarrierAgent" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200 select2">
+                                <option value="">Select agent</option>
+                                @foreach($carrierAgent as $ca)
+                                <option value="{{ $ca->id }}">{{ $ca->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <!-- Select Port -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 border rounded-md p-4 border-1 border-gray-300 mt-5">
+                        <div class="port-container" data-model="port_of_loading" data-radio-name="inputTypeLoading" wire:ignore>
+                            <h2 class="text-lg font-semibold">Port Of Loading / POL</h2>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Select or Input Port</label>
+                                <div class="flex items-center gap-3">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" value="select" name="inputTypeLoading" checked> Select from List
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" value="input" name="inputTypeLoading"> Enter Port Manually
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- Select Dropdown -->
+                            <div class="select-container">
+                                <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+                                <select wire:model="shipmentPort_of_loading"
+                                    class="port-select block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                    <option value="" disabled selected>Select a port...</option>
+                                </select>
+                            </div>
+                            <!-- Input Field -->
+                            <div class="input-container hidden">
+                                <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+                                <input wire:model="shipmentPort_of_loading" type="text"
+                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"
+                                    placeholder="Enter port name">
+                            </div>
+                        </div>
+
+                        <div class="port-container" data-model="port_of_final" data-radio-name="inputTypeFinal" wire:ignore>
+                            <h2 class="text-lg font-semibold">Port Of Final / POF</h2>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Select or Input Port</label>
+                                <div class="flex items-center gap-3">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" value="select" name="inputTypeFinal" checked> Select from List
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" value="input" name="inputTypeFinal"> Enter Port Manually
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- Select Dropdown -->
+                            <div class="select-container">
+                                <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+                                <select wire:model="shipmentPort_of_final"
+                                    class="port-select block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                    <option value="" disabled selected>Select a port...</option>
+                                </select>
+                            </div>
+                            <!-- Input Field -->
+                            <div class="input-container hidden">
+                                <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+                                <input wire:model="shipmentPort_of_final" type="text"
+                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"
+                                    placeholder="Enter port name">
+                            </div>
+                        </div>
+                        <div class="port-container" data-model="place_of_receipt" data-radio-name="inputTypeReceipt" wire:ignore>
+                            <h2 class="text-lg font-semibold">Place Of Receipts <span class="text-red-500">*</span></h2>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Select or Input Port</label>
+                                <div class="flex items-center gap-3">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" value="select" name="inputTypeReceipt" checked> Select from List
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" value="input" name="inputTypeReceipt"> Enter Port Manually
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- Select Dropdown -->
+                            <div class="select-container">
+                                <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+                                <select wire:model="shipmentPlace_of_receipt"
+                                    class="port-select block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                    <option value="" disabled selected>Select a port...</option>
+                                </select>
+                            </div>
+                            <!-- Input Field -->
+                            <div class="input-container hidden">
+                                <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+                                <input wire:model="shipmentPlace_of_receipt" type="text"
+                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"
+                                    placeholder="Enter port name">
+                            </div>
+                        </div>
+                        <div class="port-container" data-model="shipmentPort_of_receipt" data-radio-name="inputTypePReceipt" wire:ignore>
+                            <h2 class="text-lg font-semibold">Port Of Receipt / POR <span class="text-red-500">*</span></h2>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Select or Input Port</label>
+                                <div class="flex items-center gap-3">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" value="select" name="inputTypePReceipt" checked> Select from List
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" value="input" name="inputTypePReceipt"> Enter Port Manually
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- Select Dropdown -->
+                            <div class="select-container">
+                                <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+                                <select wire:model="shipmentPort_of_receipt"
+                                    class="port-select block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                    <option value="" disabled selected>Select a port...</option>
+                                </select>
+                            </div>
+                            <!-- Input Field -->
+                            <div class="input-container hidden">
+                                <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+                                <input wire:model="shipmentPort_of_receipt" type="text"
+                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"
+                                    placeholder="Enter port name">
+                            </div>
+                        </div>
+                        <!-- Port Of Discharge -->
+                        <div class="port-container" data-model="port_of_discharge" data-radio-name="inputTypeDischarge" wire:ignore>
+                            <h2 class="text-lg font-semibold">Port Of Discharge / POD <span class="text-red-500">*</span></h2>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Select or Input Port</label>
+                                <div class="flex items-center gap-3">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" value="select" name="inputTypeDischarge" checked> Select from List
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" value="input" name="inputTypeDischarge"> Enter Port Manually
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- Select Dropdown -->
+                            <div class="select-container">
+                                <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+                                <select wire:model="shipmentPort_of_discharge"
+                                    class="port-select block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                    <option value="" disabled selected>Select a port...</option>
+                                </select>
+                            </div>
+                            <!-- Input Field -->
+                            <div class="input-container hidden">
+                                <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+                                <input wire:model="shipmentPort_of_discharge" type="text"
+                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"
+                                    placeholder="Enter port name">
+                            </div>
+                        </div>
+                        <!-- Port Of Delivery -->
+                        <div class="port-container" data-model="place_of_delivery" data-radio-name="inputTypeDelivery" wire:ignore>
+                            <h2 class="text-lg font-semibold">Place Of Delivery <span class="text-red-500">*</span></h2>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Select or Input Port</label>
+                                <div class="flex items-center gap-3">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" value="select" name="inputTypeDelivery" checked> Select from List
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" value="input" name="inputTypeDelivery"> Enter Port Manually
+                                    </label>
+                                </div>
+                            </div>
+                            <!-- Select Dropdown -->
+                            <div class="select-container">
+                                <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+                                <select wire:model="shipmentPlace_of_delivery"
+                                    class="port-select block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                    <option value="" disabled selected>Select a port...</option>
+                                </select>
+                            </div>
+                            <!-- Input Field -->
+                            <div class="input-container hidden">
+                                <label class="block text-sm font-medium text-gray-700 p-1">Port</label>
+                                <input wire:model="shipmentPlace_of_delivery" type="text"
+                                    class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"
+                                    placeholder="Enter port name">
+                            </div>
+                        </div>
+                    </div>
+                    <div class=" grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="mb-4" hidden>
+                            <label for="shipmentOcean_vessel_feeder">Feeder Vessel</label>
+                            <input type="text" id="shipmentOcean_vessel_feeder" name="shipmentOcean_vessel_feeder" wire:model="shipmentOcean_vessel_feeder" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('shipmentOcean_vessel_feeder')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <!-- ETA -->
+                        <div class="mb-4">
+                            <label for="shipmentEstimearrival">ETA / Estimate Time Arrival</label>
+                            <input type="datetime-local" id=" shipmentEstimearrival" name="shipmentEstimearrival" wire:model="shipmentEstimearrival" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('shipmentEstimearrival')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <!-- ETD -->
+                        <div class="mb-4">
+                            <label for="shipmentEstimedelivery">ETD / Estimate Time Departure</label>
+                            <input type="datetime-local" id=" shipmentEstimedelivery" name="shipmentEstimedelivery" wire:model="shipmentEstimedelivery" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('shipmentEstimedelivery')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div>
+                            <label for="shipmentPayableAtJob">Payable at</label>
+                            <input type="text" id="shipmentPayableAtJob" name="shipmentPayableAtJob" wire:model="shipmentPayableAtJob" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            @error('shipmentPayableAtJob')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="mb-4" wire:ignore>
+                            <label for="shipmentServices_type">Services Type</label>
+                            <select name="" id="shipmentServices_type" wire:model="shipmentServices_type" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                <option value="">Select Services</option>
+                                <option value="CY/CY">CY/CY</option>
+                                <option value="CFS/CFS">CFS/CFS</option>
+                                <option value="CFS/CY">CFS/CY</option>
+                                <option value="CY/CFS">CY/CFS</option>
+                                <option value="CY/DOOR">CY/DOOR</option>
+                                <option value="DOOR/CY">DOOR/CY</option>
+                            </select>
+                        </div>
+                        <div class="mb-4" wire:ignore>
+                            <label for="shipmentIncoTerms">Inco Terms</label>
+                            <select name="shipmentIncoTerms" id="shipmentIncoTerms" wire:model="shipmentIncoTerms" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                <option value="">Select Terms</option>
+                                <option value="FOB">FOB</option>
+                                <option value="CFR">CFR</option>
+                                <option value="CIF">CIF</option>
+                                <option value="CPT">CPT</option>
+                                <option value="CIP">CIP</option>
+                                <option value="FAS">FAS</option>
+                            </select>
+                        </div>
+                        <div wire:ignore>
+                            <label for="shipmentFreightTypeJob">Freight</label>
+                            <select name="shipmentFreightTypeJob" id="shipmentFreightTypeJob" wire:model="shipmentFreightTypeJob" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                <option value=""></option>
+                                <option value="collect">Collect</option>
+                                <option value="prepaid">Prepaid</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                            <label for="shipmentRemarksJobDetailJobs">Remarks</label>
+                            <textarea type="text" id="shipmentRemarksJobDetailJobs" name="shipmentRemarksJobDetailJobs" wire:model="shipmentRemarksJobDetailJobs" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
+                        </div>
+                        <div class="" wire:ignore>
+                            <label for="shipmentCross_trade">Cross trade</label>
+                            <select name="" id="shipmentCross_trade" wire:model="shipmentCross_trade" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                <option value=""></option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 @break
                 @case('air_inbound')
 

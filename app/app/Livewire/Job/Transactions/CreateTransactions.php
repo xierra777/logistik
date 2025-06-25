@@ -171,13 +171,6 @@ class CreateTransactions extends Component
     {
         $transaction->load('job');
 
-        // Helper function to convert Indonesian formatted numbers to float
-        $indoStringToFloat = function (string $value): float {
-            $value = str_replace('.', '', $value);
-            $value = str_replace(',', '.', $value);
-            return floatval($value);
-        };
-
         // Get COA for sale and cost
         $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
         $costCoa = ChartOfAccount::find($transaction->coa_cost_id);

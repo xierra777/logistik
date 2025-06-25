@@ -2,16 +2,18 @@
 
 namespace App\Livewire\Accounting;
 
+use App\Models\ChargeSetting;
 use Livewire\Component;
 use App\Models\ChartOfAccount;
 use App\Models\Transaction;
 use App\Models\Shipment;
 use App\Models\JournalEntry;
+use App\Models\transaction\tax;
 use Illuminate\Support\Facades\DB;
 
 class Accountant extends Component
 {
-    public $coa;
+    public $coa, $tax, $chargeCoa;
     public $totaltransaksi;
     public $shipmentWithTransactionsCount;
 
@@ -19,6 +21,8 @@ class Accountant extends Component
     {
         $this->coa = ChartOfAccount::count();
         $this->totaltransaksi = JournalEntry::count();
+        $this->chargeCoa = ChargeSetting::count();
+        $this->tax = tax::count();
     }
     public function getCombinedLineData()
     {

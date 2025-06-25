@@ -15,7 +15,7 @@
 </head>
 
 
-<body class="font-sans antialiased overflow-x-auto max-h-3 max-h overflow-y-auto
+<body class="font-sans antialiased overflow-x-auto max-h-3 max-h overflow-y-auto 
     [&::-webkit-scrollbar]:w-2
     [&::-webkit-scrollbar-track]:rounded-full
     [&::-webkit-scrollbar-track]:bg-gray-100

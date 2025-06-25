@@ -19,11 +19,20 @@
             </td>
         </tr>
         <tr class>
-            <td class="font-bold">ID Shipments:</td>
-            <td></td>
+            <td class="font-bold">Show Exchange Rate:</td>
+            <td class="border-gray-900 ">
+                <input
+                    type="checkbox"
+                    wire:model="showExchangeRate"
+                    class="w-full h-4 rounded border-gray-300 text-blue-600 bg-gray-100 
+               focus:ring-blue-500 focus:ring-2 
+               dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 
+               hover:scale-105 transition-transform duration-150 ease-in-out
+               cursor-pointer">
+            </td>
             <td class="font-bold">Currency:</td>
             <td>
-                <select wire:model="finalCurrency" class="w-full px-3 py-2 border rounded-lg">
+                <select wire:model.live="finalCurrency" class="w-full px-3 py-2 border rounded-lg">
                     <option value="IDR">Total dalam IDR</option>
                     <option value="USD">Total dalam USD</option>
                 </select>
@@ -38,6 +47,16 @@
     <table class="w-full border text-sm mb-6">
         <thead class="bg-gray-200">
             <tr>
+                <th class="p-2 border text-left">
+                    <label class="inline-flex items-center space-x-2 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            wire:click="selectAllTransactions"
+                            class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 transition duration-150">
+                        <span class="text-sm text-gray-700">Select All</span>
+                    </label>
+                </th>
+
                 <th class="p-2 border">Charge</th>
                 <th class="p-2 border">Qty</th>
                 <th class="p-2 border">Currency</th>
@@ -50,6 +69,9 @@
         <tbody>
             @foreach($transactions as $transaction)
             <tr>
+                <td class="p-2 border text-center">
+                    <input type="checkbox" wire:model="selectedTransactionIds" value="{{ $transaction->id }}" class="form-checkbox text-blue-600 rounded-md">
+                </td>
                 <td class="p-2 border">{{ $transaction->description }}</td>
                 <td class="p-2 border">{{ $transaction->quantity }}</td>
                 <td class="p-2 border">{{ $transaction->scurrency }}</td>
@@ -70,6 +92,7 @@
         </tbody>
         <tfoot>
             <tr class="font-bold">
+                <td></td>
                 <td colspan="3" class="p-2 border text-right">Total</td>
                 <td class="p-2 border">
                     {{ number_format($transactions->sum('samountidr'), 2, ',', '.') }}

@@ -185,28 +185,28 @@
                     <tbody class="">
                         @foreach ($transactions as $transaction)
                         <tr class="bg-white dark:bg-neutral-900 align-top">
-                            <td class=" border-r border-l border-gray-900 text-center">{{ $transaction->description }}</td>
-                            <td class="px-4 border-r border-l border-gray-900 text-center">{{ $transaction->quantity }}</td>
-                            <td class="px-4 border-r border-l border-gray-900 text-center">{{ $transaction->scurrency }}</td>
-                            <td class="px-4 border-r border-l border-gray-900 text-center">@if($transaction->scurrency == 'USD')
+                            <td class=" border border-gray-900 text-center">{{ $transaction->description }}</td>
+                            <td class="px-4 border border-gray-900 text-center">{{ $transaction->quantity }}</td>
+                            <td class="px-4 border border-gray-900 text-center">{{ $finalCurrency }}</td>
+                            <td class="px-4 border border-gray-900 text-center">@if($showExchangeRate == 'USD')
                                 {{ $transaction->srate }}
                                 @endif
                             </td>
-                            <td class="px-2 border-r border-l border-gray-900 text-xs">
+                            <td class="px-2 border border-gray-900 text-xs">
                                 <div class="flex justify-between w-full">
                                     <span class="text-left">
                                         {{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}
                                     </span>
                                     <span class="text-right">
-                                        {{ $finalCurrency == 'IDR'
-                                    ? number_format($transaction->samountidr, 2, '.', ',')
-                                    : number_format($transaction->sfcyamount, 2, '.', ',') }}
+                                        {{ $finalCurrency == 'USD'
+                                    ? number_format($transaction->sfcyamount, 2, '.', ',')
+                                    : number_format($transaction->samountidr, 2, '.', ',') }}
                                     </span>
                                 </div>
                             </td>
 
                             </td>
-                            <td class="px-2 border-r border-l border-gray-900 text-xs">
+                            <td class="px-2 border border-gray-900 text-xs">
                                 <div class="flex justify-between w-full">
                                     <span class="text-left"> {{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}
                                     </span>
@@ -218,7 +218,7 @@
                                 </div>
                             </td>
                             </td>
-                            <td class="px-2 border-r border-l border-gray-900 text-center text-xs">
+                            <td class="px-2 border border-gray-900 text-center text-xs">
                                 @if (!is_null($transaction->svatgstamount) || !is_null($transaction->svatgstusd))
                                 <div class="flex justify-between w-full">
                                     <span class="text-left">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
@@ -232,7 +232,7 @@
                                 &nbsp; {{-- biar tetap ada spacing kalau kosong --}}
                                 @endif
                             </td>
-                            <td class="px-2 border-r border-l border-gray-900 text-center text-xs align-top">
+                            <td class="px-2 border border-gray-900 text-center text-xs align-top">
                                 @if (($transaction->swhtaxamount ?? 0) > 0 || ($transaction->shwtaxrateusd ?? 0) > 0)
                                 <div class="flex justify-between w-full">
                                     <span class="text-left">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
@@ -246,7 +246,7 @@
                                 &nbsp; {{-- agar cell tetap terisi dan layout stabil --}}
                                 @endif
                             </td>
-                            <td class="px-2 border-r border-l border-gray-900 text-center text-xs align-top">
+                            <td class="px-2 border border-gray-900 text-center text-xs align-top">
                                 <div class="flex justify-between w-full">
                                     <span class="text-left">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
                                     <span class="text-right">

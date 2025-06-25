@@ -721,7 +721,8 @@
         </div>
 
         <div class="mt-3 p-1 gap-2 flex flex-row ">
-            <button class="bg-blue-600 text-white rounded-lg py-1 px-5 hover:scale-105"> Add Shipments</button>
+            <a href="{{route('viewJobCreateShipment', ['id' => $job->id])}}" onclick="saveScrollPosition()"
+                class="bg-blue-600 text-white rounded-lg py-1 px-5 hover:scale-105"> Add Shipments</a>
             <div x-data="{ openDetachAssigned: false }" @close-detach-assigned.window="openDetachAssigned = false">
                 <button @click="openDetachAssigned = true"
                     class="bg-red-600 text-white rounded-lg py-1 px-5 hover:scale-105 transition-transform">
@@ -755,6 +756,7 @@
                                         <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">No</th>
                                         <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left"></th>
                                         <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Shipment Id</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Type Job</th>
                                         <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">POL</th>
                                         <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">POD</th>
                                         <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">ETA</th>
@@ -770,6 +772,8 @@
                                                 class="form-checkbox text-red-600 rounded-md">
                                         </td>
                                         <td class="px-4 py-2 text-left">{{ $s->shipment_id }}</td>
+                                        <td class="px-4 py-2 text-left whitespace-nowrap"> {{ strtoupper(str_replace('_', ' ', $s->shipmentsTypeJob)) }}
+                                        </td>
                                         <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_loading'] ?? '-' }}</td>
                                         <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_discharge'] ?? '-' }}</td>
                                         <td class="px-4 py-2 text-left">
@@ -958,7 +962,7 @@
                         <th scope="col" class="px-6 py-3 bg-orange-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Sale
                         </th>
-                        <th scope="col" class="px-6 py-3 bg-orange-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col" class="px-6 py-3 bg-orange-500 text-xs whitespace-nowrap font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Amount (IDR)
                         </th>
                         <th scope="col" class="px-6 py-3 bg-orange-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
@@ -970,7 +974,7 @@
                         <th scope="col" class="px-6 py-3 bg-blue-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Cost
                         </th>
-                        <th scope="col" class="px-6 py-3 bg-blue-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col" class="px-6 py-3 bg-blue-500 text-xs whitespace-nowrap font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Amount (IDR)
                         </th>
                         <th scope="col" class="px-6 py-3 bg-blue-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
@@ -1007,8 +1011,8 @@
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->transactionClient->name ?? ''}}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->quantity }} x {{$transaction->samount_qty}}x{{$transaction->srate}}
+                        <td scope="col" class="px-6 py-4  text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $transaction->quantity }} x {{number_format($transaction->sfcyamount, 2, ',', '.')}} x {{$transaction->srate}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ number_format($transaction->samountidr, 2, ',', '.') }}
@@ -1019,8 +1023,9 @@
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->transactionVendor->name ?? ''}}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->quantity }} x {{$transaction->camount_qty}}x{{$transaction->crate}}
+                        <td scope="col" class="px-6 py-4  text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $transaction->quantity }} x {{number_format($transaction->cfcyamount, 2, ',', '.')}}
+                            x {{$transaction->crate}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{number_format($transaction->camountidr, 2, ',', '.')}}
@@ -1236,3 +1241,73 @@
 </script>
 @endscript
 @endpush
+
+<script>
+    // Fungsi untuk restore scroll position
+    function restoreScrollPosition() {
+        const savedPosition = sessionStorage.getItem('scrollPosition');
+        if (savedPosition) {
+            const scrollTo = parseInt(savedPosition);
+
+            // Cek apakah halaman sudah cukup tinggi untuk di-scroll
+            const checkAndScroll = () => {
+                if (document.body.scrollHeight > scrollTo) {
+                    window.scrollTo({
+                        top: scrollTo,
+                        behavior: 'auto'
+                    });
+                    sessionStorage.removeItem('scrollPosition');
+                    return true;
+                }
+                return false;
+            };
+
+            // Coba scroll langsung
+            if (!checkAndScroll()) {
+                // Kalau belum bisa, tunggu sebentar lagi
+                setTimeout(() => {
+                    if (!checkAndScroll()) {
+                        // Terakhir, tunggu sampai semua image/content load
+                        const images = document.querySelectorAll('img');
+                        let loadedImages = 0;
+
+                        if (images.length === 0) {
+                            checkAndScroll();
+                        } else {
+                            images.forEach(img => {
+                                if (img.complete) {
+                                    loadedImages++;
+                                } else {
+                                    img.onload = () => {
+                                        loadedImages++;
+                                        if (loadedImages === images.length) {
+                                            checkAndScroll();
+                                        }
+                                    };
+                                }
+                            });
+
+                            if (loadedImages === images.length) {
+                                checkAndScroll();
+                            }
+                        }
+                    }
+                }, 200);
+            }
+        }
+    }
+
+    // Jalankan setelah DOM ready
+    document.addEventListener('DOMContentLoaded', restoreScrollPosition);
+
+    // Backup: jalankan juga setelah window load
+    window.addEventListener('load', function() {
+        // Cek lagi kalau belum ter-scroll
+        setTimeout(restoreScrollPosition, 100);
+    });
+
+    // Simpan scroll position sebelum navigasi
+    function saveScrollPosition() {
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+    }
+</script>

@@ -29,7 +29,7 @@ class PurchaseInvoice extends Component
         }
 
         // Ambil daftar vendor dari transaksi yang sudah ada
-        $this->vendors = Customer::whereIn('id', Transaction::whereNotNull('vendor_id')->pluck('vendor_id'))->get();
+        $this->vendors = Customer::whereIn('id', Transaction::whereNotNull('cvendor')->pluck('cvendor'))->get();
         $this->containers = shipmentContainers::all();
 
         if ($shipmentId) {
@@ -301,7 +301,7 @@ class PurchaseInvoice extends Component
     public function loadTransactions()
     {
         $this->transactions = ($this->shipmentId && $this->vendor_id)
-            ? Transaction::where('shipment_id', $this->shipmentId)->where('vendor_id', $this->vendor_id)->get()
+            ? Transaction::where('id_shipment', $this->shipmentId)->where('cvendor', $this->vendor_id)->get()
             : collect();
     }
 

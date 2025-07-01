@@ -117,7 +117,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="py-12 text-center">
+                            <td colspan="8" class="py-12 text-center">
                                 <div class="flex flex-col items-center justify-center max-w-md mx-auto">
                                     <img src="{{ asset('./images/nodata.svg') }}" alt="No data illustration" class="w-64 h-48 mb-4 opacity-75 dark:opacity-50">
                                     <p class="text-gray-600 dark:text-neutral-300 text-lg font-medium mb-2">No customers found!</p>

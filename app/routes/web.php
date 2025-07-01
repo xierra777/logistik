@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\CustomerOutstandingDebts;
 use Illuminate\Support\Facades\Route;
 
 use App\Livewire\Accounting\Accountant;
@@ -46,6 +47,8 @@ Route::get('/dashboard', Dashboard::class)->middleware([
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
+
+Route::get('customer-outstanding-debts', CustomerOutstandingDebts::class)->middleware('auth')->name('customerDebt');
 Route::view('shipments', 'shipments.index',)
     ->middleware(['auth', 'verified'])
     ->name('shipments');

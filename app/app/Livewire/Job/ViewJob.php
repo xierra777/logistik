@@ -147,11 +147,17 @@ class ViewJob extends Component
             'containers' => $container,
             'created_by' => Auth::user()->id
         ]);
+        $this->resetContainerFields();
+        $this->dispatch('close-create-container');
+    }
+    public function resetContainerFields()
+    {
         $this->reset([
             'containerType',
-            'noOfPackages',
             'containerReleaseNo',
+            'containerNo',
             'containerReleaseDate',
+            'noOfPackages',
             'typeOfPackages',
             'grossWeight',
             'typeOfGrossWeight',
@@ -160,7 +166,6 @@ class ViewJob extends Component
             'volume',
             'chargableWeight',
             'containerRemarks',
-            'containerNo',
             'containerSealNo',
             'noOfPallet',
             'netOfWeight',
@@ -168,9 +173,8 @@ class ViewJob extends Component
             'totalWeight',
             'typeOfTotalWeight',
             'hsCode',
-            'hsCodeDesc'
+            'hsCodeDesc',
         ]);
-        $this->dispatch('close-create-container');
     }
     public function getOrganizationsProperty()
     {

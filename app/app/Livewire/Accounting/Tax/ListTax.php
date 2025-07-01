@@ -9,12 +9,13 @@ use Illuminate\Support\Facades\Auth;
 
 class ListTax extends Component
 {
-    public $name, $type, $rate, $context, $coa_id, $taxAccount, $is_active = true;
+    public $name, $description, $type, $rate, $context, $coa_id, $taxAccount, $is_active = true;
     public function save()
     {
         tax::create([
             'name' => $this->name,
             'type' => $this->type,
+            'description' => $this->description,
             'rate' => $this->rate,
             'context' => $this->context,
             'coa_id' => $this->coa_id,

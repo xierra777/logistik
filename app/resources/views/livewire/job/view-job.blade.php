@@ -894,7 +894,7 @@
                 <span class="text-red-700">...</span>
             </p>
             <div class="flex justify-end p-1 ">
-                <div x-data="{ open: false }" @close-modal.window="open = false"
+                <div x-data="{ open: false }" @keydown.escape.window="open = false" @close-modal.window="open = false"
                     x-ref="modalContent">
                     <div class=" flex justify-end mb-4 p-4">
                         <button
@@ -1036,7 +1036,7 @@
                         <td scope="col" class="px-6 py-4 uppercase whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->freight}}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium font-bold {{ $transaction->gp < 0 ? 'text-red-500' : 'text-green-700' }}">
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium font-bold {{ $transaction->SamountgpFormatted < 0 ? 'text-red-500' : 'text-green-700' }}">
                             {{$transaction->SamountgpFormatted}}
                         </td>
                     </tr>
@@ -1132,25 +1132,51 @@
                 placeholder: placeholder,
                 allowClear: true,
                 width: '100%',
-                theme: 'tailwindcss-3', // Use default theme for better compatibility
-                dropdownParent: $el.closest('.fixed'), // Attach to modal container
-                dropdownAutoWidth: true,
+                theme: 'tailwindcss-3',
+                dropdownParent: $el.closest('.fixed'),
+                dropdownAutoWidth: false,
                 escapeMarkup: function(markup) {
                     return markup;
-                }
+                },
+                // Prevent Select2 from focusing on search input
+                selectOnClose: false,
+                // Prevent dropdown from closing modal
+                closeOnSelect: true
             });
 
-            // Handle Select2 change events
-            $el.off('select2:select.container select2:unselect.container')
-                .on('select2:select.container select2:unselect.container', function(e) {
+            // IMPORTANT: Remove all previous event handlers to prevent duplicates
+            $el.off('select2:select.container select2:unselect.container select2:open.container select2:close.container');
+
+            // Handle Select2 events with debouncing to prevent multiple triggers
+            let updateTimeout;
+            $el.on('select2:select.container select2:unselect.container', function(e) {
+                e.stopPropagation(); // Prevent event bubbling
+
+                clearTimeout(updateTimeout);
+                updateTimeout = setTimeout(() => {
                     const value = $(this).val();
                     if (typeof $wire !== 'undefined' && $wire[model] !== undefined) {
-                        $wire.set(model, value);
+                        // Use Livewire's set method without triggering full refresh
+                        $wire.set(model, value, false); // false = don't trigger refresh
                     }
                     console.log(`${model} changed to:`, value);
-                });
+                }, 100);
+            });
 
-            // Sync with Livewire property if it exists
+            // Prevent modal from closing when dropdown opens
+            $el.on('select2:open.container', function(e) {
+                e.stopPropagation();
+                // Ensure dropdown is positioned correctly
+                const dropdown = $('.select2-dropdown');
+                // dropdown.css('z-index', '9999');
+            });
+
+            // Handle dropdown close
+            $el.on('select2:close.container', function(e) {
+                e.stopPropagation();
+            });
+
+            // Sync with Livewire property if it exists (without triggering events)
             if (typeof $wire !== 'undefined' && $wire[model] !== undefined) {
                 $el.val($wire[model]).trigger('change.select2');
             }
@@ -1159,23 +1185,37 @@
 
     // Initialize when document is ready
     $(document).ready(function() {
-        // Initialize Select2 when modal opens
-        $(document).on('click', '[x-on\\:click="openCreateContainer = true"]', function() {
+        // Initialize Select2 when modal opens with proper timing
+        $(document).on('click', '[x-on\\:click="openCreateContainer = true"]', function(e) {
+            e.stopPropagation();
+            // Wait for modal to fully render
             setTimeout(function() {
-                window.initContainerSelect2();
-            }, 300); // Wait for modal animation
+                if ($('.fixed').is(':visible')) {
+                    window.initContainerSelect2();
+                }
+            }, 400); // Increased delay for better reliability
         });
 
-        // Alternative method using Alpine.js event
+        // Enhanced Alpine.js integration
         document.addEventListener('alpine:init', () => {
             Alpine.data('containerForm', () => ({
                 openCreateContainer: false,
                 init() {
                     this.$watch('openCreateContainer', (value) => {
                         if (value) {
-                            setTimeout(() => {
-                                window.initContainerSelect2();
-                            }, 250);
+                            // Delay initialization until modal is fully rendered
+                            this.$nextTick(() => {
+                                setTimeout(() => {
+                                    window.initContainerSelect2();
+                                }, 300);
+                            });
+                        } else {
+                            // Clean up Select2 when modal closes
+                            this.$nextTick(() => {
+                                $('.select2-hidden-accessible').each(function() {
+                                    $(this).select2('destroy');
+                                });
+                            });
                         }
                     });
                 }
@@ -1183,65 +1223,118 @@
         });
     });
 
-    // Livewire hooks
+    // Enhanced Livewire hooks with better error handling
     if (typeof Livewire !== 'undefined') {
-        // Reinitialize after Livewire updates
-        Livewire.hook('message.processed', () => {
+        // Preserve Select2 state during Livewire updates
+        let preservedValues = {};
+        let isFormReset = false;
+
+        // Before Livewire request (preserve state)
+        Livewire.hook('message.sent', (message, component) => {
+            // Check if this is a form reset/creation request
+            isFormReset = message.updates.some(update =>
+                update.type === 'callMethod' &&
+                (update.payload.method === 'createContainer' ||
+                    update.payload.method === 'resetContainerFields' ||
+                    update.payload.method === 'cancelContainer')
+            );
+
+            if (!isFormReset) {
+                preservedValues = {};
+                ['#containerType', '#typeOfPackages', '#typeOfGrossWeight',
+                    '#typeOfVolumeWeight', '#typeNetOfWeight', '#typeOfTotalWeight'
+                ].forEach(sel => {
+                    const $el = $(sel);
+                    if ($el.length && $el.hasClass('select2-hidden-accessible')) {
+                        preservedValues[sel] = $el.val();
+                    }
+                });
+            }
+        });
+
+        // After Livewire response (restore state or reset)
+        Livewire.hook('message.processed', (message, component) => {
             setTimeout(() => {
-                window.initContainerSelect2();
-            }, 100);
+                // Only reinitialize if modal is still open
+                if ($('.fixed').is(':visible')) {
+                    window.initContainerSelect2();
+
+                    if (isFormReset) {
+                        // Reset all Select2 values to empty
+                        ['#containerType', '#typeOfPackages', '#typeOfGrossWeight',
+                            '#typeOfVolumeWeight', '#typeNetOfWeight', '#typeOfTotalWeight'
+                        ].forEach(sel => {
+                            const $el = $(sel);
+                            if ($el.length && $el.hasClass('select2-hidden-accessible')) {
+                                $el.val(null).trigger('change.select2');
+                            }
+                        });
+                    } else {
+                        // Restore preserved values
+                        Object.keys(preservedValues).forEach(sel => {
+                            const $el = $(sel);
+                            if ($el.length && preservedValues[sel]) {
+                                $el.val(preservedValues[sel]).trigger('change.select2');
+                            }
+                        });
+                    }
+                }
+                preservedValues = {};
+                isFormReset = false;
+            }, 200);
         });
 
         // Handle specific element updates
         Livewire.hook('element.updated', (el, component) => {
             if (el.matches('select') || el.querySelector('select')) {
                 setTimeout(() => {
-                    window.initContainerSelect2();
-                }, 100);
+                    if ($('.fixed').is(':visible')) {
+                        window.initContainerSelect2();
+                    }
+                }, 150);
             }
         });
 
-        // Before Livewire request (cleanup)
-        Livewire.hook('message.sent', () => {
-            // Preserve Select2 values before Livewire processes
-            const values = {};
-            ['#containerType', '#typeOfPackages', '#typeOfGrossWeight',
-                '#typeOfVolumeWeight', '#typeNetOfWeight', '#typeOfTotalWeight'
-            ].forEach(sel => {
-                const $el = $(sel);
-                if ($el.length && $el.hasClass('select2-hidden-accessible')) {
-                    values[sel] = $el.val();
-                }
-            });
-            window.tempSelect2Values = values;
-        });
-
-        // After Livewire response (restore)
-        Livewire.hook('message.received', () => {
+        // Listen for close-create-container event to reset Select2
+        Livewire.on('close-create-container', () => {
             setTimeout(() => {
-                if (window.tempSelect2Values) {
-                    Object.keys(window.tempSelect2Values).forEach(sel => {
-                        const $el = $(sel);
-                        if ($el.length && window.tempSelect2Values[sel]) {
-                            $el.val(window.tempSelect2Values[sel]).trigger('change.select2');
-                        }
-                    });
-                    delete window.tempSelect2Values;
-                }
-            }, 150);
+                ['#containerType', '#typeOfPackages', '#typeOfGrossWeight',
+                    '#typeOfVolumeWeight', '#typeNetOfWeight', '#typeOfTotalWeight'
+                ].forEach(sel => {
+                    const $el = $(sel);
+                    if ($el.length && $el.hasClass('select2-hidden-accessible')) {
+                        $el.val(null).trigger('change.select2');
+                    }
+                });
+            }, 100);
         });
     }
 
-    // Manual initialization function (call this if needed)
+    // Manual initialization function with safety checks
     window.forceInitContainerSelect2 = () => {
         setTimeout(() => {
-            window.initContainerSelect2();
+            if ($('.fixed').is(':visible')) {
+                window.initContainerSelect2();
+            }
         }, 100);
     };
+
+    // Global click handler to prevent modal closing
+    $(document).on('click', '.select2-dropdown', function(e) {
+        e.stopPropagation();
+    });
+
+    // Prevent modal background clicks when Select2 is open
+    $(document).on('select2:open', function(e) {
+        $('.fixed.inset-0.bg-gray-500').css('pointer-events', 'none');
+    });
+
+    $(document).on('select2:close', function(e) {
+        $('.fixed.inset-0.bg-gray-500').css('pointer-events', 'auto');
+    });
 </script>
 @endscript
 @endpush
-
 <script>
     // Fungsi untuk restore scroll position
     function restoreScrollPosition() {

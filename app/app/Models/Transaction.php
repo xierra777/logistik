@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\transaction\tax;
 use Illuminate\Database\Eloquent\Model;
 
 class Transaction extends Model
@@ -82,7 +83,22 @@ class Transaction extends Model
     {
         return $this->belongsTo(Customer::class, 'sclient');
     }
-
+    public function saleVat()
+    {
+        return $this->belongsTo(tax::class, 'svatgst');
+    }
+    public function costVat()
+    {
+        return $this->belongsTo(tax::class, 'cvatgst');
+    }
+    public function saleWht()
+    {
+        return $this->belongsTo(tax::class, 'swhtaxrate');
+    }
+    public function costWht()
+    {
+        return $this->belongsTo(tax::class,  'cwhtaxrate');
+    }
     public function shipment()
     {
         return $this->belongsTo(TShipments::class, 'id_shipment');

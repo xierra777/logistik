@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class tax extends Model
 {
-    protected $fillable = ['name', 'type', 'rate', 'context', 'coa_id', 'is_active', 'created_by', 'updated_by'];
+    protected $fillable = ['name', 'type', 'rate', 'context', 'coa_id', 'is_active', 'description', 'created_by', 'updated_by'];
     public function coaAccount()
     {
         return $this->belongsTo(ChartOfAccount::class, 'coa_id');

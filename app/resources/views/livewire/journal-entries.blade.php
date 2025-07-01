@@ -28,8 +28,17 @@
             @endforeach
             <tr class="font-bold bg-gray-200">
                 <td class="border px-4 py-2 text-right" colspan="3">Total</td>
-                <td class="border px-4 py-2 text-right">{{ number_format($totalDebit, 2, ',', '.') }}</td>
-                <td class="border px-4 py-2 text-right">{{ number_format($totalCredit, 2, ',', '.') }}</td>
+                <td class="border px-4 py-2 text-right {{ $totalDebit != $totalCredit ? 'bg-red-200 text-red-700' : '' }}">
+                    {{ number_format($totalDebit, 2, ',', '.') }}
+                </td>
+                <td class="border px-4 py-2 text-right {{ $totalDebit != $totalCredit ? 'bg-red-200 text-red-700' : '' }}">
+                    {{ number_format($totalCredit, 2, ',', '.') }}
+                </td>
+                @if($totalDebit != $totalCredit)
+                <td class="border px-4 py-2 text-red-700 font-semibold">Tidak Imbang</td>
+                @else
+                <td class="border px-4 py-2"></td>
+                @endif
             </tr>
         </tbody>
     </table>

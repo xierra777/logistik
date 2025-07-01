@@ -14,10 +14,15 @@ use App\Models\ChartOfAccount;
 use App\Models\jobContainer;
 use App\Models\JournalEntry;
 use App\Models\TJob;
+use App\Models\transaction\tax;
 
 class CreateTransactions extends Component
 {
     public $chargeCoa;
+
+    public $taxRates = [];
+    public $taxData = [];
+    public $taxRatesWht = [];
 
     public $jobId;
     public $job;
@@ -48,14 +53,14 @@ class CreateTransactions extends Component
     {
         $this->jobId = $id;
         $job = TJob::with(['client'])->find($id);
-
         $this->clients = collect([
             $job->client,
         ])->filter()->unique();
-        if (!$job) {
-            throw new \Exception("Job with ID {$id} not found");
-        }
+        $taxes = tax::where('is_active', '1')->get(); // asumsikan ada kolom 'id', 'name', 'rate'
 
+        $this->taxRates = $taxes->where('type', 'vat')->pluck('rate', 'id')->toArray(); // untuk dropdown
+        $this->taxRatesWht = $taxes->where('type', 'wht')->pluck('rate', 'id')->toArray(); // untuk dropdown
+        $this->taxData = $taxes->pluck('rate', 'id')->toArray(); // untuk Alpine.js
         $customers = Customer::orderBy('name')->get();
 
         $this->chargeCoa = ChargeSetting::get();
@@ -100,11 +105,37 @@ class CreateTransactions extends Component
             $this->coaCostId = null;
         }
     }
+    protected function rules()
+    {
+        return [
+            // 'sclient' => Customer::exists('name'),
+            // Add other validation rules as needed, for example:
+            'charge' => 'required',
+            'quantity' => 'required|numeric|min:1',
+            // 'scurrency' => 'required',
+            // etc.
+        ];
+    }
 
     // === Save Transaction ===
     public function save()
     {
-
+        $this->validate();
+        if ($this->getErrorBag()->isNotEmpty()) {
+            $this->dispatch('scroll-to-error');
+        }
+        if ($this->svatgst == 0 || empty($this->svatgst)) {
+            $this->svatgst = null;
+        }
+        if ($this->cvatgst == 0 || empty($this->cvatgst)) {
+            $this->cvatgst = null;
+        }
+        if ($this->swhtaxrate == 0 || empty($this->swhtaxrate)) {
+            $this->swhtaxrate = null;
+        }
+        if ($this->cwhtaxrate == 0 || empty($this->cwhtaxrate)) {
+            $this->cwhtaxrate = null;
+        }
         $transaction = Transaction::create([
             'id_job' => $this->jobId,
             'charge' => $this->charge,
@@ -178,7 +209,8 @@ class CreateTransactions extends Component
         // Create sale journal entry
         if ($transaction->samountidr && $saleCoa) {
             $saleAmount = $transaction->samountidr;
-            $totalSale = $saleAmount * $transaction->quantity;
+            $vatAmount = $transaction->svatgstamount;
+            $totalSale = $saleAmount + $vatAmount - $transaction->swhtaxamount;
 
             // Jurnal Piutang (A/R) - Debit
             JournalEntry::create([
@@ -192,13 +224,42 @@ class CreateTransactions extends Component
                 'date' => now(),
                 'created_by' => Auth::id(),
             ]);
+            // Jurnal VAT (kalau ada)
+            if ($vatAmount > 0 && $transaction->saleVat && $transaction->saleVat->coa_id) {
+                JournalEntry::create([
+                    'transaction_id' => $transaction->id,
+                    'coa_id' => $transaction->saleVat->coa_id, // VAT Output
+                    'credit' => $vatAmount,
+                    'debit' => 0,
+                    'description' => "PPN dari transaksi #{$transaction->job->job_id} - {$transaction->description}",
+                    'transactionable_type' => get_class($transaction),
+                    'transactionable_id' => $transaction->id,
+                    'date' => now(),
+                    'created_by' => Auth::id(),
+                ]);
+            }
+
+            $whtAmount = $transaction->swhtaxamount;
+
+            if ($whtAmount > 0 && $transaction->saleWht && $transaction->saleWht->coa_id) {
+                JournalEntry::create([
+                    'transaction_id' => $transaction->id,
+                    'coa_id' => $transaction->saleWht->coa_id, // COA WHT Receivable
+                    'debit' => $whtAmount,
+                    'credit' => 0,
+                    'description' => "PPh 23 dari transaksi #{$transaction->job->job_id} - {$transaction->description}",
+                    'transactionable_type' => get_class($transaction),
+                    'transactionable_id' => $transaction->id,
+                    'date' => now(),
+                    'created_by' => Auth::id(),
+                ]);
+            }
 
             // Jurnal Pendapatan (Revenue) - Kredit
             JournalEntry::create([
                 'transaction_id' => $transaction->id,
                 'coa_id' => $saleCoa->id,
-                'debit' => $saleCoa->term_type === 'DR' ? $totalSale : 0,
-                'credit' => $saleCoa->term_type === 'CR' ? $totalSale : 0,
+                'credit' =>  $saleAmount,
                 'description' => "Sale transaction #{$transaction->reference_type} ({$transaction->job->job_id}) - {$transaction->description}",
                 'transactionable_type' => $transaction->reference_type,
                 'transactionable_id' => $transaction->id,
@@ -209,13 +270,12 @@ class CreateTransactions extends Component
 
         if ($transaction->camountidr && $costCoa) {
             $costAmount = $transaction->camountidr;
-            $totalCost = $costAmount * $transaction->quantity;
+            $cvatAmount = $transaction->cvatgstamount;
+            $totalCost = $costAmount + $cvatAmount - $transaction->cwhtaxamount;
 
-            // Jurnal Hutang (A/P) - Kredit
             JournalEntry::create([
                 'transaction_id' => $transaction->id,
-                'coa_id' => $transaction->transactionVendor->coa_id, // COA A/P untuk vendor
-                'debit' => 0,
+                'coa_id' => $transaction->transactionVendor->coa_id, // COA A/R untuk customer
                 'credit' => $totalCost,
                 'description' => "Hutang dari transaksi #{$transaction->transactionVendor->name} ({$transaction->job->job_id}) - {$transaction->description}",
                 'transactionable_type' => get_class($transaction),
@@ -223,13 +283,40 @@ class CreateTransactions extends Component
                 'date' => now(),
                 'created_by' => Auth::id(),
             ]);
+            // Jurnal VAT (kalau ada)
+            if ($cvatAmount > 0 && $transaction->costVat && $transaction->costVat->coa_id) {
+                JournalEntry::create([
+                    'transaction_id' => $transaction->id,
+                    'coa_id' => $transaction->costVat->coa_id, // VAT Output
+                    'debit' => $cvatAmount,
+                    'description' => "PPN dari transaksi #{$transaction->job->job_id} - {$transaction->description}",
+                    'transactionable_type' => get_class($transaction),
+                    'transactionable_id' => $transaction->id,
+                    'date' => now(),
+                    'created_by' => Auth::id(),
+                ]);
+            }
 
-            // Jurnal Biaya (Expense) - Debit
+            $cwhtAmount = $transaction->cwhtaxamount;
+
+            if ($cwhtAmount > 0 && $transaction->costWht && $transaction->costWht->coa_id) {
+                JournalEntry::create([
+                    'transaction_id' => $transaction->id,
+                    'coa_id' => $transaction->costWht->coa_id, // COA WHT Receivable
+                    'credit' => $cwhtAmount,
+                    'description' => "PPh 23 dari transaksi #{$transaction->job->job_id} - {$transaction->description}",
+                    'transactionable_type' => get_class($transaction),
+                    'transactionable_id' => $transaction->id,
+                    'date' => now(),
+                    'created_by' => Auth::id(),
+                ]);
+            }
+
+            // Jurnal Pendapatan (Expenses) - Kredit
             JournalEntry::create([
                 'transaction_id' => $transaction->id,
                 'coa_id' => $costCoa->id,
-                'debit' => $costCoa->term_type === 'DR' ? $totalCost : 0,
-                'credit' => $costCoa->term_type === 'CR' ? $totalCost : 0,
+                'debit' =>  $costAmount,
                 'description' => "Cost transaction #{$transaction->reference_type} ({$transaction->job->job_id}) - {$transaction->description}",
                 'transactionable_type' => $transaction->reference_type,
                 'transactionable_id' => $transaction->id,

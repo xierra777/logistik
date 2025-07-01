@@ -37,12 +37,12 @@ return new class extends Migration
             $table->decimal('sfcyamount', 16, 2)->nullable();
             $table->decimal('samountidr', 16, 2)->nullable();
             $table->string('sdrcr', 5)->nullable(); // debit / credit
-            $table->decimal('svatgst', 5, 2)->nullable();
+            $table->foreignId('svatgst')->nullable()->constrained('taxes')->nullOnDelete();
             $table->decimal('staxableamount', 16, 2)->nullable();
             $table->decimal('svatgstamount', 16, 2)->nullable();
             $table->decimal('shwtaxrateusd', 16, 2)->nullable();
             $table->decimal('svatgstusd', 16, 2)->nullable();
-            $table->decimal('swhtaxrate', 5, 2)->nullable();
+            $table->foreignId('swhtaxrate')->nullable()->constrained('taxes')->nullOnDelete();
             $table->decimal('swhtaxamount', 16, 2)->nullable();
             $table->text('sremarks')->nullable();
             $table->string('sgrossprofit')->nullable();
@@ -58,13 +58,13 @@ return new class extends Migration
             $table->string('cincludedtax')->nullable();
             $table->decimal('cfcyamount', 16, 2)->nullable();
             $table->decimal('camountidr', 16, 2)->nullable();
-            $table->decimal('cvatgst', 5, 2)->nullable();
+            $table->foreignId('cvatgst')->nullable()->constrained('taxes')->nullOnDelete();
             $table->decimal('cvatgstamount', 16, 2)->nullable();
             $table->decimal('ctaxableamount', 16, 2)->nullable();
             $table->text('cremarks')->nullable();
             $table->decimal('chwtaxrateusd', 16, 2)->nullable();
             $table->decimal('cvatgstusd', 16, 2)->nullable();
-            $table->decimal('cwhtaxrate', 5, 2)->nullable();
+            $table->foreignId('cwhtaxrate')->nullable()->constrained('taxes')->nullOnDelete();
             $table->decimal('cwhtaxamount', 16, 2)->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete()->after('created_at');
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete()->after('updated_at');

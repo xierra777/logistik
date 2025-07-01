@@ -67,7 +67,7 @@ class EditCustomer extends Component
             'roles'   => $this->roles,
         ]);
         session()->flash('message', 'Customer updated successfully');
-        return redirect()->route('customers.list')->with('success', [
+        return redirect()->route('listCust')->with('success', [
             'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.
             'title' => 'Success Updating', // Toast title
         ]);

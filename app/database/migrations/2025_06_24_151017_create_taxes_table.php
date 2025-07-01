@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('context', ['sales', 'cost'])->default('sales'); // pajak berlaku di penjualan atau pembelian
             $table->foreignId('coa_id')->nullable()->constrained('chart_of_accounts')->nullOnDelete(); // akun COA terkait
             $table->boolean('is_active')->default(true);
+            $table->text('description')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

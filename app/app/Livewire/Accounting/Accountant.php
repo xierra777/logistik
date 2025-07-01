@@ -5,8 +5,8 @@ namespace App\Livewire\Accounting;
 use App\Models\ChargeSetting;
 use Livewire\Component;
 use App\Models\ChartOfAccount;
+use App\Models\Customer;
 use App\Models\Transaction;
-use App\Models\Shipment;
 use App\Models\JournalEntry;
 use App\Models\transaction\tax;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +15,7 @@ class Accountant extends Component
 {
     public $coa, $tax, $chargeCoa;
     public $totaltransaksi;
+    public $totalOutstanding = 0;
     public $shipmentWithTransactionsCount;
 
     public function mount()
@@ -23,6 +24,22 @@ class Accountant extends Component
         $this->totaltransaksi = JournalEntry::count();
         $this->chargeCoa = ChargeSetting::count();
         $this->tax = tax::count();
+        $customers = Customer::with([
+            'jobs.jobTransactions' => fn($q) => $q->whereNotNull('samountidr'),
+            'jobs.paymentAllocations',
+        ])->get();
+
+        $this->totalOutstanding = $customers->reduce(function ($carry, $customer) {
+            $totalInvoice = 0;
+            $totalPaid = 0;
+
+            foreach ($customer->jobs as $job) {
+                $totalInvoice += $job->jobTransactions->sum('samountidr');
+                $totalPaid += $job->paymentAllocations->sum('allocated_amount');
+            }
+
+            return $carry + max(0, $totalInvoice - $totalPaid);
+        }, 0);
     }
     public function getCombinedLineData()
     {

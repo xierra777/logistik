@@ -39,6 +39,11 @@
                             <input type="text" id="name" wire:model="name" placeholder="Enter name" class="w-full rounded-md border border-gray-300">
                             @error('name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                         </div>
+                        <div class="mb-4">
+                            <label for="description" class="block text-sm font-medium text-gray-700 dark:text-white">Name</label>
+                            <input type="text" id="description" wire:model="description" placeholder="Enter description" class="w-full rounded-md border border-gray-300">
+                            @error('description') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                        </div>
                         <div class="mb-4" wire:ignore>
                             <label for="type" class="block text-sm font-medium text-gray-700 dark:text-white">Type</label>
                             <select name="type" id="type" wire:model="type">

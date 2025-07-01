@@ -1,4 +1,4 @@
-<form wire:submit.prevent="save" class="p-6 text-dark-900 dark:text-gray-100">
+<form wire:submit.prevent="updateCustomer" class="p-6 text-dark-900 dark:text-gray-100">
     <div class="space-y-12">
         <div class="border-b border-gray-900/10 pb-12">
             <h2 class="text-base/7 font-semibold text-gray-900">Tambahkan Data Organisasi</h2>
@@ -113,14 +113,9 @@
             </div>
 
             <div class="relative w-full mb-4 bg">
-                <label for="address" class="block text-sm font-medium text-gray-700">
-                    Alamat <span class="text-red-500">*</span>
+                <label for="address" class="block text-sm font-medium text-red-700">
+                    Untuk Edit alamat ada di view Customer
                 </label>
-                <textarea class="py-2 px-3 mt-2 sm:py-3 sm:px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600" rows="3" placeholder="This is a textarea placeholder" wire:model="address"
-                    type="text"
-                    id="address"
-                    name="address"
-                    required></textarea>
                 @error('address')
                 <span class="text-sm text-red-500">{{ $message }}</span>
                 @enderror
@@ -276,17 +271,20 @@
                                 let selectedValue = $(this).val();
 
                                 if (selectedValue && typeof $wire !== 'undefined') {
-                                    let parts = selectedValue.split(" - ");
+                                    // Update country value in Livewire component
                                     $wire.country = selectedValue;
-                                    $wire.country_code = parts[0];
 
-                                    // Call Livewire method if exists
-                                    if (typeof $wire.generateCustomerCode === 'function') {
-                                        $wire.generateCustomerCode();
+                                    // Call setCountry method if exists
+                                    if (typeof $wire.setCountry === 'function') {
+                                        $wire.setCountry(selectedValue);
                                     }
                                 }
                             });
 
+                            // Set selected value if exists (for edit mode)
+                            if (typeof $wire !== 'undefined' && $wire.country) {
+                                $select.val($wire.country).trigger('change.select2');
+                            }
 
                         } catch (parseError) {
                             console.error("Error parsing country data:", parseError);
@@ -316,11 +314,21 @@
         if ($('#retryCountries').length === 0) {
             $('#countrySelect').after('<button id="retryCountries" class="ml-2 px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600" style="display:none;">Retry</button>');
         }
+
+        // Listen for syncCountry event from Livewire
+        window.addEventListener('syncCountry', function(event) {
+            const countryValue = event.detail;
+            if (countryValue && $("#countrySelect").hasClass('select2-hidden-accessible')) {
+                $("#countrySelect").val(countryValue).trigger('change.select2');
+            }
+        });
     });
 
     document.addEventListener("livewire:load", function() {
         Livewire.hook("message.processed", () => {
-            $("#countrySelect").select2("destroy");
+            if ($("#countrySelect").hasClass('select2-hidden-accessible')) {
+                $("#countrySelect").select2("destroy");
+            }
             loadCountries();
         });
     });

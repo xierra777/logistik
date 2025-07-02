@@ -21,6 +21,7 @@ class SaleInvoice extends Component
     public $totalgw = 0;
     public $shipment;
     public $dataShip;
+    public $issuedInvoices;
     public $showExchangeRate = false;
     public array $selectedTransactionIds = [];
 
@@ -46,8 +47,7 @@ class SaleInvoice extends Component
         ])->filter();
 
         $this->clients = Customer::whereIn('name', $customerNames)->get();
-        $this->containers = shipmentContainers::all();
-
+        // $this->containers = shipmentContainers::all();
         if ($shipmentId) {
             $this->loadTransactions();
         }
@@ -307,8 +307,7 @@ class SaleInvoice extends Component
 
         $pdfContent = Browsershot::html($html)
             ->setChromePath('/usr/bin/google-chrome')
-            ->format('A3')
-            ->margins(5, 5, 5, 5)
+            ->format('A4')
             ->showBackground()
             ->setOption('args', ['--no-sandbox'])
             ->pdf();
@@ -363,7 +362,8 @@ class SaleInvoice extends Component
     {
         return view('livewire.accounting.sale-invoice', [
             'invoices'  => Invoice::where('shipment_id', $this->shipmentId)
-                ->with(['shipment.containers', 'customer', 'transactions'])
+                ->with(['shipment.container', 'client', 'transactions'])
+                ->where('status', '!=', 'draft')
                 ->get(),
             'shipment' => TShipments::find($this->shipmentId),
         ]);

@@ -582,7 +582,6 @@
     <div class="mt-4 shadow-lg ">
         <div>
             <p class="text-center p-3 bg-gray-400 rounded-t-lg font-bold italic border">Transaction still under Construction <br>
-                <span class="text-red-700">...</span>
             </p>
             <div class="flex justify-end p-1 ">
                 <div x-data="{ open: false }" @close-modal.window="open = false"

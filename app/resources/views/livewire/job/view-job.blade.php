@@ -891,18 +891,28 @@
     <div class="mt-4 shadow-lg ">
         <div>
             <p class="text-center p-3 bg-gray-400 rounded-t-lg font-bold italic border">Transaction still under Construction <br>
-                <span class="text-red-700">...</span>
             </p>
             <div class="flex justify-end p-1 ">
                 <div x-data="{ open: false }" @keydown.escape.window="open = false" @close-modal.window="open = false"
                     x-ref="modalContent">
-                    <div class=" flex justify-end mb-4 p-4">
+                    <div class=" flex justify-end mb-4 p-4 gap-2">
+                        <a
+                            href="{{ route('jobSaleInvoice', ['jobId' => $job->id]) }}"
+                            class="py-3 px-4 bg-green-600 text-white rounded-lg">
+                            Print Invoice
+                        </a>
+                        <a
+                            href="{{route('jobPurchaseInvoice',['jobId' => $job->id])}}"
+                            class="py-3 px-4 bg-red-600 text-white rounded-lg">
+                            Print PI
+                        </a>
                         <button
                             wire:click="refreshTransaction({{ $job->id }})"
                             @click="open = true"
                             class="py-3 px-4 bg-blue-600 text-white rounded-lg">
                             Add Cost
                         </button>
+
                     </div>
 
                     <!-- Background Overlay -->

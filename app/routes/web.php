@@ -24,6 +24,7 @@ use App\Livewire\Job\ContainerJob;
 use App\Livewire\Pdfhbl;
 use App\Livewire\Job\CreateJob;
 use App\Livewire\Job\EditJob;
+use App\Livewire\Job\Invoice\JobSaleInvoice;
 use App\Livewire\Job\JobCreateShipment;
 use App\Livewire\Job\ListJob;
 use App\Livewire\Job\ViewJob;
@@ -37,7 +38,7 @@ use App\Livewire\Users\UserView;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
-
+use App\Livewire\Job\Invoice\PurchaseInvoice as jobPurchaseInvoice;
 
 Route::redirect('/', '/login');
 Route::get('/dashboard', Dashboard::class)->middleware([
@@ -148,6 +149,16 @@ Route::get('view-job/{id}/container-job/{jobContainer_id}', ContainerJob::class)
 Route::get('view-job/{id}/Create-Shipment', JobCreateShipment::class)
     ->middleware(['auth', 'verified'])
     ->name('viewJobCreateShipment');
+
+
+Route::get('jobpurchase-invoice/{jobId}', jobPurchaseInvoice::class)
+    ->middleware(['auth', 'verified'])
+    ->name('jobPurchaseInvoice');
+
+Route::get('jobsale-invoice/{jobId}', JobSaleInvoice::class)
+    ->middleware(['auth', 'verified'])
+    ->name('jobSaleInvoice');
+
 // End Job Route
 
 

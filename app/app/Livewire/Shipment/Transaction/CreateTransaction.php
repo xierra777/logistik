@@ -13,10 +13,15 @@ use App\Models\ChargeSetting;
 use App\Models\ChartOfAccount;
 use App\Models\JournalEntry;
 use App\Models\shipmentContainers;
+use App\Models\transaction\tax;
 
 class CreateTransaction extends Component
 {
     public $chargeCoa;
+
+    public $taxRates = [];
+    public $taxData = [];
+    public $taxRatesWht = [];
 
     public $shipmentId;
     public $shipment;
@@ -64,8 +69,13 @@ class CreateTransaction extends Component
             $shipment->carrierModel,
             $shipment->deliveryAgent,
         ])->filter()->unique();
-        $this->chargeCoa = ChargeSetting::get();
+        $taxes = tax::where('is_active', '1')->get(); // asumsikan ada kolom 'id', 'name', 'rate'
 
+        $this->chargeCoa = ChargeSetting::get();
+        $this->taxRates = $taxes->where('type', 'vat')->pluck('rate', 'id')->toArray(); // untuk dropdown
+        $this->taxRatesWht = $taxes->where('type', 'wht')->pluck('rate', 'id')->toArray(); // untuk dropdown
+        $this->taxData = $taxes->pluck('rate', 'id')->toArray(); // untuk Alpine.js
+        $customers = Customer::orderBy('name')->get();
         $this->vendors = customer::where('category', 'creditor')->orderBy('name')->get();
 
         // $this->updateQty();
@@ -111,7 +121,21 @@ class CreateTransaction extends Component
     // === Simpan Data Transaksi Baru ===
     public function save()
     {
-
+        if ($this->getErrorBag()->isNotEmpty()) {
+            $this->dispatch('scroll-to-error');
+        }
+        if ($this->svatgst == 0 || empty($this->svatgst)) {
+            $this->svatgst = null;
+        }
+        if ($this->cvatgst == 0 || empty($this->cvatgst)) {
+            $this->cvatgst = null;
+        }
+        if ($this->swhtaxrate == 0 || empty($this->swhtaxrate)) {
+            $this->swhtaxrate = null;
+        }
+        if ($this->cwhtaxrate == 0 || empty($this->cwhtaxrate)) {
+            $this->cwhtaxrate = null;
+        }
         $transaction = Transaction::create([
             'id_shipment' => $this->shipmentId,
             'charge' => $this->charge,
@@ -164,6 +188,7 @@ class CreateTransaction extends Component
             'created_by' => Auth::id(),
 
         ]);
+
 
         $this->createJournalEntries($transaction);
         $this->reset();

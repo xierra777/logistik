@@ -13,12 +13,13 @@ class CustomerOutstandingDebts extends Component
 
     public function mount()
     {
-        $this->customers = Customer::with([
-            'jobs.jobTransactions' => function ($q) {
-                $q->whereNotNull('samountidr'); // hanya transaksi sales
-            },
-            'jobs.paymentAllocations'
-        ])->get();
+        $this->customers = Customer::whereJsonContains('roles', 'client')
+            ->with([
+                'jobs.jobTransactions' => function ($q) {
+                    $q->whereNotNull('samountidr'); // hanya transaksi sales
+                },
+                'jobs.paymentAllocations'
+            ])->get();
 
         $this->customerDebts = $this->customers->map(function ($customer) {
             $totalInvoice = 0;
@@ -36,8 +37,9 @@ class CustomerOutstandingDebts extends Component
                 'total_paid'     => $totalPaid,
                 'outstanding'    => max(0, $totalInvoice - $totalPaid),
             ];
-        })->values(); // pastikan outputnya collection biasa, bukan keyed by id
+        })->values();
     }
+
 
     public function render()
     {

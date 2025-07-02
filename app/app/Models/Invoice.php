@@ -25,15 +25,15 @@ class Invoice extends Model
 
     public function shipment()
     {
-        return $this->belongsTo(Shipment::class);
+        return $this->belongsTo(TShipments::class);
     }
 
     public function client()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
     public function transactions()
     {
-        return $this->belongsTo(transaction::class);
+        return $this->belongsTo(Transaction::class);
     }
 }

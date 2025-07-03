@@ -24,7 +24,6 @@ class TShipments extends Model
         'shipmentClient_address',
         'shipmentCarrierAirline',
         'shipmentContainerDeliveryAgent',
-        'containerShipmentCarrierAirline',
         'shipmentCarrierAgent',
         'shipmentDeliveryAgent',
         'carrier',

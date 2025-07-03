@@ -134,13 +134,13 @@
 
             <!-- Pagination -->
             @if($job->hasPages())
-            <div class="mt-4 px-1.5">
+            <div class="mt-4 px-1.5 flex justify-end">
                 {{ $job->links() }}
             </div>
             @endif
 
             <!-- Selector Rows Per Page -->
-            <div class="mt-4">
+            <div class="mt-4 foe">
                 <select wire:model.live="perPage" class="py-1 px-2 bg-gray-100 border rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:border-transparent dark:text-neutral-400 dark:focus:ring-neutral-600">
                     <option value="5">5 Rows</option>
                     <option value="10">10 Rows</option>

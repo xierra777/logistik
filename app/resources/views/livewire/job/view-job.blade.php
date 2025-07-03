@@ -722,7 +722,7 @@
 
         <div class="mt-3 p-1 gap-2 flex flex-row ">
             <a href="{{route('viewJobCreateShipment', ['id' => $job->id])}}" onclick="saveScrollPosition()"
-                class="bg-blue-600 text-white rounded-lg py-1 px-5 hover:scale-105"> Add Shipments</a>
+                class="bg-blue-600 text-white rounded-lg py-1 px-5 hover:scale-105"> Add Shipments From Job</a>
             <div x-data="{ openDetachAssigned: false }" @close-detach-assigned.window="openDetachAssigned = false">
                 <button @click="openDetachAssigned = true"
                     class="bg-red-600 text-white rounded-lg py-1 px-5 hover:scale-105 transition-transform">

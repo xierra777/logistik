@@ -30,14 +30,13 @@ class CreateShipment extends Component
     public $carrierModel;
     public $deliveryAgent;
     public $carrierAgent;
-    public $containerShipmentCarrierAirline;
     public $employe;
     public $shipmentEmployee_id;
     public $shipmentClient_id, $shipmentShipper_id, $shipmentConsignee_id, $shipmentNotify_id, $shipmentCarrierAgent, $shipmentDeliveryAgent, $shipmentCarrierAirline, $shipmentClient_address, $shipmentClientAddresses = [];
 
 
     // Detail Shipment
-    public $shipmentCustomerCodeJob, $shipmentBillLadingDate, $shipmentPort_of_loading, $shipmentPort_of_final, $shipmentPlace_of_receipt, $shipmentPort_of_receipt, $shipmentPort_of_discharge, $shipmentPlace_of_delivery, $shipmentOcean_vessel_feeder, $shipmentEstimearrival, $shipmentEstimedelivery, $shipmentPayableAtJob, $shipmentServices_type, $shipmentIncoTerms, $shipmentFreightTypeJob = "Prepaid", $shipmentCross_trade, $shipmentRemarksJobDetailJobs;
+    public $shipmentCustomerCodeJob, $shipmentBillLadingDate, $shipmentPort_of_loading, $shipmentPort_of_final, $shipmentPlace_of_receipt, $shipmentPort_of_receipt, $shipmentPort_of_discharge, $shipmentPlace_of_delivery, $shipmentOcean_vessel_feeder, $shipmentEstimearrival, $shipmentEstimedelivery, $shipmentPayableAtJob, $shipmentServices_type, $shipmentIncoTerms, $shipmentFreightTypeJob = "Prepaid", $shipmentCross_trade, $shipmentRemarksJobDetailJobs, $shipmentHouseBillLadingNo;
 
     // Container Detail
     public $shipmentFlightVesselName, $shipmentFlightVesselNo, $shipmentNoOfPackages, $shipmentContainerDeliveryAgent, $shipmentGrossWeight, $shipmentVolumeWeight, $shipmentVolume, $shipmentChargableWeight, $ShipmentHsCode, $shipmentContainerRemarks, $shipmentHsCodeDesc, $shipmentTypeOfVolumeWeight, $shipmentTypeOfGrossWeight, $shipmentTypeOfPackages, $typeOfShipmentVolume, $shipmentHsCode;
@@ -116,12 +115,6 @@ class CreateShipment extends Component
         if (!$this->shipmentCarrierAirline) return '';
         $carrier = $this->carrierModel->firstWhere('id', $this->shipmentCarrierAirline);
         return $carrier;
-    }
-    public function getContainerCarrierNameProperty()
-    {
-        if (!$this->containerShipmentCarrierAirline) return '';
-        $containerCarrier = $this->carrierModel->firstWhere('id', $this->containerShipmentCarrierAirline);
-        return $containerCarrier;
     }
     public function getCarrierAgentNameProperty()
     {
@@ -247,6 +240,12 @@ class CreateShipment extends Component
             case 'ocean_fcl_import':
                 $this->ocean_fcl_import();
                 break;
+            case 'ocean_lcl_export':
+                $this->ocean_lcl_export();
+                break;
+            case 'ocean_lcl_import':
+                $this->ocean_lcl_import();
+                break;
             case 'air_outbound':
                 $this->air_outbound();
                 break;
@@ -275,13 +274,13 @@ class CreateShipment extends Component
             'shipmentTypeOfGrossWeight'    => $this->shipmentTypeOfGrossWeight,
             'shipmentTypeOfPackages'       => $this->shipmentTypeOfPackages,
             'typeOfShipmentVolume'         => $this->typeOfShipmentVolume,
-            'containerShipmentCarrierAirline' => $this->containerShipmentCarrierAirline,
         ];
         $payload = [
             'shipmentFlightVesselName'     => $this->shipmentFlightVesselName,
             'shipmentFlightVesselNo'       => $this->shipmentFlightVesselNo,
             'shipmentCustomerCodeJob'      => $this->shipmentCustomerCodeJob,
             'shipmentBillLadingDate'       => $this->shipmentBillLadingDate,
+            'shipmentHouseBillLadingNo'    => $this->shipmentHouseBillLadingNo,
             'shipmentPort_of_loading'      => $this->shipmentPort_of_loading,
             'shipmentPort_of_final'        => $this->shipmentPort_of_final,
             'shipmentPlace_of_receipt'     => $this->shipmentPlace_of_receipt,
@@ -295,7 +294,6 @@ class CreateShipment extends Component
             'shipmentServices_type'        => $this->shipmentServices_type,
             'shipmentIncoTerms'            => $this->shipmentIncoTerms,
             'shipmentFreightTypeJob'       => $this->shipmentFreightTypeJob,
-            'shipmentCross_trade'          => $this->shipmentCross_trade,
             'shipmentRemarksJobDetailJobs' => $this->shipmentRemarksJobDetailJobs,
         ];
 
@@ -322,7 +320,416 @@ class CreateShipment extends Component
             'shipmentNotify_id'         => $this->shipmentNotify_id,
             'shipmentCarrierAirline'      => $this->shipmentCarrierAirline,
             'shipmentContainerDeliveryAgent' => $this->shipmentContainerDeliveryAgent,
-            'containerShipmentCarrierAirline' => $this->containerShipmentCarrierAirline,
+            'shipmentCarrierAgent'      => $this->shipmentCarrierAgent,
+            'shipmentDeliveryAgent'     => $this->shipmentDeliveryAgent,
+            'employee_id' => $this->shipmentEmployee_id,
+            'dataShipments'              => $payload,
+            'created_by'        => Auth::user()->id
+
+        ]);
+
+        shipmentContainers::create([
+            'id_shipments' => $shipment->id,
+            'containersData' => $container,
+            'created_by'        => Auth::user()->id
+
+        ]);
+
+        return redirect()->route('listShipment')->with('success', [
+            'icon' => 'success',
+            'title' => 'Success!',
+
+        ]);
+    }
+    public function ocean_fcl_import()
+    {
+        $container = [
+            'shipmentNoOfPackages'         => $this->shipmentNoOfPackages,
+            'shipmentGrossWeight'          => $this->shipmentGrossWeight,
+            'shipmentVolumeWeight'         => $this->shipmentVolumeWeight,
+            'shipmentVolume'               => $this->shipmentVolume,
+            'shipmentChargableWeight'      => $this->shipmentChargableWeight,
+            'shipmentHsCode'               => $this->shipmentHsCode,
+            'shipmentHsCodeDesc'           => $this->shipmentHsCodeDesc,
+            'shipmentContainerRemarks'     => $this->shipmentContainerRemarks,
+            'shipmentTypeOfVolumeWeight'   => $this->shipmentTypeOfVolumeWeight,
+            'shipmentTypeOfGrossWeight'    => $this->shipmentTypeOfGrossWeight,
+            'shipmentTypeOfPackages'       => $this->shipmentTypeOfPackages,
+            'typeOfShipmentVolume'         => $this->typeOfShipmentVolume,
+        ];
+        $payload = [
+            'shipmentFlightVesselName'     => $this->shipmentFlightVesselName,
+            'shipmentFlightVesselNo'       => $this->shipmentFlightVesselNo,
+            'shipmentCustomerCodeJob'      => $this->shipmentCustomerCodeJob,
+            'shipmentBillLadingDate'       => $this->shipmentBillLadingDate,
+            'shipmentHouseBillLadingNo'    => $this->shipmentHouseBillLadingNo,
+            'shipmentPort_of_loading'      => $this->shipmentPort_of_loading,
+            'shipmentPort_of_final'        => $this->shipmentPort_of_final,
+            'shipmentPlace_of_receipt'     => $this->shipmentPlace_of_receipt,
+            'shipmentPort_of_receipt'      => $this->shipmentPort_of_receipt,
+            'shipmentPort_of_discharge'    => $this->shipmentPort_of_discharge,
+            'shipmentPlace_of_delivery'    => $this->shipmentPlace_of_delivery,
+            'shipmentOcean_vessel_feeder'  => $this->shipmentOcean_vessel_feeder,
+            'shipmentEstimearrival'        => $this->shipmentEstimearrival,
+            'shipmentEstimedelivery'       => $this->shipmentEstimedelivery,
+            'shipmentPayableAtJob'         => $this->shipmentPayableAtJob,
+            'shipmentServices_type'        => $this->shipmentServices_type,
+            'shipmentIncoTerms'            => $this->shipmentIncoTerms,
+            'shipmentFreightTypeJob'       => $this->shipmentFreightTypeJob,
+            'shipmentRemarksJobDetailJobs' => $this->shipmentRemarksJobDetailJobs,
+        ];
+
+        // dd([
+        //     'shipmentClient_id' => $this->shipmentClient_id,
+        //     'shipmentType_job' => $this->shipmentType_job,
+        //     'shipment_id' => $this->shipment_id,
+        //     'shipmentClient_address' => $this->shipmentClient_address,
+        //     'shipmentShipper_id' => $this->shipmentShipper_id,
+        //     'shipmentConsignee_id' => $this->shipmentConsignee_id,
+        //     'shipmentNotify_id' => $this->shipmentNotify_id,
+        //     'data' => $payload,
+        //     'container' => $container
+        // ]);
+
+
+        $shipment = TShipments::create([
+            'shipmentsTypeJob'          => $this->shipmentType_job,
+            'shipment_id'              => $this->shipment_id,
+            'shipmentClient_id'        => $this->shipmentClient_id,
+            'shipmentClient_address'    => $this->shipmentClient_address,
+            'shipmentShipper_id'     => $this->shipmentShipper_id,
+            'shipmentConsignee_id'    => $this->shipmentConsignee_id,
+            'shipmentNotify_id'         => $this->shipmentNotify_id,
+            'shipmentCarrierAirline'      => $this->shipmentCarrierAirline,
+            'shipmentContainerDeliveryAgent' => $this->shipmentContainerDeliveryAgent,
+            'shipmentCarrierAgent'      => $this->shipmentCarrierAgent,
+            'shipmentDeliveryAgent'     => $this->shipmentDeliveryAgent,
+            'employee_id' => $this->shipmentEmployee_id,
+            'dataShipments'              => $payload,
+            'created_by'        => Auth::user()->id
+
+        ]);
+
+        shipmentContainers::create([
+            'id_shipments' => $shipment->id,
+            'containersData' => $container,
+            'created_by'        => Auth::user()->id
+
+        ]);
+
+        return redirect()->route('listShipment')->with('success', [
+            'icon' => 'success',
+            'title' => 'Success!',
+
+        ]);
+    }
+    public function ocean_lcl_export()
+    {
+        $container = [
+            'shipmentNoOfPackages'         => $this->shipmentNoOfPackages,
+            'shipmentGrossWeight'          => $this->shipmentGrossWeight,
+            'shipmentVolumeWeight'         => $this->shipmentVolumeWeight,
+            'shipmentVolume'               => $this->shipmentVolume,
+            'shipmentChargableWeight'      => $this->shipmentChargableWeight,
+            'shipmentHsCode'               => $this->shipmentHsCode,
+            'shipmentHsCodeDesc'           => $this->shipmentHsCodeDesc,
+            'shipmentContainerRemarks'     => $this->shipmentContainerRemarks,
+            'shipmentTypeOfVolumeWeight'   => $this->shipmentTypeOfVolumeWeight,
+            'shipmentTypeOfGrossWeight'    => $this->shipmentTypeOfGrossWeight,
+            'shipmentTypeOfPackages'       => $this->shipmentTypeOfPackages,
+            'typeOfShipmentVolume'         => $this->typeOfShipmentVolume,
+        ];
+        $payload = [
+            'shipmentFlightVesselName'     => $this->shipmentFlightVesselName,
+            'shipmentFlightVesselNo'       => $this->shipmentFlightVesselNo,
+            'shipmentCustomerCodeJob'      => $this->shipmentCustomerCodeJob,
+            'shipmentBillLadingDate'       => $this->shipmentBillLadingDate,
+            'shipmentHouseBillLadingNo'    => $this->shipmentHouseBillLadingNo,
+            'shipmentPort_of_loading'      => $this->shipmentPort_of_loading,
+            'shipmentPort_of_final'        => $this->shipmentPort_of_final,
+            'shipmentPlace_of_receipt'     => $this->shipmentPlace_of_receipt,
+            'shipmentPort_of_receipt'      => $this->shipmentPort_of_receipt,
+            'shipmentPort_of_discharge'    => $this->shipmentPort_of_discharge,
+            'shipmentPlace_of_delivery'    => $this->shipmentPlace_of_delivery,
+            'shipmentOcean_vessel_feeder'  => $this->shipmentOcean_vessel_feeder,
+            'shipmentEstimearrival'        => $this->shipmentEstimearrival,
+            'shipmentEstimedelivery'       => $this->shipmentEstimedelivery,
+            'shipmentPayableAtJob'         => $this->shipmentPayableAtJob,
+            'shipmentServices_type'        => $this->shipmentServices_type,
+            'shipmentIncoTerms'            => $this->shipmentIncoTerms,
+            'shipmentFreightTypeJob'       => $this->shipmentFreightTypeJob,
+            'shipmentRemarksJobDetailJobs' => $this->shipmentRemarksJobDetailJobs,
+        ];
+
+        // dd([
+        //     'shipmentClient_id' => $this->shipmentClient_id,
+        //     'shipmentType_job' => $this->shipmentType_job,
+        //     'shipment_id' => $this->shipment_id,
+        //     'shipmentClient_address' => $this->shipmentClient_address,
+        //     'shipmentShipper_id' => $this->shipmentShipper_id,
+        //     'shipmentConsignee_id' => $this->shipmentConsignee_id,
+        //     'shipmentNotify_id' => $this->shipmentNotify_id,
+        //     'data' => $payload,
+        //     'container' => $container
+        // ]);
+
+
+        $shipment = TShipments::create([
+            'shipmentsTypeJob'          => $this->shipmentType_job,
+            'shipment_id'              => $this->shipment_id,
+            'shipmentClient_id'        => $this->shipmentClient_id,
+            'shipmentClient_address'    => $this->shipmentClient_address,
+            'shipmentShipper_id'     => $this->shipmentShipper_id,
+            'shipmentConsignee_id'    => $this->shipmentConsignee_id,
+            'shipmentNotify_id'         => $this->shipmentNotify_id,
+            'shipmentCarrierAirline'      => $this->shipmentCarrierAirline,
+            'shipmentContainerDeliveryAgent' => $this->shipmentContainerDeliveryAgent,
+            'shipmentCarrierAgent'      => $this->shipmentCarrierAgent,
+            'shipmentDeliveryAgent'     => $this->shipmentDeliveryAgent,
+            'employee_id' => $this->shipmentEmployee_id,
+            'dataShipments'              => $payload,
+            'created_by'        => Auth::user()->id
+
+        ]);
+
+        shipmentContainers::create([
+            'id_shipments' => $shipment->id,
+            'containersData' => $container,
+            'created_by'        => Auth::user()->id
+
+        ]);
+
+        return redirect()->route('listShipment')->with('success', [
+            'icon' => 'success',
+            'title' => 'Success!',
+
+        ]);
+    }
+    public function ocean_lcl_import()
+    {
+        $container = [
+            'shipmentNoOfPackages'         => $this->shipmentNoOfPackages,
+            'shipmentGrossWeight'          => $this->shipmentGrossWeight,
+            'shipmentVolumeWeight'         => $this->shipmentVolumeWeight,
+            'shipmentVolume'               => $this->shipmentVolume,
+            'shipmentChargableWeight'      => $this->shipmentChargableWeight,
+            'shipmentHsCode'               => $this->shipmentHsCode,
+            'shipmentHsCodeDesc'           => $this->shipmentHsCodeDesc,
+            'shipmentContainerRemarks'     => $this->shipmentContainerRemarks,
+            'shipmentTypeOfVolumeWeight'   => $this->shipmentTypeOfVolumeWeight,
+            'shipmentTypeOfGrossWeight'    => $this->shipmentTypeOfGrossWeight,
+            'shipmentTypeOfPackages'       => $this->shipmentTypeOfPackages,
+            'typeOfShipmentVolume'         => $this->typeOfShipmentVolume,
+        ];
+        $payload = [
+            'shipmentFlightVesselName'     => $this->shipmentFlightVesselName,
+            'shipmentFlightVesselNo'       => $this->shipmentFlightVesselNo,
+            'shipmentCustomerCodeJob'      => $this->shipmentCustomerCodeJob,
+            'shipmentBillLadingDate'       => $this->shipmentBillLadingDate,
+            'shipmentHouseBillLadingNo'    => $this->shipmentHouseBillLadingNo,
+            'shipmentPort_of_loading'      => $this->shipmentPort_of_loading,
+            'shipmentPort_of_final'        => $this->shipmentPort_of_final,
+            'shipmentPlace_of_receipt'     => $this->shipmentPlace_of_receipt,
+            'shipmentPort_of_receipt'      => $this->shipmentPort_of_receipt,
+            'shipmentPort_of_discharge'    => $this->shipmentPort_of_discharge,
+            'shipmentPlace_of_delivery'    => $this->shipmentPlace_of_delivery,
+            'shipmentOcean_vessel_feeder'  => $this->shipmentOcean_vessel_feeder,
+            'shipmentEstimearrival'        => $this->shipmentEstimearrival,
+            'shipmentEstimedelivery'       => $this->shipmentEstimedelivery,
+            'shipmentPayableAtJob'         => $this->shipmentPayableAtJob,
+            'shipmentServices_type'        => $this->shipmentServices_type,
+            'shipmentIncoTerms'            => $this->shipmentIncoTerms,
+            'shipmentFreightTypeJob'       => $this->shipmentFreightTypeJob,
+            'shipmentRemarksJobDetailJobs' => $this->shipmentRemarksJobDetailJobs,
+        ];
+
+        // dd([
+        //     'shipmentClient_id' => $this->shipmentClient_id,
+        //     'shipmentType_job' => $this->shipmentType_job,
+        //     'shipment_id' => $this->shipment_id,
+        //     'shipmentClient_address' => $this->shipmentClient_address,
+        //     'shipmentShipper_id' => $this->shipmentShipper_id,
+        //     'shipmentConsignee_id' => $this->shipmentConsignee_id,
+        //     'shipmentNotify_id' => $this->shipmentNotify_id,
+        //     'data' => $payload,
+        //     'container' => $container
+        // ]);
+
+
+        $shipment = TShipments::create([
+            'shipmentsTypeJob'          => $this->shipmentType_job,
+            'shipment_id'              => $this->shipment_id,
+            'shipmentClient_id'        => $this->shipmentClient_id,
+            'shipmentClient_address'    => $this->shipmentClient_address,
+            'shipmentShipper_id'     => $this->shipmentShipper_id,
+            'shipmentConsignee_id'    => $this->shipmentConsignee_id,
+            'shipmentNotify_id'         => $this->shipmentNotify_id,
+            'shipmentCarrierAirline'      => $this->shipmentCarrierAirline,
+            'shipmentContainerDeliveryAgent' => $this->shipmentContainerDeliveryAgent,
+            'shipmentCarrierAgent'      => $this->shipmentCarrierAgent,
+            'shipmentDeliveryAgent'     => $this->shipmentDeliveryAgent,
+            'employee_id' => $this->shipmentEmployee_id,
+            'dataShipments'              => $payload,
+            'created_by'        => Auth::user()->id
+
+        ]);
+
+        shipmentContainers::create([
+            'id_shipments' => $shipment->id,
+            'containersData' => $container,
+            'created_by'        => Auth::user()->id
+
+        ]);
+
+        return redirect()->route('listShipment')->with('success', [
+            'icon' => 'success',
+            'title' => 'Success!',
+
+        ]);
+    }
+    public function air_inbound()
+    {
+        $container = [
+            'shipmentNoOfPackages'         => $this->shipmentNoOfPackages,
+            'shipmentGrossWeight'          => $this->shipmentGrossWeight,
+            'shipmentVolumeWeight'         => $this->shipmentVolumeWeight,
+            'shipmentVolume'               => $this->shipmentVolume,
+            'shipmentChargableWeight'      => $this->shipmentChargableWeight,
+            'shipmentHsCode'               => $this->shipmentHsCode,
+            'shipmentHsCodeDesc'           => $this->shipmentHsCodeDesc,
+            'shipmentContainerRemarks'     => $this->shipmentContainerRemarks,
+            'shipmentTypeOfVolumeWeight'   => $this->shipmentTypeOfVolumeWeight,
+            'shipmentTypeOfGrossWeight'    => $this->shipmentTypeOfGrossWeight,
+            'shipmentTypeOfPackages'       => $this->shipmentTypeOfPackages,
+            'typeOfShipmentVolume'         => $this->typeOfShipmentVolume,
+        ];
+        $payload = [
+            'shipmentFlightVesselName'     => $this->shipmentFlightVesselName,
+            'shipmentFlightVesselNo'       => $this->shipmentFlightVesselNo,
+            'shipmentCustomerCodeJob'      => $this->shipmentCustomerCodeJob,
+            'shipmentBillLadingDate'       => $this->shipmentBillLadingDate,
+            'shipmentHouseBillLadingNo'    => $this->shipmentHouseBillLadingNo,
+            'shipmentPort_of_loading'      => $this->shipmentPort_of_loading,
+            'shipmentPort_of_final'        => $this->shipmentPort_of_final,
+            'shipmentPlace_of_receipt'     => $this->shipmentPlace_of_receipt,
+            'shipmentPort_of_receipt'      => $this->shipmentPort_of_receipt,
+            'shipmentPort_of_discharge'    => $this->shipmentPort_of_discharge,
+            'shipmentPlace_of_delivery'    => $this->shipmentPlace_of_delivery,
+            'shipmentOcean_vessel_feeder'  => $this->shipmentOcean_vessel_feeder,
+            'shipmentEstimearrival'        => $this->shipmentEstimearrival,
+            'shipmentEstimedelivery'       => $this->shipmentEstimedelivery,
+            'shipmentPayableAtJob'         => $this->shipmentPayableAtJob,
+            'shipmentServices_type'        => $this->shipmentServices_type,
+            'shipmentIncoTerms'            => $this->shipmentIncoTerms,
+            'shipmentFreightTypeJob'       => $this->shipmentFreightTypeJob,
+            'shipmentRemarksJobDetailJobs' => $this->shipmentRemarksJobDetailJobs,
+        ];
+
+        // dd([
+        //     'shipmentClient_id' => $this->shipmentClient_id,
+        //     'shipmentType_job' => $this->shipmentType_job,
+        //     'shipment_id' => $this->shipment_id,
+        //     'shipmentClient_address' => $this->shipmentClient_address,
+        //     'shipmentShipper_id' => $this->shipmentShipper_id,
+        //     'shipmentConsignee_id' => $this->shipmentConsignee_id,
+        //     'shipmentNotify_id' => $this->shipmentNotify_id,
+        //     'data' => $payload,
+        //     'container' => $container
+        // ]);
+
+
+        $shipment = TShipments::create([
+            'shipmentsTypeJob'          => $this->shipmentType_job,
+            'shipment_id'              => $this->shipment_id,
+            'shipmentClient_id'        => $this->shipmentClient_id,
+            'shipmentClient_address'    => $this->shipmentClient_address,
+            'shipmentShipper_id'     => $this->shipmentShipper_id,
+            'shipmentConsignee_id'    => $this->shipmentConsignee_id,
+            'shipmentNotify_id'         => $this->shipmentNotify_id,
+            'shipmentCarrierAirline'      => $this->shipmentCarrierAirline,
+            'shipmentContainerDeliveryAgent' => $this->shipmentContainerDeliveryAgent,
+            'shipmentCarrierAgent'      => $this->shipmentCarrierAgent,
+            'shipmentDeliveryAgent'     => $this->shipmentDeliveryAgent,
+            'employee_id' => $this->shipmentEmployee_id,
+            'dataShipments'              => $payload,
+            'created_by'        => Auth::user()->id
+
+        ]);
+
+        shipmentContainers::create([
+            'id_shipments' => $shipment->id,
+            'containersData' => $container,
+            'created_by'        => Auth::user()->id
+
+        ]);
+
+        return redirect()->route('listShipment')->with('success', [
+            'icon' => 'success',
+            'title' => 'Success!',
+
+        ]);
+    }
+    public function air_outbound()
+    {
+        $container = [
+            'shipmentNoOfPackages'         => $this->shipmentNoOfPackages,
+            'shipmentGrossWeight'          => $this->shipmentGrossWeight,
+            'shipmentVolumeWeight'         => $this->shipmentVolumeWeight,
+            'shipmentVolume'               => $this->shipmentVolume,
+            'shipmentChargableWeight'      => $this->shipmentChargableWeight,
+            'shipmentHsCode'               => $this->shipmentHsCode,
+            'shipmentHsCodeDesc'           => $this->shipmentHsCodeDesc,
+            'shipmentContainerRemarks'     => $this->shipmentContainerRemarks,
+            'shipmentTypeOfVolumeWeight'   => $this->shipmentTypeOfVolumeWeight,
+            'shipmentTypeOfGrossWeight'    => $this->shipmentTypeOfGrossWeight,
+            'shipmentTypeOfPackages'       => $this->shipmentTypeOfPackages,
+            'typeOfShipmentVolume'         => $this->typeOfShipmentVolume,
+        ];
+        $payload = [
+            'shipmentFlightVesselName'     => $this->shipmentFlightVesselName,
+            'shipmentFlightVesselNo'       => $this->shipmentFlightVesselNo,
+            'shipmentCustomerCodeJob'      => $this->shipmentCustomerCodeJob,
+            'shipmentBillLadingDate'       => $this->shipmentBillLadingDate,
+            'shipmentHouseBillLadingNo'    => $this->shipmentHouseBillLadingNo,
+            'shipmentPort_of_loading'      => $this->shipmentPort_of_loading,
+            'shipmentPort_of_final'        => $this->shipmentPort_of_final,
+            'shipmentPlace_of_receipt'     => $this->shipmentPlace_of_receipt,
+            'shipmentPort_of_receipt'      => $this->shipmentPort_of_receipt,
+            'shipmentPort_of_discharge'    => $this->shipmentPort_of_discharge,
+            'shipmentPlace_of_delivery'    => $this->shipmentPlace_of_delivery,
+            'shipmentOcean_vessel_feeder'  => $this->shipmentOcean_vessel_feeder,
+            'shipmentEstimearrival'        => $this->shipmentEstimearrival,
+            'shipmentEstimedelivery'       => $this->shipmentEstimedelivery,
+            'shipmentPayableAtJob'         => $this->shipmentPayableAtJob,
+            'shipmentServices_type'        => $this->shipmentServices_type,
+            'shipmentIncoTerms'            => $this->shipmentIncoTerms,
+            'shipmentFreightTypeJob'       => $this->shipmentFreightTypeJob,
+            'shipmentRemarksJobDetailJobs' => $this->shipmentRemarksJobDetailJobs,
+        ];
+
+        // dd([
+        //     'shipmentClient_id' => $this->shipmentClient_id,
+        //     'shipmentType_job' => $this->shipmentType_job,
+        //     'shipment_id' => $this->shipment_id,
+        //     'shipmentClient_address' => $this->shipmentClient_address,
+        //     'shipmentShipper_id' => $this->shipmentShipper_id,
+        //     'shipmentConsignee_id' => $this->shipmentConsignee_id,
+        //     'shipmentNotify_id' => $this->shipmentNotify_id,
+        //     'data' => $payload,
+        //     'container' => $container
+        // ]);
+
+
+        $shipment = TShipments::create([
+            'shipmentsTypeJob'          => $this->shipmentType_job,
+            'shipment_id'              => $this->shipment_id,
+            'shipmentClient_id'        => $this->shipmentClient_id,
+            'shipmentClient_address'    => $this->shipmentClient_address,
+            'shipmentShipper_id'     => $this->shipmentShipper_id,
+            'shipmentConsignee_id'    => $this->shipmentConsignee_id,
+            'shipmentNotify_id'         => $this->shipmentNotify_id,
+            'shipmentCarrierAirline'      => $this->shipmentCarrierAirline,
+            'shipmentContainerDeliveryAgent' => $this->shipmentContainerDeliveryAgent,
             'shipmentCarrierAgent'      => $this->shipmentCarrierAgent,
             'shipmentDeliveryAgent'     => $this->shipmentDeliveryAgent,
             'employee_id' => $this->shipmentEmployee_id,
@@ -348,16 +755,19 @@ class CreateShipment extends Component
     {
         $carriers = [];
         $airlines = [];
+        $agents = [];
 
         if (in_array($this->shipmentType_job, ['air_inbound', 'air_outbound'])) {
             $airlines = Customer::whereJsonContains('roles', 'airline')->get();
         } else {
             $carriers = Customer::whereJsonContains('roles', 'carrier')->get();
+            $agents = Customer::whereJsonContains('roles', 'agent')->get();
         }
 
         return view('livewire.shipment.create-shipment', [
             'carriers' => $carriers,
             'airlines' => $airlines,
+            'agents'   => $agents,
         ]);
     }
 }

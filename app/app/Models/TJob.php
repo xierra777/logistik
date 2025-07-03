@@ -9,7 +9,7 @@ class TJob extends Model
     protected $casts = ['data' => 'array'];
 
     protected $fillable = [
-        'id_job',
+        'job_id',
         'jobBillLadingNo',
         'jobBillLadingDate',
         'houseJobBillLadingNo',

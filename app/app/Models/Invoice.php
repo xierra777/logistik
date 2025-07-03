@@ -12,13 +12,13 @@ class Invoice extends Model
     protected $fillable = [
         'invoice_number',
         'shipment_id',
+        'job_id',
         'customer_id',
         'invoice_date',
+        'due_date',
         'currency',
-        'sub_total',
-        'total_vat',
-        'total_wht',
-        'grand_total',
+        'total_amount',
+        'status',
         'created_by',
         'updated_by',
     ];
@@ -27,6 +27,10 @@ class Invoice extends Model
     {
         return $this->belongsTo(TShipments::class);
     }
+    public function job()
+    {
+        return $this->belongsTo(TJob::class);
+    }
 
     public function client()
     {
@@ -34,6 +38,6 @@ class Invoice extends Model
     }
     public function transactions()
     {
-        return $this->belongsTo(Transaction::class);
+        return $this->hasMany(Transaction::class);
     }
 }

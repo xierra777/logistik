@@ -6,6 +6,7 @@ use App\Models\ChargeSetting;
 use Livewire\Component;
 use App\Models\ChartOfAccount;
 use App\Models\Customer;
+use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Models\JournalEntry;
 use App\Models\transaction\tax;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class Accountant extends Component
 {
-    public $coa, $tax, $chargeCoa;
+    public $coa, $tax, $chargeCoa, $invoices, $extra;
     public $totaltransaksi;
     public $totalOutstanding = 0;
     public $shipmentWithTransactionsCount;
@@ -24,6 +25,8 @@ class Accountant extends Component
         $this->totaltransaksi = JournalEntry::count();
         $this->chargeCoa = ChargeSetting::count();
         $this->tax = tax::count();
+        $this->invoices = Invoice::count();
+        $this->extra = Invoice::sum('total_amount');
         $customers = Customer::with([
             'jobs.jobTransactions' => fn($q) => $q->whereNotNull('samountidr'),
             'jobs.paymentAllocations',

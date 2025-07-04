@@ -23,4 +23,16 @@ class jobContainer extends Model
     {
         return $this->hasMany(shipmentContainers::class, 'id_jobContainer');
     }
+    public function getNoOfPackagesAttribute()
+    {
+        return isset($this->containers['noOfPackages'])
+            ? (int)$this->containers['noOfPackages']
+            : 0;
+    }
+    public function getGrossWeightAttribute()
+    {
+        return isset($this->containers['grossWeight'])
+            ? (int)$this->containers['grossWeight']
+            : 0;
+    }
 }

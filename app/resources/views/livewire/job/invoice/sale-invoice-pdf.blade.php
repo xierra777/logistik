@@ -17,22 +17,45 @@
 
         .draft-watermark {
             position: absolute;
-            top: 50%;
+            top: 40%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
             font-size: 12rem;
-            color: rgba(255, 0, 0, 0.1);
+            color: rgba(255, 0, 0, 0.31);
             font-weight: bold;
             z-index: 10;
             pointer-events: none;
             user-select: none;
         }
+
+        .draft-void {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-25deg);
+            /* Lebih miring biar menonjol */
+            font-size: 20rem;
+            font-weight: 900;
+            color: rgba(220, 38, 38, 0.2);
+            /* deep red */
+            text-shadow:
+                2px 2px 5px rgba(0, 0, 0, 0.3),
+                -2px -2px 5px rgba(0, 0, 0, 0.3);
+            z-index: 999999;
+            pointer-events: none;
+            user-select: none;
+            white-space: nowrap;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 
 <body class="shadow-lg m-1 text-xs ">
+    @if($invoice->status === 'draft')
     <div class="draft-watermark">DRAFT</div>
-
+    @elseif($invoice->status === 'void')
+    <div class="draft-void">VOID</div>
+    @endif
     <div class="a4-wrapper align-center border border-gray-900 shadow-lg">
         <div class="grid grid-cols-4 border border-seperate border-gray-900 ">
             <div class="col-span-4 p-2 flex ">
@@ -89,11 +112,11 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Total No. of Pcs</p>
-                    <p class="col-span-3 uppercase font-bold text-[10px]">:</p>
+                    <p class="col-span-3 uppercase font-bold text-[10px]">: {{$totalPcs}} {{$job->tjobContainer->first()->containers['typeOfPackages'] }}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Total G.Weight</p>
-                    <p class="col-span-3 text-[10px]">: </p>
+                    <p class="col-span-3 text-[10px]">: {{$totalgw}} {{$job->tjobContainer->first()->containers['typeOfGrossWeight'] }} </p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Total Volume</p>
@@ -115,7 +138,7 @@
                     <p class="col-span-3 text-[10px]">: {{$job?->job_id}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
-                    <p class="font-semibold text-xs"> No.</p>
+                    <p class="font-semibold text-xs">Shipment No.</p>
                     <p class="col-span-3 text-[10px]">: </p>
                 </div>
                 <div class="grid grid-cols-4 ">
@@ -169,29 +192,29 @@
                         @if(isset($job) && $job->TjobContainer && $job->TjobContainer->count() > 0)
                         @foreach($job->TjobContainer as $c)
                         <tr class="text-center">
-                            <td class="p-2 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-left">
+                            <td class="p-2 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
                                 {{ $c->containers['containerNo'] ?? '' }}
                             </td>
                             <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
                                 {{ $c->containers['containerType'] ?? '' }}
                             </td>
                             <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                {{ $c->containers['NoOfPackages'] ?? 0 }}
+                                {{ $c->containers['noOfPackages'] ?? '' }}
+                            </td>
+                            <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center uppercase">
+                                {{ $c->containers['typeOfPackages'] ?? '' }}
                             </td>
                             <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                {{ $c->containers['TypeOfPackages'] ?? '' }}
+                                {{ $c->containers['grossWeight'] ?? '' }}
                             </td>
                             <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                {{ $c->containers['GrossWeight'] ?? 0 }}
+                                {{ $c->containers['typeOfGrossWeight'] ?? '' }}
                             </td>
                             <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                {{ $c->containers['TypeOfGrossWeight'] ?? '' }}
+                                {{ $c->containers['volume'] ?? '' }}
                             </td>
                             <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                {{ $c->containers['Volume'] ?? 0 }}
-                            </td>
-                            <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                {{ $c->containers['VolumeWeight'] ?? 0 }}
+                                {{ $c->containers['volumeWeight'] ?? '' }}
                             </td>
                             <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
                                 <!-- kosong -->
@@ -227,39 +250,39 @@
                     <tbody class="">
                         @foreach ($transactions as $transaction)
                         <tr class="bg-white dark:bg-neutral-900 align-top">
-                            <td class="text-[10px] border border-gray-900 text-center p-1">{{ $transaction->description }}</td>
-                            <td class="text-[10px] border border-gray-900 text-center p-1">{{ $transaction->quantity }}</td>
-                            <td class="text-[10px] border border-gray-900 text-center p-1">{{ $finalCurrency }}</td>
-                            <td class="text-[10px] border border-gray-900 text-center p-1">
+                            <td class="text-[9px] border border-gray-900 text-center p-1">{{ $transaction->description }}</td>
+                            <td class="text-[9px] border border-gray-900 text-center p-1">{{ $transaction->quantity }}</td>
+                            <td class="text-[9px] border border-gray-900 text-center p-1">{{ $finalCurrency }}</td>
+                            <td class="text-[9px] border border-gray-900 text-center p-1">
                                 @if($showExchangeRate == 'USD')
                                 {{ $transaction->srate }}
                                 @endif
                             </td>
-                            <td class="text-[10px] border border-gray-900 p-1">
+                            <td class="text-[9px] border border-gray-900 p-1">
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[10px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
-                                    <span class="text-[10px]">
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">
                                         {{ $finalCurrency == 'USD'
                         ? number_format($transaction->sfcyamount, 2, '.', ',')
-                        : number_format($transaction->samountidr, 2, '.', ',') }}
+                        : number_format($transaction->samountidr, 2, ',', '.') }}
                                     </span>
                                 </div>
                             </td>
-                            <td class="text-[10px] border border-gray-900 p-1">
+                            <td class="text-[9px] border border-gray-900 p-1">
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[10px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
-                                    <span class="text-[10px]">
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">
                                         {{ $finalCurrency == 'IDR'
                         ? number_format($transaction->subtotal, 2, ',', '.')
                         : number_format($transaction->subtotal, 2, '.', ',') }}
                                     </span>
                                 </div>
                             </td>
-                            <td class="text-[10px] border border-gray-900 text-center p-1">
+                            <td class="text-[9px] border border-gray-900 text-center p-1">
                                 @if (!is_null($transaction->svatgstamount) || !is_null($transaction->svatgstusd))
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[10px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
-                                    <span class="text-[10px]">
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">
                                         {{ $finalCurrency == 'IDR'
                         ? number_format($transaction->svatgstamount, 2, ',', '.')
                         : number_format($transaction->svatgstusd, 2, ',', '.') }}
@@ -269,11 +292,11 @@
                                 &nbsp;
                                 @endif
                             </td>
-                            <td class="text-[10px] border border-gray-900 text-center p-1 align-top">
+                            <td class="text-[9px] border border-gray-900 text-center p-1 align-top">
                                 @if (($transaction->swhtaxamount ?? 0) > 0 || ($transaction->shwtaxrateusd ?? 0) > 0)
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[10px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
-                                    <span class="text-[10px]">
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">
                                         {{ $finalCurrency == 'IDR'
                         ? number_format($transaction->swhtaxamount, 2, ',', '.')
                         : number_format($transaction->shwtaxrateusd, 2, ',', '.') }}
@@ -283,10 +306,10 @@
                                 &nbsp;
                                 @endif
                             </td>
-                            <td class="text-[10px] border border-gray-900 text-center p-1 align-top">
+                            <td class="text-[9px] border border-gray-900 text-center p-1 align-top">
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[10px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
-                                    <span class="text-[10px]">
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">
                                         {{ number_format($transaction->total, 2, ',', '.') }}
                                     </span>
                                 </div>
@@ -351,7 +374,7 @@
                     </div>
                 </div>
                 @if($customer->country == 'ID - Indonesia')
-                <p class="font-semibold italic mt-1">Payment Term 30 Days After Invoice Received</p>
+                <p class="font-semibold text-red-500 italic mt-1">Payment Term 30 Days After Invoice Received</p>
                 @endif
             </div>
         </div>

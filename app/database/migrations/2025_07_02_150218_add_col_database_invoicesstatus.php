@@ -11,16 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('transactions', function (Blueprint $table) {
-            // $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete()->after('created_at');
-            // $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete()->after('updated_at');
-            // $table->string('status')->default('draft')->after('invoice_number');
-            $table->string('is_invoiced')->nullable();
+        Schema::table('journal_entries', function (Blueprint $table) {
+            $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('cascade');
         });
-        // Schema::table('invoice_transaction', function (Blueprint $table) {
-        //     $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete()->after('created_at');
-        //     $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete()->after('updated_at');
-        // });
     }
 
     /**

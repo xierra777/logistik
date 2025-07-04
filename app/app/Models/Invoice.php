@@ -38,6 +38,12 @@ class Invoice extends Model
     }
     public function transactions()
     {
-        return $this->hasMany(Transaction::class);
+        return $this->belongsToMany(Transaction::class, 'invoice_transaction')
+            ->withPivot('amount', 'remarks')
+            ->withTimestamps();
+    }
+    public function users()
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

@@ -10,8 +10,10 @@ use App\Models\TJob;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
 use Spatie\Browsershot\Browsershot;
+use Livewire\Attributes\On;
 
 class JobSaleInvoice extends Component
 {
@@ -21,12 +23,14 @@ class JobSaleInvoice extends Component
     public $id_job;
     public $transactions;
     public $selected_transactions = [];
-    public $selectedTransactionIds = []; // Add this property for the checkboxes
+    public array $selectedTransactionIds = [];
     public $invoice_number;
     public $currency, $invoicesIssued;
     public $showExchangeRate = false; // Add this property
     public $finalCurrency = 'IDR'; // Add this property
     public $pdfData = '';
+    public $selectAll = false;
+    public $isIndeterminate = false; // Tambahkan ini
 
     public function mount($jobId)
     {
@@ -47,24 +51,136 @@ class JobSaleInvoice extends Component
 
     public function loadTransactions()
     {
-
-        // Load transactions for this job
-        // Adjust this query based on your database structure
         $this->transactions = Transaction::where('id_job', $this->jobId)
             ->whereNull('invoice_id')
             ->get();
         $this->invoicesIssued = Invoice::where('job_id', $this->jobId)->get();
-        // Alternative if your relationship is different:
-        // $this->transactions = $this->job->transactions;
+    }
+    #[On('issueInvoice')]
+    public function issueInvoice($id)
+    {
+        $invoice = Invoice::findOrFail($id);
+        $invoice->update(['status' => 'issued']);
 
-        // Or if you need to get transactions from a different relationship:
-        // $this->transactions = collect([]); // Empty collection as fallback
+        $this->loadTransactions();
+
+        $this->dispatch('showSuccessAlert', [
+            'title' => 'Invoice Issued!',
+            'text'  => "Invoice #{$invoice->invoice_number} has been marked as issued.",
+        ]);
+        $selectedTransactions = $invoice->transactions;
+        foreach ($selectedTransactions as $transaction) {
+            $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
+            $costCoa = ChartOfAccount::find($transaction->coa_cost_id);
+
+            // Jurnal Penjualan (Revenue)
+            if ($transaction->samountidr && $saleCoa && $transaction->transactionClient) {
+                $saleAmount = $transaction->samountidr;
+                $vatAmount  = $transaction->svatgstamount;
+                $whtAmount  = $transaction->swhtaxamount;
+                $totalSale  = $saleAmount + $vatAmount - $whtAmount;
+
+                // Piutang (A/R) - Debit
+                JournalEntry::create([
+                    'transaction_id'      => $transaction->id,
+                    'coa_id'              => $transaction->transactionClient->coa_id,
+                    'invoice_id'             => $invoice->id,
+                    'debit'               => $totalSale,
+                    'credit'              => 0,
+                    'description'         => "Piutang dari transaksi #{$transaction->transactionClient->name} ({$transaction->job->job_id}) - {$transaction->description}",
+                    'transactionable_type' => get_class($transaction),
+                    'transactionable_id'  => $transaction->id,
+                    'date'                => now(),
+                    'created_by'          => Auth::id(),
+                ]);
+
+                // VAT Output - Kredit
+                if ($vatAmount > 0 && $transaction->saleVat && $transaction->saleVat->coa_id) {
+                    JournalEntry::create([
+                        'transaction_id'      => $transaction->id,
+                        'coa_id'              => $transaction->saleVat->coa_id,
+                        'invoice_id'             => $invoice->id,
+                        'debit'               => 0,
+                        'credit'              => $vatAmount,
+                        'description'         => "PPN dari transaksi #{$transaction->job->job_id} - {$transaction->description}",
+                        'transactionable_type' => get_class($transaction),
+                        'transactionable_id'  => $transaction->id,
+                        'date'                => now(),
+                        'created_by'          => Auth::id(),
+                    ]);
+                }
+
+                // WHT Receivable - Debit
+                if ($whtAmount > 0 && $transaction->saleWht && $transaction->saleWht->coa_id) {
+                    JournalEntry::create([
+                        'transaction_id'      => $transaction->id,
+                        'coa_id'              => $transaction->saleWht->coa_id,
+                        'invoice_id'             => $invoice->id,
+                        'debit'               => $whtAmount,
+                        'credit'              => 0,
+                        'description'         => "PPh 23 dari transaksi #{$transaction->job->job_id} - {$transaction->description}",
+                        'transactionable_type' => get_class($transaction),
+                        'transactionable_id'  => $transaction->id,
+                        'date'                => now(),
+                        'created_by'          => Auth::id(),
+                    ]);
+                }
+
+                // Pendapatan (Revenue) - Kredit
+                JournalEntry::create([
+                    'transaction_id'      => $transaction->id,
+                    'coa_id'              => $saleCoa->id,
+                    'invoice_id'             => $invoice->id,
+                    'debit'               => 0,
+                    'credit'              => $saleAmount,
+                    'description'         => "Sale transaction #{$transaction->reference_type} ({$transaction->job->job_id}) - {$transaction->description}",
+                    'transactionable_type' => $transaction->reference_type,
+                    'transactionable_id'  => $transaction->id,
+                    'date'                => now(),
+                    'created_by'          => Auth::id(),
+                ]);
+            }
+        }
     }
 
+    public function voidInvoice($id)
+    {
+        $invoice = Invoice::findOrFail($id);
+        $invoice->update(['status' => 'void']);
+        $journalEntries = JournalEntry::where('invoice_id', $invoice->id)->get();
+
+        foreach ($journalEntries as $entry) {
+            JournalEntry::create([
+                'invoice_id'           => $entry->invoice_id,
+                'transaction_id'       => $entry->transaction_id,
+                'coa_id'               => $entry->coa_id,
+                'debit'                => $entry->credit, // dibalik
+                'credit'               => $entry->debit,  // dibalik
+                'description'          => "REVERSE: " . $entry->description,
+                'transactionable_type' => $entry->transactionable_type,
+                'transactionable_id'   => $entry->transactionable_id,
+                'date'                 => now(),
+                'created_by'           => Auth::id(),
+            ]);
+        }
+
+        // 2. Tandai transaksi bahwa invoice-nya sudah void (optional)
+        if (Schema::hasColumn('transactions', 'invoice_id')) {
+            Transaction::where('invoice_id', $invoice->id)->update([
+                'invoice_id' => null,
+            ]);
+        }
+        $this->loadTransactions();
+
+        $this->dispatch('showSuccessAlert', [
+            'title' => 'Invoice Issued!',
+            'text'  => "Invoice #{$invoice->invoice_number} has been marked as issued.",
+        ]);
+    }
     public function generateInvoiceNumber()
     {
         // Get the last invoice_number that matches today's pattern
-        $prefix = "INV-BRN-" . now()->format('ymd');
+        $prefix = "INV/BRN/" . now()->format('y/m/d - ');
         $lastInvoice = Invoice::where('invoice_number', 'like', $prefix . '%')
             ->orderByDesc('invoice_number')
             ->first();
@@ -80,15 +196,39 @@ class JobSaleInvoice extends Component
         return $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
     }
 
-    public function selectAllTransactions()
+
+    public function updatedSelectAll($value)
     {
-        if (count($this->selectedTransactionIds) === $this->transactions->count()) {
-            $this->selectedTransactionIds = [];
-        } else {
+        if ($value) {
             $this->selectedTransactionIds = $this->transactions->pluck('id')->toArray();
+        } else {
+            $this->selectedTransactionIds = [];
         }
+
+        $this->updateIndeterminateState();
     }
 
+    public function updatedSelectedTransactionIds()
+    {
+        $totalTransactions = $this->transactions->count();
+        $selectedCount = count($this->selectedTransactionIds);
+
+        if ($selectedCount === $totalTransactions && $totalTransactions > 0) {
+            $this->selectAll = true;
+        } else {
+            $this->selectAll = false;
+        }
+
+        $this->updateIndeterminateState();
+    }
+
+    public function updateIndeterminateState()
+    {
+        $selectedCount = count($this->selectedTransactionIds);
+        $totalCount = $this->transactions->count();
+
+        $this->isIndeterminate = $selectedCount > 0 && $selectedCount < $totalCount;
+    }
     public function generatePDF()
     {
         // Add your PDF generation logic here
@@ -104,9 +244,9 @@ class JobSaleInvoice extends Component
             // Asumsi invoice memiliki relasi ke job atau shipment memiliki relasi ke job
             $job = TJob::with('TjobContainer')->findOrFail($invoice->job_id);
             $customer = $invoice->client;
-
             $totalPcs = $job->TjobContainer->sum('noOfPackages');
             $totalgw  = $job->TjobContainer->sum('grossWeight');
+            // dd($totalPcs);
 
             $summary = [
                 'subtotal' => 0,
@@ -206,6 +346,7 @@ class JobSaleInvoice extends Component
                 'invoice_number'       => $invoice->invoice_number, // Ambil dari invoice
                 'showExchangeRate'     => $this->showExchangeRate,
             ];
+            // dd($invoice->transactions);
 
             $html = view('livewire.job.invoice.sale-invoice-pdf', $data)->render();
 
@@ -271,7 +412,12 @@ class JobSaleInvoice extends Component
             Transaction::whereIn('id', $this->selectedTransactionIds)->update([
                 'invoice_id' => $invoice->id
             ]);
-
+            foreach ($selectedTransactions as $transaction) {
+                $invoice->transactions()->attach($transaction->id, [
+                    'amount' => $transaction->samountidr,
+                    'remarks' => null,
+                ]);
+            }
             // Buat jurnal untuk setiap transaksi
             foreach ($selectedTransactions as $transaction) {
                 $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
@@ -288,6 +434,7 @@ class JobSaleInvoice extends Component
                     JournalEntry::create([
                         'transaction_id'      => $transaction->id,
                         'coa_id'              => $transaction->transactionClient->coa_id,
+                        'invoice_id'             => $invoice->id,
                         'debit'               => $totalSale,
                         'credit'              => 0,
                         'description'         => "Piutang dari transaksi #{$transaction->transactionClient->name} ({$transaction->job->job_id}) - {$transaction->description}",
@@ -302,6 +449,7 @@ class JobSaleInvoice extends Component
                         JournalEntry::create([
                             'transaction_id'      => $transaction->id,
                             'coa_id'              => $transaction->saleVat->coa_id,
+                            'invoice_id'             => $invoice->id,
                             'debit'               => 0,
                             'credit'              => $vatAmount,
                             'description'         => "PPN dari transaksi #{$transaction->job->job_id} - {$transaction->description}",
@@ -317,6 +465,7 @@ class JobSaleInvoice extends Component
                         JournalEntry::create([
                             'transaction_id'      => $transaction->id,
                             'coa_id'              => $transaction->saleWht->coa_id,
+                            'invoice_id'             => $invoice->id,
                             'debit'               => $whtAmount,
                             'credit'              => 0,
                             'description'         => "PPh 23 dari transaksi #{$transaction->job->job_id} - {$transaction->description}",
@@ -331,6 +480,7 @@ class JobSaleInvoice extends Component
                     JournalEntry::create([
                         'transaction_id'      => $transaction->id,
                         'coa_id'              => $saleCoa->id,
+                        'invoice_id'             => $invoice->id,
                         'debit'               => 0,
                         'credit'              => $saleAmount,
                         'description'         => "Sale transaction #{$transaction->reference_type} ({$transaction->job->job_id}) - {$transaction->description}",
@@ -342,6 +492,71 @@ class JobSaleInvoice extends Component
                 }
             }
 
+            DB::commit();
+            session()->flash('message', 'Invoice created successfully!');
+            // Optionally redirect or reset form here
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Failed to create invoice: ' . $e->getMessage());
+        }
+        $this->loadTransactions();
+    }
+    public function saveAsDraft()
+    {
+        // Validasi minimal ada transaksi yang dipilih
+        $this->validate([
+            'selectedTransactionIds' => 'required|array|min:1',
+            'invoice_number' => 'required|string|max:255',
+        ], [
+            'selectedTransactionIds.required' => 'Please select at least one transaction.',
+            'selectedTransactionIds.min' => 'Please select at least one transaction.',
+            'invoice_number.required' => 'Invoice number is required.',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            // Ambil transaksi yang dipilih dan belum di-invoice
+            $selectedTransactions = Transaction::whereIn('id', $this->selectedTransactionIds)
+                ->whereNull('invoice_id')
+                ->get();
+
+            if ($selectedTransactions->isEmpty()) {
+                DB::rollBack();
+                session()->flash('error', 'All selected transactions are already attached to an invoice.');
+                return;
+            }
+
+            // Hitung subtotal, VAT, WHT, dan grand total
+            $subtotal   = $selectedTransactions->sum('samountidr');
+            $totalVat   = $selectedTransactions->sum('svatgstamount');
+            $totalWht   = $selectedTransactions->sum('swhtaxamount');
+            $grandTotal = $subtotal + $totalVat + $totalWht;
+            // dd($this->jobId);
+            // Buat invoice baru
+            $invoice = Invoice::create([
+                'invoice_number' => $this->invoice_number,
+                'job_id'         => $this->jobId,
+                'customer_id'    => $this->customer->id,
+                'invoice_date'   => $this->invoice_date ?? now(),
+                'due_date'       => now()->addDays(30),
+                'status'         => 'draft',
+                'currency'       => $this->currency ?? 'IDR',
+                'total_amount'   => $grandTotal,
+                'created_by'     => Auth::id(),
+            ]);
+
+            // Update transaksi dengan invoice_id
+            Transaction::whereIn('id', $this->selectedTransactionIds)->update([
+                'invoice_id' => $invoice->id
+            ]);
+            foreach ($selectedTransactions as $transaction) {
+                $invoice->transactions()->attach($transaction->id, [
+                    'amount' => $transaction->samountidr,
+                    'remarks' => null,
+                ]);
+            }
             DB::commit();
             session()->flash('message', 'Invoice created successfully!');
             // Optionally redirect or reset form here

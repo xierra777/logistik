@@ -113,9 +113,11 @@ class Transaction extends Model
         return $this->belongsTo(Customer::class, 'cvendor');
     }
 
-    public function invoice()
+    public function invoices()
     {
-        return $this->belongsTo(Invoice::class);
+        return $this->belongsToMany(Invoice::class, 'invoice_transaction')
+            ->withPivot('amount', 'remarks')
+            ->withTimestamps();
     }
 
     public function getSamountgpFormattedAttribute()

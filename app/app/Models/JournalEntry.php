@@ -11,6 +11,7 @@ class JournalEntry extends Model
 
     protected $fillable = [
         'transaction_id',
+        'invoice_id',
         'coa_id',
         'debit',
         'transactionable_type',

@@ -139,7 +139,7 @@
                         {{$ac->rate}}
                     </td>
                     <td class="px-4 py-4 text-center text-sm text-gray-800 dark:text-neutral-300">
-                        {{$ac->coaAccount->account_name}}
+                        {{$ac->coaAccount->account_name ?? ''}}
                     </td>
                     <td class="px-4 py-4 text-center text-sm text-gray-800 dark:text-neutral-300">
                         <span class="ml-2 text-sm px-2 py-1 rounded-full {{ $ac->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600' }}">

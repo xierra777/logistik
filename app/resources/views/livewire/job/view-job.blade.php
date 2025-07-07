@@ -1004,12 +1004,20 @@
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $loop->iteration }}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200 gap-3">
+                            <!-- Edit Transaction Button with Alpine.js Modal -->
+
                             <button
                                 type="button"
                                 @click="$dispatch('confirm-delete', { get_id: {{ $transaction->id }} })"
                                 class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
                                 Delete
+                            </button>
+                            <button
+                                type="button"
+                                wire:click="editingTrans({{ $job->id }})"
+                                class="p-2 bg-blue-500 rounded-full text-gray-300 hover:text-gray-100 dark:text-blue-400 dark:hover:text-blue-300 hover:scale-105 hover:animate-pulse transition-transform inline-block">
+                                Update (Job: {{ $job->id }})
                             </button>
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
@@ -1076,6 +1084,7 @@
                 :key="'confirm-delete-job-transaction-' . now()->timestamp" />
         </div>
     </div>
+
     <hr class="border-gray-500 dark:border-neutral-500 mt-5">
 
 
@@ -1086,6 +1095,7 @@
             Back
         </a>
     </div>
+
 </div>
 @push('script')
 @script()

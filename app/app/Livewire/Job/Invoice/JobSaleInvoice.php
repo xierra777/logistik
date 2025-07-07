@@ -540,7 +540,7 @@ class JobSaleInvoice extends Component
                 'job_id'         => $this->jobId,
                 'customer_id'    => $this->customer->id,
                 'invoice_date'   => $this->invoice_date ?? now(),
-                'due_date'       => now()->addDays(30),
+                'due_date'       => null,
                 'status'         => 'draft',
                 'currency'       => $this->currency ?? 'IDR',
                 'total_amount'   => $grandTotal,

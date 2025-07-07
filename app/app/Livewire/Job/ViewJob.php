@@ -22,6 +22,7 @@ class ViewJob extends Component
     public $modalContainer = true;
     public $containerType, $noOfPackages, $containerReleaseNo, $containerReleaseDate, $typeOfPackages, $grossWeight, $typeOfGrossWeight, $volumeWeight, $typeOfVolumeWeight, $volume, $chargableWeight, $containerRemarks, $containerNo, $containerSealNo, $noOfPallet, $netOfWeight, $typeNetOfWeight, $totalWeight, $typeOfTotalWeight, $hsCode, $hsCodeDesc;
 
+
     protected $listeners = [
         'transactionSaved' => 'refreshJob',
     ];
@@ -48,8 +49,8 @@ class ViewJob extends Component
 
         $this->refreshKey = now()->timestamp;
         $this->loadJob($id); // cukup panggil method ini, tidak perlu cari ulang shipment ID
-
     }
+
     public function loadJob($id)
     {
         $this->job = TJob::with([
@@ -108,6 +109,21 @@ class ViewJob extends Component
         }
     }
 
+    public function editTransaction($jobId, $transactionId)
+    {
+        // Validate that transaction belongs to this job
+        $transaction = Transaction::where('id', $transactionId)
+            ->where('id_job', $jobId)
+            ->first();
+
+        if (!$transaction) {
+            session()->flash('error', 'Transaction not found or does not belong to this job.');
+            return;
+        }
+
+        // Dispatch event to Alpine.js to show modal
+        $this->dispatch('open-edit-modal');
+    }
     public function getAssignedShipmentsProperty()
     {
         return $this->job->shipments;

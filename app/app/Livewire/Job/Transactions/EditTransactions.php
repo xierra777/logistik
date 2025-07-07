@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Job\Transactions;
 
-use App\Livewire\Shipment\ContainerShipment;
 use Livewire\Component;
 use App\Models\TShipments;
 use App\Models\Customer;
@@ -16,7 +15,7 @@ use App\Models\JournalEntry;
 use App\Models\TJob;
 use App\Models\transaction\tax;
 
-class CreateTransactions extends Component
+class EditTransactions extends Component
 {
     public $chargeCoa;
 
@@ -31,7 +30,7 @@ class CreateTransactions extends Component
     public $coaCostId;
 
     // === Charge Details ===
-    public $charge = '', $description, $freight, $unit = 'CONTAINER', $ofdtype, $remarks;
+    public $charge, $description, $freight, $unit = 'CONTAINER', $ofdtype, $remarks;
     public $quantity = 0;
 
     // === Sale Details ===
@@ -48,25 +47,91 @@ class CreateTransactions extends Component
     public $shwtaxrateusd = 0, $chwtaxrateusd = 0;
     public $vendors, $clients;
     public $shipmentType;
-
-    public function mount($id)
+    public $transactionId;
+    public function mount($id = null, $transactionId = null)
     {
         $this->jobId = $id;
+        $this->transactionId = $transactionId;
+        $this->loadTransaction($this->transactionId);
         $job = TJob::with(['client'])->find($id);
         $this->clients = collect([
-            $job->client,
+
+            $job->client ?? '',
         ])->filter()->unique();
+        // dd($id);
+
         $taxes = tax::where('is_active', '1')->get(); // asumsikan ada kolom 'id', 'name', 'rate'
 
         $this->taxRates = $taxes->where('type', 'vat')->pluck('rate', 'id')->toArray(); // untuk dropdown
         $this->taxRatesWht = $taxes->where('type', 'wht')->pluck('rate', 'id')->toArray(); // untuk dropdown
         $this->taxData = $taxes->pluck('rate', 'id')->toArray(); // untuk Alpine.js
         $customers = Customer::orderBy('name')->get();
-
         $this->chargeCoa = ChargeSetting::get();
         $this->updatedUnit($this->unit);
 
+
         $this->vendors = Customer::where('category', 'creditor')->orderBy('name')->get();
+    }
+    public function loadTransaction($transactionId)
+    {
+        $transaction = Transaction::find($transactionId);
+
+        if (!$transaction) return alert('niggas');
+
+        $this->charge = $transaction->charge;
+        $this->description = $transaction->description;
+        $this->freight = $transaction->freight;
+        $this->unit = $transaction->unit;
+        $this->quantity = $transaction->quantity;
+        $this->ofdtype = $transaction->ofdtype;
+        $this->remarks = $transaction->remarks;
+
+        $this->sclient = $transaction->sclient;
+        $this->scurrency = $transaction->scurrency;
+        $this->srate = $transaction->srate;
+        $this->samount_qty = $transaction->samount_qty;
+        $this->sincludedtax = $transaction->sincludedtax;
+        $this->sfcyamount = $transaction->sfcyamount;
+        $this->samountidr = $transaction->samountidr;
+        $this->sdrcr = $transaction->sdrcr;
+        $this->svatgst = $transaction->svatgst;
+        $this->staxableamount = $transaction->staxableamount;
+        $this->svatgstamount = $transaction->svatgstamount;
+        $this->swhtaxrate = $transaction->swhtaxrate;
+        $this->swhtaxamount = $transaction->swhtaxamount;
+        $this->sremarks = $transaction->sremarks;
+        $this->sgrossprofit = $transaction->sgrossprofit;
+
+        // Cost Details
+        $this->cvendor = $transaction->cvendor;
+        $this->creferenceno = $transaction->creferenceno;
+        $this->cdate = $transaction->cdate;
+        $this->cdrcr = $transaction->cdrcr;
+        $this->ccurrency = $transaction->ccurrency;
+        $this->crate = $transaction->crate;
+        $this->camount_qty = $transaction->camount_qty;
+        $this->cincludedtax = $transaction->cincludedtax;
+        $this->cfcyamount = $transaction->cfcyamount;
+        $this->camountidr = $transaction->camountidr;
+        $this->cvatgst = $transaction->cvatgst;
+        $this->cvatgstusd = $transaction->cvatgstusd;
+        $this->cvatgstamount = $transaction->cvatgstamount;
+        $this->chwtaxrateusd = $transaction->chwtaxrateusd;
+        $this->ctaxableamount = $transaction->ctaxableamount;
+        $this->cremarks = $transaction->cremarks;
+        $this->cwhtaxrate = $transaction->cwhtaxrate;
+        $this->cwhtaxamount = $transaction->cwhtaxamount;
+        $this->totalcost = $transaction->totalcost;
+
+        // COA columns
+        $this->coaSaleId = $transaction->coa_sale_id;
+        $this->coaCostId = $transaction->coa_cost_id;
+
+        // // created_by, updated_by
+        // $this->created_by = $transaction->created_by ?? null;
+        // $this->updated_by = $transaction->updated_by ?? null;
+
+
     }
     public function updatedUnit($value)
     {
@@ -100,9 +165,13 @@ class CreateTransactions extends Component
             $this->coaSaleId = $charge->coa_sale_id;
             $this->coaCostId = $charge->coa_cost_id;
             $this->description = $charge->charge_name;
+
+            // dd($this->coaSaleId, $this->coaCostId);
+            // dd($this->description);
         } else {
             $this->coaSaleId = null;
             $this->coaCostId = null;
+            $this->description = null;
         }
     }
     protected function rules()
@@ -136,7 +205,7 @@ class CreateTransactions extends Component
         if ($this->cwhtaxrate == 0 || empty($this->cwhtaxrate)) {
             $this->cwhtaxrate = null;
         }
-        $transaction = Transaction::create([
+        $transaction = Transaction::where('id', $this->transactionId)->update([
             'id_job' => $this->jobId,
             'charge' => $this->charge,
             'description' => $this->description,
@@ -384,9 +453,6 @@ class CreateTransactions extends Component
     }
     public function render()
     {
-        return view('livewire.job.transactions.create-transactions');
+        return view('livewire.job.transactions.edit-transactions');
     }
-
-    // Update quantity based on containers associated with the job
-
 }

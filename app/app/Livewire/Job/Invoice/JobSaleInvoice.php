@@ -59,10 +59,22 @@ class JobSaleInvoice extends Component
     #[On('issueInvoice')]
     public function issueInvoice($id)
     {
+        // Ambil invoice berdasarkan $id
         $invoice = Invoice::findOrFail($id);
-        $invoice->update(['status' => 'issued']);
 
-        $this->loadTransactions();
+        // Ambil semua transaksi yang berelasi dengan invoice tersebut
+        $transactions = Transaction::where('invoice_id', $invoice->id)->get();
+
+        // Update semua transaksi, bisa pakai query langsung:
+
+        foreach ($transactions as $transaction) {
+            $transaction->update(['is_invoiced' => 'locked']);
+        }
+        $invoice->update([
+            'status' => 'issued',
+            'due_date' => now()->addDays(30)
+        ]);
+
 
         $this->dispatch('showSuccessAlert', [
             'title' => 'Invoice Issued!',
@@ -141,12 +153,17 @@ class JobSaleInvoice extends Component
                 ]);
             }
         }
+        $this->loadTransactions();
     }
 
     public function voidInvoice($id)
     {
         $invoice = Invoice::findOrFail($id);
-        $invoice->update(['status' => 'void']);
+        $invoice->update([
+            'status' => 'void',
+            'due_date' => null,
+            'updated_by' => Auth::user()->id
+        ]);
         $journalEntries = JournalEntry::where('invoice_id', $invoice->id)->get();
 
         foreach ($journalEntries as $entry) {
@@ -159,6 +176,8 @@ class JobSaleInvoice extends Component
                 'description'          => "REVERSE: " . $entry->description,
                 'transactionable_type' => $entry->transactionable_type,
                 'transactionable_id'   => $entry->transactionable_id,
+                'is_reversal'          => true,
+                'reversal_of'          => $entry->id,
                 'date'                 => now(),
                 'created_by'           => Auth::id(),
             ]);
@@ -170,17 +189,17 @@ class JobSaleInvoice extends Component
                 'invoice_id' => null,
             ]);
         }
-        $this->loadTransactions();
 
         $this->dispatch('showSuccessAlert', [
             'title' => 'Invoice Issued!',
             'text'  => "Invoice #{$invoice->invoice_number} has been marked as issued.",
         ]);
+        $this->loadTransactions();
     }
     public function generateInvoiceNumber()
     {
         // Get the last invoice_number that matches today's pattern
-        $prefix = "INV/BRN/" . now()->format('y/m/d - ');
+        $prefix = "INV/BRN/" . now()->format('y/m/');
         $lastInvoice = Invoice::where('invoice_number', 'like', $prefix . '%')
             ->orderByDesc('invoice_number')
             ->first();
@@ -434,7 +453,7 @@ class JobSaleInvoice extends Component
                     JournalEntry::create([
                         'transaction_id'      => $transaction->id,
                         'coa_id'              => $transaction->transactionClient->coa_id,
-                        'invoice_id'             => $invoice->id,
+                        'invoice_id'           => $invoice->id,
                         'debit'               => $totalSale,
                         'credit'              => 0,
                         'description'         => "Piutang dari transaksi #{$transaction->transactionClient->name} ({$transaction->job->job_id}) - {$transaction->description}",

@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('journal_entries', function (Blueprint $table) {
-            $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('cascade');
+        Schema::table('transactions', function (Blueprint $table) {
+            $table->boolean('is_locked')->nullable();
         });
     }
 

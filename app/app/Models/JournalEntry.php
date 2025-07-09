@@ -18,6 +18,9 @@ class JournalEntry extends Model
         'credit',
         'description',
         'date',
+        'reversal_of',
+        'is_reversal',
+        'description_of_reversal',
         'created_by',
         'updated_by',
     ];

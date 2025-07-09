@@ -328,16 +328,26 @@
                             </span>
                             @endif
                         </td>
+
                         <td class="p-4 text-center">
                             @php
                             $dueTime = $invs->due_date;
+                            $status = $invs->status;
                             @endphp
-                            <div x-data="countdownTimer('{{ \Carbon\Carbon::parse($invs->due_date)->toIso8601String() }}')"
+                            <div x-data="countdownTimer('{{ \Carbon\Carbon::parse($invs->due_date)->toIso8601String() }}', '{{ $status }}')"
                                 x-init="start()"
-                                class="text-red-600 font-bold">
+                                class="font-bold"
+                                :class="{
+            'text-red-600': time === 'EXPIRED',
+            'text-yellow-600': time === 'DRAFT',
+            'text-blue-600': time !== 'EXPIRED' && time !== 'DRAFT' && time !== '',
+            'text-gray-400': time === ''
+        }">
                                 <span x-text="time" class="text-sm">LOADING...</span>
                             </div>
+                            @if($invs->due_stats === 'issued')
                             <div class="text-green-600 text-sm mt-1">{{$invs->due_date}}</div>
+                            @endif
                         </td>
                         <td class="p-4 text-center text-gray-700">{{ $invs->invoice_date ?? '' }}</td>
                         <td class="p-4 text-center text-gray-700">
@@ -373,7 +383,7 @@
                                     <i class="fas fa-print text-sm"></i>
                                 </button>
 
-                                @if($invs->status !== 'void')
+                                @if($invs->status === 'issued')
                                 <button wire:click="voidInvoice({{ $invs->id }})"
                                     wire:loading.attr="disabled"
                                     wire:target="voidInvoice"
@@ -440,31 +450,48 @@
 </div>
 @push('scripts')
 <script>
-    function countdownTimer(dueTime) {
+    function countdownTimer(dueTime, status) {
         return {
             time: '',
             start() {
                 const end = new Date(dueTime).getTime();
 
                 const update = () => {
-                    const now = new Date().getTime();
-                    const diff = end - now;
-
-                    if (diff <= 0) {
-                        this.time = 'Expired';
+                    // Handle different statuses
+                    if (status === 'void') {
+                        this.time = '';
                         return;
                     }
 
-                    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                    const s = Math.floor((diff % (1000 * 60)) / 1000);
+                    if (status === 'draft') {
+                        this.time = 'DRAFT';
+                        return;
+                    }
 
-                    this.time = `${d}d ${h}h ${m}m `;
+                    if (status === 'issued') {
+                        const now = new Date().getTime();
+                        const diff = end - now;
+
+                        if (diff <= 0) {
+                            this.time = 'EXPIRED';
+                            return;
+                        }
+
+                        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                        this.time = `${d}d ${h}h ${m}m ${s}s`;
+                    }
                 };
 
                 update();
-                setInterval(update, 1000);
+
+                // Only set interval for issued invoices
+                if (status === 'issued') {
+                    setInterval(update, 1000);
+                }
             }
         }
     }

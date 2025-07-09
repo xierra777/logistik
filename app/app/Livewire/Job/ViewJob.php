@@ -12,19 +12,21 @@ use Illuminate\Support\Facades\Auth;
 
 class ViewJob extends Component
 {
-
+    public $isEditing = false;
+    public $editingJobId = false;
     public $job;
-    public $refreshKey;
+    public $refreshKey, $transactionId, $jobId;
     public $type_job = '';
     public array $selectedShipments = [];
     public $organizationFields = [];
     public array $selectedAssignedShipments = [];
     public $modalContainer = true;
     public $containerType, $noOfPackages, $containerReleaseNo, $containerReleaseDate, $typeOfPackages, $grossWeight, $typeOfGrossWeight, $volumeWeight, $typeOfVolumeWeight, $volume, $chargableWeight, $containerRemarks, $containerNo, $containerSealNo, $noOfPallet, $netOfWeight, $typeNetOfWeight, $totalWeight, $typeOfTotalWeight, $hsCode, $hsCodeDesc;
-
+    public $editingTransactionId;
 
     protected $listeners = [
         'transactionSaved' => 'refreshJob',
+        'close-modal' => 'closeEditTransaction'
     ];
     public function mount($id)
     {
@@ -46,7 +48,6 @@ class ViewJob extends Component
     }
     public function refreshTransaction($id)
     {
-
         $this->refreshKey = now()->timestamp;
         $this->loadJob($id); // cukup panggil method ini, tidak perlu cari ulang shipment ID
     }
@@ -57,7 +58,7 @@ class ViewJob extends Component
             'client',
             'TjobContainer',
             'carrierModel',
-            'jobTransactions',     // relasi ke Customer
+            'jobTransactions.invs',     // relasi ke Customer
             'ogents',
             'dagents',
             'employee',
@@ -101,6 +102,14 @@ class ViewJob extends Component
     }
     public function confirmDelete($get_id)
     {
+        if ($this->job->jobTransactions && $this->job->jobTransactions->invs->status === 'issued') {
+            $this->dispatch('swal', [
+                'title' => 'Gagal Update',
+                'text' => 'Transaksi ini sudah masuk ke invoice yang telah issued.',
+                'icon' => 'error', // Diubah dari 'errors' menjadi 'error'
+            ]);
+            return;
+        }
         try {
             Transaction::destroy($get_id);
             session()->flash('message', 'Shipment deleted successfully!');
@@ -111,18 +120,13 @@ class ViewJob extends Component
 
     public function editTransaction($jobId, $transactionId)
     {
-        // Validate that transaction belongs to this job
-        $transaction = Transaction::where('id', $transactionId)
-            ->where('id_job', $jobId)
-            ->first();
+        $this->editingTransactionId = $transactionId; // Store the actual transaction ID
+        $this->editingJobId = $jobId; // You might need this too
+    }
+    public function closeEditTransaction()
+    {
+        $this->editingTransactionId = null; // Store the actual transaction ID
 
-        if (!$transaction) {
-            session()->flash('error', 'Transaction not found or does not belong to this job.');
-            return;
-        }
-
-        // Dispatch event to Alpine.js to show modal
-        $this->dispatch('open-edit-modal');
     }
     public function getAssignedShipmentsProperty()
     {

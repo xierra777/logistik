@@ -15,11 +15,15 @@ return new class extends Migration {
                 ->onDelete('cascade');
             $table->string('transactionable_type');
             $table->foreignId('coa_id')->constrained('chart_of_accounts')->onDelete('cascade');
+            $table->foreignId('invoice_id')->constrained('invoices')->onDelete('cascade');
             $table->decimal('debit', 16, 2)->default(0);
             $table->decimal('credit', 16, 2)->default(0);
             $table->string('description')->nullable();
             $table->date('date')->nullable();
             $table->timestamps();
+            $table->unsignedBigInteger('reversal_of')->nullable(); // menunjuk ke journal yg direverse
+            $table->boolean('is_reversal')->default(false);
+            $table->string('description_of_reversal')->nullable();
 
             $table->index('coa_id');
             $table->index('transactionable_type'); // index untuk polymorphic type

@@ -208,7 +208,6 @@
     // --- Initialization ---
     init() {
         window.reinitSelect2();
-         this.resetModal();
         // Watch for recalculation
         this.$watch('srate', () => this.samountIdrComputed);
         this.$watch('amount', () => this.samountIdrComputed);
@@ -282,6 +281,7 @@
 
     <div class="bg-white">
         <!-- Heading Bar -->
+
         <div class="bg-green-600 p-3 rounded-t-xl">
             <h2 class="text-white text-lg font-semibold">Charge</h2>
         </div>
@@ -295,7 +295,7 @@
                         Charge<span class="text-red-500">*</span>
                     </label>
                     <div wire:ignore>
-                        <select id="charge" name="charge" wire:model.live="charge"
+                        <select id="editCharge" name="charge" wire:model.live="charge"
                             class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" require>
                             <option value=""></option>
                             @foreach($chargeCoa as $c)
@@ -305,19 +305,17 @@
                     </div>
                     @error('charge') <span class="text-red-500">{{$message}}</span> @enderror
                 </div>
+
                 <!-- Description -->
                 <div>
                     <label for="description" class="block text-sm font-medium text-gray-700">
                         Description / Name<span class="text-red-500">*</span>
                     </label>
                     <div class="flex gap-2">
-                        <input type="text"
-                            id="description"
-                            name="description"
-                            wire:model.live="description"
-                            placeholder=""
-                            class="block py-1.5 pr-8 pl-3 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                        <input type="text" id="description" name="description" wire:model.live="description" placeholder=""
+                            class="block py-1.5 pr-8 pl-3 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"><span wire:loading></span>
                     </div>
+                    {{$description}}
                 </div>
                 <!-- Freight -->
                 <div wire:ignore>
@@ -341,7 +339,7 @@
                     <select id="unit" name="unit" wire:model="unit"
                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         <option value=""></option>
-                        <option value="">-- Pilih --</option>
+                        <option value="">-- Choose --</option>
                         <option value="CONTAINER">PER CONTAINER</option>
                         <option value="PALLET">PER PALLET</option>
                         <option value="DOCUMENT">PER DOCUMENT</option>
@@ -388,9 +386,9 @@
             <!-- Row 1: Client, Currency, Exchange Rate -->
             <div class="grid grid-cols-3 gap-4" wire:ignore>
                 <div class="">
-                    <label class="block font-medium">Pilih Client</label>
-                    <select wire:model="sclient" id="sclientEdit" class="w-full border rounded-md border-gray-300 p-2">
-                        <option value="">-- Pilih Client --</option>
+                    <label class="block font-medium">Choose Client</label>
+                    <select wire:model="sclient" id="editSclient" class="w-full border rounded-md border-gray-300 p-2">
+                        <option value="">-- Choose Client --</option>
                         @foreach($clients as $client)
                         <option value="{{ $client->id }}">{{$client->customer_code}} - {{ $client->name }}</option>
                         @endforeach
@@ -422,7 +420,7 @@
                     </div>
                     <div class="flex-1" wire:ignore>
                         <label for="sincludedtax" class="block text-sm font-medium text-gray-700">Included Tax?</label>
-                        <select id="sincludedtax" name="sincludedtax"
+                        <select id="editSincludedtax" name="sincludedtax"
                             wire:model="sincludedtax" x-model="sincludedtax"
                             class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="No">No</option>
@@ -455,7 +453,7 @@
                 </div>
                 <div wire:ignore>
                     <label for="svatgst" class="block text-sm font-medium text-gray-700">VAT / GST Type</label>
-                    <select id="svatgst" name="svatgst" x-model="svatgst" wire:model="svatgst"
+                    <select id="editSvatgst" name="svatgst" x-model="svatgst" wire:model="svatgst"
                         class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm">
                         <option value="">Select Tax</option>
                         @foreach($taxRates as $id => $rate)
@@ -553,9 +551,9 @@
             <div class="grid grid-cols-3 gap-4">
                 <!-- Vendor -->
                 <div class="" wire:ignore>
-                    <label class="block font-medium">Pilih Vendor</label>
+                    <label class="block font-medium">Choose Vendor</label>
                     <select wire:model="cvendor" id="cvendor" class="w-full border rounded-md border-gray-300 p-2">
-                        <option value="">-- Pilih Vendor --</option>
+                        <option value="">-- Choose Vendor --</option>
                         @foreach($vendors as $vendor)
                         <option wire:key="{{$vendor}}" value="{{ $vendor->id }}">{{$vendor->customer_code}} - {{ $vendor->name }}</option>
                         @endforeach
@@ -642,7 +640,7 @@
                 <!-- VAT / GST Type -->
                 <div wire:ignore>
                     <label for="cvatgst" class="block text-sm font-medium text-gray-700">VAT / GST TAX</label>
-                    <select id="cvatgst" name="cvatgst" wire:model="cvatgst"
+                    <select id="editCvatgst" name="cvatgst" wire:model="cvatgst"
                         class="w-full rounded-md border-gray-300 shadow-sm">
                         <option value="">Select Tax</option>
                         @foreach($taxRates as $id => $rate)
@@ -704,33 +702,34 @@
 
     <!-- Modal Footer (Buttons) -->
     <div class="flex justify-end mt-4 gap-2 p-4 border-t color-gray-200">
-        <button type="button" @click="openEditTransaction = false" class="px-4 py-2 bg-gray-500 text-white rounded-lg" @click="$refs.modalContent.scrollTo({ top: 0, behavior: 'smooth' })">
+        <button type="button" class="px-4 py-2 bg-gray-500 text-white rounded-lg" wire:click="closeModal">
             Cancel
         </button>
         <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">
             Save
         </button>
     </div>
+
 </form>
 @push('script')
 @script()
 <script>
     window.reinitSelect2 = () => {
         [{
-                sel: '#sclientEdit',
+                sel: '#editSclient',
                 model: 'sclient',
                 placeholder: 'Select Client '
             }, {
-                sel: '#sincludedtax',
+                sel: '#editSincludedtax',
                 model: 'sincludedtax',
                 placeholder: 'Select tax '
             }, {
-                sel: '#cvatgst',
+                sel: '#editCvatgst',
                 model: 'cvatgst',
                 placeholder: 'Select VAT '
             },
             {
-                sel: '#svatgst',
+                sel: '#editSvatgst',
                 model: 'svatgst',
                 placeholder: 'Select VAT '
             },
@@ -738,6 +737,11 @@
                 sel: '#swhtaxrate',
                 model: 'swhtaxrate',
                 placeholder: 'Select Tax Rate '
+            },
+            {
+                sel: '#editCharge',
+                model: 'charge',
+                placeholder: 'Select Charge'
             },
             {
                 sel: '#cwhtaxrate',
@@ -749,10 +753,6 @@
                 placeholder: 'Select Vendor'
             },
             {
-                sel: '#charge',
-                model: 'charge',
-                placeholder: 'Select charge'
-            }, {
                 sel: '#freight',
                 model: 'freight',
                 placeholder: 'Select Freight'
@@ -782,16 +782,14 @@
             placeholder
         }) => {
             const $el = $(sel);
-            if (!$el.length) {
-                console.warn('Not found:', sel);
-                return;
-            }
+            if (!$el.length) return;
 
-            // Hapus Select2 sebelumnya
+            // Destroy existing Select2 instance
             if ($el.hasClass('select2-hidden-accessible')) {
                 $el.select2('destroy');
             }
 
+            // Initialize Select2
             $el.select2({
                 placeholder,
                 allowClear: true,
@@ -799,27 +797,66 @@
                 width: '100%',
             });
 
-            $el.off('change.lw').on('change.lw', function() {
+            // Set initial value from Livewire
+            const initialValue = $wire[model];
+            if (initialValue !== null && initialValue !== undefined && initialValue !== '') {
+                //   console.log(`Setting initial value for ${model}:`, initialValue);
+
+                // Check if option exists
+                if ($el.find(`option[value="${initialValue}"]`).length === 0) {
+                    // If option doesn't exist, add it temporarily
+                    // This is common for AJAX-loaded selects
+                    $el.append(`<option value="${initialValue}" selected>${initialValue}</option>`);
+                }
+
+                $el.val(initialValue).trigger('change.select2');
+            }
+
+            // Remove existing event handlers to prevent duplicates
+            $el.off('change.lw');
+
+            // Handle Select2 changes
+            $el.on('change.lw', function() {
                 const value = $(this).val();
-
-                // Paksa perubahan
-                $wire.set(model, null);
-                setTimeout(() => {
-                    $wire.set(model, value);
-                }, 20);
-
-                console.log('Set:', model, value);
+                $wire.set(model, value);
             });
 
+            // Handle Livewire updates
             Livewire.hook('message.processed', () => {
-                const current = $el.val();
-                const expected = $wire[model];
-                if (current !== expected) {
-                    $el.val(expected).trigger('change.select2');
+                const livewireValue = $wire[model];
+                const select2Value = $el.val();
+
+                console.log(`Livewire update - ${model}: LW=${livewireValue}, S2=${select2Value}`);
+
+                if (livewireValue !== select2Value) {
+                    // Check if option exists
+                    if (livewireValue && $el.find(`option[value="${livewireValue}"]`).length === 0) {
+                        // Add option if it doesn't exist
+                        $el.append(`<option value="${livewireValue}" selected>${livewireValue}</option>`);
+                    }
+
+                    $el.val(livewireValue).trigger('change.select2');
                 }
             });
         });
-    }
+    };
+
+    // Initialize when component loads
+    document.addEventListener('livewire:navigated', function() {
+        if (typeof window.reinitSelect2 === 'function') {
+            window.reinitSelect2();
+        }
+    });
+
+    // Re-initialize when Livewire component updates
+    Livewire.hook('message.processed', () => {
+        // Small delay to ensure DOM is updated
+        setTimeout(() => {
+            if (typeof window.reinitSelect2 === 'function') {
+                window.reinitSelect2();
+            }
+        }, 100);
+    });
 </script>
 @endscript
 @endpush

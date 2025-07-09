@@ -60,6 +60,7 @@ class Transaction extends Model
         'cwhtaxrate',
         'cwhtaxamount',
         'totalcost',
+        'is_invoiced',
         // COA columns
         'coa_sale_id',
         'coa_cost_id',
@@ -113,6 +114,10 @@ class Transaction extends Model
         return $this->belongsTo(Customer::class, 'cvendor');
     }
 
+    public function invs()
+    {
+        return $this->belongsTo(Invoice::class, 'invoice_id');
+    }
     public function invoices()
     {
         return $this->belongsToMany(Invoice::class, 'invoice_transaction')

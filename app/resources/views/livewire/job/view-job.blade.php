@@ -1015,7 +1015,7 @@
                             </button>
                             <button
                                 type="button"
-                                wire:click="editingTrans({{ $job->id }})"
+                                wire:click="editTransaction({{ $job->id }},{{$transaction->id}})"
                                 class="p-2 bg-blue-500 rounded-full text-gray-300 hover:text-gray-100 dark:text-blue-400 dark:hover:text-blue-300 hover:scale-105 hover:animate-pulse transition-transform inline-block">
                                 Update (Job: {{ $job->id }})
                             </button>
@@ -1084,6 +1084,52 @@
                 :key="'confirm-delete-job-transaction-' . now()->timestamp" />
         </div>
     </div>
+    @if($editingTransactionId)
+    <div>
+        <div wire:loading
+            wire:target="saveTransaction,editTransaction"
+            class="fixed inset-0 bg-black bg-opacity-30 z-50 items-center justify-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+            <span class="ml-4 text-white text-lg font-medium">TUNGGU SEBENTAR...</span>
+        </div> {{-- Backdrop --}}
+        <div x-cloak
+            x-transition:enter="transition ease-out duration-300 delay-150"
+            x-transition:leave="transition ease-in duration-200"
+            class="fixed inset-0 bg-gray-500 bg-opacity-50 z-40">
+        </div>
+
+        {{-- Modal Container --}}
+        <div x-cloak
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="scale-90 opacity-0"
+            x-transition:enter-end="scale-100 opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="scale-100 opacity-100"
+            x-transition:leave-end="scale-90 opacity-0"
+            class="fixed inset-0 flex items-center justify-center z-50 px-4">
+            <div class="bg-white rounded-lg shadow-md w-full max-w-7.5xl">
+                {{-- Modal Header --}}
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h2 class="text-lg font-semibold text-gray-800">Costing</h2>
+                    <button wire:click="closeEditTransaction"
+                        class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Form --}}
+                <livewire:job.transactions.edit-transactions
+                    :id="$job->id"
+                    :transactionId="$editingTransactionId"
+                    :key="'transaction-' . $job->id . '-' . $editingTransactionId . '-' . now()->timestamp" />
+            </div>
+        </div>
+    </div>
+    @endif
+
 
     <hr class="border-gray-500 dark:border-neutral-500 mt-5">
 
@@ -1355,6 +1401,7 @@
 </script>
 @endscript
 @endpush
+
 <script>
     // Fungsi untuk restore scroll position
     function restoreScrollPosition() {
@@ -1423,4 +1470,12 @@
     function saveScrollPosition() {
         sessionStorage.setItem('scrollPosition', window.scrollY);
     }
+    window.addEventListener('swal', event => {
+        Swal.fire({
+            title: 'Error',
+            text: 'Transaction Already Issued',
+            icon: 'error', // 'warning' adalah fallback default
+            confirmButtonText: 'OK'
+        });
+    });
 </script>

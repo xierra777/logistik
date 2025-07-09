@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Models\ChargeSetting;
 use App\Models\ChartOfAccount;
+use App\Models\Invoice;
 use App\Models\jobContainer;
 use App\Models\JournalEntry;
 use App\Models\TJob;
@@ -28,7 +29,7 @@ class EditTransactions extends Component
     public $customer_id;
     public $coaSaleId;
     public $coaCostId;
-
+    public $is_invoiced;
     // === Charge Details ===
     public $charge, $description, $freight, $unit = 'CONTAINER', $ofdtype, $remarks;
     public $quantity = 0;
@@ -47,37 +48,51 @@ class EditTransactions extends Component
     public $shwtaxrateusd = 0, $chwtaxrateusd = 0;
     public $vendors, $clients;
     public $shipmentType;
-    public $transactionId;
+    public $transactionId, $transaction;
+
     public function mount($id = null, $transactionId = null)
     {
         $this->jobId = $id;
         $this->transactionId = $transactionId;
-        $this->loadTransaction($this->transactionId);
-        $job = TJob::with(['client'])->find($id);
-        $this->clients = collect([
 
+        if ($this->transactionId) {
+            $this->loadTransaction($this->transactionId);
+        }
+        $this->transaction = Transaction::find($transactionId);
+
+        $job = TJob::with(['client'])->find($id);
+
+        if (!$job) {
+            session()->flash('error', 'Job not found');
+            return;
+        }
+
+        $this->clients = collect([
             $job->client ?? '',
         ])->filter()->unique();
-        // dd($id);
 
-        $taxes = tax::where('is_active', '1')->get(); // asumsikan ada kolom 'id', 'name', 'rate'
+        $taxes = Tax::where('is_active', '1')->get();
 
-        $this->taxRates = $taxes->where('type', 'vat')->pluck('rate', 'id')->toArray(); // untuk dropdown
-        $this->taxRatesWht = $taxes->where('type', 'wht')->pluck('rate', 'id')->toArray(); // untuk dropdown
-        $this->taxData = $taxes->pluck('rate', 'id')->toArray(); // untuk Alpine.js
-        $customers = Customer::orderBy('name')->get();
+        $this->taxRates = $taxes->where('type', 'vat')->pluck('rate', 'id')->toArray();
+        $this->taxRatesWht = $taxes->where('type', 'wht')->pluck('rate', 'id')->toArray();
+        $this->taxData = $taxes->pluck('rate', 'id')->toArray();
+
         $this->chargeCoa = ChargeSetting::get();
-        $this->updatedUnit($this->unit);
-
-
         $this->vendors = Customer::where('category', 'creditor')->orderBy('name')->get();
+
+        $this->updatedUnit($this->unit);
     }
+
     public function loadTransaction($transactionId)
     {
         $transaction = Transaction::find($transactionId);
 
-        if (!$transaction) return alert('niggas');
+        if (!$transaction) {
+            session()->flash('error', 'Transaction not found');
+            return;
+        }
 
+        // Sales Details
         $this->charge = $transaction->charge;
         $this->description = $transaction->description;
         $this->freight = $transaction->freight;
@@ -126,13 +141,8 @@ class EditTransactions extends Component
         // COA columns
         $this->coaSaleId = $transaction->coa_sale_id;
         $this->coaCostId = $transaction->coa_cost_id;
-
-        // // created_by, updated_by
-        // $this->created_by = $transaction->created_by ?? null;
-        // $this->updated_by = $transaction->updated_by ?? null;
-
-
     }
+
     public function updatedUnit($value)
     {
         if (!$this->job) {
@@ -181,6 +191,7 @@ class EditTransactions extends Component
             // Add other validation rules as needed, for example:
             'charge' => 'required',
             'quantity' => 'required|numeric|min:1',
+            // 'invoice_id' => 'required'
             // 'scurrency' => 'required',
             // etc.
         ];
@@ -189,7 +200,15 @@ class EditTransactions extends Component
     // === Save Transaction ===
     public function save()
     {
-        $this->validate();
+
+        if ($this->transaction->invs && $this->transaction->invs->status === 'issued') {
+            $this->dispatch('swal', [
+                'title' => 'Gagal Update',
+                'text' => 'Transaksi ini sudah masuk ke invoice yang telah issued.',
+                'icon' => 'error', // Diubah dari 'errors' menjadi 'error'
+            ]);
+            return;
+        }
         if ($this->getErrorBag()->isNotEmpty()) {
             $this->dispatch('scroll-to-error');
         }

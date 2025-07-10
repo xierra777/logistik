@@ -121,7 +121,7 @@ class Transaction extends Model
     public function invoices()
     {
         return $this->belongsToMany(Invoice::class, 'invoice_transaction')
-            ->withPivot('amount', 'remarks')
+            ->withPivot('amountInvoice', 'amountInvoiceUsd', 'quantityInvoice', 'vatInvoice', 'vatInvoiceUsd', 'whtInvoice', 'whtInvoiceUsd', 'remarks')
             ->withTimestamps();
     }
 

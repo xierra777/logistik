@@ -10,6 +10,7 @@ use App\Models\TJob;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
 use Spatie\Browsershot\Browsershot;
@@ -17,9 +18,9 @@ use Livewire\Attributes\On;
 
 class JobSaleInvoice extends Component
 {
-    public $jobId, $invoiceId;
+    public $jobId, $invoiceId, $isVoiding;
     public $job;
-    public $customer;
+    public $customer, $void_reason;
     public $id_job;
     public $transactions;
     public $selected_transactions = [];
@@ -30,7 +31,10 @@ class JobSaleInvoice extends Component
     public $finalCurrency = 'IDR'; // Add this property
     public $pdfData = '';
     public $selectAll = false;
+    public $showModal = false;
     public $isIndeterminate = false; // Tambahkan ini
+    public $voidedInvoices = []; // Track voided invoices for animation
+
 
     public function mount($jobId)
     {
@@ -72,7 +76,8 @@ class JobSaleInvoice extends Component
         }
         $invoice->update([
             'status' => 'issued',
-            'due_date' => now()->addDays(30)
+            'due_date' => now()->addDays(30),
+            'updated_by' => Auth::user()->id,
         ]);
 
 
@@ -83,7 +88,6 @@ class JobSaleInvoice extends Component
         $selectedTransactions = $invoice->transactions;
         foreach ($selectedTransactions as $transaction) {
             $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
-            $costCoa = ChartOfAccount::find($transaction->coa_cost_id);
 
             // Jurnal Penjualan (Revenue)
             if ($transaction->samountidr && $saleCoa && $transaction->transactionClient) {
@@ -155,15 +159,31 @@ class JobSaleInvoice extends Component
         }
         $this->loadTransactions();
     }
-
-    public function voidInvoice($id)
+    public function confirmVoid($invoiceId)
     {
-        $invoice = Invoice::findOrFail($id);
+        $this->invoiceId = $invoiceId;
+        $this->showModal = true;
+        $this->void_reason = ''; // Reset reason
+    }
+
+    public function voidInvoice()
+    {
+        // Validate the void reason
+        $this->validate([
+            'void_reason' => 'required|string|max:255',
+        ]);
+
+        $invoice = Invoice::findOrFail($this->invoiceId);
+
+        // Update invoice status
         $invoice->update([
             'status' => 'void',
             'due_date' => null,
+            'void_reason' => $this->void_reason,
             'updated_by' => Auth::user()->id
         ]);
+
+        // Create reversal journal entries
         $journalEntries = JournalEntry::where('invoice_id', $invoice->id)->get();
 
         foreach ($journalEntries as $entry) {
@@ -183,36 +203,60 @@ class JobSaleInvoice extends Component
             ]);
         }
 
-        // 2. Tandai transaksi bahwa invoice-nya sudah void (optional)
+        // Update related transactions
         if (Schema::hasColumn('transactions', 'invoice_id')) {
             Transaction::where('invoice_id', $invoice->id)->update([
                 'invoice_id' => null,
             ]);
         }
 
+        // Close modal and reset form
+        $this->showModal = false;
+        $this->void_reason = '';
+        $this->invoiceId = null;
+
+        // Show correct success message
         $this->dispatch('showSuccessAlert', [
-            'title' => 'Invoice Issued!',
-            'text'  => "Invoice #{$invoice->invoice_number} has been marked as issued.",
+            'title' => 'Invoice Voided!',
+            'text'  => "Invoice #{$invoice->invoice_number} has been successfully voided.",
         ]);
+
         $this->loadTransactions();
+    }
+
+    public function cancelVoid()
+    {
+        $this->showModal = false;
+        $this->void_reason = '';
+        $this->invoiceId = null;
     }
     public function generateInvoiceNumber()
     {
-        // Get the last invoice_number that matches today's pattern
-        $prefix = "INV/BRN/" . now()->format('y/m/');
-        $lastInvoice = Invoice::where('invoice_number', 'like', $prefix . '%')
-            ->orderByDesc('invoice_number')
-            ->first();
+        try {
+            $prefix = "INV/BRN/" . now()->format('y/m/');
 
-        if ($lastInvoice) {
-            // Extract the last 3 digits and increment
-            $lastNumber = (int)substr($lastInvoice->invoice_number, -3);
-            $nextNumber = $lastNumber + 1;
-        } else {
-            $nextNumber = 1;
+            // Get the highest number for today using raw SQL for better performance
+            $result = DB::select("
+                SELECT invoice_number 
+                FROM invoices 
+                WHERE invoice_number LIKE ? 
+                ORDER BY CAST(SUBSTRING(invoice_number, -3) AS UNSIGNED) DESC 
+                LIMIT 1
+            ", [$prefix . '%']);
+
+            if (!empty($result)) {
+                $lastNumber = (int)substr($result[0]->invoice_number, -3);
+                $nextNumber = $lastNumber + 1;
+            } else {
+                $nextNumber = 1;
+            }
+
+            return $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        } catch (\Exception $e) {
+            // Fallback jika ada error
+            Log::error('Error generating invoice number: ' . $e->getMessage());
+            return $prefix . str_pad(1, 3, '0', STR_PAD_LEFT);
         }
-
-        return $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
     }
 
 
@@ -256,16 +300,25 @@ class JobSaleInvoice extends Component
     public function previewPDF($invoiceId)
     {
         if ($invoiceId) {
-            // Gunakan parameter $invoiceId yang diterima, bukan $this->invoiceId
-            $invoice = Invoice::with('transactions', 'client', 'job')->findOrFail($invoiceId);
+            // Gunakan eager loading yang konsisten
+            $invoice = Invoice::with([
+                'transactions',
+                'client',
+                'job.TjobContainer' // atau 'job.jobContainer' sesuai nama relasi
+            ])->findOrFail($invoiceId);
 
-            // Pastikan ada relasi yang benar untuk mengakses job dan customer
-            // Asumsi invoice memiliki relasi ke job atau shipment memiliki relasi ke job
-            $job = TJob::with('TjobContainer')->findOrFail($invoice->job_id);
+            // Akses langsung dari relasi yang sudah di-load
+            $job = $invoice->job;
             $customer = $invoice->client;
-            $totalPcs = $job->TjobContainer->sum('noOfPackages');
-            $totalgw  = $job->TjobContainer->sum('grossWeight');
-            // dd($totalPcs);
+
+            // Pastikan relasi ada sebelum mengakses
+            if ($job && $job->TjobContainer) {
+                $totalPcs = $job->TjobContainer->sum('noOfPackages');
+                $totalgw = $job->TjobContainer->sum('grossWeight');
+            } else {
+                $totalPcs = 0;
+                $totalgw = 0;
+            }
 
             $summary = [
                 'subtotal' => 0,
@@ -274,57 +327,107 @@ class JobSaleInvoice extends Component
                 'total'    => 0,
             ];
 
-            foreach ($invoice->transactions as $trx) {
-                $currency = strtoupper(trim($this->finalCurrency));
-                $qty      = (int) $trx->quantity;
-                $rate     = (float) ($trx->srate ?? 1);
+            if ($invoice->status === 'void') {
+                foreach ($invoice->invtrx as $pivot) {
+                    $currency = strtoupper(trim($this->finalCurrency));
+                    $qty =  $pivot->quantityInvoice;
 
-                $amount = $currency === 'IDR'
-                    ? (int) $trx->samountidr
-                    : (float) $trx->sfcyamount;
 
-                $vat = $currency === 'IDR'
-                    ? (float) $trx->svatgstamount
-                    : (float) ($trx->svatgstusd ?? 0);
+                    // Ambil amount dari pivot (snapshot)
+                    $amount = $currency === 'IDR'
+                        ?  $pivot->amountInvoice
+                        :  $pivot->amountInvoiceUsd;
 
-                $wht = $currency === 'IDR'
-                    ? (float) $trx->swhtaxamount
-                    : (float) ($trx->shwtaxrateusd ?? 0);
+                    // VAT dan WHT seharusnya dari field yang sesuai di pivot
+                    $vat = $pivot->vatInvoice ?? 0;
+                    $wht = $pivot->whtInvoice ?? 0;
 
-                $subtotal = $qty * $amount;
-                $total    = $subtotal + $vat + $wht;
+                    $subtotal = $qty * $amount;
+                    $total = $subtotal + $vat + $wht;
 
-                $trx->subtotal = $subtotal;
-                $trx->vat      = $vat;
-                $trx->wht      = $wht;
-                $trx->total    = $total;
+                    $pivot->subtotal = $subtotal;
+                    $pivot->vat = $vat;
+                    $pivot->wht = $wht;
+                    $pivot->total = $total;
 
-                if ($currency !== $this->finalCurrency) {
-                    if ($currency === 'IDR' && $this->finalCurrency === 'USD') {
-                        $cSub   = $subtotal / $rate;
-                        $cVat   = $vat      / $rate;
-                        $cWht   = $wht      / $rate;
-                    } elseif ($currency === 'USD' && $this->finalCurrency === 'IDR') {
-                        $cSub   = $subtotal * $rate;
-                        $cVat   = $vat      * $rate;
-                        $cWht   = $wht      * $rate;
+                    // Akumulasi untuk summary
+                    $summary['subtotal'] += $subtotal;
+                    $summary['vat'] += $vat;
+                    $summary['wht'] += $wht;
+                    $summary['total'] += $total;
+                }
+            } else {
+                foreach ($invoice->transactions as $trx) {
+                    $currency = strtoupper(trim($this->finalCurrency));
+
+                    $qty = (int) $trx->quantity;
+                    $rate = (float) ($trx->srate ?? 1);
+                    // dd('Masuk ke bagian else - invoice normal', $invoice->status, $invoice->transactions->count());
+
+                    // PERBAIKAN: Pastikan menggunakan field yang benar dari transaction
+                    $amount = $currency === 'IDR'
+                        ? (float) $trx->samountidr
+                        : (float) $trx->sfcyamount;
+
+                    $vat = $currency === 'IDR'
+                        ? (float) ($trx->svatgstamount ?? 0)
+                        : (float) ($trx->svatgstusd ?? 0);
+
+                    $wht = $currency === 'IDR'
+                        ? (float) ($trx->swhtaxamount ?? 0)
+                        : (float) ($trx->shwtaxrateusd ?? 0);
+
+                    // PERBAIKAN: Kalkulasi subtotal berdasarkan qty * rate per unit
+                    // Bukan qty * amount (karena amount sudah total)
+                    $unitPrice = $amount / $qty; // Hitung unit price
+                    $subtotal = $qty * $unitPrice;
+
+                    // Atau jika amount sudah merupakan subtotal:
+                    // $subtotal = $amount;
+
+                    $total = $subtotal + $vat + $wht;
+
+                    // PERBAIKAN: Assign nilai ke transaction object agar bisa diakses di view
+                    $trx->subtotal = $subtotal;
+                    $trx->vat = $vat;
+                    $trx->wht = $wht;
+                    $trx->total = $total;
+
+                    // Currency conversion jika diperlukan
+                    if ($currency !== $this->finalCurrency) {
+                        if ($currency === 'IDR' && $this->finalCurrency === 'USD') {
+                            $cSub = $subtotal / $rate;
+                            $cVat = $vat / $rate;
+                            $cWht = $wht / $rate;
+                        } elseif ($currency === 'USD' && $this->finalCurrency === 'IDR') {
+                            $cSub = $subtotal * $rate;
+                            $cVat = $vat * $rate;
+                            $cWht = $wht * $rate;
+                        } else {
+                            $cSub = $subtotal;
+                            $cVat = $vat;
+                            $cWht = $wht;
+                        }
+
+                        // Update transaction object dengan nilai yang sudah dikonversi
+                        $trx->subtotal = $cSub;
+                        $trx->vat = $cVat;
+                        $trx->wht = $cWht;
+                        $trx->total = $cSub + $cVat + $cWht;
                     } else {
                         $cSub = $subtotal;
                         $cVat = $vat;
                         $cWht = $wht;
                     }
-                } else {
-                    $cSub = $subtotal;
-                    $cVat = $vat;
-                    $cWht = $wht;
-                }
 
-                $summary['subtotal'] += $cSub;
-                $summary['vat']      += $cVat;
-                $summary['wht']      += $cWht;
-                $summary['total']    += ($cSub + $cVat + $cWht);
+                    $summary['subtotal'] += $cSub;
+                    $summary['vat'] += $cVat;
+                    $summary['wht'] += $cWht;
+                    $summary['total'] += ($cSub + $cVat + $cWht);
+                }
             }
 
+            // Format summary
             $formattedSummary = [
                 'subtotal' => number_format(
                     $summary['subtotal'],
@@ -332,19 +435,19 @@ class JobSaleInvoice extends Component
                     $this->finalCurrency === 'IDR' ? ',' : '.',
                     $this->finalCurrency === 'IDR' ? '.' : ','
                 ),
-                'vat'      => number_format(
+                'vat' => number_format(
                     $summary['vat'],
                     2,
                     $this->finalCurrency === 'IDR' ? ',' : '.',
                     $this->finalCurrency === 'IDR' ? '.' : ','
                 ),
-                'wht'      => number_format(
+                'wht' => number_format(
                     $summary['wht'],
                     2,
                     $this->finalCurrency === 'IDR' ? ',' : '.',
                     $this->finalCurrency === 'IDR' ? '.' : ','
                 ),
-                'total'    => number_format(
+                'total' => number_format(
                     $summary['total'],
                     2,
                     $this->finalCurrency === 'IDR' ? ',' : '.',
@@ -352,20 +455,20 @@ class JobSaleInvoice extends Component
                 ),
             ];
 
-            // render view
-            $data = compact('customer') + [
+            // Render view - gunakan data yang konsisten
+            $data = [
+                'customer'             => $customer,
                 'invoice'              => $invoice,
-                'job'                   => $invoice->job,
-                'container'             => $invoice->job->jobContainer,
-                'transactions'         => $invoice->transactions, // Perbaikan: gunakan semua transactions
+                'job'                  => $invoice->job,
+                'container'            => $invoice->job->TjobContainer ?? collect(), // fallback jika null
+                'transactions'         => $invoice->transactions,
                 'totalPcs'             => $totalPcs,
                 'totalgw'              => $totalgw,
                 'formattedSummary'     => $formattedSummary,
                 'finalCurrency'        => $this->finalCurrency,
-                'invoice_number'       => $invoice->invoice_number, // Ambil dari invoice
+                'invoice_number'       => $invoice->invoice_number,
                 'showExchangeRate'     => $this->showExchangeRate,
             ];
-            // dd($invoice->transactions);
 
             $html = view('livewire.job.invoice.sale-invoice-pdf', $data)->render();
 
@@ -433,8 +536,15 @@ class JobSaleInvoice extends Component
             ]);
             foreach ($selectedTransactions as $transaction) {
                 $invoice->transactions()->attach($transaction->id, [
-                    'amount' => $transaction->samountidr,
-                    'remarks' => null,
+                    'amountInvoice' => $transaction->samountidr,
+                    'amountInvoiceUsd' => $transaction->sfcyamount,
+                    'quantityInvoice'   => $transaction->quantity,
+                    'vatInvoice'        => $transaction->svatgstamount,
+                    'vatInvoiceUsd'     => $transaction->svatgstusd,
+                    'whtInvoice'        => $transaction->swhtaxamount,
+                    'whtInvoiceUsd'     => $transaction->shwtaxrateusd,
+                    'exchangeRate'      => $transaction->srate,
+                    'remarks' => $transaction->description,
                 ]);
             }
             // Buat jurnal untuk setiap transaksi
@@ -510,7 +620,6 @@ class JobSaleInvoice extends Component
                     ]);
                 }
             }
-
             DB::commit();
             session()->flash('message', 'Invoice created successfully!');
             // Optionally redirect or reset form here
@@ -519,6 +628,8 @@ class JobSaleInvoice extends Component
             DB::rollBack();
             session()->flash('error', 'Failed to create invoice: ' . $e->getMessage());
         }
+        $this->generateInvoiceNumber();
+
         $this->loadTransactions();
     }
     public function saveAsDraft()
@@ -572,8 +683,14 @@ class JobSaleInvoice extends Component
             ]);
             foreach ($selectedTransactions as $transaction) {
                 $invoice->transactions()->attach($transaction->id, [
-                    'amount' => $transaction->samountidr,
-                    'remarks' => null,
+                    'amountInvoice' => $transaction->samountidr,
+                    'amountInvoiceUsd' => $transaction->sfcyamount,
+                    'quantityInvoice'   => $transaction->quantity,
+                    'vatInvoice'        => $transaction->svatgstamount,
+                    'vatInvoiceUsd'     => $transaction->svatgstusd,
+                    'whtInvoice'        => $transaction->svatgstamount,
+                    'whtInvoiceUsd'     => $transaction->shwtaxrateusd,
+                    'remarks' => $transaction->description,
                 ]);
             }
             DB::commit();
@@ -585,6 +702,7 @@ class JobSaleInvoice extends Component
             session()->flash('error', 'Failed to create invoice: ' . $e->getMessage());
         }
         $this->loadTransactions();
+        $this->generateInvoiceNumber();
     }
     public function render()
     {

@@ -19,6 +19,7 @@ class Invoice extends Model
         'currency',
         'total_amount',
         'status',
+        'void_reason',
         'created_by',
         'updated_by',
     ];
@@ -39,8 +40,13 @@ class Invoice extends Model
     public function transactions()
     {
         return $this->belongsToMany(Transaction::class, 'invoice_transaction')
-            ->withPivot('amount', 'remarks')
+            ->using(InvoiceTransaction::class) // Pake custom pivot model
+            ->withPivot('amountInvoice', 'amountInvoiceUsd', 'quantityInvoice', 'vatInvoice', 'vatInvoiceUsd', 'whtInvoice', 'whtInvoiceUsd', 'remarks')
             ->withTimestamps();
+    }
+    public function invtrx()
+    {
+        return $this->hasMany(InvoiceTransaction::class, 'invoice_id');
     }
     public function users()
     {

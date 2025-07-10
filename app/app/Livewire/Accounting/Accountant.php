@@ -18,6 +18,7 @@ class Accountant extends Component
     public $totaltransaksi;
     public $totalOutstanding = 0;
     public $shipmentWithTransactionsCount;
+    public $customers, $customerDebts;
 
     public function mount()
     {
@@ -26,23 +27,38 @@ class Accountant extends Component
         $this->chargeCoa = ChargeSetting::count();
         $this->tax = tax::count();
         $this->invoices = Invoice::count();
-        $this->extra = Invoice::sum('total_amount');
-        $customers = Customer::with([
-            'jobs.jobTransactions' => fn($q) => $q->whereNotNull('samountidr'),
-            'jobs.paymentAllocations',
-        ])->get();
+        $this->extra = Invoice::sum('total_amount'); {
+            // Load customers first
 
-        $this->totalOutstanding = $customers->reduce(function ($carry, $customer) {
-            $totalInvoice = 0;
-            $totalPaid = 0;
+            $this->customers = Customer::whereJsonContains('roles', 'client')
+                ->with([
+                    'jobs.jobTransactions.invoices' => function ($q) {
+                        $q->whereNotNull('total_amount')
+                            ->where('status', '=', 'issued'); // lebih eksplisit
+                    },
+                    'jobs.paymentAllocations'
+                ])->get();
 
-            foreach ($customer->jobs as $job) {
-                $totalInvoice += $job->jobTransactions->sum('samountidr');
-                $totalPaid += $job->paymentAllocations->sum('allocated_amount');
-            }
+            $this->customerDebts = $this->customers->map(function ($customer) {
+                $totalInvoice = $customer->jobs->sum(function ($job) {
+                    return $job->jobTransactions->sum(function ($transaction) {
+                        // Karena sudah difilter di eager loading, semua invoices di sini sudah status 'issued'
+                        return $transaction->invoices->sum('total_amount');
+                    });
+                });
+                $totalPaid = $customer->jobs->sum(function ($job) {
+                    return $job->paymentAllocations->sum('allocated_amount');
+                });
 
-            return $carry + max(0, $totalInvoice - $totalPaid);
-        }, 0);
+                return [
+                    'customer_id'    => $customer->id,
+                    'customer_name'  => $customer->name,
+                    'total_invoice'  => $totalInvoice,
+                    'total_paid'     => $totalPaid,
+                    'outstanding'    => max(0, $totalInvoice - $totalPaid),
+                ];
+            })->values();
+        }
     }
     public function getCombinedLineData()
     {

@@ -1004,22 +1004,42 @@
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $loop->iteration }}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200 gap-3">
-                            <!-- Edit Transaction Button with Alpine.js Modal -->
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            <div class="flex items-center space-x-3">
+                                <!-- Delete Button -->
+                                <div x-data>
+                                    <button
+                                        class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                                        @click="
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'You won\'t be able to revert this!',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d8',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!',
+                        cancelButtonText: 'No, Keep it',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $wire.confirmDelete({{ $transaction->id }});
+                        }
+                    })
+                ">
+                                        Delete
+                                    </button>
+                                </div>
 
-                            <button
-                                type="button"
-                                @click="$dispatch('confirm-delete', { get_id: {{ $transaction->id }} })"
-                                class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
-                                Delete
-                            </button>
-                            <button
-                                type="button"
-                                wire:click="editTransaction({{ $job->id }},{{$transaction->id}})"
-                                class="p-2 bg-blue-500 rounded-full text-gray-300 hover:text-gray-100 dark:text-blue-400 dark:hover:text-blue-300 hover:scale-105 hover:animate-pulse transition-transform inline-block">
-                                Update (Job: {{ $job->id }})
-                            </button>
+                                <!-- Update Button -->
+                                <button
+                                    type="button"
+                                    wire:click="editTransaction({{ $job->id }}, {{ $transaction->id }})"
+                                    class="px-3 py-1 bg-blue-500 rounded-full text-white hover:bg-blue-600 transition transform hover:scale-105">
+                                    Update (Job: {{ $job->id }})
+                                </button>
+                            </div>
                         </td>
+
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $transaction->description }}
                         </td>

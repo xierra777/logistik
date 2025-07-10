@@ -27,7 +27,7 @@
                 <label class="text-purple-700 font-semibold text-sm">Invoice No</label>
                 <div class="relative">
                     <input type="text"
-                        wire:model="invoice_number"
+                        wire:model.live="invoice_number"
                         class="w-full px-4 py-3 bg-purple-50 border-2 border-purple-200 rounded-xl focus:border-purple-400 focus:bg-white transition-all duration-300 outline-none placeholder-purple-300"
                         placeholder="INV-2025-001">
                     <i class="fas fa-hashtag absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-400"></i>
@@ -383,15 +383,72 @@
                                     <i class="fas fa-print text-sm"></i>
                                 </button>
 
-                                @if($invs->status === 'issued')
-                                <button wire:click="voidInvoice({{ $invs->id }})"
-                                    wire:loading.attr="disabled"
-                                    wire:target="voidInvoice"
-                                    class="w-10 h-10 bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
-                                    title="Void Invoice">
-                                    <i class="fas fa-ban text-sm"></i>
-                                </button>
-                                @endif
+                                <div class="flex items-center space-x-2">
+                                    @if($invs->status === 'issued')
+                                    <!-- Tombol Void dengan Animasi -->
+                                    <button
+                                        wire:click="confirmVoid({{ $invs->id }})"
+                                        wire:loading.attr="disabled"
+                                        class="group relative w-10 h-10 bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-110 transition-all duration-300 active:scale-95"
+                                        title="Void Invoice">
+                                        <i class="fas fa-ban text-sm group-hover:rotate-12 transition-transform duration-300"></i>
+
+                                        <!-- Ripple Effect -->
+                                        <div class="absolute inset-0 rounded-full bg-white opacity-0 group-active:opacity-20 transition-opacity duration-150"></div>
+                                    </button>
+                                    @endif
+                                </div>
+
+
+
+                                <!-- Custom Animations -->
+                                <style>
+                                    @keyframes fadeIn {
+                                        from {
+                                            opacity: 0;
+                                        }
+
+                                        to {
+                                            opacity: 1;
+                                        }
+                                    }
+
+                                    .animate-fadeIn {
+                                        animation: fadeIn 0.3s ease-out;
+                                    }
+
+                                    /* Pulse animation untuk row yang baru di-void */
+                                    .invoice-row.animate-pulse {
+                                        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1);
+                                    }
+
+                                    @keyframes pulse {
+
+                                        0%,
+                                        100% {
+                                            opacity: 1;
+                                        }
+
+                                        50% {
+                                            opacity: .8;
+                                        }
+                                    }
+                                </style>
+
+                                <script>
+                                    // Listen for remove animation event
+                                    document.addEventListener('livewire:init', () => {
+                                        Livewire.on('remove-void-animation', (event) => {
+                                            setTimeout(() => {
+                                                // Remove the void animation class after delay
+                                                const invoiceRow = document.querySelector(`[data-invoice-id="${event.invoiceId}"]`);
+                                                if (invoiceRow) {
+                                                    invoiceRow.classList.remove('opacity-50', 'scale-95', 'bg-red-50');
+                                                }
+                                            }, 3000);
+                                        });
+                                    });
+                                </script>
                             </div>
                         </td>
                     </tr>
@@ -400,9 +457,91 @@
             </table>
         </div>
     </div>
+    @if($showModal)
+    <div
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
+        x-data="{ show: false }"
+        x-init="setTimeout(() => show = true, 50)"
+        x-show="show"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0" x-cloak>
 
+        <div
+            class="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl transform"
+            x-show="show"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+            x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+            x-transition:leave-end="opacity-0 scale-95 translate-y-4" x-cloak>
+
+            <!-- Header -->
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                    <i class="fas fa-ban text-red-500 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Void Invoice</h3>
+                <p class="text-gray-600">Invoice #{{ $invoice_number }}</p>
+            </div>
+
+            <form wire:submit.prevent="voidInvoice">
+                <!-- Reason Input -->
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-medium mb-2">
+                        <i class="fas fa-edit mr-2"></i>Alasan Void
+                    </label>
+                    <textarea
+                        wire:model="void_reason"
+                        rows="3"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200 resize-none"
+                        placeholder="Masukkan alasan kenapa invoice ini di-void..."
+                        {{ $isVoiding ? 'disabled' : '' }}></textarea>
+                    @error('void_reason')
+                    <span class="text-red-500 text-sm flex items-center mt-1">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>{{ $message }}
+                    </span>
+                    @enderror
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-end space-x-3">
+                    <button
+                        type="button"
+                        wire:click="cancelVoid"
+                        {{ $isVoiding ? 'disabled' : '' }}
+                        class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-medium disabled:opacity-50">
+                        <i class="fas fa-times mr-2"></i>Batal
+                    </button>
+
+                    <button
+                        type="submit"
+                        wire:loading.attr="disabled"
+                        class="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-lg hover:from-red-600 hover:to-pink-700 transition-all duration-200 font-medium disabled:opacity-50 transform hover:scale-105 active:scale-95 min-w-[140px]">
+
+                        <span wire:loading.remove wire:target="voidInvoice">
+                            <i class="fas fa-ban mr-2"></i>Konfirmasi Void
+                        </span>
+
+                        <span wire:loading wire:target="voidInvoice" class="flex items-center justify-center">
+                            <svg class="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Memproses...
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    @endif
     <!-- PDF Preview Modal -->
-    <div x-data="{ open: false, pdfSrc: '', loading: false }"
+    <div x-cloak x-data="{ open: false, pdfSrc: '', loading: false }"
         x-cloak
         @open-pdf-preview.window="
             loading = true;
@@ -450,6 +589,10 @@
 </div>
 @push('scripts')
 <script>
+    // document.addEventListener('livewire:navigated', function() {
+    //     window.countdownTimer(dueTime, status);
+    // });
+
     function countdownTimer(dueTime, status) {
         return {
             time: '',
@@ -495,6 +638,17 @@
             }
         }
     }
+</script>
+<script>
+    window.addEventListener('showSuccessAlert', function(e) {
+        const id = e.detail.id;
+        Swal.fire({
+            title: 'Success',
+            text: "Success voiding this Transactions",
+            icon: 'success',
+
+        })
+    });
 </script>
 @script
 <script>

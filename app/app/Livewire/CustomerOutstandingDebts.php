@@ -15,20 +15,24 @@ class CustomerOutstandingDebts extends Component
     {
         $this->customers = Customer::whereJsonContains('roles', 'client')
             ->with([
-                'jobs.jobTransactions' => function ($q) {
-                    $q->whereNotNull('samountidr'); // hanya transaksi sales
+                'jobs.jobTransactions.invoices' => function ($q) {
+                    $q->whereNotNull('total_amount')
+                        ->where('status', '=', 'issued'); // lebih eksplisit
                 },
                 'jobs.paymentAllocations'
             ])->get();
 
         $this->customerDebts = $this->customers->map(function ($customer) {
-            $totalInvoice = 0;
-            $totalPaid = 0;
+            $totalInvoice = $customer->jobs->sum(function ($job) {
+                return $job->jobTransactions->sum(function ($transaction) {
+                    // Karena sudah difilter di eager loading, semua invoices di sini sudah status 'issued'
+                    return $transaction->invoices->sum('total_amount');
+                });
+            });
 
-            foreach ($customer->jobs as $job) {
-                $totalInvoice += $job->jobTransactions->sum('samountidr');
-                $totalPaid += $job->paymentAllocations->sum('allocated_amount');
-            }
+            $totalPaid = $customer->jobs->sum(function ($job) {
+                return $job->paymentAllocations->sum('allocated_amount');
+            });
 
             return [
                 'customer_id'    => $customer->id,

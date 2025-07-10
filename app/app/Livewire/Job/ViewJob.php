@@ -102,19 +102,43 @@ class ViewJob extends Component
     }
     public function confirmDelete($get_id)
     {
-        if ($this->job->jobTransactions && $this->job->jobTransactions->invs->status === 'issued') {
+        // dd('niggas');
+        // Ambil transaksi beserta relasi invoice-nya
+        $transaction = Transaction::with('invs')->find($get_id);
+
+        if (!$transaction) {
             $this->dispatch('swal', [
-                'title' => 'Gagal Update',
-                'text' => 'Transaksi ini sudah masuk ke invoice yang telah issued.',
-                'icon' => 'error', // Diubah dari 'errors' menjadi 'error'
+                'title' => 'Gagal',
+                'text' => 'Transaksi tidak ditemukan.',
+                'icon' => 'error',
             ]);
             return;
         }
+
+        // Kalau invoice-nya sudah issued, tolak penghapusan
+        if ($transaction->invs && $transaction->invs->status === 'issued') {
+            $this->dispatch('swal', [
+                'title' => 'Tidak Bisa Dihapus',
+                'text' => 'Transaksi ini sudah masuk ke invoice yang telah issued.',
+                'icon' => 'error',
+            ]);
+            return;
+        }
+
+        // Kalau belum issued, lanjut hapus
         try {
             Transaction::destroy($get_id);
-            session()->flash('message', 'Shipment deleted successfully!');
+            $this->dispatch('swal', [
+                'title' => 'Berhasil',
+                'text' => 'Transaksi berhasil dihapus.',
+                'icon' => 'success',
+            ]);
         } catch (\Exception $e) {
-            session()->flash('error', 'Error deleting shipment: ' . $e->getMessage());
+            $this->dispatch('swal', [
+                'title' => 'Error',
+                'text' => 'Gagal menghapus transaksi: ' . $e->getMessage(),
+                'icon' => 'error',
+            ]);
         }
     }
 

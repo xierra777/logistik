@@ -350,19 +350,19 @@ class CreateJob extends Component
 
 
         $job = TJob::create([
-            'job_id'            => $this->job_id,
-            'type_job'          => $this->type_job,
-            'client_id'         => $this->client_id,
-            'dagentsJob'        => $this->deliveryAgent ?: null,
-            'carrierAirline'    => $this->carrierAirline,
-            'employee_id'       => $this->jobEmployee,
-            'customerCodeJob'     => $this->customerCodeJob,
-            'jobBillLadingNo'     => $this->jobBillLadingNo,
-            'jobBillLadingDate'   => $this->jobBillLadingDate,
-            'houseJobBillLadingNo' => $this->houseJobBillLadingNo,
+            'job_id'                 => $this->job_id,
+            'type_job'               => $this->type_job,
+            'client_id'              => $this->client_id,
+            'dagentsJob'             => $this->deliveryAgent ?: null,
+            'carrierAirline'         => $this->carrierAirline,
+            'employee_id'            => $this->jobEmployee,
+            'customerCodeJob'        => $this->customerCodeJob,
+            'jobBillLadingNo'        => $this->jobBillLadingNo,
+            'jobBillLadingDate'      => $this->jobBillLadingDate,
+            'houseJobBillLadingNo'   => $this->houseJobBillLadingNo,
             'houseJobBillLadingDate' => $this->houseJobBillLadingDate,
-            'data'              => $data,
-            'created_by'        => Auth::user()->id
+            'data'                   => $data,
+            'created_by'             => Auth::user()->id
         ]);
 
         jobContainer::create([

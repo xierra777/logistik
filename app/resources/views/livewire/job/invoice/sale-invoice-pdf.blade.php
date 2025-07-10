@@ -237,17 +237,69 @@
                     <thead>
                         <tr class="bg-gray-100 dark:bg-neutral-800">
                             <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Charge</th>
-                            <th class="p-1 border border-gray-900  text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Qty</th>
-                            <th class="p-1 border border-gray-900  text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Currency</th>
-                            <th class="p-1 border border-gray-900  text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Ex.Rate</th>
-                            <th class="p-1 border border-gray-900  text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Amount/Qty</th>
-                            <th class="p-1 border border-gray-900  text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Sale Amount</th>
-                            <th class="p-1 border border-gray-900  text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">VAT</th>
-                            <th class="p-1 border border-gray-900  text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">WHT</th>
+                            <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Qty</th>
+                            <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Currency</th>
+                            <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Ex.Rate</th>
+                            <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Amount/Qty</th>
+                            <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Sale Amount</th>
+                            <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">VAT</th>
+                            <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">WHT</th>
                             <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Amount</th>
                         </tr>
                     </thead>
-                    <tbody class="">
+                    <tbody>
+                        @if($invoice->status === 'void')
+                        @foreach ($invoice->invtrx as $inv)
+                        <tr>
+                            <td class="text-[9px] border border-gray-900 text-center p-1">{{ $inv->remarks }}</td>
+                            <td class="text-[9px] border border-gray-900 text-center p-1">{{$inv->quantityInvoice}}</td>
+                            <td class="text-[9px] border border-gray-900 text-center p-1">{{ $finalCurrency }}</td>
+                            <td class="text-[9px] border border-gray-900 text-center p-1">
+                                @if($showExchangeRate == 'USD')
+                                {{$inv->exchangeRate}}
+                                @endif
+                            </td>
+                            <td class="text-[9px] border border-gray-900 text-center p-1">{{ number_format($inv->amountInvoice, 2, ',', '.')}}</td>
+                            <td class="text-[9px] border border-gray-900 text-center p-1">{{ number_format($inv->subtotal, 2, ',', '.')}}</td>
+                            <td class="text-[9px] border border-gray-900 text-center p-1 align-top">
+                                @if (($inv->vatInvoice ?? 0) > 0 || ($inv->vatInvoiceUsd?? 0) > 0)
+                                <div class="flex justify-between w-full">
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : 'USD' }}</span>
+                                    <span class="text-[9px]">
+                                        {{ $finalCurrency == 'IDR'
+                                        ? number_format($inv->vatInvoice, 2, ',', '.')
+                                        : number_format($inv->vatInvoiceUsd, 2, ',', '.') }}
+                                    </span>
+                                </div>
+                                @else
+                                &nbsp;
+                                @endif
+                            </td>
+                            <td class="text-[9px] border border-gray-900 text-center p-1 align-top">
+                                @if (($inv->whtInvoice ?? 0) > 0 || ($inv->whtInvoiceUsd?? 0) > 0)
+                                <div class="flex justify-between w-full">
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : 'USD' }}</span>
+                                    <span class="text-[9px]">
+                                        {{ $finalCurrency == 'IDR'
+                                        ? number_format($inv->whtInvoice, 2, ',', '.')
+                                        : number_format($inv->whtInvoiceUsd, 2, ',', '.') }}
+                                    </span>
+                                </div>
+                                @else
+                                &nbsp;
+                                @endif
+                            </td>
+                            <td class="text-[9px] border border-gray-900 text-center p-1 align-top">
+                                <div class="flex justify-between w-full">
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : 'USD'}}</span>
+                                    <span class="text-[9px]">
+                                        {{ number_format($inv->total, 2, ',', '.') }}
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforeach
+                        @else
                         @foreach ($transactions as $transaction)
                         <tr class="bg-white dark:bg-neutral-900 align-top">
                             <td class="text-[9px] border border-gray-900 text-center p-1">{{ $transaction->description }}</td>
@@ -263,8 +315,8 @@
                                     <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ $finalCurrency == 'USD'
-                        ? number_format($transaction->sfcyamount, 2, '.', ',')
-                        : number_format($transaction->samountidr, 2, ',', '.') }}
+                                    ? number_format($transaction->sfcyamount, 2, '.', ',')
+                                    : number_format($transaction->samountidr, 2, ',', '.') }}
                                     </span>
                                 </div>
                             </td>
@@ -273,8 +325,8 @@
                                     <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ $finalCurrency == 'IDR'
-                        ? number_format($transaction->subtotal, 2, ',', '.')
-                        : number_format($transaction->subtotal, 2, '.', ',') }}
+                                    ? number_format($transaction->subtotal, 2, ',', '.')
+                                    : number_format($transaction->subtotal, 2, '.', ',') }}
                                     </span>
                                 </div>
                             </td>
@@ -284,8 +336,8 @@
                                     <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ $finalCurrency == 'IDR'
-                        ? number_format($transaction->svatgstamount, 2, ',', '.')
-                        : number_format($transaction->svatgstusd, 2, ',', '.') }}
+                                        ? number_format($transaction->svatgstamount, 2, ',', '.')
+                                        : number_format($transaction->svatgstusd, 2, ',', '.') }}
                                     </span>
                                 </div>
                                 @else
@@ -298,8 +350,8 @@
                                     <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ $finalCurrency == 'IDR'
-                        ? number_format($transaction->swhtaxamount, 2, ',', '.')
-                        : number_format($transaction->shwtaxrateusd, 2, ',', '.') }}
+                                        ? number_format($transaction->swhtaxamount, 2, ',', '.')
+                                        : number_format($transaction->shwtaxrateusd, 2, ',', '.') }}
                                     </span>
                                 </div>
                                 @else
@@ -316,8 +368,10 @@
                             </td>
                         </tr>
                         @endforeach
+                        @endif
                     </tbody>
                 </table>
+
             </div>
             <div class="col-span-4 mt-3">
                 <div class="grid grid-cols-4">

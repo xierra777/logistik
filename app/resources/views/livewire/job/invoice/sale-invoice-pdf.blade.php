@@ -112,11 +112,11 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Total No. of Pcs</p>
-                    <p class="col-span-3 uppercase font-bold text-[10px]">: {{$totalPcs}} {{$job->tjobContainer->first()->containers['typeOfPackages'] }}</p>
+                    <p class="col-span-3 uppercase font-bold text-[10px]">: {{$totalPcs ?? ''}} {{$job->tjobContainer->first()->containers['typeOfPackages'] ?? '' }}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Total G.Weight</p>
-                    <p class="col-span-3 text-[10px]">: {{$totalgw}} {{$job->tjobContainer->first()->containers['typeOfGrossWeight'] }} </p>
+                    <p class="col-span-3 text-[10px] font-bold uppercase">: {{$totalgw ?? ''}} {{$job->tjobContainer->first()->containers['typeOfGrossWeight'] ?? '' }} </p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Total Volume</p>
@@ -173,63 +173,64 @@
             <div class="col-span-4 border h-4 bg-blue-900  border-blue-900"></div>
             <div class="col-span-4">
                 <!-- Table 1 -->
-                <table class="w-full table-fixed border-collapse border border-gray-900">
-                    <thead>
-                        <tr class="bg-gray-100 dark:bg-neutral-800 align-center">
-                            <th class="p-1 border border-gray-900 text-[10px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Container No.</th>
-                            <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Type</th>
-                            <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">No Of Pcs</th>
-                            <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Pack Of Type</th>
-                            <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">G. Weight</th>
-                            <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Unit</th>
-                            <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Volume</th>
-                            <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">V. Weight</th>
-                            <th class="p-1 border border-gray-900 text-[11px]s font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">C. Weight</th>
-                        </tr>
-                    </thead>
-                    <tbody class="align-center">
-                        {{-- Karena containers adalah array cast, kode ini seharusnya bekerja --}}
-                        @if(isset($job) && $job->TjobContainer && $job->TjobContainer->count() > 0)
-                        @foreach($job->TjobContainer as $c)
-                        <tr class="text-center">
-                            <td class="p-2 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                {{ $c->containers['containerNo'] ?? '' }}
-                            </td>
-                            <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                {{ $c->containers['containerType'] ?? '' }}
-                            </td>
-                            <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                {{ $c->containers['noOfPackages'] ?? '' }}
-                            </td>
-                            <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center uppercase">
-                                {{ $c->containers['typeOfPackages'] ?? '' }}
-                            </td>
-                            <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                {{ $c->containers['grossWeight'] ?? '' }}
-                            </td>
-                            <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                {{ $c->containers['typeOfGrossWeight'] ?? '' }}
-                            </td>
-                            <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                {{ $c->containers['volume'] ?? '' }}
-                            </td>
-                            <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                {{ $c->containers['volumeWeight'] ?? '' }}
-                            </td>
-                            <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                <!-- kosong -->
-                            </td>
-                        </tr>
-                        @endforeach
-                        @else
-                        <tr>
-                            <td colspan="9" class="p-4 text-center text-gray-500">
-                                No container data available
-                            </td>
-                        </tr>
-                        @endif
-                    </tbody>
-                </table>
+                <div class="overflow-x-auto">
+                    <table class="w-full table-fixed border-collapse border border-gray-900">
+                        <thead>
+                            <tr class="bg-gray-100 dark:bg-neutral-800 align-center">
+                                <th class="p-1 border border-gray-900 text-[10px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Container No.</th>
+                                <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Type</th>
+                                <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">No Of Pcs</th>
+                                <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Pack Of Type</th>
+                                <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">G. Weight</th>
+                                <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Unit</th>
+                                <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">Volume</th>
+                                <th class="p-1 border border-gray-900 text-[11px] font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">V. Weight</th>
+                                <th class="p-1 border border-gray-900 text-[11px]s font-bold text-gray-900 uppercase text-center dark:text-neutral-400 w-1/9">C. Weight</th>
+                            </tr>
+                        </thead>
+                        <tbody class="align-center">
+                            {{-- Karena containers adalah array cast, kode ini seharusnya bekerja --}}
+                            @if(isset($job) && $job->TjobContainer && $job->TjobContainer->count() > 0)
+                            @foreach($job->TjobContainer as $c)
+                            <tr class="text-center">
+                                <td class="p-1 whitespace-normal text-[9px]  border-r border-l border-gray-900 text-center break-words"> {{ $c->containers['containerNo'] ?? '' }}
+                                </td>
+                                <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
+                                    {{ $c->containers['containerType'] ?? '' }}
+                                </td>
+                                <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
+                                    {{ $c->containers['noOfPackages'] ?? '' }}
+                                </td>
+                                <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center uppercase">
+                                    {{ $c->containers['typeOfPackages'] ?? '' }}
+                                </td>
+                                <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
+                                    {{ $c->containers['grossWeight'] ?? '' }}
+                                </td>
+                                <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
+                                    {{ $c->containers['typeOfGrossWeight'] ?? '' }}
+                                </td>
+                                <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
+                                    {{ $c->containers['volume'] ?? '' }}
+                                </td>
+                                <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
+                                    {{ $c->containers['volumeWeight'] ?? '' }}
+                                </td>
+                                <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
+                                    <!-- kosong -->
+                                </td>
+                            </tr>
+                            @endforeach
+                            @else
+                            <tr>
+                                <td colspan="9" class="p-4 text-center text-gray-500">
+                                    - </td>
+                            </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+
                 <!-- Divider -->
                 <div class="col-span-4 border h-4 bg-blue-900 border-blue-900"></div>
                 <!-- Table 2 -->
@@ -259,8 +260,24 @@
                                 {{$inv->exchangeRate}}
                                 @endif
                             </td>
-                            <td class="text-[9px] border border-gray-900 text-center p-1">{{ number_format($inv->amountInvoice, 2, ',', '.')}}</td>
-                            <td class="text-[9px] border border-gray-900 text-center p-1">{{ number_format($inv->subtotal, 2, ',', '.')}}</td>
+                            <td class="text-[9px] border border-gray-900 text-center p-1">
+                                <div class="flex justify-between w-full">
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : 'USD' }}</span>
+                                    <span class="text-[9px]">
+                                        {{ $finalCurrency == 'IDR'
+                                        ? number_format($inv->amountInvoice, 2, ',', '.')
+                                        : number_format($inv->amountInvoiceUsd, 2, ',', '.') }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="text-[9px] border border-gray-900 text-center p-1">
+                                <div class="flex justify-between w-full">
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : 'USD' }}</span>
+                                    <span class="text-[9px]">
+                                        {{ number_format($inv->subtotal, 2, ',', '.')}}
+                                    </span>
+                                </div>
+                            </td>
                             <td class="text-[9px] border border-gray-900 text-center p-1 align-top">
                                 @if (($inv->vatInvoice ?? 0) > 0 || ($inv->vatInvoiceUsd?? 0) > 0)
                                 <div class="flex justify-between w-full">

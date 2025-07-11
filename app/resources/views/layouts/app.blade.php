@@ -67,9 +67,9 @@
         <button @click="swal.fire({text: 'masih under construction yaa :D tetap sabar',
         icon: 'warning',title:'SEMANGAT TEROSSS',
          
-         })" class="fixed bottom-4 right-4 z-50 animate-bounce  transition-transform duration-50">
-            <p class="w-12 flex justify-center items-center h-12 bg-blue-500 rounded-full text-white text-sm shadow-lg transition-transform duration-300 cursor-pointer">
-                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span>
+         })" class="fixed bottom-4 right-4 z-50 transition-transform duration-50">
+            <p class="w-12 flex justify-center items-center h-12  bg-blue-500 rounded-full text-white text-sm shadow-lg transition-transform duration-300 cursor-pointer">
+                <span class="absolute inline-flex h-full w-full duration-1000 rounded-full bg-sky-400 opacity-75"></span>
                 <span class="relative inline-flex size-3 rounded-full bg-sky-500">
                     <i class="fa-solid fa-comment-dots"></i>
                 </span>

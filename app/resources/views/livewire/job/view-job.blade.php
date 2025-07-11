@@ -720,12 +720,12 @@
             @endforelse
         </div>
 
-        <div class="mt-3 p-1 gap-2 flex flex-row ">
+        <div class="mt-3 p-1 gap-2 flex flex-col sm:flex-row">
             <a href="{{route('viewJobCreateShipment', ['id' => $job->id])}}" onclick="saveScrollPosition()"
-                class="bg-blue-600 text-white rounded-lg py-1 px-5 hover:scale-105"> Add Shipments From Job</a>
+                class="bg-blue-600 text-white rounded-lg py-2 px-5 hover:scale-105 text-center sm:text-left"> Add Shipments From Job</a>
             <div x-data="{ openDetachAssigned: false }" @close-detach-assigned.window="openDetachAssigned = false">
                 <button @click="openDetachAssigned = true"
-                    class="bg-red-600 text-white rounded-lg py-1 px-5 hover:scale-105 transition-transform">
+                    class="bg-red-600 text-white rounded-lg py-2 px-5 hover:scale-105 transition-transform w-full sm:w-auto">
                     <i class="fa-solid fa-file-export"></i> Detach Shipment
                 </button>
 
@@ -738,11 +738,10 @@
                     x-transition:leave-end="opacity-0"
                     class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
 
-                    <div class="bg-white rounded-xl shadow-xl w-full max-w-7xl p-6 space-y-4 relative z-50
-        max-h-[80vh] flex flex-col">
+                    <div class="bg-white rounded-xl shadow-xl w-full max-w-7xl p-6 space-y-4 relative z-50 max-h-[80vh] flex flex-col">
                         <div class="p-3 flex items-center">
                             <button @click="openDetachAssigned = false"
-                                class="absolute top-3 right-3 text-gray-500 bg-gray-200 border border-gray-200 rounded-full py-1 px-2 hover:text-gray-800 text-2xl font-bold leading-none">
+                                class="absolute top-3 right-3 text-gray-500 bg-gray-200 border border-gray-200 rounded-full py-1 px-5 hover:text-gray-800 text-2xl font-bold leading-none">
                                 &times;
                             </button>
                         </div>
@@ -792,7 +791,7 @@
                             </table>
                         </div>
 
-                        <div class="flex justify-end space-x-2 mt-4">
+                        <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
                             <button @click="openDetachAssigned = false"
                                 class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition">
                                 Batal
@@ -809,7 +808,7 @@
 
             <div x-data="{ openDetachShipment: false }" @close-detach-shipment.window="openDetachShipment = false">
                 <button @click="openDetachShipment = true"
-                    class="bg-green-600 text-white rounded-lg py-1 px-5 hover:scale-105 transition-transform">
+                    class="bg-green-600 text-white rounded-lg py-2 px-5 hover:scale-105 transition-transform w-full sm:w-auto">
                     <i class="fa-solid fa-file-import"></i> Attach Shipment
                 </button>
 
@@ -873,7 +872,7 @@
                             </table>
                         </div>
 
-                        <div class="flex justify-end space-x-2 mt-4">
+                        <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
                             <button @click="openDetachShipment = false" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition">
                                 Batal
                             </button>
@@ -890,31 +889,18 @@
     </div>
     <div class="mt-4 shadow-lg ">
         <div>
-            <p class="text-center p-3 bg-gray-400 rounded-t-lg font-bold italic border">Transaction still under Construction <br>
-            </p>
-            <div class="flex justify-end p-1 ">
-                <div x-data="{ open: false }" @keydown.escape.window="open = false" @close-modal.window="open = false"
+            <div class=" p-1 ">
+                <div x-data="{ open: false }" @keydown.escape.window="open = false" @close-transaction-modal.window="open = false"
                     x-ref="modalContent">
-                    <div class=" flex justify-end mb-4 p-4 gap-2">
-                        <a
-                            href="{{ route('jobSaleInvoice', ['jobId' => $job->id]) }}"
-                            class="py-3 px-4 bg-green-600 text-white rounded-lg">
-                            Print Invoice
-                        </a>
-                        <a
-                            href="{{route('jobPurchaseInvoice',['jobId' => $job->id])}}"
-                            class="py-3 px-4 bg-red-600 text-white rounded-lg">
-                            Print PI
-                        </a>
-                        <button
-                            wire:click="refreshTransaction({{ $job->id }})"
-                            @click="open = true"
-                            class="py-3 px-4 bg-blue-600 text-white rounded-lg">
-                            Add Cost
-                        </button>
-
+                    <div class="flex items-center justify-between p-3 bg-gray-400 rounded-t-lg border mb-4">
+                        <div class="flex-1"></div> <!-- Spacer kiri -->
+                        <p class="font-bold  text-center">TRANSACTION</p>
+                        <div class="flex-1 flex justify-end gap-2">
+                            <a href="{{route('jobSaleInvoice', ['jobId' => $job->id])}}" class="py-2 px-3 bg-green-600 text-white rounded-lg text-sm">Print Invoice</a>
+                            <a href="{{route('jobPurchaseInvoice', ['jobId' => $job->id])}}" class="py-2 px-3 bg-red-600 text-white rounded-lg text-sm">Print PI</a>
+                            <button @click="open = true" class="py-2 px-3 bg-blue-600 text-white rounded-lg text-sm">Add Cost</button>
+                        </div>
                     </div>
-
                     <!-- Background Overlay -->
                     <div x-cloak x-show="open"
                         x-transition:enter="transition ease-out duration-300 delay-150"
@@ -931,7 +917,7 @@
                         x-transition:leave-start="scale-100 opacity-100"
                         x-transition:leave-end="scale-90 opacity-0"
                         class="fixed inset-0 flex items-center justify-center z-50 px-4">
-                        <div class="bg-white rounded-lg shadow-md w-full max-w-7.5xl">
+                        <div class="bg-white rounded-2xl shadow-md w-full max-w-7.5xl">
                             <!-- Modal Header -->
                             <div class="flex justify-between items-center p-4 border-b">
                                 <h2 class="text-lg font-semibold text-gray-800">Costing</h2>
@@ -945,7 +931,7 @@
                             <!-- Form -->
                             <livewire:job.transactions.create-transactions
                                 :id="$job->id"
-                                :key="'transaction' . $job->id . '-' . now()->timestamp" />
+                                :key="'transaction' . $job->id" />
                         </div>
                     </div>
                 </div>
@@ -1009,7 +995,7 @@
                                 <!-- Delete Button -->
                                 <div x-data>
                                     <button
-                                        class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                                        class="px-3 py-2 bg-red-600 text-white rounded-full hover:scale-105 hover:bg-red-700 transition-transform"
                                         @click="
                     Swal.fire({
                         title: 'Are you sure?',
@@ -1026,7 +1012,7 @@
                         }
                     })
                 ">
-                                        Delete
+                                        <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
 
@@ -1034,9 +1020,8 @@
                                 <button
                                     type="button"
                                     wire:click="editTransaction({{ $job->id }}, {{ $transaction->id }})"
-                                    class="px-3 py-1 bg-blue-500 rounded-full text-white hover:bg-blue-600 transition transform hover:scale-105">
-                                    Update (Job: {{ $job->id }})
-                                </button>
+                                    class="px-3 py-2 bg-blue-500 rounded-full text-white hover:bg-blue-600 transition transform hover:scale-105">
+                                    <i class="fa-solid fa-pen-to-square"></i> </button>
                             </div>
                         </td>
 
@@ -1104,30 +1089,48 @@
                 :key="'confirm-delete-job-transaction-' . now()->timestamp" />
         </div>
     </div>
-    @if($editingTransactionId)
-    <div>
+
+
+
+    <hr class="border-gray-500 dark:border-neutral-500 mt-5">
+
+
+    <!-- SIGMA Button -->
+    <div class="p-4 flex justify-end">
+        <a href="{{ url ('/list-job') }}"
+            class="py-2 px-6 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg transform transition duration-200 ease-in-out shadow:hover-cyan-200 hover:bg-cyan-400 hover:scale-110">
+            Back
+        </a>
+    </div>
+    @if($isEditing)
+    <div x-data="{ show: false }">
         <div wire:loading
             wire:target="saveTransaction,editTransaction"
             class="fixed inset-0 bg-black bg-opacity-30 z-50 items-center justify-center">
             <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
             <span class="ml-4 text-white text-lg font-medium">TUNGGU SEBENTAR...</span>
         </div> {{-- Backdrop --}}
-        <div x-cloak
-            x-transition:enter="transition ease-out duration-300 delay-150"
-            x-transition:leave="transition ease-in duration-200"
-            class="fixed inset-0 bg-gray-500 bg-opacity-50 z-40">
-        </div>
-
-        {{-- Modal Container --}}
-        <div x-cloak
+        <div
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
+            x-data="{ show: false }"
+            x-init="setTimeout(() => show = true, 50)"
+            x-show="show"
             x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="scale-90 opacity-0"
-            x-transition:enter-end="scale-100 opacity-100"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
             x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="scale-100 opacity-100"
-            x-transition:leave-end="scale-90 opacity-0"
-            class="fixed inset-0 flex items-center justify-center z-50 px-4">
-            <div class="bg-white rounded-lg shadow-md w-full max-w-7.5xl">
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0" x-cloak>
+
+            <div
+                class="bg-white rounded-2xl w-full  mx-4 shadow-2xl transform"
+                x-show="show"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                x-transition:leave-end="opacity-0 scale-95 translate-y-4" x-cloak>
                 {{-- Modal Header --}}
                 <div class="flex justify-between items-center p-4 border-b">
                     <h2 class="text-lg font-semibold text-gray-800">Costing</h2>
@@ -1141,27 +1144,17 @@
                 </div>
 
                 {{-- Form --}}
-                <livewire:job.transactions.edit-transactions
-                    :id="$job->id"
-                    :transactionId="$editingTransactionId"
-                    :key="'transaction-' . $job->id . '-' . $editingTransactionId . '-' . now()->timestamp" />
+                <div wire:ignore>
+                    <livewire:job.transactions.edit-transactions
+                        :id="$job->id"
+                        :transactionId="$editingTransactionId"
+                        :key="'transaction-' . $job->id . '-' . $editingTransactionId" wire:debug />
+                </div>
+
             </div>
         </div>
     </div>
     @endif
-
-
-    <hr class="border-gray-500 dark:border-neutral-500 mt-5">
-
-
-    <!-- SIGMA Button -->
-    <div class="p-4 flex justify-end">
-        <a href="{{ url ('/list-job') }}"
-            class="py-2 px-6 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg transform transition duration-200 ease-in-out shadow:hover-cyan-200 hover:bg-cyan-400 hover:scale-110">
-            Back
-        </a>
-    </div>
-
 </div>
 @push('script')
 @script()
@@ -1423,6 +1416,29 @@
 @endpush
 
 <script>
+    window.addEventListener('swal', event => {
+        let data;
+
+        // Handle both array and object
+        if (Array.isArray(event.detail)) {
+            data = event.detail[0]; // Ambil element pertama jika array
+        } else {
+            data = event.detail; // Gunakan langsung jika object
+        }
+
+        // console.log('Processed data:', data);
+
+        if (data && data.title) {
+            Swal.fire({
+                title: data.title,
+                text: data.text,
+                icon: data.icon,
+                confirmButtonText: data.confirmButtonText || 'OK'
+            });
+        } else {
+            // console.error('Invalid data structure:', data);
+        }
+    });
     // Fungsi untuk restore scroll position
     function restoreScrollPosition() {
         const savedPosition = sessionStorage.getItem('scrollPosition');
@@ -1490,12 +1506,5 @@
     function saveScrollPosition() {
         sessionStorage.setItem('scrollPosition', window.scrollY);
     }
-    window.addEventListener('swal', event => {
-        Swal.fire({
-            title: 'Error',
-            text: 'Transaction Already Issued',
-            icon: 'error', // 'warning' adalah fallback default
-            confirmButtonText: 'OK'
-        });
-    });
+    // ===== KODE YANG BENAR =====
 </script>

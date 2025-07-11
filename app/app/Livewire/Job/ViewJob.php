@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ViewJob extends Component
 {
-    public $isEditing = false;
     public $editingJobId = false;
     public $job;
     public $refreshKey, $transactionId, $jobId;
@@ -23,10 +22,11 @@ class ViewJob extends Component
     public $modalContainer = true;
     public $containerType, $noOfPackages, $containerReleaseNo, $containerReleaseDate, $typeOfPackages, $grossWeight, $typeOfGrossWeight, $volumeWeight, $typeOfVolumeWeight, $volume, $chargableWeight, $containerRemarks, $containerNo, $containerSealNo, $noOfPallet, $netOfWeight, $typeNetOfWeight, $totalWeight, $typeOfTotalWeight, $hsCode, $hsCodeDesc;
     public $editingTransactionId;
+    public $isEditing = false;
 
     protected $listeners = [
         'transactionSaved' => 'refreshJob',
-        'close-modal' => 'closeEditTransaction'
+        'close-modal' => 'closeEditTransaction',
     ];
     public function mount($id)
     {
@@ -38,13 +38,17 @@ class ViewJob extends Component
             'Shipper' => 'shipper',
             'Consignee' => 'consignee',
             'Notify Party' => 'notify',
-
         ];
     }
 
     public function refreshJob()
     {
         $this->loadJob($this->job->id);
+        $this->dispatch('swal', [
+            'title' => 'Success',
+            'text' => 'Success Adding Transactions.',
+            'icon' => 'success',
+        ]);
     }
     public function refreshTransaction($id)
     {
@@ -129,28 +133,29 @@ class ViewJob extends Component
         try {
             Transaction::destroy($get_id);
             $this->dispatch('swal', [
-                'title' => 'Berhasil',
-                'text' => 'Transaksi berhasil dihapus.',
+                'title' => 'Success!',
+                'text' => 'Transaction Deleted',
                 'icon' => 'success',
             ]);
         } catch (\Exception $e) {
-            $this->dispatch('swal', [
-                'title' => 'Error',
-                'text' => 'Gagal menghapus transaksi: ' . $e->getMessage(),
-                'icon' => 'error',
-            ]);
+            session()->flash('error', $e->getMessage());
         }
     }
-
     public function editTransaction($jobId, $transactionId)
     {
+        $this->isEditing = true;
         $this->editingTransactionId = $transactionId; // Store the actual transaction ID
         $this->editingJobId = $jobId; // You might need this too
     }
     public function closeEditTransaction()
     {
-        $this->editingTransactionId = null; // Store the actual transaction ID
-
+        $this->isEditing = false;
+        $this->dispatch('swal', [
+            'title' => 'Success',
+            'text' => 'Success Updating Transactions.',
+            'icon' => 'success',
+        ]);
+        // $this->reset(['isReadonly' /* add other properties */]);
     }
     public function getAssignedShipmentsProperty()
     {

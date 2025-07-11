@@ -32,8 +32,7 @@ class JobSaleInvoice extends Component
     public $pdfData = '';
     public $selectAll = false;
     public $showModal = false;
-    public $isIndeterminate = false; // Tambahkan ini
-    public $voidedInvoices = []; // Track voided invoices for animation
+    public $isIndeterminate = false, $voidReason_job_sale_invoice = false; // Tambahkan ini
 
 
     public function mount($jobId)
@@ -166,6 +165,17 @@ class JobSaleInvoice extends Component
         $this->void_reason = ''; // Reset reason
     }
 
+    public function reasonVoidingJobSaleInvoice($id)
+    {
+        $this->voidReason_job_sale_invoice = true;
+        $invoice = Invoice::findOrFail($id);
+        $this->invoice_number = $invoice->invoice_number;
+        $this->void_reason = $invoice->void_reason;
+    }
+    public function cancelReasonVoidingJobSaleInvoice()
+    {
+        $this->voidReason_job_sale_invoice = false;
+    }
     public function voidInvoice()
     {
         // Validate the void reason
@@ -339,8 +349,12 @@ class JobSaleInvoice extends Component
                         :  $pivot->amountInvoiceUsd;
 
                     // VAT dan WHT seharusnya dari field yang sesuai di pivot
-                    $vat = $pivot->vatInvoice ?? 0;
-                    $wht = $pivot->whtInvoice ?? 0;
+                    $vat = $currency === 'IDR'
+                        ?  $pivot->vatInvoice
+                        :  $pivot->vatInvoiceUsd;
+                    $wht = $currency === 'IDR'
+                        ?  $pivot->whtInvoice
+                        :  $pivot->whtInvoiceUsd;
 
                     $subtotal = $qty * $amount;
                     $total = $subtotal + $vat + $wht;
@@ -526,8 +540,8 @@ class JobSaleInvoice extends Component
                 'status'         => 'issued',
                 'currency'       => $this->currency ?? 'IDR',
                 'total_amount'   => $grandTotal,
+                'type_invoice'   => 'INVOICE',
                 'created_by'     => Auth::id(),
-                'updated_by'     => Auth::id(),
             ]);
 
             // Update transaksi dengan invoice_id
@@ -672,6 +686,7 @@ class JobSaleInvoice extends Component
                 'invoice_date'   => $this->invoice_date ?? now(),
                 'due_date'       => null,
                 'status'         => 'draft',
+                'type_invoice'   => 'INVOICE',
                 'currency'       => $this->currency ?? 'IDR',
                 'total_amount'   => $grandTotal,
                 'created_by'     => Auth::id(),

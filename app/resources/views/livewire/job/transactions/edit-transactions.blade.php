@@ -10,6 +10,7 @@
     fcyAmount: @entangle('sfcyamount'),
     samountidr: @entangle('samountidr'),
     quantity: @entangle('quantity'),
+    isReadonly: @entangle('isReadonly'),
 
     // --- Cost Section (Purchasing/Expense) ---
     ccurrency: @entangle('ccurrency'),
@@ -275,10 +276,23 @@
             });
     }
 }"
-    x-init="init(); $nextTick(() => window.reinitSelect2())"
+    x-init="init(); $nextTick(() => window.reinitSelect2()),console.log('isReadonly:', $wire.isReadonly)"
     x-cloak>
 
-
+    <div x-show="isReadonly" class="bg-yellow-50 border border-yellow-200 rounded-md p-4 mb-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm text-yellow-800">
+                    This transaction is already <strong>ISSUED</strong> , read-only mode active and cannot be edited.
+                </p>
+            </div>
+        </div>
+    </div>
     <div class="bg-white">
         <!-- Heading Bar -->
 
@@ -295,7 +309,9 @@
                         Charge<span class="text-red-500">*</span>
                     </label>
                     <div wire:ignore>
-                        <select id="editCharge" name="charge" wire:model.live="charge"
+                        <select id="editCharge" name="charge" wire:model.live="charge" :disabled="isReadonly"
+                            :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
+
                             class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" require>
                             <option value=""></option>
                             @foreach($chargeCoa as $c)
@@ -312,17 +328,18 @@
                         Description / Name<span class="text-red-500">*</span>
                     </label>
                     <div class="flex gap-2">
-                        <input type="text" id="description" name="description" wire:model.live="description" placeholder=""
+                        <input type="text" id="description" name="description" wire:model.live="description" placeholder="" :disabled="isReadonly"
+                            :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                             class="block py-1.5 pr-8 pl-3 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"><span wire:loading></span>
                     </div>
-                    {{$description}}
                 </div>
                 <!-- Freight -->
                 <div wire:ignore>
                     <label for="freight" class="block text-sm font-medium text-gray-700">
                         Freight<span class="text-red-500">*</span>
                     </label>
-                    <select name="freight" id="freight" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <select name="freight" id="editFreight" wire:model="freight" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}">
                         <option value=""></option>
                         <option value="prepaid">Prepaid</option>
                         <option value="collect">Collect</option>
@@ -336,8 +353,9 @@
                     <label for="unit" class="block text-sm font-medium text-gray-700">
                         Unit<span class="text-red-500">*</span>
                     </label>
-                    <select id="unit" name="unit" wire:model="unit"
-                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <select id="editUnit" name="unit" wire:model="unit"
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}">
                         <option value=""></option>
                         <option value="">-- Choose --</option>
                         <option value="CONTAINER">PER CONTAINER</option>
@@ -350,7 +368,8 @@
                     <label for="quantity" class="block text-sm font-medium text-gray-700">
                         Quantity
                     </label>
-                    <input type="text" name="quantity" id="quantity" wire:model="quantity" placeholder="" x-model="quantity"
+                    <input type="text" name="quantity" id="quantity" wire:model="quantity" placeholder="" x-model="quantity" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         class="block py-1.5 pr-8 pl-3 w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
                 </div>
                 <!-- OFD Type -->
@@ -358,7 +377,8 @@
                     <label for="cofdtype" class="block text-sm font-medium text-gray-700">
                         OFD Type
                     </label>
-                    <select name="cofdtype" id="cofdtype" wire:model="ofdtype" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    <select name="cofdtype" id="editCofdtype" wire:model="ofdtype" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}">
                         <option value="OFD">OFD</option>
                         <option value="OFC">OFC</option>
                     </select>
@@ -368,7 +388,8 @@
             <div class="w-full gap-4">
                 <div class="max-w-lg">
                     <label for="remarks" class="block text-sm font-medium mb-2 dark:text-white">Remarks</label>
-                    <textarea id="remarks" name="remarks" wire:model="remarks"
+                    <textarea id="remarks" name="remarks" wire:model="remarks" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         class="py-3 px-4 block w-full border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
                         rows="3" placeholder="Say hi..."></textarea>
                 </div>
@@ -387,7 +408,8 @@
             <div class="grid grid-cols-3 gap-4" wire:ignore>
                 <div class="">
                     <label class="block font-medium">Choose Client</label>
-                    <select wire:model="sclient" id="editSclient" class="w-full border rounded-md border-gray-300 p-2">
+                    <select wire:model="sclient" id="editSclient" class="w-full border rounded-md border-gray-300 p-2" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}">
                         <option value="">-- Choose Client --</option>
                         @foreach($clients as $client)
                         <option value="{{ $client->id }}">{{$client->customer_code}} - {{ $client->name }}</option>
@@ -397,7 +419,8 @@
                 </div>
                 <div>
                     <label for="scurrency" class="block text-sm font-medium text-gray-700">Currency</label>
-                    <input type="text" name="scurrency" id="scurrency"
+                    <input type="text" name="scurrency" id="scurrency" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         wire:model="scurrency" x-model="scurrency"
                         @input="scurrency = $event.target.value.toUpperCase()"
                         autocomplete="off"
@@ -405,7 +428,8 @@
                 </div>
                 <div>
                     <label for="srate" class="block text-sm font-medium text-gray-700">Ex.rate</label>
-                    <input type="text" id="srate" name="srate" :value="srate" wire:model="srate"
+                    <input type="text" id="srate" name="srate" :value="srate" wire:model="srate" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
             </div>
@@ -414,29 +438,33 @@
                 <div class="flex space-x-4">
                     <div class="flex-1">
                         <label for="samount_qty" class="block text-sm font-medium text-gray-700">Amount / Qty</label>
-                        <input type="text" id="samount_qty" name="samount_qty"
+                        <input type="text" id="samount_qty" name="samount_qty" :disabled="isReadonly"
+                            :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                             x-model.number="amount" wire:model="samount_qty"
                             class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div class="flex-1" wire:ignore>
                         <label for="sincludedtax" class="block text-sm font-medium text-gray-700">Included Tax?</label>
-                        <select id="editSincludedtax" name="sincludedtax"
+                        <select id="editSincludedtax" name="sincludedtax" :disabled="isReadonly"
+                            :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                             wire:model="sincludedtax" x-model="sincludedtax"
                             class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                            <option value="No">No</option>
-                            <option value="Yes">Yes</option>
+                            <option value="false">No</option>
+                            <option value="true">Yes</option>
                         </select>
                     </div>
                 </div>
                 <div>
                     <label for="sfcyamount" class="block text-sm font-medium text-gray-700">FCY Amount</label>
-                    <input type="text" id="sfcyamount" name="sfcyamount"
+                    <input type="text" id="sfcyamount" name="sfcyamount" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         :value="formatNumber(fcyAmount)" readonly wire:model="sfcyamount"
                         class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <div>
                     <label for="samountidr" class="block text-sm font-medium text-gray-700">Amount (IDR)</label>
-                    <input type="text" id="samountidr" name="samountidr"
+                    <input type="text" id="samountidr" name="samountidr" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         :value="formatNumber(samountidr)" wire:model="samountidr" readonly
                         class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
@@ -445,7 +473,8 @@
             <div class="grid grid-cols-3 gap-4" wire:ignore>
                 <div>
                     <label for="sdrcr" class="block text-sm font-medium text-gray-700">Dr / Cr</label>
-                    <select id="sdrcr" name="sdrcr" wire:model="sdrcr"
+                    <select id="sdrcr" name="sdrcr" wire:model="sdrcr" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm">
                         <option value="dr">Dr(+)</option>
                         <option value="cr">Cr(-)</option>
@@ -453,7 +482,8 @@
                 </div>
                 <div wire:ignore>
                     <label for="svatgst" class="block text-sm font-medium text-gray-700">VAT / GST Type</label>
-                    <select id="editSvatgst" name="svatgst" x-model="svatgst" wire:model="svatgst"
+                    <select id="editSvatgst" name="svatgst" x-model="svatgst" wire:model="svatgst" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm">
                         <option value="">Select Tax</option>
                         @foreach($taxRates as $id => $rate)
@@ -465,7 +495,8 @@
                 </div>
                 <div wire:ignore>
                     <label for="swhtaxrate" class="block text-sm font-medium text-gray-700">W/H Tax Rate</label>
-                    <select id="swhtaxrate" name="swhtaxrate" wire:model="swhtaxrate" x-model="swhtaxrate"
+                    <select id="swhtaxrate" name="swhtaxrate" wire:model="swhtaxrate" x-model="swhtaxrate" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         <option value="">Select Tax</option>
                         @foreach($taxRatesWht as $id => $rate)
@@ -480,13 +511,15 @@
                 <div class="hidden">
                     <div>
                         <label for="svatgstusd" class="block text-sm font-medium text-gray-700">VAT TAX (USD)</label>
-                        <input type="text" id="svatgstusd" name="svatgstusd"
+                        <input type="text" id="svatgstusd" name="svatgstusd" :disabled="isReadonly"
+                            :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                             :value="formatNumber(vatAmountUsd)"
                             class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div>
                         <label for="shwtaxrateusd" class="block text-sm font-medium text-gray-700">WHT TAX (USD)</label>
-                        <input type="text" id="shwtaxrateusd" name="shwtaxrateusd"
+                        <input type="text" id="shwtaxrateusd" name="shwtaxrateusd" :disabled="isReadonly"
+                            :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                             :value="formatNumber(swhtaxamountusd)"
                             class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
@@ -496,19 +529,22 @@
             <div class="grid grid-cols-3 gap-4">
                 <div>
                     <label for="svatgstamount" class="block text-sm font-medium text-gray-700">VAT TAX </label>
-                    <input type="text" id="svatgstamount" name="svatgstamount"
+                    <input type="text" id="svatgstamount" name="svatgstamount" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         :value="formatNumber(vatAmount)" readonly
                         class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <div>
                     <label for="swhtaxamount" class="block text-sm font-medium text-gray-700">W/H Tax Amount</label>
-                    <input type="text" id="swhtaxamount" name="swhtaxamount"
+                    <input type="text" id="swhtaxamount" name="swhtaxamount" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         :value="formatNumber(whtaxAmount)"
                         class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <div>
                     <label for="staxableamount" class="block text-sm font-medium text-gray-700">Total TAX</label>
-                    <input type="text" id="staxableamount" name="staxableamount"
+                    <input type="text" id="staxableamount" name="staxableamount" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         :value="formatNumber(totalTax)"
                         class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
@@ -517,7 +553,8 @@
             <div class="grid grid-cols-3 gap-4">
                 <div class="max-w-lg">
                     <label for="sremarks" class="block text-sm font-medium mb-2 dark:text-white">Remarks</label>
-                    <textarea id="sremarks" name="sremarks" wire:model="sremarks"
+                    <textarea id="sremarks" name="sremarks" wire:model="sremarks" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         class="py-3 px-4 block w-full border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
                         rows="3" placeholder="Say hi.."></textarea>
                 </div>
@@ -552,7 +589,8 @@
                 <!-- Vendor -->
                 <div class="" wire:ignore>
                     <label class="block font-medium">Choose Vendor</label>
-                    <select wire:model="cvendor" id="cvendor" class="w-full border rounded-md border-gray-300 p-2">
+                    <select wire:model="cvendor" id="cvendor" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}" class="w-full border rounded-md border-gray-300 p-2">
                         <option value="">-- Choose Vendor --</option>
                         @foreach($vendors as $vendor)
                         <option wire:key="{{$vendor}}" value="{{ $vendor->id }}">{{$vendor->customer_code}} - {{ $vendor->name }}</option>
@@ -563,13 +601,15 @@
                 <!-- No Invoice -->
                 <div>
                     <label for="creferenceno" class="block text-sm font-medium text-gray-700">No Invoice</label>
-                    <input type="text" id="creferenceno" name="creferenceno" wire:model="creferenceno"
+                    <input type="text" id="creferenceno" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}" name="creferenceno" wire:model="creferenceno"
                         class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <!-- Date -->
                 <div>
                     <label for="cdate" class="block text-sm font-medium text-gray-700">Date</label>
-                    <input type="date" id="cdate" name="cdate" wire:model="cdate"
+                    <input type="date" id="cdate" name="cdate" wire:model="cdate" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
             </div>
@@ -579,7 +619,8 @@
                 <!-- Dr / Cr -->
                 <div wire:ignore>
                     <label for="cdrcr" class="block text-sm font-medium text-gray-700">Dr / Cr</label>
-                    <select id="cdrcr" name="cdrcr" wire:model="cdrcr"
+                    <select id="cdrcr" name="cdrcr" wire:model="cdrcr" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         class="block w-full rounded-md border-gray-300 shadow-sm">
                         <option value="dr">Dr(+)</option>
                         <option value="cr">Cr(-)</option>
@@ -588,7 +629,8 @@
                 <!-- Currency -->
                 <div>
                     <label for="ccurrency" class="block text-sm font-medium text-gray-700">Currency</label>
-                    <input type="text" id="ccurrency" name="ccurrency" wire:model="ccurrency"
+                    <input type="text" id="ccurrency" name="ccurrency" wire:model="ccurrency" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         @input="ccurrency = $event.target.value.toUpperCase()"
                         x-model="ccurrency" class="block w-full py-1.5 pr-8 pl-3 rounded-md shadow-sm border-gray-300 focus:border-blue-500 focus:ring-blue-500">
                     <div>
@@ -598,7 +640,8 @@
                 <!-- Exchange Rate -->
                 <div>
                     <label for="crate" class="block text-sm font-medium text-gray-700">Ex.rate</label>
-                    <input type="text" id="crate" name="crate" wire:model="crate" :value="crate"
+                    <input type="text" id="crate" name="crate" wire:model="crate" :value="crate" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}"
                         class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
             </div>
@@ -609,12 +652,14 @@
                 <div class="flex space-x-4">
                     <div class="flex-1">
                         <label for="camount_qty" class="block text-sm font-medium text-gray-700">Amount / Qty</label>
-                        <input type="text" id="camount_qty" name="camount_qty" wire:model="camount_qty" x-model.number="camount"
+                        <input type="text" id="camount_qty" name="camount_qty" wire:model="camount_qty" :disabled="isReadonly"
+                            :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}" x-model.number="camount"
                             class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     </div>
                     <div class="flex-1" wire:ignore>
                         <label for="cincludedtax" class="block text-sm font-medium text-gray-700">Included Tax?</label>
-                        <select id="cincludedtax" name="cincludedtax" wire:model="cincludedtax" x-model="cincludedtax"
+                        <select id="cincludedtax" name="cincludedtax" wire:model="cincludedtax" :disabled="isReadonly"
+                            :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}" x-model="cincludedtax"
                             class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                             <option value="No">No</option>
                             <option value="Yes">Yes</option>
@@ -624,13 +669,15 @@
                 <!-- FCY Amount -->
                 <div>
                     <label for="cfcyamount" class="block text-sm font-medium text-gray-700">FCY Amount</label>
-                    <input type="text" id="cfcyamount" name="cfcyamount" :value="formatNumber(cfcyAmount)" readonly
+                    <input type="text" id="cfcyamount" name="cfcyamount" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}" :value="formatNumber(cfcyAmount)" readonly
                         class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
                 <!-- Amount (IDR) -->
                 <div>
                     <label for="camountidr" class="block text-sm font-medium text-gray-700">Amount (IDR)</label>
-                    <input type="text" id="camountidr" name="camountidr" placeholder="" :value="formatNumber(camountidr)"
+                    <input type="text" id="camountidr" name="camountidr" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}" placeholder="" :value="formatNumber(camountidr)"
                         class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
             </div>
@@ -640,7 +687,8 @@
                 <!-- VAT / GST Type -->
                 <div wire:ignore>
                     <label for="cvatgst" class="block text-sm font-medium text-gray-700">VAT / GST TAX</label>
-                    <select id="editCvatgst" name="cvatgst" wire:model="cvatgst"
+                    <select id="editCvatgst" name="cvatgst" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}" wire:model="cvatgst"
                         class="w-full rounded-md border-gray-300 shadow-sm">
                         <option value="">Select Tax</option>
                         @foreach($taxRates as $id => $rate)
@@ -653,7 +701,8 @@
                 <!-- W/H TAX RATE -->
                 <div wire:ignore>
                     <label for="cwhtaxrate" class="block text-sm font-medium text-gray-700">W/H Tax Rate (cwhtaxrate)</label>
-                    <select id="cwhtaxrate" name="cwhtaxrate" wire:model="cwhtaxrate" x-model="cwhtaxrate"
+                    <select id="cwhtaxrate" name="cwhtaxrate" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}" wire:model="cwhtaxrate" x-model="cwhtaxrate"
                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                         <option value="">Select Tax</option>
                         @foreach($taxRatesWht as $id => $rate)
@@ -666,7 +715,8 @@
                 <!-- Taxable Amount -->
                 <div>
                     <label for="ctaxableamount" class="block text-sm font-medium text-gray-700">VAT TAX</label>
-                    <input type="text" id="ctaxableamount" name="ctaxableamount"
+                    <input type="text" id="ctaxableamount" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}" name="ctaxableamount"
                         :value="formatNumber(ctaxable)"
                         class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                 </div>
@@ -677,7 +727,8 @@
                 <!-- Remarks -->
                 <div class="max-w-lg">
                     <label for="cremarks" class="block text-sm font-medium mb-2 dark:text-white">Remarks</label>
-                    <textarea id="cremarks" name="cremarks" wire:model="cremarks"
+                    <textarea id="cremarks" name="cremarks" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}" wire:model="cremarks"
                         class="py-3 px-4 block w-full border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500"
                         rows="3" placeholder="Say hi..."></textarea>
                 </div>
@@ -685,14 +736,16 @@
                 <div>
                     <label for="cvatgstamount" class="block text-sm font-medium text-gray-700">TOTAL TAX</label>
                     <input type="text" id="cvatgstamount" name="cvatgstamount" :value="formatNumber(ctaxamount)"
-                        class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="0">
+                        class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="0" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}">
                 </div>
 
                 <!-- W/H TAX AMOUNT -->
                 <div>
                     <label for="cwhtaxamount" class="block text-sm font-medium text-gray-700">W/H TAX</label>
                     <input type="text" id="cwhtaxamount" name="cwhtaxamount" :value="formatNumber(cwhtaxamount)"
-                        class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="0">
+                        class="block w-full py-1.5 pr-8 pl-3 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" value="0" :disabled="isReadonly"
+                        :class="{'bg-gray-100 cursor-not-allowed opacity-60': isReadonly}">
                 </div>
             </div>
 
@@ -705,7 +758,8 @@
         <button type="button" class="px-4 py-2 bg-gray-500 text-white rounded-lg" wire:click="closeModal">
             Cancel
         </button>
-        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">
+        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg" :disabled="isReadonly"
+            :class="{' cursor-not-allowed opacity-60': isReadonly}">
             Save
         </button>
     </div>
@@ -753,12 +807,12 @@
                 placeholder: 'Select Vendor'
             },
             {
-                sel: '#freight',
+                sel: '#editFreight',
                 model: 'freight',
                 placeholder: 'Select Freight'
             },
             {
-                sel: '#cofdtype',
+                sel: '#editCofdtype',
                 model: 'ofdtype',
                 placeholder: 'Select OFD  Type'
             },
@@ -772,7 +826,7 @@
                 model: 'sdrcr',
                 placeholder: 'Select DR CR'
             }, {
-                sel: '#unit',
+                sel: '#editUnit',
                 model: 'unit',
                 placeholder: 'Select Unit'
             },

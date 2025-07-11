@@ -19,6 +19,7 @@ use App\Models\transaction\tax;
 class EditTransactions extends Component
 {
     public $chargeCoa;
+    public $isReadonly = false;
 
     public $taxRates = [];
     public $taxData = [];
@@ -79,9 +80,17 @@ class EditTransactions extends Component
 
         $this->chargeCoa = ChargeSetting::get();
         $this->vendors = Customer::where('category', 'creditor')->orderBy('name')->get();
+        $this->checkReadonlyStatus();
 
         $this->updatedUnit($this->unit);
     }
+    private function checkReadonlyStatus()
+    {
+        if ($this->transaction->invs && $this->transaction->invs->status === 'issued') {
+            $this->isReadonly = true;
+        }
+    }
+
 
     public function loadTransaction($transactionId)
     {
@@ -207,6 +216,7 @@ class EditTransactions extends Component
                 'text' => 'Transaksi ini sudah masuk ke invoice yang telah issued.',
                 'icon' => 'error', // Diubah dari 'errors' menjadi 'error'
             ]);
+            $this->isReadonly = true;
             return;
         }
         if ($this->getErrorBag()->isNotEmpty()) {
@@ -280,10 +290,10 @@ class EditTransactions extends Component
         // $this->createJournalEntries($transaction);
         $this->resetForm();
         $this->dispatch('transactionSaved');
-        $this->dispatch('close-modal');
         $this->chargeCoa = ChargeSetting::get();
         session()->flash('message', 'Transaksi berhasil disimpan!');
         $this->vendors = customer::where('category', 'creditor')->orderBy('name')->get();
+        $this->dispatch('close-modal');
     }
 
     private function createJournalEntries($transaction)

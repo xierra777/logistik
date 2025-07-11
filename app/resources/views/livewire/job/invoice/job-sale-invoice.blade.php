@@ -305,7 +305,7 @@
                         <th class="p-4 text-purple-700 font-semibold text-center">Currency</th>
                         <th class="p-4 text-purple-700 font-semibold text-center">Total Amount</th>
                         <th class="p-4 text-purple-700 font-semibold text-center">Created By</th>
-                        <th class="p-4 text-purple-700 font-semibold text-center rounded-tr-2xl">Action</th>
+                        <th class="p-4 text-purple-700 font-semibold text-center ">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -382,23 +382,31 @@
                                     title="Print Invoice">
                                     <i class="fas fa-print text-sm"></i>
                                 </button>
+                                @if($invs->status === 'issued')
+                                <!-- Tombol Void dengan Animasi -->
+                                <button
+                                    wire:click="confirmVoid({{ $invs->id }})"
+                                    wire:loading.attr="disabled"
+                                    class="group relative w-10 h-10 bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-110 transition-all duration-300 active:scale-95"
+                                    title="Void Invoice">
+                                    <i class="fas fa-ban text-sm group-hover:rotate-12 transition-transform duration-300"></i>
 
-                                <div class="flex items-center space-x-2">
-                                    @if($invs->status === 'issued')
-                                    <!-- Tombol Void dengan Animasi -->
-                                    <button
-                                        wire:click="confirmVoid({{ $invs->id }})"
-                                        wire:loading.attr="disabled"
-                                        class="group relative w-10 h-10 bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-110 transition-all duration-300 active:scale-95"
-                                        title="Void Invoice">
-                                        <i class="fas fa-ban text-sm group-hover:rotate-12 transition-transform duration-300"></i>
-
-                                        <!-- Ripple Effect -->
-                                        <div class="absolute inset-0 rounded-full bg-white opacity-0 group-active:opacity-20 transition-opacity duration-150"></div>
-                                    </button>
-                                    @endif
-                                </div>
-
+                                    <!-- Ripple Effect -->
+                                    <div class="absolute inset-0 rounded-full bg-white opacity-0 group-active:opacity-20 transition-opacity duration-150"></div>
+                                </button>
+                                @endif
+                                @if($invs->status === 'void')
+                                <!-- Tombol Void dengan Animasi -->
+                                <button
+                                    wire:click="reasonVoidingJobSaleInvoice({{ $invs->id }})"
+                                    wire:loading.attr="disabled"
+                                    title="Reason Voiding"
+                                    class="group relative w-10 h-10 bg-gradient-to-l from-red-400 to-pink-300 hover:from-red-500 hover:to-pink-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-110 transition-all duration-300 active:scale-95">
+                                    <i class="fa-solid fa-info"></i>
+                                    <!-- Ripple Effect -->
+                                    <div class="absolute inset-0 rounded-full bg-white opacity-0 group-active:opacity-20 transition-opacity duration-150"></div>
+                                </button>
+                                @endif
 
 
                                 <!-- Custom Animations -->
@@ -457,6 +465,60 @@
             </table>
         </div>
     </div>
+    @if($voidReason_job_sale_invoice)
+    <div
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
+        x-data="{ show: false }"
+        x-init="setTimeout(() => show = true, 50)"
+        x-show="show"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0" x-cloak>
+
+        <div
+            class="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl transform"
+            x-show="show"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+            x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+            x-transition:leave-end="opacity-0 scale-95 translate-y-4" x-cloak>
+
+            <!-- Header -->
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                    <i class="fas fa-info text-red-500 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Reason Voiding Invoice</h3>
+                <p class="text-gray-600">Invoice #{{ $invoice_number }}</p>
+            </div>
+
+
+            <!-- Reason Input -->
+            <div class="mb-6">
+                <textarea
+                    wire:model="void_reason"
+                    rows="3"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200 resize-none"></textarea>
+
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-center space-x-3">
+                <button
+                    type="button"
+                    wire:click="cancelReasonVoidingJobSaleInvoice"
+                    class="px-6 py-3 bg-red-100 text-gray-700 rounded-lg hover:bg-red-200 transition-colors duration-200 font-medium disabled:opacity-50">
+                    Ok
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
     @if($showModal)
     <div
         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"

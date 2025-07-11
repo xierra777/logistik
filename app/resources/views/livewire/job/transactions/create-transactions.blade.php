@@ -3,7 +3,7 @@
     // --- Source Section (Sales/Income) ---
     scurrency: @entangle('scurrency'),
     srate: @entangle('srate'),
-    amount: @entangle('samount_qty'),
+    amount: @entangle('samount_qty').defer || 0,
     sincludedtax: @entangle('sincludedtax'),
     svatgst: @entangle('svatgst'),
     swhtaxrate: @entangle('swhtaxrate'),
@@ -802,7 +802,7 @@
             $el.off('change.lw').on('change.lw', function() {
                 const value = $(this).val();
                 $wire.set(model, value);
-                console.log(value);
+                // console.log(value);
             });
         });
     };

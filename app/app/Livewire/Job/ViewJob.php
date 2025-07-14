@@ -21,7 +21,7 @@ class ViewJob extends Component
     public array $selectedAssignedShipments = [];
     public $modalContainer = true;
     public $containerType, $noOfPackages, $containerReleaseNo, $containerReleaseDate, $typeOfPackages, $grossWeight, $typeOfGrossWeight, $volumeWeight, $typeOfVolumeWeight, $volume, $chargableWeight, $containerRemarks, $containerNo, $containerSealNo, $noOfPallet, $netOfWeight, $typeNetOfWeight, $totalWeight, $typeOfTotalWeight, $hsCode, $hsCodeDesc;
-    public $editingTransactionId;
+    public $editingTransactionId, $transactions;
     public $isEditing = false;
 
     protected $listeners = [
@@ -55,6 +55,11 @@ class ViewJob extends Component
         $this->refreshKey = now()->timestamp;
         $this->loadJob($id); // cukup panggil method ini, tidak perlu cari ulang shipment ID
     }
+    public function trancsationsDispatchclear()
+    {
+        $this->refreshKey = now()->timestamp;
+    }
+
 
     public function loadJob($id)
     {
@@ -62,7 +67,6 @@ class ViewJob extends Component
             'client',
             'TjobContainer',
             'carrierModel',
-            'jobTransactions.invs',     // relasi ke Customer
             'ogents',
             'dagents',
             'employee',
@@ -150,11 +154,11 @@ class ViewJob extends Component
     public function closeEditTransaction()
     {
         $this->isEditing = false;
-        $this->dispatch('swal', [
-            'title' => 'Success',
-            'text' => 'Success Updating Transactions.',
-            'icon' => 'success',
-        ]);
+        // $this->dispatch('swal', [
+        //     'title' => 'Success',
+        //     'text' => 'Success Updating Transactions.',
+        //     'icon' => 'success',
+        // ]);
         // $this->reset(['isReadonly' /* add other properties */]);
     }
     public function getAssignedShipmentsProperty()
@@ -257,6 +261,8 @@ class ViewJob extends Component
 
     public function render()
     {
+        $this->transactions = Transaction::where('id_job', $this->job->id)
+            ->get();
         return view('livewire.job.view-job',);
     }
 }

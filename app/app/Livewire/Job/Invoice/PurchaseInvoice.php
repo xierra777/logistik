@@ -12,6 +12,8 @@ use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Spatie\Browsershot\Browsershot;
 
@@ -20,7 +22,7 @@ class PurchaseInvoice extends Component
 
     public $jobId, $invoiceId, $isVoiding;
     public $job;
-    public $customer, $void_reason, $selectedVendor = '';
+    public $customer, $void_reason, $selectedVendor;
     public $id_job;
     public $transactions;
     public $selected_transactions = [];
@@ -45,7 +47,19 @@ class PurchaseInvoice extends Component
         }
 
         $this->job = TJob::findOrFail($jobId);
-        $this->vendors = Customer::whereIn('id', Transaction::whereNotNull('cvendor')->pluck('cvendor'))->get();
+        $this->vendors = Customer::select([
+            'customers.id',
+            'customers.name',
+            'customers.email'
+        ])
+            ->selectRaw('COUNT(transactions.id) as total_transactions')
+            ->selectRaw('COUNT(CASE WHEN transactions.is_invoiced = 0 OR transactions.is_invoiced IS NULL THEN 1 END) as uninvoiced_transactions')
+            ->join('transactions', 'customers.id', '=', 'transactions.cvendor')
+            ->whereNotNull('transactions.cvendor')
+            ->groupBy('customers.id', 'customers.name', 'customers.email')
+            ->orderBy('customers.name')
+            ->get();
+
         $this->loadTransactions();
     }
     public function loadTransactions()
@@ -62,7 +76,7 @@ class PurchaseInvoice extends Component
         } else {
             $this->transactions = collect();
             $this->purchasingInvoice = collect();
-            session()->flash('error', 'Please select a vendor to view transactions.');
+            // session()->flash('error', 'Please select a vendor to view transactions.');
 
             // Optional: Show all uninvoiced transactions for the job
             /*
@@ -83,6 +97,7 @@ class PurchaseInvoice extends Component
     public function updatedSelectedVendor($value)
     {
         $this->loadTransactions();
+        $this->updateIndeterminateState();
     }
     public function updatedSelectAll($value)
     {
@@ -93,7 +108,7 @@ class PurchaseInvoice extends Component
             $this->selectedTransactionIds = [];
         }
 
-        $this->updateIndeterminateState();
+        $this->updatedSelectedTransactionIds();
     }
 
     public function generateInvoiceNumber()
@@ -150,6 +165,193 @@ class PurchaseInvoice extends Component
     {
         // Add your PDF generation logic here
         session()->flash('message', 'PDF generated successfully!');
+    }
+    #[On('issueInvoice')]
+    public function issueInvoice($id)
+    {
+        // Ambil invoice berdasarkan $id
+        $invoice = Invoice::findOrFail($id);
+
+        // Ambil semua transaksi yang berelasi dengan invoice tersebut
+        $transactions = Transaction::where('invoice_id', $invoice->id)->get();
+
+        // Update semua transaksi, bisa pakai query langsung:
+
+        foreach ($transactions as $transaction) {
+            $transaction->update(['is_invoiced' => true]);
+        }
+        $invoice->update([
+            'status' => 'issued',
+            'due_date' => now()->addDays(30),
+            'updated_by' => Auth::user()->id,
+        ]);
+
+
+        $this->dispatch('showSuccessAlert', [
+            'title' => 'Invoice Issued!',
+            'text'  => "Purchase Invoice #{$invoice->invoice_number} has been marked as issued.",
+            'icon'  => 'success'
+        ]);
+        $selectedTransactions = $invoice->transactions;
+        foreach ($selectedTransactions as $transaction) {
+            $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
+
+            // Jurnal Penjualan (Revenue)
+            if ($transaction->camountidr && $saleCoa && $transaction->transactionVendor) {
+                $saleAmount = $transaction->camountidr;
+                $vatAmount  = $transaction->cvatgstamount;
+                $whtAmount  = $transaction->cwhtaxamount;
+                $totalSale  = $saleAmount + $vatAmount - $whtAmount;
+
+                // Piutang (A/R) - Debit
+                JournalEntry::create([
+                    'transaction_id'      => $transaction->id,
+                    'coa_id'              => $transaction->transactionVendor->coa_id,
+                    'invoice_id'           => $invoice->id,
+                    'debit'               => $totalSale,
+                    'credit'              => 0,
+                    'description'         => "HUTANG dari transaksi #{$transaction->transactionVendor->name} ({$transaction->job->job_id}) - {$transaction->description}",
+                    'transactionable_type' => get_class($transaction),
+                    'transactionable_id'  => $transaction->id,
+                    'date'                => now(),
+                    'created_by'          => Auth::id(),
+                ]);
+
+                // VAT Output - Kredit
+                if ($vatAmount > 0 && $transaction->saleVat && $transaction->saleVat->coa_id) {
+                    JournalEntry::create([
+                        'transaction_id'      => $transaction->id,
+                        'coa_id'              => $transaction->saleVat->coa_id,
+                        'invoice_id'             => $invoice->id,
+                        'debit'               => 0,
+                        'credit'              => $vatAmount,
+                        'description'         => "HUTANG PPN dari transaksi #{$transaction->job->job_id} - {$transaction->description}",
+                        'transactionable_type' => get_class($transaction),
+                        'transactionable_id'  => $transaction->id,
+                        'date'                => now(),
+                        'created_by'          => Auth::id(),
+                    ]);
+                }
+
+                // WHT Receivable - Debit
+                if ($whtAmount > 0 && $transaction->saleWht && $transaction->saleWht->coa_id) {
+                    JournalEntry::create([
+                        'transaction_id'      => $transaction->id,
+                        'coa_id'              => $transaction->saleWht->coa_id,
+                        'invoice_id'          => $invoice->id,
+                        'debit'               => $whtAmount,
+                        'credit'              => 0,
+                        'description'         => "HUTANG PPh 23 dari transaksi #{$transaction->job->job_id} - {$transaction->description}",
+                        'transactionable_type' => get_class($transaction),
+                        'transactionable_id'  => $transaction->id,
+                        'date'                => now(),
+                        'created_by'          => Auth::id(),
+                    ]);
+                }
+
+                // Pendapatan (Revenue) - Kredit
+                JournalEntry::create([
+                    'transaction_id'      => $transaction->id,
+                    'coa_id'              => $saleCoa->id,
+                    'invoice_id'             => $invoice->id,
+                    'debit'               => 0,
+                    'credit'              => $saleAmount,
+                    'description'         => "cost transaction #{$transaction->reference_type} ({$transaction->job->job_id}) - {$transaction->description}",
+                    'transactionable_type' => $transaction->reference_type,
+                    'transactionable_id'  => $transaction->id,
+                    'date'                => now(),
+                    'created_by'          => Auth::id(),
+                ]);
+            }
+        }
+        $this->loadTransactions();
+    }
+    public function confirmVoid($invoiceId)
+    {
+        $this->invoiceId = $invoiceId;
+        $this->showModal = true;
+        $invoice = Invoice::findOrFail($invoiceId);
+        $this->invoice_number = $invoice->invoice_number;
+        $this->void_reason = ''; // Reset reason
+    }
+
+    public function reasonVoidingJobSaleInvoice($id)
+    {
+        $this->voidReason_job_sale_invoice = true;
+        $invoice = Invoice::findOrFail($id);
+        $this->invoice_number = $invoice->invoice_number;
+        $this->void_reason = $invoice->void_reason;
+    }
+    public function cancelReasonVoidingJobSaleInvoice()
+    {
+        $this->voidReason_job_sale_invoice = false;
+    }
+    public function voidInvoice()
+    {
+        // Validate the void reason
+        $this->validate([
+            'void_reason' => 'required|string|max:255',
+        ]);
+
+        $invoice = Invoice::findOrFail($this->invoiceId);
+
+        // Update invoice status
+        $invoice->update([
+            'status' => 'void',
+            'due_date' => null,
+            'void_reason' => $this->void_reason,
+            'updated_by' => Auth::user()->id
+        ]);
+
+        // Create reversal journal entries
+        $journalEntries = JournalEntry::where('invoice_id', $invoice->id)->get();
+
+        foreach ($journalEntries as $entry) {
+            JournalEntry::create([
+                'invoice_id'           => $entry->invoice_id,
+                'transaction_id'       => $entry->transaction_id,
+                'coa_id'               => $entry->coa_id,
+                'debit'                => $entry->credit, // dibalik
+                'credit'               => $entry->debit,  // dibalik
+                'description'          => "REVERSE: " . $entry->description,
+                'transactionable_type' => $entry->transactionable_type,
+                'transactionable_id'   => $entry->transactionable_id,
+                'is_reversal'          => true,
+                'reversal_of'          => $entry->id,
+                'date'                 => now(),
+                'created_by'           => Auth::id(),
+                'updated_by'           => Auth::id(),
+            ]);
+        }
+
+        // Update related transactions
+        if (Schema::hasColumn('transactions', 'invoice_id')) {
+            Transaction::where('invoice_id', $invoice->id)->update([
+                'invoice_id' => null,
+                'is_invoiced' => null,
+            ]);
+        }
+
+        // Close modal and reset form
+        $this->showModal = false;
+        $this->void_reason = '';
+        $this->invoiceId = null;
+
+        // Show correct success message
+        $this->dispatch('showSuccessAlert', [
+            'title' => 'Invoice Voided!',
+            'icon'  => 'success',
+            'text'  => "Invoice #{$invoice->invoice_number} has been successfully voided.",
+        ]);
+
+        $this->loadTransactions();
+    }
+
+    public function cancelVoid()
+    {
+        $this->showModal = false;
+        $this->void_reason = '';
+        $this->invoiceId = null;
     }
     public function previewPDF($invoiceId)
     {
@@ -224,16 +426,16 @@ class PurchaseInvoice extends Component
 
                     // PERBAIKAN: Pastikan menggunakan field yang benar dari transaction
                     $amount = $currency === 'IDR'
-                        ? (float) $trx->samountidr
-                        : (float) $trx->sfcyamount;
+                        ? (float) $trx->camountidr
+                        : (float) $trx->cfcyamount;
 
                     $vat = $currency === 'IDR'
-                        ? (float) ($trx->svatgstamount ?? 0)
-                        : (float) ($trx->svatgstusd ?? 0);
+                        ? (float) ($trx->cvatgstamount ?? 0)
+                        : (float) ($trx->cvatgstusd ?? 0);
 
                     $wht = $currency === 'IDR'
-                        ? (float) ($trx->swhtaxamount ?? 0)
-                        : (float) ($trx->shwtaxrateusd ?? 0);
+                        ? (float) ($trx->cwhtaxamount ?? 0)
+                        : (float) ($trx->chwtaxrateusd ?? 0);
 
                     // PERBAIKAN: Kalkulasi subtotal berdasarkan qty * rate per unit
                     // Bukan qty * amount (karena amount sudah total)
@@ -373,12 +575,12 @@ class PurchaseInvoice extends Component
             $totalVat   = $selectedTransactions->sum('svatgstamount');
             $totalWht   = $selectedTransactions->sum('swhtaxamount');
             $grandTotal = $subtotal + $totalVat + $totalWht;
-            // dd($this->jobId);
+            // dd($this->selectedVendor);
             // Buat invoice baru
             $invoice = Invoice::create([
                 'invoice_number' => $this->invoice_number,
                 'job_id'         => $this->jobId,
-                'customer_id'    => $this->customer->id,
+                'customer_id'    => $this->selectedVendor,
                 'invoice_date'   => $this->invoice_date ?? now(),
                 'due_date'       => now()->addDays(30),
                 'status'         => 'issued',
@@ -390,7 +592,9 @@ class PurchaseInvoice extends Component
 
             // Update transaksi dengan invoice_id
             Transaction::whereIn('id', $this->selectedTransactionIds)->update([
-                'invoice_id' => $invoice->id
+                'invoice_id' => $invoice->id,
+                'is_invoiced' => true,
+
             ]);
             foreach ($selectedTransactions as $transaction) {
                 $invoice->transactions()->attach($transaction->id, [
@@ -479,8 +683,11 @@ class PurchaseInvoice extends Component
                 }
             }
             DB::commit();
-            session()->flash('message', 'Invoice created successfully!');
-            // Optionally redirect or reset form here
+            $this->dispatch('showSuccessAlert', [
+                'title' => 'Invoicing transaction!',
+                'icon'  => 'success',
+                'text'  => "Purchase Invoice #{$invoice->invoice_number} has been successfully invoiced.",
+            ]);            // Optionally redirect or reset form here
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -489,6 +696,7 @@ class PurchaseInvoice extends Component
         $this->generateInvoiceNumber();
 
         $this->loadTransactions();
+        $this->dispatch('transaction-updated');
     }
     public function saveAsDraft()
     {
@@ -496,6 +704,7 @@ class PurchaseInvoice extends Component
         $this->validate([
             'selectedTransactionIds' => 'required|array|min:1',
             'invoice_number' => 'required|string|max:255',
+            'selectedVendor'  => 'required'
         ], [
             'selectedTransactionIds.required' => 'Please select at least one transaction.',
             'selectedTransactionIds.min' => 'Please select at least one transaction.',
@@ -517,16 +726,17 @@ class PurchaseInvoice extends Component
             }
 
             // Hitung subtotal, VAT, WHT, dan grand total
-            $subtotal   = $selectedTransactions->sum('samountidr');
-            $totalVat   = $selectedTransactions->sum('svatgstamount');
-            $totalWht   = $selectedTransactions->sum('swhtaxamount');
+            $subtotal   = $selectedTransactions->sum('camountidr');
+            $totalVat   = $selectedTransactions->sum('cvatgstamount');
+            $totalWht   = $selectedTransactions->sum('cwhtaxamount');
             $grandTotal = $subtotal + $totalVat + $totalWht;
             // dd($this->jobId);
             // Buat invoice baru
+            // dd($this->selectedVendor->id);
             $invoice = Invoice::create([
                 'invoice_number' => $this->invoice_number,
                 'job_id'         => $this->jobId,
-                'customer_id'    => $this->customer->id,
+                'customer_id'    => $this->selectedVendor,
                 'invoice_date'   => $this->invoice_date ?? now(),
                 'due_date'       => null,
                 'status'         => 'draft',
@@ -538,17 +748,18 @@ class PurchaseInvoice extends Component
 
             // Update transaksi dengan invoice_id
             Transaction::whereIn('id', $this->selectedTransactionIds)->update([
-                'invoice_id' => $invoice->id
+                'invoice_id' => $invoice->id,
+                'is_invoiced' => true,
             ]);
             foreach ($selectedTransactions as $transaction) {
                 $invoice->transactions()->attach($transaction->id, [
-                    'amountInvoice' => $transaction->samountidr,
-                    'amountInvoiceUsd' => $transaction->sfcyamount,
+                    'amountInvoice' => $transaction->camountidr,
+                    'amountInvoiceUsd' => $transaction->cfcyamount,
                     'quantityInvoice'   => $transaction->quantity,
-                    'vatInvoice'        => $transaction->svatgstamount,
-                    'vatInvoiceUsd'     => $transaction->svatgstusd,
-                    'whtInvoice'        => $transaction->svatgstamount,
-                    'whtInvoiceUsd'     => $transaction->shwtaxrateusd,
+                    'vatInvoice'        => $transaction->cvatgstamount,
+                    'vatInvoiceUsd'     => $transaction->cvatgstusd,
+                    'whtInvoice'        => $transaction->cvatgstamount,
+                    'whtInvoiceUsd'     => $transaction->chwtaxrateusd,
                     'remarks' => $transaction->description,
                 ]);
             }
@@ -565,6 +776,7 @@ class PurchaseInvoice extends Component
     }
     public function render()
     {
+        $this->purchasingInvoice = Invoice::where('job_id', $this->jobId)->where('type_invoice', 'PURCHASING')->get();
         return view('livewire.job.invoice.purchase-invoice', [
             'job' => $this->job,
             'customer' => $this->customer,

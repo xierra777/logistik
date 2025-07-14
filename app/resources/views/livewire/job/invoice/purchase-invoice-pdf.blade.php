@@ -329,17 +329,17 @@
                             </td>
                             <td class="text-[9px] border border-gray-900 p-1">
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ $finalCurrency == 'USD'
-                                    ? number_format($transaction->sfcyamount, 2, '.', ',')
-                                    : number_format($transaction->samountidr, 2, ',', '.') }}
+                                    ? number_format($transaction->cfcyamount, 2, '.', ',')
+                                    : number_format($transaction->camountidr, 2, ',', '.') }}
                                     </span>
                                 </div>
                             </td>
                             <td class="text-[9px] border border-gray-900 p-1">
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ $finalCurrency == 'IDR'
                                     ? number_format($transaction->subtotal, 2, ',', '.')
@@ -350,11 +350,11 @@
                             <td class="text-[9px] border border-gray-900 text-center p-1">
                                 @if (!is_null($transaction->svatgstamount) || !is_null($transaction->svatgstusd))
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ $finalCurrency == 'IDR'
-                                        ? number_format($transaction->svatgstamount, 2, ',', '.')
-                                        : number_format($transaction->svatgstusd, 2, ',', '.') }}
+                                        ? number_format($transaction->cvatgstamount, 2, ',', '.')
+                                        : number_format($transaction->cvatgstusd, 2, ',', '.') }}
                                     </span>
                                 </div>
                                 @else
@@ -364,11 +364,11 @@
                             <td class="text-[9px] border border-gray-900 text-center p-1 align-top">
                                 @if (($transaction->swhtaxamount ?? 0) > 0 || ($transaction->shwtaxrateusd ?? 0) > 0)
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ $finalCurrency == 'IDR'
-                                        ? number_format($transaction->swhtaxamount, 2, ',', '.')
-                                        : number_format($transaction->shwtaxrateusd, 2, ',', '.') }}
+                                        ? number_format($transaction->cwhtaxamount, 2, ',', '.')
+                                        : number_format($transaction->chwtaxrateusd, 2, ',', '.') }}
                                     </span>
                                 </div>
                                 @else
@@ -377,7 +377,7 @@
                             </td>
                             <td class="text-[9px] border border-gray-900 text-center p-1 align-top">
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ number_format($transaction->total, 2, ',', '.') }}
                                     </span>

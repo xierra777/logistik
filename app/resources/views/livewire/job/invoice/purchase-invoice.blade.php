@@ -28,7 +28,7 @@
                 <div class="relative">
                     <input type="text"
                         wire:model.live="invoice_number"
-                        class="w-full bg-purple-50 py-1.5 pr-8 pl-3 border-2 border-purple-200 rounded-xl focus:border-purple-400 focus:bg-white transition-all duration-300 outline-none placeholder-purple-300"
+                        class="w-full bg-purple-50 py-1.5 pr-8 pl-3 border-2 border-purple-200 rounded-md focus:border-purple-400 focus:bg-white transition-all duration-300 outline-none placeholder-purple-300"
                         placeholder="INV-2025-001">
                     <i class="fas fa-hashtag absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-400"></i>
                 </div>
@@ -41,17 +41,27 @@
                     <select name="vendors" id="vendorPurchasingInvoicing" class="w-full py-1.5 pr-8 pl-3 bg-teal-50 border-2 border-teal-200 rounded-xl focus:border-teal-400 focus:bg-white transition-all duration-300 outline-none appearance-none" wire:model.live="selectedVendor">
                         <option value=""></option>
                         @foreach($vendors as $vndr)
-                        <option value="{{$vndr->id}}">{{$vndr->name}}</option>
+                        <option value="{{$vndr->id}}">
+                            {{$vndr->name}}
+                            ({{$vndr->total_transactions}} transaksi, {{$vndr->uninvoiced_transactions}} belum invoice)
+                            @if($vndr->uninvoiced_transactions > 0)
+                            ⚠️
+                            @endif
+                        </option>
                         @endforeach
+
                     </select>
                 </div>
             </div>
 
             <!-- HAWB -->
             <div class="flex flex-col space-y-2">
-                <label class="text-purple-700 font-semibold text-sm">HAWB</label>
-                <div class="bg-amber-50 rounded-xl py-1.5 pr-8 pl-3 border-2 border-amber-200">
-                    <span class="text-amber-700 font-semibold">{{$job->jobBillLadingNo}}</span>
+                @if(in_array($job->type_job, ['air_inbound', 'air_outbound', 'domestics_transport']))
+                <label class="text-purple-700 font-semibold text-sm">MAWB NO</label>
+                @else
+                <label class="text-purple-700 font-semibold text-sm">MBL NO</label>
+                @endif <div class="bg-amber-50 rounded-xl py-1.5 pr-8 pl-3 border-2 border-amber-200">
+                    <span class="text-amber-700 font-semibold">{{$job->jobBillLadingNo ?? '-'}}</span>
                 </div>
             </div>
 
@@ -91,7 +101,7 @@
             <i class="fas fa-list-alt mr-3 text-purple-500"></i>
             Uninvoiced Transactions
         </h3>
-        {{$transactions}}
+        <!-- {{$transactions}} -->
         <div class="overflow-x-auto rounded-2xl border-2 border-purple-100">
             <table class="w-full">
                 <thead>
@@ -296,6 +306,7 @@
                 <thead>
                     <tr class="bg-gradient-to-r from-purple-100 to-pink-100">
                         <th class="p-4 text-purple-700 font-semibold text-center rounded-tl-2xl">No</th>
+                        <th class="p-4 text-purple-700 font-semibold text-center">Vendor Name</th>
                         <th class="p-4 text-purple-700 font-semibold text-center">Invoice Number</th>
                         <th class="p-4 text-purple-700 font-semibold text-center">Status</th>
                         <th class="p-4 text-purple-700 font-semibold text-center">Due Date</th>
@@ -310,6 +321,7 @@
                     @foreach($purchasingInvoice as $invs)
                     <tr class="border-b border-purple-100 hover:bg-purple-50 transition-all duration-200">
                         <td class="p-4 text-center text-gray-700">{{ $loop->iteration }}</td>
+                        <td class="p-4  text-gray-700 font-semibold">{{ $invs->client->name ?? '' }}</td>
                         <td class="p-4 text-center text-gray-700 font-semibold">{{ $invs->invoice_number ?? '' }}</td>
                         <td class="p-4 text-center whitespace-nowrap">
                             @if($invs->status === 'issued')
@@ -349,7 +361,7 @@
                         </td>
                         <td class="p-4 text-center text-gray-700">{{ $invs->invoice_date ?? '' }}</td>
                         <td class="p-4 text-center text-gray-700">
-                            {{ optional($invs->transactions->first())->scurrency ?? '' }}
+                            {{ optional($invs->transactions->first())->ccurrency ?? '' }}
                         </td>
                         <td class="p-4 text-center text-gray-700 font-semibold">{{ number_format($invs->total_amount ?? 0, 2, ',', '.') }}</td>
                         <td class="p-4 text-center text-gray-700">{{$invs->users->name ?? ''}}</td>
@@ -701,81 +713,39 @@
     }
 </script>
 <script>
-    window.addEventListener('showSuccessAlert', function(e) {
-        const id = e.detail.id;
-        Swal.fire({
-            title: 'Success',
-            text: "Success voiding this Transactions",
-            icon: 'success',
+    window.addEventListener('showSuccessAlert', event => {
+        let data;
 
-        })
+        // Handle both array and object
+        if (Array.isArray(event.detail)) {
+            data = event.detail[0]; // Ambil element pertama jika array
+        } else {
+            data = event.detail; // Gunakan langsung jika object
+        }
+
+        // console.log('Processed data:', data);
+
+        if (data && data.title) {
+            Swal.fire({
+                title: data.title,
+                text: data.text,
+                icon: data.icon,
+                confirmButtonText: data.confirmButtonText || 'OK'
+            });
+        } else {
+            // console.error('Invalid data structure:', data);
+        }
     });
+    // Di Blade atau script JS (pastikan setelah Livewire dimuat)
 </script>
 @script
 <script>
     window.reinitSelect2 = () => {
         [{
-                sel: '#vendorPurchasingInvoicing',
-                model: 'selectedVendor',
-                placeholder: 'Select Client '
-            }, {
-                sel: '#sincludedtax',
-                model: 'sincludedtax',
-                placeholder: 'Select tax '
-            }, {
-                sel: '#cvatgst',
-                model: 'cvatgst',
-                placeholder: 'Select VAT '
-            },
-            {
-                sel: '#svatgst',
-                model: 'svatgst',
-                placeholder: 'Select VAT '
-            },
-            {
-                sel: '#swhtaxrate',
-                model: 'swhtaxrate',
-                placeholder: 'Select Tax Rate '
-            },
-            {
-                sel: '#charge',
-                model: 'charge',
-                placeholder: 'Select Charge'
-            },
-            {
-                sel: '#cwhtaxrate',
-                model: 'cwhtaxrate',
-                placeholder: 'Select Tax Rate'
-            }, {
-                sel: '#cvendor',
-                model: 'cvendor',
-                placeholder: 'Select Vendor'
-            },
-            {
-                sel: '#freight',
-                model: 'freight',
-                placeholder: 'Select Freight'
-            },
-            {
-                sel: '#cofdtype',
-                model: 'ofdtype',
-                placeholder: 'Select OFD  Type'
-            },
-            {
-                sel: '#cdrcr',
-                model: 'cdrcr',
-                placeholder: 'Select DR CR'
-            },
-            {
-                sel: '#sdrcr',
-                model: 'sdrcr',
-                placeholder: 'Select DR CR'
-            }, {
-                sel: '#unit',
-                model: 'unit',
-                placeholder: 'Select Unit'
-            },
-        ].forEach(({
+            sel: '#vendorPurchasingInvoicing',
+            model: 'selectedVendor',
+            placeholder: 'Select Vendor  '
+        }, ].forEach(({
             sel,
             model,
             placeholder

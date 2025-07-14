@@ -898,7 +898,8 @@
                         <div class="flex-1 flex justify-end gap-2">
                             <a href="{{route('jobSaleInvoice', ['jobId' => $job->id])}}" class="py-2 px-3 bg-green-600 text-white rounded-lg text-sm">Print Invoice</a>
                             <a href="{{route('jobPurchaseInvoice', ['jobId' => $job->id])}}" class="py-2 px-3 bg-red-600 text-white rounded-lg text-sm">Print PI</a>
-                            <button @click="open = true" class="py-2 px-3 bg-blue-600 text-white rounded-lg text-sm">Add Cost</button>
+                            <button @click="open = true; $wire.trancsationsDispatchclear()" class="py-2 px-3 bg-blue-600 text-white rounded-lg text-sm">Add Cost</button>
+
                         </div>
                     </div>
                     <!-- Background Overlay -->
@@ -931,7 +932,7 @@
                             <!-- Form -->
                             <livewire:job.transactions.create-transactions
                                 :id="$job->id"
-                                :key="'transaction' . $job->id" />
+                                :key="'transaction' . $job->id. '-' . $refreshKey" />
                         </div>
                     </div>
                 </div>
@@ -985,7 +986,7 @@
                     </tr>
                 </thead>
                 <tbody class="">
-                    @forelse($job->jobTransactions as $transaction)
+                    @forelse($transactions as $transaction)
                     <tr>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $loop->iteration }}

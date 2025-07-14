@@ -1,6 +1,16 @@
-<div class=" p-4">
-    <h1 class="text-2xl font-bold mb-4">Journal Entries Summary</h1>
+<div class=" p-4" x-init="reinitSelect2">
+    <h1 class="text-2xl font-bold ">Journal Entries Summary</h1>
 
+    <!-- Liar -->
+    <div class="mb-2 mt-2" wire:ignore>
+        <select name="sortJournal" id="sortJournal" wire:model.live="sortJournalEntries">
+            <option value=""></option>
+            <option value="all">All</option>
+            <option value="true">Reverse</option>
+            <option value="false">Sales</option>
+        </select>
+    </div>
+    <!-- {{$sortJournalEntries}} -->
     <table class="w-full table-auto border border-gray-300">
         <thead class="bg-gray-100">
             <tr>
@@ -47,3 +57,51 @@
         <a href="{{ route('accountant.list') }}" class="bg-blue-500 text-white px-4 py-2 rounded hover:scale-105 transition-transform hover:shadow-lg hover:shadow-blue-500 hover:shadow-lg">Back</a>
     </div>
 </div>
+@push('script')
+<script>
+    window.reinitSelect2 = () => {
+        const selects = [{
+            sel: '#sortJournal',
+            model: 'sortJournalEntries',
+        }, ];
+
+        selects.forEach(({
+            sel,
+            model,
+            placeholder
+        }) => {
+            const $el = $(sel);
+            if (!$el.length) return;
+
+            // Destroy if already initialized
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+
+            $el.select2({
+                placeholder,
+                allowClear: true,
+                theme: 'tailwindcss-3',
+                width: '100%',
+            });
+
+            // Sync value from Livewire to Select2
+            Livewire.hook('message.processed', () => {
+                if ($el.val() !== $wire[model]) {
+                    $el.val($wire[model]).trigger('change.select2');
+                }
+            });
+
+            // Sync value from Select2 to Livewire
+            $el.off('change.lw').on('change.lw', function() {
+                $wire.set(model, $(this).val());
+            });
+        });
+    };
+
+    // Run on initial load
+    // document.readyState('livewire:navigated', () => {
+    //     window.reinitSelect2();
+    // });
+</script>
+@endpush

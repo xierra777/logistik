@@ -51,9 +51,13 @@
 
             <!-- HAWB -->
             <div class="flex flex-col space-y-2">
-                <label class="text-purple-700 font-semibold text-sm">HAWB</label>
+                @if(in_array($job->type_job, ['air_inbound', 'air_outbound', 'domestics_transport']))
+                <label class="text-purple-700 font-semibold text-sm">MAWB NO</label>
+                @else
+                <label class="text-purple-700 font-semibold text-sm">MBL NO</label>
+                @endif
                 <div class="bg-amber-50 rounded-xl p-3 border-2 border-amber-200">
-                    <span class="text-amber-700 font-semibold">{{$job->jobBillLadingNo}}</span>
+                    <span class="text-amber-700 font-semibold">{{$job->jobBillLadingNo ?? '-'}}</span>
                 </div>
             </div>
 
@@ -702,14 +706,28 @@
     }
 </script>
 <script>
-    window.addEventListener('showSuccessAlert', function(e) {
-        const id = e.detail.id;
-        Swal.fire({
-            title: 'Success',
-            text: "Success voiding this Transactions",
-            icon: 'success',
+    window.addEventListener('showSuccessAlert', event => {
+        let data;
 
-        })
+        // Handle both array and object
+        if (Array.isArray(event.detail)) {
+            data = event.detail[0]; // Ambil element pertama jika array
+        } else {
+            data = event.detail; // Gunakan langsung jika object
+        }
+
+        // console.log('Processed data:', data);
+
+        if (data && data.title) {
+            Swal.fire({
+                title: data.title,
+                text: data.text,
+                icon: data.icon,
+                confirmButtonText: data.confirmButtonText || 'OK'
+            });
+        } else {
+            // console.error('Invalid data structure:', data);
+        }
     });
 </script>
 @script

@@ -56,8 +56,9 @@ class JobSaleInvoice extends Component
     {
         $this->transactions = Transaction::where('id_job', $this->jobId)
             ->whereNull('invoice_id')
+            ->where('samountidr', '!=', 0)  // Exclude nilai 0
             ->get();
-        $this->invoicesIssued = Invoice::where('job_id', $this->jobId)->get();
+        $this->invoicesIssued = Invoice::where('job_id', $this->jobId)->where('type_invoice', 'SALES')->get();
     }
     #[On('issueInvoice')]
     public function issueInvoice($id)
@@ -83,6 +84,7 @@ class JobSaleInvoice extends Component
         $this->dispatch('showSuccessAlert', [
             'title' => 'Invoice Issued!',
             'text'  => "Invoice #{$invoice->invoice_number} has been marked as issued.",
+            'icon'  => 'success'
         ]);
         $selectedTransactions = $invoice->transactions;
         foreach ($selectedTransactions as $transaction) {
@@ -162,6 +164,8 @@ class JobSaleInvoice extends Component
     {
         $this->invoiceId = $invoiceId;
         $this->showModal = true;
+        $invoice = Invoice::findOrFail($invoiceId);
+        $this->invoice_number = $invoice->invoice_number;
         $this->void_reason = ''; // Reset reason
     }
 
@@ -210,6 +214,7 @@ class JobSaleInvoice extends Component
                 'reversal_of'          => $entry->id,
                 'date'                 => now(),
                 'created_by'           => Auth::id(),
+                'updated_by'           => Auth::id(),
             ]);
         }
 
@@ -228,6 +233,7 @@ class JobSaleInvoice extends Component
         // Show correct success message
         $this->dispatch('showSuccessAlert', [
             'title' => 'Invoice Voided!',
+            'icon'  => 'success',
             'text'  => "Invoice #{$invoice->invoice_number} has been successfully voided.",
         ]);
 
@@ -540,7 +546,7 @@ class JobSaleInvoice extends Component
                 'status'         => 'issued',
                 'currency'       => $this->currency ?? 'IDR',
                 'total_amount'   => $grandTotal,
-                'type_invoice'   => 'INVOICE',
+                'type_invoice'   => 'SALES',
                 'created_by'     => Auth::id(),
             ]);
 
@@ -635,7 +641,12 @@ class JobSaleInvoice extends Component
                 }
             }
             DB::commit();
-            session()->flash('message', 'Invoice created successfully!');
+            $this->dispatch('showSuccessAlert', [
+                'title' => 'Invoicing transaction!',
+                'icon'  => 'success',
+                'text'  => "Purchase Invoice #{$invoice->invoice_number} has been successfully invoiced.",
+            ]);
+            // session()->flash('message', 'Invoice created successfully!');
             // Optionally redirect or reset form here
 
         } catch (\Exception $e) {
@@ -686,7 +697,7 @@ class JobSaleInvoice extends Component
                 'invoice_date'   => $this->invoice_date ?? now(),
                 'due_date'       => null,
                 'status'         => 'draft',
-                'type_invoice'   => 'INVOICE',
+                'type_invoice'   => 'SALES',
                 'currency'       => $this->currency ?? 'IDR',
                 'total_amount'   => $grandTotal,
                 'created_by'     => Auth::id(),

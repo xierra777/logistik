@@ -4,12 +4,16 @@ namespace App\Livewire\Accounting\ChartOfAccount;
 
 use Livewire\Component;
 use App\Models\ChartOfAccount;
+use Illuminate\Support\Facades\Auth;
+use Livewire\WithPagination;
 
 class ChartOfAccountDetails extends Component
 {
+    use WithPagination;
+
     public $account_code, $account_name, $account_type, $term_type;
     public $parent_account_id;
-    public $coa_id;
+    public $coa_id, $perPage = 5;
     public $isEditing = false;
 
     protected $rules = [
@@ -30,6 +34,7 @@ class ChartOfAccountDetails extends Component
             'account_type'      => $this->account_type,
             'term_type'         => $this->term_type,
             'parent_account_id' => $this->parent_account_id,
+            'created_by'        => Auth::user()->id
         ]);
 
         $this->resetForm();
@@ -87,8 +92,18 @@ class ChartOfAccountDetails extends Component
     }
     public function render()
     {
+        $query = ChartOfAccount::query();
+
+        if ($this->account_type) {
+            $query->where('account_type', $this->account_type);
+        }
+
+
+
+        $accounts = $query->orderBy('account_code')->paginate($this->perPage);
+
         return view('livewire.accounting.chart-of-account.chart-of-account-details', [
-            'accounts' => ChartOfAccount::orderBy('account_code')->get(),
+            'accounts' => $accounts,
             'parents'  => ChartOfAccount::all(),
         ]);
     }

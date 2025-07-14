@@ -78,7 +78,7 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-800 dark:text-neutral-300">{{ $customer->name }}</td>
                             <td class="px-6 py-4 text-sm text-gray-800 dark:text-neutral-300">{{ $customer->country }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-800 dark:text-neutral-300 font-bold">
+                            <td class="px-6 py-4 text-sm text-gray-800 dark:text-neutral-300 font-bold uppercase">
                                 {{ implode(', ', array_map(fn($r) => str_replace('_', ' ', $r), $customer->roles)) }}
                             </td>
                             <td class="px-6 py-4 text-sm text-end font-medium space-x-3">
@@ -105,7 +105,7 @@
 
             <!-- Pagination -->
             @if($customers->hasPages())
-            <div class="mt-4 px-1.5">
+            <div class="mt-4 px-1.5 flex justify-end">
                 {{ $customers->links() }}
             </div>
             @endif

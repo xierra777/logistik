@@ -13,59 +13,61 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('shipment_id')->nullable()->constrained('t_shipments')->onDelete('cascade');
-            $table->foreignId('job_id')->nullable()->constrained('t_jobs')->onDelete('cascade');
-            $table->foreignId('invoice_id')->nullable()->constrained('invoices')->onDelete('set null');
-            $table->foreignId('customer_id')->nullable()->constrained('customers')->onDelete('set null');
-            $table->foreignId('vendor_id')->nullable()->constrained('customers')->onDelete('set null');
-            $table->foreignId('coa_sale_id')->nullable()->constrained('chart_of_accounts')->onDelete('set null');
-            $table->foreignId('coa_cost_id')->nullable()->constrained('chart_of_accounts')->onDelete('set null');
+            $table->foreignId('id_shipment')->nullable()->constrained('t_shipments')->nullOnDelete();
+            $table->foreignId('id_job')->nullable()->constrained('t_jobs')->nullOnDelete();
+            $table->foreignId('invoice_id')->nullable()->constrained('invoices')->nullOnDelete();
+            $table->foreignId('coa_sale_id')->nullable()->constrained('chart_of_accounts')->nullOnDelete();
+            $table->foreignId('coa_cost_id')->nullable()->constrained('chart_of_accounts')->nullOnDelete();
+            $table->string('reference_type')->nullable(); // 'job', 'shipment', 'office_expense'
+            $table->unsignedBigInteger('reference_id')->nullable();
+            $table->index(['reference_type', 'reference_id']);
             $table->string('charge')->nullable();
             $table->string('description')->nullable();
             $table->string('freight')->nullable();
             $table->string('unit')->nullable();
-            $table->string('quantity')->nullable();
+            $table->decimal('quantity', 12, 2)->default(0);
             $table->string('ofdtype')->nullable();
             $table->text('remarks')->nullable();
 
-            $table->string('sclient')->nullable();
-            $table->string('scurrency')->nullable();
-            $table->string('srate')->nullable();
-            $table->string('samount_qty')->nullable();
+            $table->foreignId('sclient')->nullable()->constrained('customers')->nullOnDelete();
+            $table->string('scurrency', 10)->nullable();
+            $table->decimal('srate', 12, 2)->nullable();
+            $table->decimal('samount_qty', 16, 2)->nullable();
             $table->string('sincludedtax')->nullable();
-            $table->string('sfcyamount')->nullable();
-            $table->string('samountidr')->nullable();
-            $table->string('sdrcr')->nullable();
-            $table->string('svatgst')->nullable();
-            $table->string('staxableamount')->nullable();
-            $table->string('svatgstamount')->nullable();
-            $table->string('swhtaxrate')->nullable();
-            $table->string('swhtaxamount')->nullable();
+            $table->decimal('sfcyamount', 16, 2)->nullable();
+            $table->decimal('samountidr', 16, 2)->nullable();
+            $table->string('sdrcr', 5)->nullable(); // debit / credit
+            $table->foreignId('svatgst')->nullable()->constrained('taxes')->nullOnDelete();
+            $table->decimal('staxableamount', 16, 2)->nullable();
+            $table->decimal('svatgstamount', 16, 2)->nullable();
+            $table->decimal('shwtaxrateusd', 16, 2)->nullable();
+            $table->decimal('svatgstusd', 16, 2)->nullable();
+            $table->foreignId('swhtaxrate')->nullable()->constrained('taxes')->nullOnDelete();
+            $table->decimal('swhtaxamount', 16, 2)->nullable();
             $table->text('sremarks')->nullable();
             $table->string('sgrossprofit')->nullable();
 
             // Cost section
-            $table->string('cvendor')->nullable();
+            $table->foreignId('cvendor')->nullable()->constrained('customers')->nullOnDelete();
             $table->string('creferenceno')->nullable();
-            $table->string('cdate')->nullable();
-            $table->string('cdrcr')->nullable();
-            $table->string('ccurrency')->nullable();
-            $table->string('crate')->nullable();
-            $table->string('camount_qty')->nullable();
+            $table->date('cdate')->nullable();
+            $table->string('cdrcr', 5)->nullable(); // debit / credit
+            $table->string('ccurrency', 10)->nullable();
+            $table->decimal('crate', 12, 2)->nullable();
+            $table->decimal('camount_qty', 16, 2)->nullable();
             $table->string('cincludedtax')->nullable();
-            $table->string('cfcyamount')->nullable();
-            $table->string('camountidr')->nullable();
-            $table->string('cvatgst')->nullable();
-            $table->string('cvatgstamount')->nullable();
-            $table->string('ctaxableamount')->nullable();
+            $table->decimal('cfcyamount', 16, 2)->nullable();
+            $table->decimal('camountidr', 16, 2)->nullable();
+            $table->foreignId('cvatgst')->nullable()->constrained('taxes')->nullOnDelete();
+            $table->decimal('cvatgstamount', 16, 2)->nullable();
+            $table->decimal('ctaxableamount', 16, 2)->nullable();
             $table->text('cremarks')->nullable();
-            $table->string('cwhtaxrate')->nullable();
-            $table->string('cwhtaxamount')->nullable();
-
-            $table->string('shwtaxrateusd')->nullable();
-            $table->string('svatgstusd')->nullable();
-            $table->string('chwtaxrateusd')->nullable();
-            $table->string('cvatgstusd')->nullable();
+            $table->decimal('chwtaxrateusd', 16, 2)->nullable();
+            $table->decimal('cvatgstusd', 16, 2)->nullable();
+            $table->foreignId('cwhtaxrate')->nullable()->constrained('taxes')->nullOnDelete();
+            $table->decimal('cwhtaxamount', 16, 2)->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete()->after('created_at');
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete()->after('updated_at');
             $table->timestamps();
         });
     }

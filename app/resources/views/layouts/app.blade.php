@@ -15,7 +15,7 @@
 </head>
 
 
-<body class="font-sans antialiased overflow-x-auto max-h-3 max-h overflow-y-auto
+<body class="font-sans antialiased overflow-x-auto max-h-3 max-h overflow-y-auto 
     [&::-webkit-scrollbar]:w-2
     [&::-webkit-scrollbar-track]:rounded-full
     [&::-webkit-scrollbar-track]:bg-gray-100
@@ -63,6 +63,20 @@
     </div>
     @include('include.script')
     @stack('scripts')
+    <div x-data>
+        <button @click="swal.fire({text: 'masih under construction yaa :D tetap sabar',
+        icon: 'warning',title:'SEMANGAT TEROSSS',
+         
+         })" class="fixed bottom-4 right-4 z-50 transition-transform duration-50">
+            <p class="w-12 flex justify-center items-center h-12  bg-blue-500 rounded-full text-white text-sm shadow-lg transition-transform duration-300 cursor-pointer">
+                <span class="absolute inline-flex h-full w-full duration-1000 rounded-full bg-sky-400 opacity-75"></span>
+                <span class="relative inline-flex size-3 rounded-full bg-sky-500">
+                    <i class="fa-solid fa-comment-dots"></i>
+                </span>
+            </p>
+        </button>
+    </div>
+
 
 </body>
 <footer>

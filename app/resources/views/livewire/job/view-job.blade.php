@@ -720,11 +720,12 @@
             @endforelse
         </div>
 
-        <div class="mt-3 p-1 gap-2 flex flex-row ">
-            <button class="bg-blue-600 text-white rounded-lg py-1 px-5 hover:scale-105"> Add Shipments</button>
+        <div class="mt-3 p-1 gap-2 flex flex-col sm:flex-row">
+            <a href="{{route('viewJobCreateShipment', ['id' => $job->id])}}" onclick="saveScrollPosition()"
+                class="bg-blue-600 text-white rounded-lg py-2 px-5 hover:scale-105 text-center sm:text-left"> Add Shipments From Job</a>
             <div x-data="{ openDetachAssigned: false }" @close-detach-assigned.window="openDetachAssigned = false">
                 <button @click="openDetachAssigned = true"
-                    class="bg-red-600 text-white rounded-lg py-1 px-5 hover:scale-105 transition-transform">
+                    class="bg-red-600 text-white rounded-lg py-2 px-5 hover:scale-105 transition-transform w-full sm:w-auto">
                     <i class="fa-solid fa-file-export"></i> Detach Shipment
                 </button>
 
@@ -737,11 +738,10 @@
                     x-transition:leave-end="opacity-0"
                     class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
 
-                    <div class="bg-white rounded-xl shadow-xl w-full max-w-7xl p-6 space-y-4 relative z-50
-        max-h-[80vh] flex flex-col">
+                    <div class="bg-white rounded-xl shadow-xl w-full max-w-7xl p-6 space-y-4 relative z-50 max-h-[80vh] flex flex-col">
                         <div class="p-3 flex items-center">
                             <button @click="openDetachAssigned = false"
-                                class="absolute top-3 right-3 text-gray-500 bg-gray-200 border border-gray-200 rounded-full py-1 px-2 hover:text-gray-800 text-2xl font-bold leading-none">
+                                class="absolute top-3 right-3 text-gray-500 bg-gray-200 border border-gray-200 rounded-full py-1 px-5 hover:text-gray-800 text-2xl font-bold leading-none">
                                 &times;
                             </button>
                         </div>
@@ -755,6 +755,7 @@
                                         <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">No</th>
                                         <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left"></th>
                                         <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Shipment Id</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Type Job</th>
                                         <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">POL</th>
                                         <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">POD</th>
                                         <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">ETA</th>
@@ -770,6 +771,8 @@
                                                 class="form-checkbox text-red-600 rounded-md">
                                         </td>
                                         <td class="px-4 py-2 text-left">{{ $s->shipment_id }}</td>
+                                        <td class="px-4 py-2 text-left whitespace-nowrap"> {{ strtoupper(str_replace('_', ' ', $s->shipmentsTypeJob)) }}
+                                        </td>
                                         <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_loading'] ?? '-' }}</td>
                                         <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_discharge'] ?? '-' }}</td>
                                         <td class="px-4 py-2 text-left">
@@ -788,7 +791,7 @@
                             </table>
                         </div>
 
-                        <div class="flex justify-end space-x-2 mt-4">
+                        <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
                             <button @click="openDetachAssigned = false"
                                 class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition">
                                 Batal
@@ -805,7 +808,7 @@
 
             <div x-data="{ openDetachShipment: false }" @close-detach-shipment.window="openDetachShipment = false">
                 <button @click="openDetachShipment = true"
-                    class="bg-green-600 text-white rounded-lg py-1 px-5 hover:scale-105 transition-transform">
+                    class="bg-green-600 text-white rounded-lg py-2 px-5 hover:scale-105 transition-transform w-full sm:w-auto">
                     <i class="fa-solid fa-file-import"></i> Attach Shipment
                 </button>
 
@@ -869,7 +872,7 @@
                             </table>
                         </div>
 
-                        <div class="flex justify-end space-x-2 mt-4">
+                        <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
                             <button @click="openDetachShipment = false" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition">
                                 Batal
                             </button>
@@ -886,21 +889,19 @@
     </div>
     <div class="mt-4 shadow-lg ">
         <div>
-            <p class="text-center p-3 bg-gray-400 rounded-t-lg font-bold italic border">Transaction still under Construction <br>
-                <span class="text-red-700">...</span>
-            </p>
-            <div class="flex justify-end p-1 ">
-                <div x-data="{ open: false }" @close-modal.window="open = false"
+            <div class=" p-1 ">
+                <div x-data="{ open: false }" @keydown.escape.window="open = false" @close-transaction-modal.window="open = false"
                     x-ref="modalContent">
-                    <div class=" flex justify-end mb-4 p-4">
-                        <button
-                            wire:click="refreshTransaction({{ $job->id }})"
-                            @click="open = true"
-                            class="py-3 px-4 bg-blue-600 text-white rounded-lg">
-                            Add Cost
-                        </button>
-                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-400 rounded-t-lg border mb-4">
+                        <div class="flex-1"></div> <!-- Spacer kiri -->
+                        <p class="font-bold  text-center">TRANSACTION</p>
+                        <div class="flex-1 flex justify-end gap-2">
+                            <a href="{{route('jobSaleInvoice', ['jobId' => $job->id])}}" class="py-2 px-3 bg-green-600 text-white rounded-lg text-sm">Print Invoice</a>
+                            <a href="{{route('jobPurchaseInvoice', ['jobId' => $job->id])}}" class="py-2 px-3 bg-red-600 text-white rounded-lg text-sm">Print PI</a>
+                            <button @click="open = true; $wire.trancsationsDispatchclear()" class="py-2 px-3 bg-blue-600 text-white rounded-lg text-sm">Add Cost</button>
 
+                        </div>
+                    </div>
                     <!-- Background Overlay -->
                     <div x-cloak x-show="open"
                         x-transition:enter="transition ease-out duration-300 delay-150"
@@ -917,7 +918,7 @@
                         x-transition:leave-start="scale-100 opacity-100"
                         x-transition:leave-end="scale-90 opacity-0"
                         class="fixed inset-0 flex items-center justify-center z-50 px-4">
-                        <div class="bg-white rounded-lg shadow-md w-full max-w-7.5xl">
+                        <div class="bg-white rounded-2xl shadow-md w-full max-w-7.5xl">
                             <!-- Modal Header -->
                             <div class="flex justify-between items-center p-4 border-b">
                                 <h2 class="text-lg font-semibold text-gray-800">Costing</h2>
@@ -931,7 +932,7 @@
                             <!-- Form -->
                             <livewire:job.transactions.create-transactions
                                 :id="$job->id"
-                                :key="'transaction' . $job->id . '-' . now()->timestamp" />
+                                :key="'transaction' . $job->id. '-' . $refreshKey" />
                         </div>
                     </div>
                 </div>
@@ -945,6 +946,8 @@
                             No
                         </th>
                         <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Description
                         </th>
                         <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
@@ -956,7 +959,7 @@
                         <th scope="col" class="px-6 py-3 bg-orange-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Sale
                         </th>
-                        <th scope="col" class="px-6 py-3 bg-orange-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col" class="px-6 py-3 bg-orange-500 text-xs whitespace-nowrap font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Amount (IDR)
                         </th>
                         <th scope="col" class="px-6 py-3 bg-orange-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
@@ -968,7 +971,7 @@
                         <th scope="col" class="px-6 py-3 bg-blue-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Cost
                         </th>
-                        <th scope="col" class="px-6 py-3 bg-blue-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col" class="px-6 py-3 bg-blue-500 text-xs whitespace-nowrap font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Amount (IDR)
                         </th>
                         <th scope="col" class="px-6 py-3 bg-blue-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
@@ -983,19 +986,46 @@
                     </tr>
                 </thead>
                 <tbody class="">
-                    @forelse($job->jobTransactions as $transaction)
+                    @forelse($transactions as $transaction)
                     <tr>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $loop->iteration }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            <button
-                                type="button"
-                                @click="$dispatch('confirm-delete', { get_id: {{ $transaction->id }} })"
-                                class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
-                                Delete
-                            </button>
+                            <div class="flex items-center space-x-3">
+                                <!-- Delete Button -->
+                                <div x-data>
+                                    <button
+                                        class="px-3 py-2 bg-red-600 text-white rounded-full hover:scale-105 hover:bg-red-700 transition-transform"
+                                        @click="
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'You won\'t be able to revert this!',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d8',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!',
+                        cancelButtonText: 'No, Keep it',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $wire.confirmDelete({{ $transaction->id }});
+                        }
+                    })
+                ">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Update Button -->
+                                <button
+                                    type="button"
+                                    wire:click="editTransaction({{ $job->id }}, {{ $transaction->id }})"
+                                    class="px-3 py-2 bg-blue-500 rounded-full text-white hover:bg-blue-600 transition transform hover:scale-105">
+                                    <i class="fa-solid fa-pen-to-square"></i> </button>
+                            </div>
                         </td>
+
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $transaction->description }}
                         </td>
@@ -1003,25 +1033,26 @@
                             {{ $transaction->unit }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$transaction->customer->name ?? ''}}
+                            {{$transaction->transactionClient->name ?? ''}}
+                        </td>
+                        <td scope="col" class="px-6 py-4  text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $transaction->quantity }} x {{number_format($transaction->sfcyamount, 2, ',', '.')}} x {{$transaction->srate}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->quantity }} x {{$transaction->samount_qty}}x{{$transaction->srate}}
-                        </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->samountidr_formatted ?? '' }}
+                            {{ number_format($transaction->samountidr, 2, ',', '.') }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->sdrcr}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$transaction->vendor->name ?? ''}}
+                            {{$transaction->transactionVendor->name ?? ''}}
+                        </td>
+                        <td scope="col" class="px-6 py-4  text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $transaction->quantity }} x {{number_format($transaction->cfcyamount, 2, ',', '.')}}
+                            x {{$transaction->crate}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->quantity }} x {{$transaction->camount_qty}}x{{$transaction->crate}}
-                        </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$transaction->camountidr_formatted}}
+                            {{number_format($transaction->camountidr, 2, ',', '.')}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->cdrcr}}
@@ -1029,8 +1060,8 @@
                         <td scope="col" class="px-6 py-4 uppercase whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->freight}}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium font-bold {{ $transaction->gp < 0 ? 'text-red-500' : 'text-green-700' }}">
-                            {{ number_format($transaction->gp, 2, ',', '.') }}
+                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium font-bold {{ $transaction->SamountgpFormatted < 0 ? 'text-red-500' : 'text-green-700' }}">
+                            {{$transaction->SamountgpFormatted}}
                         </td>
                     </tr>
                     @empty
@@ -1059,6 +1090,9 @@
                 :key="'confirm-delete-job-transaction-' . now()->timestamp" />
         </div>
     </div>
+
+
+
     <hr class="border-gray-500 dark:border-neutral-500 mt-5">
 
 
@@ -1069,6 +1103,59 @@
             Back
         </a>
     </div>
+    @if($isEditing)
+    <div x-data="{ show: false }">
+        <div wire:loading
+            wire:target="saveTransaction,editTransaction"
+            class="fixed inset-0 bg-black bg-opacity-30 z-50 items-center justify-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+            <span class="ml-4 text-white text-lg font-medium">TUNGGU SEBENTAR...</span>
+        </div> {{-- Backdrop --}}
+        <div
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
+            x-data="{ show: false }"
+            x-init="setTimeout(() => show = true, 50)"
+            x-show="show"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0" x-cloak>
+
+            <div
+                class="bg-white rounded-2xl w-full  mx-4 shadow-2xl transform"
+                x-show="show"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                x-transition:leave-end="opacity-0 scale-95 translate-y-4" x-cloak>
+                {{-- Modal Header --}}
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h2 class="text-lg font-semibold text-gray-800">Costing</h2>
+                    <button wire:click="closeEditTransaction"
+                        class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Form --}}
+                <div wire:ignore>
+                    <livewire:job.transactions.edit-transactions
+                        :id="$job->id"
+                        :transactionId="$editingTransactionId"
+                        :key="'transaction-' . $job->id . '-' . $editingTransactionId" wire:debug />
+                </div>
+
+            </div>
+        </div>
+    </div>
+    @endif
 </div>
 @push('script')
 @script()
@@ -1125,25 +1212,51 @@
                 placeholder: placeholder,
                 allowClear: true,
                 width: '100%',
-                theme: 'tailwindcss-3', // Use default theme for better compatibility
-                dropdownParent: $el.closest('.fixed'), // Attach to modal container
-                dropdownAutoWidth: true,
+                theme: 'tailwindcss-3',
+                dropdownParent: $el.closest('.fixed'),
+                dropdownAutoWidth: false,
                 escapeMarkup: function(markup) {
                     return markup;
-                }
+                },
+                // Prevent Select2 from focusing on search input
+                selectOnClose: false,
+                // Prevent dropdown from closing modal
+                closeOnSelect: true
             });
 
-            // Handle Select2 change events
-            $el.off('select2:select.container select2:unselect.container')
-                .on('select2:select.container select2:unselect.container', function(e) {
+            // IMPORTANT: Remove all previous event handlers to prevent duplicates
+            $el.off('select2:select.container select2:unselect.container select2:open.container select2:close.container');
+
+            // Handle Select2 events with debouncing to prevent multiple triggers
+            let updateTimeout;
+            $el.on('select2:select.container select2:unselect.container', function(e) {
+                e.stopPropagation(); // Prevent event bubbling
+
+                clearTimeout(updateTimeout);
+                updateTimeout = setTimeout(() => {
                     const value = $(this).val();
                     if (typeof $wire !== 'undefined' && $wire[model] !== undefined) {
-                        $wire.set(model, value);
+                        // Use Livewire's set method without triggering full refresh
+                        $wire.set(model, value, false); // false = don't trigger refresh
                     }
                     console.log(`${model} changed to:`, value);
-                });
+                }, 100);
+            });
 
-            // Sync with Livewire property if it exists
+            // Prevent modal from closing when dropdown opens
+            $el.on('select2:open.container', function(e) {
+                e.stopPropagation();
+                // Ensure dropdown is positioned correctly
+                const dropdown = $('.select2-dropdown');
+                // dropdown.css('z-index', '9999');
+            });
+
+            // Handle dropdown close
+            $el.on('select2:close.container', function(e) {
+                e.stopPropagation();
+            });
+
+            // Sync with Livewire property if it exists (without triggering events)
             if (typeof $wire !== 'undefined' && $wire[model] !== undefined) {
                 $el.val($wire[model]).trigger('change.select2');
             }
@@ -1152,23 +1265,37 @@
 
     // Initialize when document is ready
     $(document).ready(function() {
-        // Initialize Select2 when modal opens
-        $(document).on('click', '[x-on\\:click="openCreateContainer = true"]', function() {
+        // Initialize Select2 when modal opens with proper timing
+        $(document).on('click', '[x-on\\:click="openCreateContainer = true"]', function(e) {
+            e.stopPropagation();
+            // Wait for modal to fully render
             setTimeout(function() {
-                window.initContainerSelect2();
-            }, 300); // Wait for modal animation
+                if ($('.fixed').is(':visible')) {
+                    window.initContainerSelect2();
+                }
+            }, 400); // Increased delay for better reliability
         });
 
-        // Alternative method using Alpine.js event
+        // Enhanced Alpine.js integration
         document.addEventListener('alpine:init', () => {
             Alpine.data('containerForm', () => ({
                 openCreateContainer: false,
                 init() {
                     this.$watch('openCreateContainer', (value) => {
                         if (value) {
-                            setTimeout(() => {
-                                window.initContainerSelect2();
-                            }, 250);
+                            // Delay initialization until modal is fully rendered
+                            this.$nextTick(() => {
+                                setTimeout(() => {
+                                    window.initContainerSelect2();
+                                }, 300);
+                            });
+                        } else {
+                            // Clean up Select2 when modal closes
+                            this.$nextTick(() => {
+                                $('.select2-hidden-accessible').each(function() {
+                                    $(this).select2('destroy');
+                                });
+                            });
                         }
                     });
                 }
@@ -1176,61 +1303,209 @@
         });
     });
 
-    // Livewire hooks
+    // Enhanced Livewire hooks with better error handling
     if (typeof Livewire !== 'undefined') {
-        // Reinitialize after Livewire updates
-        Livewire.hook('message.processed', () => {
+        // Preserve Select2 state during Livewire updates
+        let preservedValues = {};
+        let isFormReset = false;
+
+        // Before Livewire request (preserve state)
+        Livewire.hook('message.sent', (message, component) => {
+            // Check if this is a form reset/creation request
+            isFormReset = message.updates.some(update =>
+                update.type === 'callMethod' &&
+                (update.payload.method === 'createContainer' ||
+                    update.payload.method === 'resetContainerFields' ||
+                    update.payload.method === 'cancelContainer')
+            );
+
+            if (!isFormReset) {
+                preservedValues = {};
+                ['#containerType', '#typeOfPackages', '#typeOfGrossWeight',
+                    '#typeOfVolumeWeight', '#typeNetOfWeight', '#typeOfTotalWeight'
+                ].forEach(sel => {
+                    const $el = $(sel);
+                    if ($el.length && $el.hasClass('select2-hidden-accessible')) {
+                        preservedValues[sel] = $el.val();
+                    }
+                });
+            }
+        });
+
+        // After Livewire response (restore state or reset)
+        Livewire.hook('message.processed', (message, component) => {
             setTimeout(() => {
-                window.initContainerSelect2();
-            }, 100);
+                // Only reinitialize if modal is still open
+                if ($('.fixed').is(':visible')) {
+                    window.initContainerSelect2();
+
+                    if (isFormReset) {
+                        // Reset all Select2 values to empty
+                        ['#containerType', '#typeOfPackages', '#typeOfGrossWeight',
+                            '#typeOfVolumeWeight', '#typeNetOfWeight', '#typeOfTotalWeight'
+                        ].forEach(sel => {
+                            const $el = $(sel);
+                            if ($el.length && $el.hasClass('select2-hidden-accessible')) {
+                                $el.val(null).trigger('change.select2');
+                            }
+                        });
+                    } else {
+                        // Restore preserved values
+                        Object.keys(preservedValues).forEach(sel => {
+                            const $el = $(sel);
+                            if ($el.length && preservedValues[sel]) {
+                                $el.val(preservedValues[sel]).trigger('change.select2');
+                            }
+                        });
+                    }
+                }
+                preservedValues = {};
+                isFormReset = false;
+            }, 200);
         });
 
         // Handle specific element updates
         Livewire.hook('element.updated', (el, component) => {
             if (el.matches('select') || el.querySelector('select')) {
                 setTimeout(() => {
-                    window.initContainerSelect2();
-                }, 100);
+                    if ($('.fixed').is(':visible')) {
+                        window.initContainerSelect2();
+                    }
+                }, 150);
             }
         });
 
-        // Before Livewire request (cleanup)
-        Livewire.hook('message.sent', () => {
-            // Preserve Select2 values before Livewire processes
-            const values = {};
-            ['#containerType', '#typeOfPackages', '#typeOfGrossWeight',
-                '#typeOfVolumeWeight', '#typeNetOfWeight', '#typeOfTotalWeight'
-            ].forEach(sel => {
-                const $el = $(sel);
-                if ($el.length && $el.hasClass('select2-hidden-accessible')) {
-                    values[sel] = $el.val();
-                }
-            });
-            window.tempSelect2Values = values;
-        });
-
-        // After Livewire response (restore)
-        Livewire.hook('message.received', () => {
+        // Listen for close-create-container event to reset Select2
+        Livewire.on('close-create-container', () => {
             setTimeout(() => {
-                if (window.tempSelect2Values) {
-                    Object.keys(window.tempSelect2Values).forEach(sel => {
-                        const $el = $(sel);
-                        if ($el.length && window.tempSelect2Values[sel]) {
-                            $el.val(window.tempSelect2Values[sel]).trigger('change.select2');
-                        }
-                    });
-                    delete window.tempSelect2Values;
-                }
-            }, 150);
+                ['#containerType', '#typeOfPackages', '#typeOfGrossWeight',
+                    '#typeOfVolumeWeight', '#typeNetOfWeight', '#typeOfTotalWeight'
+                ].forEach(sel => {
+                    const $el = $(sel);
+                    if ($el.length && $el.hasClass('select2-hidden-accessible')) {
+                        $el.val(null).trigger('change.select2');
+                    }
+                });
+            }, 100);
         });
     }
 
-    // Manual initialization function (call this if needed)
+    // Manual initialization function with safety checks
     window.forceInitContainerSelect2 = () => {
         setTimeout(() => {
-            window.initContainerSelect2();
+            if ($('.fixed').is(':visible')) {
+                window.initContainerSelect2();
+            }
         }, 100);
     };
+
+    // Global click handler to prevent modal closing
+    $(document).on('click', '.select2-dropdown', function(e) {
+        e.stopPropagation();
+    });
+
+    // Prevent modal background clicks when Select2 is open
+    $(document).on('select2:open', function(e) {
+        $('.fixed.inset-0.bg-gray-500').css('pointer-events', 'none');
+    });
+
+    $(document).on('select2:close', function(e) {
+        $('.fixed.inset-0.bg-gray-500').css('pointer-events', 'auto');
+    });
 </script>
 @endscript
 @endpush
+
+<script>
+    window.addEventListener('swal', event => {
+        let data;
+
+        // Handle both array and object
+        if (Array.isArray(event.detail)) {
+            data = event.detail[0]; // Ambil element pertama jika array
+        } else {
+            data = event.detail; // Gunakan langsung jika object
+        }
+
+        // console.log('Processed data:', data);
+
+        if (data && data.title) {
+            Swal.fire({
+                title: data.title,
+                text: data.text,
+                icon: data.icon,
+                confirmButtonText: data.confirmButtonText || 'OK'
+            });
+        } else {
+            // console.error('Invalid data structure:', data);
+        }
+    });
+    // Fungsi untuk restore scroll position
+    function restoreScrollPosition() {
+        const savedPosition = sessionStorage.getItem('scrollPosition');
+        if (savedPosition) {
+            const scrollTo = parseInt(savedPosition);
+
+            // Cek apakah halaman sudah cukup tinggi untuk di-scroll
+            const checkAndScroll = () => {
+                if (document.body.scrollHeight > scrollTo) {
+                    window.scrollTo({
+                        top: scrollTo,
+                        behavior: 'auto'
+                    });
+                    sessionStorage.removeItem('scrollPosition');
+                    return true;
+                }
+                return false;
+            };
+
+            // Coba scroll langsung
+            if (!checkAndScroll()) {
+                // Kalau belum bisa, tunggu sebentar lagi
+                setTimeout(() => {
+                    if (!checkAndScroll()) {
+                        // Terakhir, tunggu sampai semua image/content load
+                        const images = document.querySelectorAll('img');
+                        let loadedImages = 0;
+
+                        if (images.length === 0) {
+                            checkAndScroll();
+                        } else {
+                            images.forEach(img => {
+                                if (img.complete) {
+                                    loadedImages++;
+                                } else {
+                                    img.onload = () => {
+                                        loadedImages++;
+                                        if (loadedImages === images.length) {
+                                            checkAndScroll();
+                                        }
+                                    };
+                                }
+                            });
+
+                            if (loadedImages === images.length) {
+                                checkAndScroll();
+                            }
+                        }
+                    }
+                }, 200);
+            }
+        }
+    }
+
+    // Jalankan setelah DOM ready
+    document.addEventListener('DOMContentLoaded', restoreScrollPosition);
+
+    // Backup: jalankan juga setelah window load
+    window.addEventListener('load', function() {
+        // Cek lagi kalau belum ter-scroll
+        setTimeout(restoreScrollPosition, 100);
+    });
+
+    // Simpan scroll position sebelum navigasi
+    function saveScrollPosition() {
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+    }
+    // ===== KODE YANG BENAR =====
+</script>

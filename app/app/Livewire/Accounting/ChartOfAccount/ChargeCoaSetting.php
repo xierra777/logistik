@@ -4,6 +4,7 @@ namespace App\Livewire\Accounting\ChartOfAccount;
 
 use App\Models\ChargeSetting;
 use App\Models\ChartOfAccount;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class ChargeCoaSetting extends Component
@@ -27,6 +28,7 @@ class ChargeCoaSetting extends Component
             'charge_name' => $this->charge_name,
             'coa_sale_id' => $this->coa_sale_id,
             'coa_cost_id' => $this->coa_cost_id,
+            'created_by'  => Auth::user()->id
         ]);
         $this->reset(); // Optional, reset semua input
 

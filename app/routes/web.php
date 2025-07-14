@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\CustomerOutstandingDebts;
 use Illuminate\Support\Facades\Route;
 
 use App\Livewire\Accounting\Accountant;
@@ -10,6 +11,8 @@ use App\Livewire\Accounting\ChartOfAccount\ChartOfAccountDetails;
 use App\Livewire\Accounting\PurchaseInvoice;
 use App\Livewire\Accounting\Tranksaksi;
 use App\Livewire\Accounting\SaleInvoice;
+use App\Livewire\Accounting\Tax\CreateTax;
+use App\Livewire\Accounting\Tax\ListTax;
 use App\Livewire\JournalEntries;
 use App\Livewire\Customers\CreateCustomer;
 use App\Livewire\Customers\EditCustomer;
@@ -21,6 +24,8 @@ use App\Livewire\Job\ContainerJob;
 use App\Livewire\Pdfhbl;
 use App\Livewire\Job\CreateJob;
 use App\Livewire\Job\EditJob;
+use App\Livewire\Job\Invoice\JobSaleInvoice;
+use App\Livewire\Job\JobCreateShipment;
 use App\Livewire\Job\ListJob;
 use App\Livewire\Job\ViewJob;
 use App\Livewire\Shipment\ContainerShipment;
@@ -33,7 +38,7 @@ use App\Livewire\Users\UserView;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
-
+use App\Livewire\Job\Invoice\PurchaseInvoice as jobPurchaseInvoice;
 
 Route::redirect('/', '/login');
 Route::get('/dashboard', Dashboard::class)->middleware([
@@ -43,6 +48,8 @@ Route::get('/dashboard', Dashboard::class)->middleware([
 Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
+
+Route::get('customer-outstanding-debts', CustomerOutstandingDebts::class)->middleware('auth')->name('customerDebt');
 Route::view('shipments', 'shipments.index',)
     ->middleware(['auth', 'verified'])
     ->name('shipments');
@@ -138,6 +145,20 @@ Route::get('view-job/{id}', ViewJob::class)->middleware([
 Route::get('view-job/{id}/container-job/{jobContainer_id}', ContainerJob::class)
     ->middleware(['auth', 'verified'])
     ->name('jobContainer');
+
+Route::get('view-job/{id}/Create-Shipment', JobCreateShipment::class)
+    ->middleware(['auth', 'verified'])
+    ->name('viewJobCreateShipment');
+
+
+Route::get('jobpurchase-invoice/{jobId}', jobPurchaseInvoice::class)
+    ->middleware(['auth', 'verified'])
+    ->name('jobPurchaseInvoice');
+
+Route::get('jobsale-invoice/{jobId}', JobSaleInvoice::class)
+    ->middleware(['auth', 'verified'])
+    ->name('jobSaleInvoice');
+
 // End Job Route
 
 
@@ -162,7 +183,10 @@ Route::get('/journal-entries', JournalEntries::class)->middleware([
     'auth',
     'verified'
 ]);
-
+Route::get('/list-tax', ListTax::class)->middleware([
+    'auth',
+    'verified'
+])->name('listTax');
 
 Route::get('/view-customers/{id}', ViewCustomer::class)->middleware([
     'auth',

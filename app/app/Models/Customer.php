@@ -31,14 +31,22 @@ class Customer extends Model
     {
         return $this->belongsTo(ChartOfAccount::class, 'coa_id');
     }
-
+    public function getOutstandingAmountAttribute()
+    {
+        $totalJobsAmount = $this->jobs()->sum('total_amount'); // total amount dari semua job customer
+        $totalPayments = $this->payments()->sum('amount');
+        return max(0, $totalJobsAmount - $totalPayments);
+    }
     public function getCategoryAttribute()
     {
         return $this->relationLoaded('chartOfAccount') && $this->chartOfAccount
             ? $this->chartOfAccount->term_type
             : 'unknown';
     }
-
+    public function jobs()
+    {
+        return $this->hasMany(TJob::class, 'client_id');
+    }
     public function addresses()
     {
         return $this->hasMany(customerAddress::class, 'customer_id');

@@ -13,10 +13,15 @@ use App\Models\ChargeSetting;
 use App\Models\ChartOfAccount;
 use App\Models\JournalEntry;
 use App\Models\shipmentContainers;
+use App\Models\transaction\tax;
 
 class CreateTransaction extends Component
 {
     public $chargeCoa;
+
+    public $taxRates = [];
+    public $taxData = [];
+    public $taxRatesWht = [];
 
     public $shipmentId;
     public $shipment;
@@ -25,7 +30,7 @@ class CreateTransaction extends Component
     public $coaCostId;
 
     // === Charge Details ===
-    public $charge, $description, $freight, $unit, $ofdtype, $remarks;
+    public $charge, $description, $freight, $unit = 'CONTAINER', $ofdtype, $remarks;
     public $quantity = 0;
 
     // === Sale Details ===
@@ -64,8 +69,13 @@ class CreateTransaction extends Component
             $shipment->carrierModel,
             $shipment->deliveryAgent,
         ])->filter()->unique();
-        $this->chargeCoa = ChargeSetting::get();
+        $taxes = tax::where('is_active', '1')->get(); // asumsikan ada kolom 'id', 'name', 'rate'
 
+        $this->chargeCoa = ChargeSetting::get();
+        $this->taxRates = $taxes->where('type', 'vat')->pluck('rate', 'id')->toArray(); // untuk dropdown
+        $this->taxRatesWht = $taxes->where('type', 'wht')->pluck('rate', 'id')->toArray(); // untuk dropdown
+        $this->taxData = $taxes->pluck('rate', 'id')->toArray(); // untuk Alpine.js
+        $customers = Customer::orderBy('name')->get();
         $this->vendors = customer::where('category', 'creditor')->orderBy('name')->get();
 
         // $this->updateQty();
@@ -84,14 +94,50 @@ class CreateTransaction extends Component
             $this->coaCostId = null;
         }
     }
+    public function updatedUnit($value)
+    {
+        if (!$this->shipment) {
+            $this->shipment = TShipments::with('container')->find($this->shipmentId);
+        }
+
+        switch ($value) {
+            case 'CONTAINER':
+                $this->quantity = $this->shipment->container->count(); // atau hitung dari container relasi
+                break;
+
+            case 'PALLET':
+                $this->quantity = 0; // method custom
+                break;
+
+            case 'DOCUMENT':
+                $this->quantity =  $this->shipment->job();
+                break;
+
+            default:
+                $this->quantity = 0;
+        }
+    }
+
     // === Simpan Data Transaksi Baru ===
     public function save()
     {
-        $vendor = Customer::find($this->cvendor);
-        $client = Customer::find($this->sclient);
-
+        if ($this->getErrorBag()->isNotEmpty()) {
+            $this->dispatch('scroll-to-error');
+        }
+        if ($this->svatgst == 0 || empty($this->svatgst)) {
+            $this->svatgst = null;
+        }
+        if ($this->cvatgst == 0 || empty($this->cvatgst)) {
+            $this->cvatgst = null;
+        }
+        if ($this->swhtaxrate == 0 || empty($this->swhtaxrate)) {
+            $this->swhtaxrate = null;
+        }
+        if ($this->cwhtaxrate == 0 || empty($this->cwhtaxrate)) {
+            $this->cwhtaxrate = null;
+        }
         $transaction = Transaction::create([
-            'shipment_id' => $this->shipmentId,
+            'id_shipment' => $this->shipmentId,
             'charge' => $this->charge,
             'description' => $this->description,
             'freight' => $this->freight,
@@ -102,8 +148,7 @@ class CreateTransaction extends Component
             'coa_sale_id' => $this->coaSaleId,
             'coa_cost_id' => $this->coaCostId,
             // Sale
-            'customer_id' => $client?->id,
-            'sclient' => $client?->name,
+            'sclient' => $this->sclient,
             'scurrency' => $this->scurrency,
             'srate' => $this->srate,
             'samount_qty' => $this->samount_qty,
@@ -119,8 +164,7 @@ class CreateTransaction extends Component
             'sremarks' => $this->sremarks,
             'sgrossprofit' => $this->sgrossprofit,
             // Cost
-            'vendor_id' => $vendor?->id,
-            'cvendor' => $vendor?->name,
+            'cvendor' => $this->cvendor,
             'creferenceno' => $this->creferenceno,
             'cdate' => $this->cdate,
             'cdrcr' => $this->cdrcr,
@@ -140,71 +184,149 @@ class CreateTransaction extends Component
             'cvatgstusd' => $this->cvatgstusd,
             'shwtaxrateusd' => $this->shwtaxrateusd,
             'chwtaxrateusd' => $this->chwtaxrateusd,
+            'reference_type' => 'SHIPMENT',
+            'created_by' => Auth::id(),
+
         ]);
 
-        $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
-        $costCoa = ChartOfAccount::find($transaction->coa_cost_id);
-        // dd([
-        //     'sale_term' => $saleCoa?->term_type,
-        //     'cost_term' => $costCoa?->term_type,
-        //     'sale_amount' => $transaction->samountidr,
-        //     'cost_amount' => $transaction->camountidr,
-        // ]);
 
-        // === JURNAL SALE ===
-        // Fungsi helper untuk konversi string Indo ke float
+        $this->createJournalEntries($transaction);
+        $this->reset();
+        $this->dispatch('transactionSaved');
+        $this->dispatch('close-modal');
+        $this->chargeCoa = ChargeSetting::get();
+        session()->flash('message', 'Transaksi berhasil disimpan!');
+        $this->vendors = customer::where('category', 'creditor')->orderBy('name')->get();
+    }
+    private function createJournalEntries($transaction)
+    {
+        $transaction->load('shipment');
+
+        // Helper function to convert Indonesian formatted numbers to float
         $indoStringToFloat = function (string $value): float {
-            // hapus titik ribuan, ganti koma jadi titik desimal
             $value = str_replace('.', '', $value);
             $value = str_replace(',', '.', $value);
             return floatval($value);
         };
 
-        // Ambil relasi coaSale dan coaCost dari ChargeSetting agar dapat akses term_type
-        $chargeSetting = ChartOfAccount::find($transaction->coa_sale_id);
-        $saleCoa = $chargeSetting?->coaSale;
-        $costCoa = $chargeSetting?->coaCost;
+        // Get COA for sale and cost
+        $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
+        $costCoa = ChartOfAccount::find($transaction->coa_cost_id);
 
-        // JURNAL SALE
+        // Create sale journal entry
         if ($transaction->samountidr && $saleCoa) {
-            $saleAmount = $indoStringToFloat($transaction->samountidr);
+            $saleAmount = $transaction->samountidr;
             $totalSale = $saleAmount * $transaction->quantity;
 
+            // Jurnal Piutang (A/R) - Debit
+            JournalEntry::create([
+                'transaction_id' => $transaction->id,
+                'coa_id' => $transaction->transactionClient->coa_id, // COA A/R untuk customer
+                'debit' => $totalSale,
+                'credit' => 0,
+                'description' => "Piutang dari transaksi #{$transaction->transactionClient->name} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
+                'transactionable_type' => get_class($transaction),
+                'transactionable_id' => $transaction->id,
+                'date' => now(),
+                'created_by' => Auth::id(),
+            ]);
+
+            // Jurnal Pendapatan (Revenue) - Kredit
             JournalEntry::create([
                 'transaction_id' => $transaction->id,
                 'coa_id' => $saleCoa->id,
                 'debit' => $saleCoa->term_type === 'DR' ? $totalSale : 0,
                 'credit' => $saleCoa->term_type === 'CR' ? $totalSale : 0,
-                'description' => "Sale transaction #{$transaction->id}",
+                'description' => "Sale transaction #{$transaction->reference_type} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
+                'transactionable_type' => $transaction->reference_type,
+                'transactionable_id' => $transaction->id,
                 'date' => now(),
+                'created_by' => Auth::id(),
             ]);
         }
 
-        // JURNAL COST
         if ($transaction->camountidr && $costCoa) {
-            $costAmount = $indoStringToFloat($transaction->camountidr);
+            $costAmount = $transaction->camountidr;
             $totalCost = $costAmount * $transaction->quantity;
 
+            // Jurnal Hutang (A/P) - Kredit
+            JournalEntry::create([
+                'transaction_id' => $transaction->id,
+                'coa_id' => $transaction->transactionVendor->coa_id, // COA A/P untuk vendor
+                'debit' => 0,
+                'credit' => $totalCost,
+                'description' => "Hutang dari transaksi #{$transaction->transactionVendor->name} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
+                'transactionable_type' => get_class($transaction),
+                'transactionable_id' => $transaction->id,
+                'date' => now(),
+                'created_by' => Auth::id(),
+            ]);
+
+            // Jurnal Biaya (Expense) - Debit
             JournalEntry::create([
                 'transaction_id' => $transaction->id,
                 'coa_id' => $costCoa->id,
                 'debit' => $costCoa->term_type === 'DR' ? $totalCost : 0,
                 'credit' => $costCoa->term_type === 'CR' ? $totalCost : 0,
-                'description' => "Cost transaction #{$transaction->id}",
+                'description' => "Cost transaction #{$transaction->reference_type} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
+                'transactionable_type' => $transaction->reference_type,
+                'transactionable_id' => $transaction->id,
                 'date' => now(),
+                'created_by' => Auth::id(),
             ]);
         }
-
-
-        // $this->loadClients(); 
-        $this->dispatch('transactionSaved');
-        $this->dispatch('close-modal');
-        $this->reset();
-        $this->chargeCoa = ChargeSetting::get();
-        session()->flash('message', 'Transaksi berhasil disimpan!');
-        $this->vendors = customer::where('category', 'creditor')->orderBy('name')->get();
     }
+    private function resetForm()
+    {
+        $this->reset([
+            'charge',
+            'description',
+            'freight',
+            'unit',
+            'ofdtype',
+            'remarks',
+            'quantity',
+            'sclient',
+            'scurrency',
+            'srate',
+            'samount_qty',
+            'sincludedtax',
+            'sfcyamount',
+            'samountidr',
+            'sdrcr',
+            'svatgst',
+            'staxableamount',
+            'svatgstamount',
+            'swhtaxrate',
+            'swhtaxamount',
+            'sremarks',
+            'sgrossprofit',
+            'cvendor',
+            'creferenceno',
+            'cdate',
+            'cdrcr',
+            'ccurrency',
+            'crate',
+            'camount_qty',
+            'cincludedtax',
+            'cfcyamount',
+            'camountidr',
+            'cvatgst',
+            'cvatgstamount',
+            'ctaxableamount',
+            'cremarks',
+            'cwhtaxrate',
+            'cwhtaxamount',
+            'svatgstusd',
+            'cvatgstusd',
+            'shwtaxrateusd',
+            'chwtaxrateusd'
+        ]);
 
+        // Reload fresh data
+        $this->chargeCoa = ChargeSetting::get();
+        $this->vendors = Customer::where('category', 'creditor')->orderBy('name')->get();
+    }
     // public function loadClients()
     // {
     //     $this->clients = customer::where('category', 'DR')->orderBy('name')->get();

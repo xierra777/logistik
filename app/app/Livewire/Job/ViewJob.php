@@ -12,17 +12,22 @@ use Illuminate\Support\Facades\Auth;
 
 class ViewJob extends Component
 {
-
+    public $editingJobId = false;
     public $job;
-    public $refreshKey;
+    public $refreshKey, $transactionId, $jobId;
     public $type_job = '';
     public array $selectedShipments = [];
     public $organizationFields = [];
     public array $selectedAssignedShipments = [];
     public $modalContainer = true;
     public $containerType, $noOfPackages, $containerReleaseNo, $containerReleaseDate, $typeOfPackages, $grossWeight, $typeOfGrossWeight, $volumeWeight, $typeOfVolumeWeight, $volume, $chargableWeight, $containerRemarks, $containerNo, $containerSealNo, $noOfPallet, $netOfWeight, $typeNetOfWeight, $totalWeight, $typeOfTotalWeight, $hsCode, $hsCodeDesc;
+    public $editingTransactionId, $transactions;
+    public $isEditing = false;
 
-
+    protected $listeners = [
+        'transactionSaved' => 'refreshJob',
+        'close-modal' => 'closeEditTransaction',
+    ];
     public function mount($id)
     {
         $this->loadJob($id); // cukup panggil method ini, tidak perlu cari ulang shipment ID
@@ -33,28 +38,35 @@ class ViewJob extends Component
             'Shipper' => 'shipper',
             'Consignee' => 'consignee',
             'Notify Party' => 'notify',
-
         ];
     }
 
     public function refreshJob()
     {
-        $this->refreshKey = now()->timestamp;
+        $this->loadJob($this->job->id);
+        $this->dispatch('swal', [
+            'title' => 'Success',
+            'text' => 'Success Adding Transactions.',
+            'icon' => 'success',
+        ]);
     }
     public function refreshTransaction($id)
     {
-
         $this->refreshKey = now()->timestamp;
         $this->loadJob($id); // cukup panggil method ini, tidak perlu cari ulang shipment ID
-
     }
+    public function trancsationsDispatchclear()
+    {
+        $this->refreshKey = now()->timestamp;
+    }
+
+
     public function loadJob($id)
     {
         $this->job = TJob::with([
             'client',
             'TjobContainer',
             'carrierModel',
-            'jobTransactions',     // relasi ke Customer
             'ogents',
             'dagents',
             'employee',
@@ -98,14 +110,57 @@ class ViewJob extends Component
     }
     public function confirmDelete($get_id)
     {
+        // dd('niggas');
+        // Ambil transaksi beserta relasi invoice-nya
+        $transaction = Transaction::with('invs')->find($get_id);
+
+        if (!$transaction) {
+            $this->dispatch('swal', [
+                'title' => 'Gagal',
+                'text' => 'Transaksi tidak ditemukan.',
+                'icon' => 'error',
+            ]);
+            return;
+        }
+
+        // Kalau invoice-nya sudah issued, tolak penghapusan
+        if ($transaction->invs && $transaction->invs->status === 'issued') {
+            $this->dispatch('swal', [
+                'title' => 'Tidak Bisa Dihapus',
+                'text' => 'Transaksi ini sudah masuk ke invoice yang telah issued.',
+                'icon' => 'error',
+            ]);
+            return;
+        }
+
+        // Kalau belum issued, lanjut hapus
         try {
             Transaction::destroy($get_id);
-            session()->flash('message', 'Shipment deleted successfully!');
+            $this->dispatch('swal', [
+                'title' => 'Success!',
+                'text' => 'Transaction Deleted',
+                'icon' => 'success',
+            ]);
         } catch (\Exception $e) {
-            session()->flash('error', 'Error deleting shipment: ' . $e->getMessage());
+            session()->flash('error', $e->getMessage());
         }
     }
-
+    public function editTransaction($jobId, $transactionId)
+    {
+        $this->isEditing = true;
+        $this->editingTransactionId = $transactionId; // Store the actual transaction ID
+        $this->editingJobId = $jobId; // You might need this too
+    }
+    public function closeEditTransaction()
+    {
+        $this->isEditing = false;
+        // $this->dispatch('swal', [
+        //     'title' => 'Success',
+        //     'text' => 'Success Updating Transactions.',
+        //     'icon' => 'success',
+        // ]);
+        // $this->reset(['isReadonly' /* add other properties */]);
+    }
     public function getAssignedShipmentsProperty()
     {
         return $this->job->shipments;
@@ -145,11 +200,17 @@ class ViewJob extends Component
             'containers' => $container,
             'created_by' => Auth::user()->id
         ]);
+        $this->resetContainerFields();
+        $this->dispatch('close-create-container');
+    }
+    public function resetContainerFields()
+    {
         $this->reset([
             'containerType',
-            'noOfPackages',
             'containerReleaseNo',
+            'containerNo',
             'containerReleaseDate',
+            'noOfPackages',
             'typeOfPackages',
             'grossWeight',
             'typeOfGrossWeight',
@@ -158,7 +219,6 @@ class ViewJob extends Component
             'volume',
             'chargableWeight',
             'containerRemarks',
-            'containerNo',
             'containerSealNo',
             'noOfPallet',
             'netOfWeight',
@@ -166,9 +226,8 @@ class ViewJob extends Component
             'totalWeight',
             'typeOfTotalWeight',
             'hsCode',
-            'hsCodeDesc'
+            'hsCodeDesc',
         ]);
-        $this->dispatch('close-create-container');
     }
     public function getOrganizationsProperty()
     {
@@ -202,6 +261,8 @@ class ViewJob extends Component
 
     public function render()
     {
+        $this->transactions = Transaction::where('id_job', $this->job->id)
+            ->get();
         return view('livewire.job.view-job',);
     }
 }

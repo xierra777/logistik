@@ -582,7 +582,6 @@
     <div class="mt-4 shadow-lg ">
         <div>
             <p class="text-center p-3 bg-gray-400 rounded-t-lg font-bold italic border">Transaction still under Construction <br>
-                <span class="text-red-700">...</span>
             </p>
             <div class="flex justify-end p-1 ">
                 <div x-data="{ open: false }" @close-modal.window="open = false"
@@ -711,25 +710,33 @@
                             {{ $transaction->unit }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$transaction->customer->name ?? ''}}
+                            {{$transaction->transactionClient->name ?? ''}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $transaction->quantity }} x {{$transaction->samount_qty}}x{{$transaction->srate}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->samountidr_formatted ?? '' }}
+                            {{ number_format($transaction->samountidr, 2, ',', '.') }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->sdrcr}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$transaction->vendor->name ?? ''}}
+                            {{$transaction->transactionVendor->name ?? '-'}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            @if($transaction->camountidr && $transaction->camountidr != 0)
                             {{ $transaction->quantity }} x {{$transaction->camount_qty}}x{{$transaction->crate}}
+                            @else
+                            -
+                            @endif
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$transaction->camountidr_formatted}}
+                            @if($transaction->camountidr && $transaction->camountidr != 0)
+                            {{ number_format($transaction->camountidr, 2, ',', '.') }}
+                            @else
+                            -
+                            @endif
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->cdrcr}}
@@ -738,7 +745,7 @@
                             {{$transaction->freight}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium font-bold {{ $transaction->gp < 0 ? 'text-red-500' : 'text-green-700' }}">
-                            {{ number_format($transaction->gp, 2, ',', '.') }}
+                            {{$transaction->SamountgpFormatted}}
                         </td>
                     </tr>
                     @empty

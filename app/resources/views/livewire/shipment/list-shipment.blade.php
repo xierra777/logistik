@@ -170,7 +170,7 @@
 
             <!-- Pagination -->
             @if($shipment->hasPages())
-            <div class="mt-4 px-1.5">
+            <div class="mt-4 px-1.5 flex justify-end">
                 {{ $shipment->links() }}
             </div>
             @endif

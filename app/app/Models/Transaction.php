@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\transaction\tax;
 use Illuminate\Database\Eloquent\Model;
 
 class Transaction extends Model
@@ -9,10 +10,9 @@ class Transaction extends Model
     protected $table = 'transactions';
 
     protected $fillable = [
-        'shipment_id',
-        'job_id',
-        'customer_id',  // Tambahkan field ini
-        'vendor_id',  // Tambahkan field ini
+        'id_shipment',
+        'id_job',
+        'reference_type',
         'invoice_id',
         // Charge section
         'charge',
@@ -60,6 +60,7 @@ class Transaction extends Model
         'cwhtaxrate',
         'cwhtaxamount',
         'totalcost',
+        'is_invoiced',
         // COA columns
         'coa_sale_id',
         'coa_cost_id',
@@ -79,31 +80,55 @@ class Transaction extends Model
     {
         return $this->belongsTo(ChartOfAccount::class, 'coa_cost_id');
     }
-    public function customer()
+    public function transactionClient()
     {
-        return $this->belongsTo(customer::class, 'customer_id');
+        return $this->belongsTo(Customer::class, 'sclient');
+    }
+    public function saleVat()
+    {
+        return $this->belongsTo(tax::class, 'svatgst');
+    }
+    public function costVat()
+    {
+        return $this->belongsTo(tax::class, 'cvatgst');
+    }
+    public function saleWht()
+    {
+        return $this->belongsTo(tax::class, 'swhtaxrate');
+    }
+    public function costWht()
+    {
+        return $this->belongsTo(tax::class,  'cwhtaxrate');
     }
     public function shipment()
     {
-        return $this->belongsTo(Shipment::class, 'shipment_id');
+        return $this->belongsTo(TShipments::class, 'id_shipment');
+    }
+    public function job()
+    {
+        return $this->belongsTo(TJob::class, 'id_job');
     }
 
-    public function vendor()
+    public function transactionVendor()
     {
-        return $this->belongsTo(Customer::class, 'vendor_id');
+        return $this->belongsTo(Customer::class, 'cvendor');
     }
 
-    public function invoice()
+    public function invs()
     {
-        return $this->belongsTo(Invoice::class);
+        return $this->belongsTo(Invoice::class, 'invoice_id');
+    }
+    public function invoices()
+    {
+        return $this->belongsToMany(Invoice::class, 'invoice_transaction')
+            ->withPivot('amountInvoice', 'amountInvoiceUsd', 'quantityInvoice', 'vatInvoice', 'vatInvoiceUsd', 'whtInvoice', 'whtInvoiceUsd', 'remarks')
+            ->withTimestamps();
     }
 
-    public function getSamountidrFormattedAttribute()
+    public function getSamountgpFormattedAttribute()
     {
-        return number_format($this->samountidr, 2, ',', '.');
-    }
-    public function getCamountidrFormattedAttribute()
-    {
-        return number_format($this->camountidr, 2, ',', '.');
+        $samountidr = is_numeric($this->samountidr) ? $this->samountidr : 0;
+        $camountidr = is_numeric($this->camountidr) ? $this->camountidr : 0;
+        return number_format(($samountidr - $camountidr), 2, ',', '.');
     }
 }

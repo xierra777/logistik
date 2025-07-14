@@ -36,7 +36,24 @@ class TJob extends Model
     }
     public function jobTransactions()
     {
-        return $this->hasMany(Transaction::class, 'job_id');
+        return $this->hasMany(Transaction::class, 'id_job');
+    }
+    public function paymentAllocations()
+    {
+        return $this->hasMany(PaymentJobAllocations::class, 'job_id');
+    }
+
+    public function payments()
+    {
+        return $this->hasManyThrough(Payment::class, PaymentJobAllocations::class, 'job_id', 'id', 'id', 'payment_id');
+    }
+
+
+    public function getOutstandingDebtAttribute()
+    {
+        $totalInvoice = $this->total_amount;
+        $totalPayments = $this->total_payments ?? 0;
+        return max($totalInvoice - $totalPayments, 0);
     }
     public function client()
     {

@@ -21,6 +21,9 @@ class SaleInvoice extends Component
     public $totalgw = 0;
     public $shipment;
     public $dataShip;
+    public $issuedInvoices;
+    public $showExchangeRate = false;
+    public array $selectedTransactionIds = [];
 
     protected $listeners = ['setShipmentId'];
 
@@ -37,19 +40,30 @@ class SaleInvoice extends Component
 
         // dd($dataShip);
         $customerNames = collect([
+            $shipment->client?->name,
             $shipment->shipper?->name,
             $shipment->consignee?->name,
             $shipment->notify?->name,
         ])->filter();
 
         $this->clients = Customer::whereIn('name', $customerNames)->get();
-        $this->containers = shipmentContainers::all();
-
+        // $this->containers = shipmentContainers::all();
         if ($shipmentId) {
             $this->loadTransactions();
         }
     }
+    public function selectAllTransactions()
+    {
+        $allIds = $this->transactions->pluck('id')->toArray();
 
+        if (count($this->selectedTransactionIds) === count($allIds)) {
+            // Jika semua sudah dipilih → batalkan semua
+            $this->selectedTransactionIds = [];
+        } else {
+            // Jika belum semua → pilih semua
+            $this->selectedTransactionIds = $allIds;
+        }
+    }
     public function generatePDF()
     {
         if (!$this->shipmentId || !$this->customer_id || $this->transactions->isEmpty()) {
@@ -75,8 +89,8 @@ class SaleInvoice extends Component
             $rate     = (float) ($trx->srate ?? 1);
 
             $amount = $currency === 'IDR'
-                ? (float) $this->parseIndoNumber($trx->samountidr)
-                : (float) $trx->sfcyamount;
+                ? (int) $trx->samountidr
+                : (int) $trx->sfcyamount;
 
             $vat = $currency === 'IDR'
                 ? (float) ($trx->svatgstamount ?? 0)
@@ -176,6 +190,13 @@ class SaleInvoice extends Component
 
     public function previewPDF()
     {
+        $selectedTransactions = $this->transactions->filter(function ($trx) {
+            return in_array($trx->id, $this->selectedTransactionIds);
+        });
+        if ($selectedTransactions->isEmpty()) {
+            session()->flash('error', 'No transactions selected for preview.');
+            return;
+        }
         if (!$this->shipmentId || !$this->customer_id || $this->transactions->isEmpty()) {
             session()->flash('error', 'No data available for preview.');
             return;
@@ -193,21 +214,21 @@ class SaleInvoice extends Component
             'total'    => 0,
         ];
 
-        foreach ($this->transactions as $trx) {
-            $currency = strtoupper(trim($trx->scurrency));
+        foreach ($selectedTransactions as $trx) {
+            $currency = strtoupper(trim($this->finalCurrency));
             $qty      = (int) $trx->quantity;
             $rate     = (float) ($trx->srate ?? 1);
 
             $amount = $currency === 'IDR'
-                ? (float) $this->parseIndoNumber($trx->samountidr)
+                ? (int) $trx->samountidr
                 : (float) $trx->sfcyamount;
 
             $vat = $currency === 'IDR'
-                ? (float) $this->parseIndoNumber($trx->svatgstamount ?? 0)
+                ? (float) $trx->svatgstamount
                 : (float) ($trx->svatgstusd    ?? 0);
 
             $wht = $currency === 'IDR'
-                ? (float) $this->parseIndoNumber($trx->swhtaxamount   ?? 0)
+                ? (float) $trx->swhtaxamount
                 : (float) ($trx->shwtaxrateusd  ?? 0);
 
             $subtotal = $qty * $amount;
@@ -273,20 +294,20 @@ class SaleInvoice extends Component
 
         // render view
         $data = compact('shipment', 'customer') + [
-            'transactions'         => $this->transactions,
+            'transactions'         => $selectedTransactions,
             'totalPcs'             => $totalPcs,
             'totalgw'              => $totalgw,
             'formattedSummary'     => $formattedSummary,
             'finalCurrency'        => $this->finalCurrency,
             'invoice_number'       => $this->invoice_number,
+            'showExchangeRate'     => $this->showExchangeRate,
         ];
 
         $html = view('livewire.accounting.invoice-pdf', $data)->render();
 
         $pdfContent = Browsershot::html($html)
             ->setChromePath('/usr/bin/google-chrome')
-            ->format('A3')
-            ->margins(5, 5, 5, 5)
+            ->format('A4')
             ->showBackground()
             ->setOption('args', ['--no-sandbox'])
             ->pdf();
@@ -321,8 +342,8 @@ class SaleInvoice extends Component
     public function loadTransactions()
     { {
             if ($this->shipmentId && $this->customer_id) {
-                $this->transactions = Transaction::where('shipment_id', $this->shipmentId)
-                    ->where('customer_id', $this->customer_id)
+                $this->transactions = Transaction::where('id_shipment', $this->shipmentId)
+                    ->where('sclient', $this->customer_id)
                     ->get();
                 // Hitung total pcs dari containers di shipment
                 $shipment = TShipments::with('container')->find($this->shipmentId);
@@ -341,7 +362,8 @@ class SaleInvoice extends Component
     {
         return view('livewire.accounting.sale-invoice', [
             'invoices'  => Invoice::where('shipment_id', $this->shipmentId)
-                ->with(['shipment.containers', 'customer', 'transactions'])
+                ->with(['shipment.container', 'client', 'transactions'])
+                ->where('status', '!=', 'draft')
                 ->get(),
             'shipment' => TShipments::find($this->shipmentId),
         ]);

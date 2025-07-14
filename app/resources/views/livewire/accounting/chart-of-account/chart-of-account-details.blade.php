@@ -54,7 +54,11 @@
             <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
                 {{ $isEditing ? 'Update' : 'Simpan' }}
             </button>
-            <a class="coaSetting bg-blue-500 rounded-md p-3 hover:scale-105 hover:text-white transition duration-300 ease-in-out hover:shadow-cyan-200" href="{{route('coaSetting')}}">Charge Coa Setting</a>
+            <div>
+                <a class="coaSetting bg-blue-500 rounded-md p-3 hover:scale-105 hover:text-white transition duration-300 ease-in-out hover:shadow-cyan-200" href="{{route('coaSetting')}}">Charge Coa Setting</a>
+                <a class="coaSetting bg-blue-500 rounded-md p-3 hover:scale-105 hover:text-white transition duration-300 ease-in-out hover:shadow-cyan-200" href="{{route('accountant.list')}}">Back</a>
+            </div>
+
         </div>
 
     </form>
@@ -76,7 +80,7 @@
             <tbody>
                 @foreach ($accounts as $account)
                 <tr>
-                    <td class="border px-4 py-2">{{ $account->account_code }}</td>
+                    <td class="border whitespace px-4 py-2">{{ $account->account_code }}</td>
                     <td class="border px-4 py-2">{{ $account->account_name }}</td>
                     <td class="border px-4 py-2">{{ $account->account_type }}</td>
                     <td class="border px-4 py-2">{{ $account->term_type }}</td>
@@ -85,12 +89,62 @@
                     </td>
                     <td class="border px-4 py-2">
                         <button wire:click="edit({{ $account->id }})" class="bg-yellow-500 text-white px-2 py-1 rounded">Edit</button>
-                        <button wire:click="delete({{ $account->id }})" class="bg-red-600 text-white px-2 py-1 rounded" onclick="confirm('Yakin hapus?') || event.stopImmediatePropagation()">Hapus</button>
+                        <button @click="$dispatch('confirm')" class="bg-red-600 text-white px-2 py-1 rounded">Hapus</button>
                     </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
+    </div>
+    <!-- Pagination -->
+    @if($accounts->hasPages())
+    <div class="mt-4 px-1.5 flex justify-end">
+        {{ $accounts->links() }}
+    </div>
+    @endif
+
+    <!-- Selector Rows Per Page -->
+    <div class="mt-4">
+        <select wire:model.live="perPage" class="py-1 px-2 bg-gray-100 border rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:border-transparent dark:text-neutral-400 dark:focus:ring-neutral-600">
+            <option value="5">5 Rows</option>
+            <option value="10">10 Rows</option>
+            <option value="25">25 Rows</option>
+            <option value="50">50 Rows</option>
+            <option value="100">100 Rows</option>
+        </select>
+    </div>
+    <div
+        x-data="{open : false}"
+        x-show="open"
+        @confirm.window="
+     
+        const get_id= event.detail.get_id
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d8',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, Keep it',
+            }).then((result) => {
+            if (result.isConfirmed) {
+                $wire.confirmDelete(get_id).then(result =>{
+                 Swal.fire(
+                    'Deleted!',
+                    'Account has been deleted.',
+                    'success')
+                 });
+            } else if(result.dismiss === Swal.DismissReason.cancel) {
+                Swal.fire(
+                    'canceled',
+                    'Delete has been cancelled',
+                    'error'
+                )
+            }
+        });
+    ">
     </div>
 </div>
 

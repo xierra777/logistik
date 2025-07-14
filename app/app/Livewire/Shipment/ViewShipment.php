@@ -17,7 +17,6 @@ class ViewShipment extends Component
 
     protected $listeners = [
         'transactionSaved' => 'refreshShipment',
-
     ];
     public function mount($id)
     {

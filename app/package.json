@@ -27,6 +27,7 @@
         "preline": "^2.7.0",
         "puppeteer": "^24.4.0",
         "select2-tailwindcss-theme": "^1.2.4",
+        "sweetalert": "^2.1.2",
         "sweetalert2": "^11.6.13",
         "toastify-js": "^1.12.0"
     }

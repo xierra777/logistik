@@ -89,34 +89,34 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">MAWB/MBL No.</p>
-                    <p class="col-span-3 text-[10px]">: {{$job?->jobBillLadingNo}}</p>
+                    <p class="col-span-3 text-[10px]">: {{$shipment->shipment->shipmentBillLadingNo ?? ''}}</p>
                 </div>
                 <div class="grid grid-cols-4  ">
                     <p class="font-semibold text-xs">Shipper</p>
-                    <p class="col-span-3 text-[10px]">: </p>
+                    <p class="col-span-3 text-[10px]">: {{$shipment->shipper->name ?? ''}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Consignee</p>
-                    <p class="col-span-3 text-[10px]">: </p>
+                    <p class="col-span-3 text-[10px]">: {{$shipment->consignee->name ?? ''}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">ETA/ETD</p>
-                    <p class="col-span-3 text-[10px]">: {{ $job->data['estimearrival'] ? \Carbon\Carbon::parse($job->data['estimearrival'])->format('d M Y') : '-' }}
+                    <p class="col-span-3 text-[10px]">: {{ $shipment->dataShipments['shipmentEstimearrival'] ? \Carbon\Carbon::parse($shipment->dataShipments['shipmentEstimearrival'])->format('d M Y') : '-' }}
                         /
-                        {{ $job->data['estimedelivery'] ? \Carbon\Carbon::parse($job->data['estimedelivery'])->format('d M Y') : '-' }}
+                        {{ $shipment->dataShipments['shipmentEstimedelivery'] ? \Carbon\Carbon::parse($shipment->dataShipments['shipmentEstimedelivery'])->format('d M Y') : '-' }}
                     </p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">HAWB/HBL No.</p>
-                    <p class="col-span-3 text-[10px]">: {{$job?->houseJobBillLadingNo}}</p>
+                    <p class="col-span-3 text-[10px]">: {{$shipment->houseJobBillLadingNo ?? ''}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Total No. of Pcs</p>
-                    <p class="col-span-3 uppercase font-bold text-[10px]">: {{$totalPcs ?? ''}} {{$job->tjobContainer->first()->containers['typeOfPackages'] ?? '' }}</p>
+                    <p class="col-span-3 uppercase font-bold text-[10px]">: {{$totalPcs ?? ''}} {{$shipment->container->first()->containersData['shipmentTypeOfPackages'] ?? '' }}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Total G.Weight</p>
-                    <p class="col-span-3 text-[10px] font-bold uppercase">: {{$totalgw ?? ''}} {{$job->tjobContainer->first()->containers['typeOfGrossWeight'] ?? '' }} </p>
+                    <p class="col-span-3 text-[10px] font-bold uppercase">: {{$totalgw ?? ''}} {{$shipment->container->first()->containersData['shipmentTypeOfGrossWeight'] ?? '' }} </p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Total Volume</p>
@@ -135,27 +135,27 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Job No.</p>
-                    <p class="col-span-3 text-[10px]">: {{$job?->job_id}}</p>
+                    <p class="col-span-3 text-[10px]">: {{$shipment->job->job_id ?? '-'}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Shipment No.</p>
-                    <p class="col-span-3 text-[10px]">: </p>
+                    <p class="col-span-3 text-[10px]">: {{$shipment->shipment_id}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Place Of Receipt</p>
-                    <p class="col-span-3 text-[10px] nowrap-whitespace">: {{$job->data['place_of_receipt']}}</p>
+                    <p class="col-span-3 text-[10px] nowrap-whitespace">: {{$shipment->dataShipments['shipmentPlace_of_receipt']}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Port Of Loading</p>
-                    <p class="col-span-3 text-[10px]">: {{$job->data['port_of_loading']}}</p>
+                    <p class="col-span-3 text-[10px]">: {{$shipment->dataShipments['shipmentPort_of_loading']}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Port Of Dischage</p>
-                    <p class="col-span-3 text-[10px]">: {{$job->data['port_of_discharge']}}</p>
+                    <p class="col-span-3 text-[10px]">: {{$shipment->dataShipments['shipmentPort_of_discharge']}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Vessel/Voyage</p>
-                    <p class="col-span-3 text-[10px]">: {{$job->data['flightVesselName']}} / {{$job->data['flightVesselNo']}}</p>
+                    <p class="col-span-3 text-[10px]">: {{$shipment->dataShipments['shipmentFlightVesselName']}} / {{$shipment->dataShipments['shipmentFlightVesselNo']}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Reference No.</p>
@@ -190,31 +190,31 @@
                         </thead>
                         <tbody class="align-center">
                             {{-- Karena containers adalah array cast, kode ini seharusnya bekerja --}}
-                            @if(isset($job) && $job->TjobContainer && $job->TjobContainer->count() > 0)
-                            @foreach($job->TjobContainer as $c)
+                            @if(isset($shipment) && $shipment->container && $shipment->container->count() > 0)
+                            @foreach($container as $c)
                             <tr class="text-center">
-                                <td class="p-1 whitespace-normal text-[9px]  border-r border-l border-gray-900 text-center break-words"> {{ $c->containers['containerNo'] ?? '' }}
+                                <td class="p-1 whitespace-normal text-[9px]  border-r border-l border-gray-900 text-center break-words"> {{ $c->jobContainer->containers['containerNo'] ?? '' }}
                                 </td>
                                 <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                    {{ $c->containers['containerType'] ?? '' }}
+                                    {{$c->jobContainer->containers['containerType'] ?? '' }}
                                 </td>
                                 <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                    {{ $c->containers['noOfPackages'] ?? '' }}
+                                    {{ $c->containersData['shipmentNoOfPackages'] ?? '' }}
                                 </td>
                                 <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center uppercase">
-                                    {{ $c->containers['typeOfPackages'] ?? '' }}
+                                    {{ $c->containersData['shipmentTypeOfPackages'] ?? '' }}
                                 </td>
                                 <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                    {{ $c->containers['grossWeight'] ?? '' }}
+                                    {{ $c->containersData['shipmentGrossWeight'] ?? '' }}
                                 </td>
                                 <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                    {{ $c->containers['typeOfGrossWeight'] ?? '' }}
+                                    {{ $c->containersData['shipmentTypeOfGrossWeight'] ?? '' }}
                                 </td>
                                 <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                    {{ $c->containers['volume'] ?? '' }}
+                                    {{ $c->containersData['shipmentVolume'] ?? '' }}
                                 </td>
                                 <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
-                                    {{ $c->containers['volumeWeight'] ?? '' }}
+                                    {{ $c->containersData['shipmentVolumeWeight'] ?? '' }}
                                 </td>
                                 <td class="px-1 whitespace-nowrap text-[10px] border-r border-l border-gray-900 text-center">
                                     <!-- kosong -->
@@ -329,17 +329,17 @@
                             </td>
                             <td class="text-[9px] border border-gray-900 p-1">
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}</span>
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ $finalCurrency == 'USD'
-                                    ? number_format($transaction->cfcyamount, 2, '.', ',')
-                                    : number_format($transaction->camountidr, 2, ',', '.') }}
+                                    ? number_format($transaction->sfcyamount, 2, '.', ',')
+                                    : number_format($transaction->samountidr, 2, ',', '.') }}
                                     </span>
                                 </div>
                             </td>
                             <td class="text-[9px] border border-gray-900 p-1">
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}</span>
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ $finalCurrency == 'IDR'
                                     ? number_format($transaction->subtotal, 2, ',', '.')
@@ -350,11 +350,11 @@
                             <td class="text-[9px] border border-gray-900 text-center p-1">
                                 @if (!is_null($transaction->svatgstamount) || !is_null($transaction->svatgstusd))
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}</span>
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ $finalCurrency == 'IDR'
-                                        ? number_format($transaction->cvatgstamount, 2, ',', '.')
-                                        : number_format($transaction->cvatgstusd, 2, ',', '.') }}
+                                        ? number_format($transaction->svatgstamount, 2, ',', '.')
+                                        : number_format($transaction->svatgstusd, 2, ',', '.') }}
                                     </span>
                                 </div>
                                 @else
@@ -364,11 +364,11 @@
                             <td class="text-[9px] border border-gray-900 text-center p-1 align-top">
                                 @if (($transaction->swhtaxamount ?? 0) > 0 || ($transaction->shwtaxrateusd ?? 0) > 0)
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}</span>
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ $finalCurrency == 'IDR'
-                                        ? number_format($transaction->cwhtaxamount, 2, ',', '.')
-                                        : number_format($transaction->chwtaxrateusd, 2, ',', '.') }}
+                                        ? number_format($transaction->swhtaxamount, 2, ',', '.')
+                                        : number_format($transaction->shwtaxrateusd, 2, ',', '.') }}
                                     </span>
                                 </div>
                                 @else
@@ -377,7 +377,7 @@
                             </td>
                             <td class="text-[9px] border border-gray-900 text-center p-1 align-top">
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}</span>
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ number_format($transaction->total, 2, ',', '.') }}
                                     </span>
@@ -428,7 +428,7 @@
                     <p class=" col-span-1">Company Name</p>
                     <p class="text-left col-span-3">: PT Berkah Nusantara International</p>
                     <p class=" col-span-1">Bank Name</p>
-                    <p class="text-left col-span-3">0060012831172(IDR)</p>
+                    <p class="text-left col-span-3">: 0060012831172(IDR)</p>
                 </div>
                 <div class="grid grid-cols-4 mt-2">
                     <p class=" col-span-1">Bank Name</p>

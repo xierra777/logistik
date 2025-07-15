@@ -116,7 +116,7 @@
                 <div class="flex flex-col">
                     <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">MBL No</p>
                     <p class="text-center border font-bold text-md border-gray-900 px-4 py-2">
-                        {{$shipments->job->data['jobBillLadingNo'] ?? '-'}}
+                        {{$shipments->job->jobBillLadingNo ?? '-'}}
                     </p>
                 </div>
                 <div class="flex flex-col">
@@ -336,156 +336,135 @@
                     </div>
                     <form wire:submit.prevent="createContainer">
                         <div class="p-3">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                                 <!-- Left Column -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <div class="flex flex-col space-y-2 col-span-2" wire:ignore>
-                                        <label>Container Type</label>
-                                        <select name="" id="containerType" class="w-full block rounded-md border border-gray-300">
-                                            <option value=""></option>
-                                            <option value="20'DG">20'DG</option>
-                                            <option value="20'FT">20'FT</option>
-                                            <option value="20'HQ">20'HQ</option>
-                                            <option value="40'Standard">40'Standard</option>
-                                        </select>
-                                        @error('container_type')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                                    </div>
-                                    <div class="flex flex-col space-y-2">
-                                        <label>Container Release No.</label>
-                                        <input type="text" placeholder="Enter Container No  " wire:model="containerReleaseNo"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                        @error('container_size')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                                    </div>
-                                    <div class="flex flex-col space-y-2">
-                                        <label>Release date</label>
-                                        <input type="date" wire:model="containerReleaseDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                        @error('')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                                    </div>
-
-                                    <!-- Package Info -->
-                                    <div class="flex flex-col space-y-2">
-                                        <label>No Of Packages</label>
-                                        <input type="text" wire:model="noOfPackages" placeholder="Enter No Of Packages"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                    </div>
-                                    <div class="flex flex-col space-y-2" wire:ignore>
-                                        <label>Type Of Packages</label>
-                                        <select id="typeOfPackages" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                            <option value=""></option>
-                                            <option value="packages">Packages</option>
-                                            <option value="cartoon">Cartoon</option>
-                                            <option value="roll">Roll</option>
-                                            <option value="pallet">Pallet</option>
-                                        </select>
-                                    </div>
-
-                                    <!-- Weight Info -->
-                                    <div class="flex flex-col space-y-2">
-                                        <label>Gross Weight</label>
-                                        <input type="text" placeholder="Enter Gross weight" wire:model="grossWeight"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                    </div>
-                                    <div class="flex flex-col space-y-2" wire:ignore>
-                                        <label>Type Of Gross Weight</label>
-                                        <select id="typeOfGrossWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                            <option value=""></option>
-                                            <option value="KGS">KGS</option>
-                                        </select>
-                                    </div>
-
-                                    <!-- Volume Weight Info -->
-                                    <div class="flex flex-col space-y-2">
-                                        <label>Volume Weight</label>
-                                        <input type="text" wire:model="volumeWeight" placeholder="Enter Gross weight"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                    </div>
-                                    <div class="flex flex-col space-y-2" wire:ignore>
-                                        <label>Type Of Volume Weight</label>
-                                        <select id="typeOfVolumeWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                            <option value=""></option>
-                                            <option value="KGS">KGS</option>
-                                        </select>
-                                    </div>
-
-                                    <!-- Volume Info -->
-                                    <div class="flex flex-col space-y-2">
-                                        <label>Volume</label>
-                                        <div class="flex">
-                                            <input type="text" wire:model="volume" placeholder="Enter volume"
-                                                class="block w-full rounded-l-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                            <span class="inline-flex items-center px-3 border border-l-0 border-gray-300 bg-gray-100 text-gray-600 rounded-r-md">
-                                                CBM
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="flex flex-col space-y-2">
-                                        <label>Chargeable Weight</label>
-                                        <input type="text" placeholder="Enter Chargeable Weight" wire:model="chargableWeight"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                    </div>
-
-                                    <!-- Remarks -->
-                                    <div class="flex flex-col space-y-2 col-span-2">
-                                        <label>Remarks</label>
-                                        <textarea placeholder="Enter remarks" rows="3" wire:model="containerRemarks"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
-                                    </div>
+                                <div class="flex flex-col space-y-2">
+                                    <label>Container Release No.</label>
+                                    <input type="text" placeholder="Enter Container No " wire:model="containerReleaseNo"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                    @error('container_size')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                                </div>
+                                <div class="flex flex-col space-y-2">
+                                    <label>Release date</label>
+                                    <input type="date" wire:model="containerReleaseDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                    @error('')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                                </div>
+                                <div class="col-span-2"></div>
+                                <!-- Package Info -->
+                                <div class="flex flex-col space-y-2">
+                                    <label>No Of Packages</label>
+                                    <input type="text" wire:model="noOfPackages" placeholder="Enter No Of Packages"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                </div>
+                                <div class="flex flex-col space-y-2" wire:ignore>
+                                    <label>Type Of Packages</label>
+                                    <select id="typeOfPackages" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                        <option value=""></option>
+                                        <option value="PACKAGES">Packages</option>
+                                        <option value="CARTONS">Cartons</option>
+                                        <option value="ROLLS">Rolls</option>
+                                        <option value="PALLETS">Pallets</option>
+                                        <option value="CRATES">Crates</option>
+                                        <option value="BOXES">Boxes</option>
+                                        <option value="DRUMS">Drums</option>
+                                        <option value="BAGS">Bags</option>
+                                        <option value="BUNDLES">Bundles</option>
+                                        <option value="CONTAINERS">Containers</option>
+                                        <option value="PIECES">Pieces</option>
+                                        <option value="BALES">Bales</option>
+                                    </select>
+                                </div>
+                                <div class="flex flex-col space-y-2">
+                                    <label>No of Pallet</label>
+                                    <input type="text" placeholder="Enter No Of Pallet" wire:model="noOfPallet"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                </div>
+                                <div></div>
+                                <div class="flex flex-col space-y-2">
+                                    <label>Gross Weight</label>
+                                    <input type="text" placeholder="Enter Gross weight" wire:model="grossWeight"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                </div>
+                                <div class="flex flex-col space-y-2" wire:ignore>
+                                    <label>Type Of Gross Weight</label>
+                                    <select id="typeOfGrossWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                        <option value=""></option>
+                                        <option value="KGS">KGS</option>
+                                    </select>
+                                </div>
+                                <div class="flex flex-col space-y-2">
+                                    <label>Net Of Weight</label>
+                                    <input type="text" placeholder="Enter Net Of Weight" wire:model="netOfWeight"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                </div>
+                                <div class="flex flex-col space-y-2" wire:ignore>
+                                    <label>Type Of Net Of Weight</label>
+                                    <select id="typeNetOfWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                        <option value=""></option>
+                                        <option value="KGS">KGS</option>
+                                    </select>
+                                </div>
+                                <!-- Weight Info -->
+                                <div class="flex flex-col space-y-2">
+                                    <label>Volume Weight</label>
+                                    <input type="text" wire:model="volumeWeight" placeholder="Enter Gross weight"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                </div>
+                                <div class="flex flex-col space-y-2" wire:ignore>
+                                    <label>Type Of Volume Weight</label>
+                                    <select id="typeOfVolumeWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                        <option value=""></option>
+                                        <option value="KGS">KGS</option>
+                                    </select>
+                                </div>
+                                <div class="flex flex-col space-y-2">
+                                    <label>Total Weight</label>
+                                    <input type="text" placeholder="Enter Net Of Weight" wire:model="totalWeight"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                </div>
+                                <div class="flex flex-col space-y-2" wire:ignore>
+                                    <label>Type Of Weight</label>
+                                    <select id="typeOfTotalWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                        <option value=""></option>
+                                        <option value="KGS">KGS</option>
+                                    </select>
                                 </div>
 
-                                <!-- Right Column -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <div class="flex flex-col space-y-2">
-                                        <label>Container No.</label>
-                                        <input type="text" placeholder="Enter Container No" wire:model="containerNo"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                <!-- Volume Weight Info -->
+
+
+                                <!-- Volume Info -->
+                                <div class="flex flex-col space-y-2">
+                                    <label>Volume</label>
+                                    <div class="flex">
+                                        <input type="text" wire:model="volume" placeholder="Enter volume"
+                                            class="block w-full rounded-l-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                        <span class="inline-flex items-center px-3 border border-l-0 border-gray-300 bg-gray-100 text-gray-600 rounded-r-md">
+                                            CBM
+                                        </span>
                                     </div>
-                                    <div class="flex flex-col space-y-2">
-                                        <label>Seal No.</label>
-                                        <input type="text" placeholder="Enter Seal No" wire:model="containerSealNo"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                    </div>
-                                    <div class="flex flex-col space-y-2">
-                                        <label>No of Pallet</label>
-                                        <input type="text" placeholder="Enter No Of Pallet" wire:model="noOfPallet"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                    </div>
-                                    <div></div>
-                                    <div class="flex flex-col space-y-2">
-                                        <label>Net Of Weight</label>
-                                        <input type="text" placeholder="Enter Net Of Weight" wire:model="netOfWeight"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                    </div>
-                                    <div class="flex flex-col space-y-2" wire:ignore>
-                                        <label>Type Of Packages</label>
-                                        <select id="typeNetOfWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                            <option value=""></option>
-                                            <option value="KGS">KGS</option>
-                                        </select>
-                                    </div>
-                                    <div class="flex flex-col space-y-2">
-                                        <label>Total Weight</label>
-                                        <input type="text" placeholder="Enter Net Of Weight" wire:model="totalWeight"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                    </div>
-                                    <div class="flex flex-col space-y-2" wire:ignore>
-                                        <label>Type Of Weight</label>
-                                        <select id="typeOfTotalWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                            <option value=""></option>
-                                            <option value="KGS">KGS</option>
-                                        </select>
-                                    </div>
-                                    <div class="flex flex-col space-y-2">
-                                        <label>HS Code</label>
-                                        <input type="text" placeholder="Enter HS Code" wire:model="hsCode"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                    </div>
-                                    <div></div>
-                                    <div class="flex flex-col space-y-2 col-span-2">
-                                        <label>HS Description</label>
-                                        <textarea placeholder="Enter Hs Description" rows="3" wire:model="hsCodeDesc"
-                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
-                                    </div>
+                                </div>
+                                <div class="flex flex-col space-y-2">
+                                    <label>Chargeable Weight</label>
+                                    <input type="text" placeholder="Enter Chargeable Weight" wire:model="chargableWeight"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                </div>
+
+                                <div class="flex flex-col space-y-2">
+                                    <label>HS Code</label>
+                                    <input type="text" placeholder="Enter HS Code" wire:model="hsCode"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                </div>
+                                <div></div>
+                                <div class="flex flex-col space-y-2 col-span-2">
+                                    <label>Remarks</label>
+                                    <textarea placeholder="Enter remarks" rows="3" wire:model="containerRemarks"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
+                                </div>
+                                <div class="flex flex-col space-y-2 col-span-2">
+                                    <label>HS Description</label>
+                                    <textarea placeholder="Enter Hs Description" rows="3" wire:model="hsCodeDesc"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -556,7 +535,7 @@
                     <tr wire:loading.remove>
                         <td colspan=" 7" class="py-12 text-center">
                             <div class="flex flex-col items-center justify-center">
-                                <img src="{{ asset('images/nodataShipments.svg') }}"
+                                <img src="{{ asset('images/nodata.svg') }}"
                                     alt="No dataShipments illustration"
                                     class="w-64 h-48 mb-4 opacity-75 dark:opacity-50">
                                 <p class="text-lg font-medium text-gray-600 dark:text-neutral-300">
@@ -581,28 +560,18 @@
     </div>
     <div class="mt-4 shadow-lg ">
         <div>
-            <p class="text-center p-3 bg-gray-400 rounded-t-lg font-bold italic border">Transaction still under Construction <br>
-            </p>
-            <div class="flex justify-end p-1 ">
+            <div class="bg-gray-400 rounded-t-lg border">
                 <div x-data="{ open: false }" @close-modal.window="open = false"
                     x-ref="modalContent">
-                    <div class=" flex justify-end mb-4 p-4 gap-2">
-                        <a
-                            href="{{ route('saleInvoice', ['shipmentId' => $shipments->id]) }}"
-                            class="py-3 px-4 bg-green-600 text-white rounded-lg">
-                            Print Invoice
-                        </a>
-                        <a
-                            href="{{route('purchaseInvoice',['shipmentId' => $shipments->id])}}"
-                            class="py-3 px-4 bg-red-600 text-white rounded-lg">
-                            Print PI
-                        </a>
-                        <button
-                            wire:click="refreshTransaction({{ $shipments->id }})" @click="open = true"
-                            class="py-3 px-4 bg-blue-600 text-white rounded-lg">
-                            Add Cost
-                        </button>
+                    <div class="flex items-center justify-between p-3 ">
+                        <div class="flex-1"></div> <!-- Spacer kiri -->
+                        <p class="font-bold  text-center">TRANSACTION</p>
+                        <div class="flex-1 flex justify-end gap-2">
+                            <a href="{{route('saleInvoice', ['shipmentId' => $shipments->id])}}" class="py-2 px-3 bg-green-600 text-white rounded-lg text-sm">Print Invoice</a>
+                            <a href="{{route('purchaseInvoice', ['shipmentId' => $shipments->id])}}" class="py-2 px-3 bg-red-600 text-white rounded-lg text-sm">Print PI</a>
+                            <button @click="open = true; $wire.refreshTransaction()" class="py-2 px-3 bg-blue-600 text-white rounded-lg text-sm">Add Cost</button>
 
+                        </div>
                     </div>
 
                     <!-- Background Overlay -->

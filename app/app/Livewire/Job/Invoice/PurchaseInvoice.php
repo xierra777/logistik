@@ -52,21 +52,18 @@ class PurchaseInvoice extends Component
             'customers.name',
             'customers.email'
         ])
-            ->selectRaw('COUNT(transactions.id) as total_transactions')
-            ->selectRaw('COUNT(CASE WHEN transactions.is_invoiced = 0 OR transactions.is_invoiced IS NULL THEN 1 END) as uninvoiced_transactions')
             ->join('transactions', 'customers.id', '=', 'transactions.cvendor')
+            ->where('transactions.id_job', $jobId)
             ->whereNotNull('transactions.cvendor')
-            ->groupBy('customers.id', 'customers.name', 'customers.email')
-            ->orderBy('customers.name')
+            ->distinct()
             ->get();
-
         $this->loadTransactions();
     }
     public function loadTransactions()
     {
         if ($this->selectedVendor) {
             $this->transactions = Transaction::where('id_job', $this->jobId)
-                ->whereNull('invoice_id')
+                ->whereNull('purchasing_id')
                 ->where('cvendor', $this->selectedVendor)
                 ->get();
 
@@ -173,12 +170,12 @@ class PurchaseInvoice extends Component
         $invoice = Invoice::findOrFail($id);
 
         // Ambil semua transaksi yang berelasi dengan invoice tersebut
-        $transactions = Transaction::where('invoice_id', $invoice->id)->get();
+        $transactions = Transaction::where('purchasing_id', $invoice->id)->get();
 
         // Update semua transaksi, bisa pakai query langsung:
 
         foreach ($transactions as $transaction) {
-            $transaction->update(['is_invoiced' => true]);
+            $transaction->update(['is_purchasing' => true]);
         }
         $invoice->update([
             'status' => 'issued',
@@ -325,10 +322,10 @@ class PurchaseInvoice extends Component
         }
 
         // Update related transactions
-        if (Schema::hasColumn('transactions', 'invoice_id')) {
-            Transaction::where('invoice_id', $invoice->id)->update([
-                'invoice_id' => null,
-                'is_invoiced' => null,
+        if (Schema::hasColumn('transactions', 'purchasing_id')) {
+            Transaction::where('purchasing_id', $invoice->id)->update([
+                'purchasing_id' => null,
+                'is_purchasing' => null,
             ]);
         }
 
@@ -421,7 +418,7 @@ class PurchaseInvoice extends Component
                     $currency = strtoupper(trim($this->finalCurrency));
 
                     $qty = (int) $trx->quantity;
-                    $rate = (float) ($trx->srate ?? 1);
+                    $rate = (float) ($trx->crate ?? 1);
                     // dd('Masuk ke bagian else - invoice normal', $invoice->status, $invoice->transactions->count());
 
                     // PERBAIKAN: Pastikan menggunakan field yang benar dari transaction
@@ -530,7 +527,7 @@ class PurchaseInvoice extends Component
                 'showExchangeRate'     => $this->showExchangeRate,
             ];
 
-            $html = view('livewire.job.invoice.sale-invoice-pdf', $data)->render();
+            $html = view('livewire.job.invoice.purchase-invoice-pdf', $data)->render();
 
             $pdfContent = Browsershot::html($html)
                 ->setChromePath('/usr/bin/google-chrome')
@@ -561,7 +558,7 @@ class PurchaseInvoice extends Component
         try {
             // Ambil transaksi yang dipilih dan belum di-invoice
             $selectedTransactions = Transaction::whereIn('id', $this->selectedTransactionIds)
-                ->whereNull('invoice_id')
+                ->whereNull('purchasing_id')
                 ->get();
 
             if ($selectedTransactions->isEmpty()) {
@@ -571,9 +568,9 @@ class PurchaseInvoice extends Component
             }
 
             // Hitung subtotal, VAT, WHT, dan grand total
-            $subtotal   = $selectedTransactions->sum('samountidr');
-            $totalVat   = $selectedTransactions->sum('svatgstamount');
-            $totalWht   = $selectedTransactions->sum('swhtaxamount');
+            $subtotal   = $selectedTransactions->sum('camountidr');
+            $totalVat   = $selectedTransactions->sum('cvatgstamount');
+            $totalWht   = $selectedTransactions->sum('cwhtaxamount');
             $grandTotal = $subtotal + $totalVat + $totalWht;
             // dd($this->selectedVendor);
             // Buat invoice baru
@@ -592,20 +589,20 @@ class PurchaseInvoice extends Component
 
             // Update transaksi dengan invoice_id
             Transaction::whereIn('id', $this->selectedTransactionIds)->update([
-                'invoice_id' => $invoice->id,
-                'is_invoiced' => true,
+                'purchasing_id' => $invoice->id,
+                'is_purchasing' => true,
 
             ]);
             foreach ($selectedTransactions as $transaction) {
                 $invoice->transactions()->attach($transaction->id, [
-                    'amountInvoice' => $transaction->samountidr,
-                    'amountInvoiceUsd' => $transaction->sfcyamount,
+                    'amountInvoice' => $transaction->camountidr,
+                    'amountInvoiceUsd' => $transaction->cfcyamount,
                     'quantityInvoice'   => $transaction->quantity,
-                    'vatInvoice'        => $transaction->svatgstamount,
-                    'vatInvoiceUsd'     => $transaction->svatgstusd,
-                    'whtInvoice'        => $transaction->swhtaxamount,
-                    'whtInvoiceUsd'     => $transaction->shwtaxrateusd,
-                    'exchangeRate'      => $transaction->srate,
+                    'vatInvoice'        => $transaction->cvatgstamount,
+                    'vatInvoiceUsd'     => $transaction->cvatgstusd,
+                    'whtInvoice'        => $transaction->cwhtaxamount,
+                    'whtInvoiceUsd'     => $transaction->chwtaxrateusd,
+                    'exchangeRate'      => $transaction->crate,
                     'remarks' => $transaction->description,
                 ]);
             }
@@ -615,20 +612,20 @@ class PurchaseInvoice extends Component
                 $costCoa = ChartOfAccount::find($transaction->coa_cost_id);
 
                 // Jurnal Penjualan (Revenue)
-                if ($transaction->samountidr && $saleCoa && $transaction->transactionClient) {
-                    $saleAmount = $transaction->samountidr;
-                    $vatAmount  = $transaction->svatgstamount;
-                    $whtAmount  = $transaction->swhtaxamount;
+                if ($transaction->camountidr && $saleCoa && $transaction->transactionsVendor) {
+                    $saleAmount = $transaction->camountidr;
+                    $vatAmount  = $transaction->cvatgstamount;
+                    $whtAmount  = $transaction->cwhtaxamount;
                     $totalSale  = $saleAmount + $vatAmount - $whtAmount;
 
                     // Piutang (A/R) - Debit
                     JournalEntry::create([
                         'transaction_id'      => $transaction->id,
-                        'coa_id'              => $transaction->transactionClient->coa_id,
+                        'coa_id'              => $transaction->transactionsVendor->coa_id,
                         'invoice_id'           => $invoice->id,
                         'debit'               => $totalSale,
                         'credit'              => 0,
-                        'description'         => "Piutang dari transaksi #{$transaction->transactionClient->name} ({$transaction->job->job_id}) - {$transaction->description}",
+                        'description'         => "Piutang dari transaksi #{$transaction->transactionsVendor->name} ({$transaction->job->job_id}) - {$transaction->description}",
                         'transactionable_type' => get_class($transaction),
                         'transactionable_id'  => $transaction->id,
                         'date'                => now(),
@@ -640,7 +637,7 @@ class PurchaseInvoice extends Component
                         JournalEntry::create([
                             'transaction_id'      => $transaction->id,
                             'coa_id'              => $transaction->saleVat->coa_id,
-                            'invoice_id'             => $invoice->id,
+                            'invoice_id'          => $invoice->id,
                             'debit'               => 0,
                             'credit'              => $vatAmount,
                             'description'         => "PPN dari transaksi #{$transaction->job->job_id} - {$transaction->description}",
@@ -716,7 +713,7 @@ class PurchaseInvoice extends Component
         try {
             // Ambil transaksi yang dipilih dan belum di-invoice
             $selectedTransactions = Transaction::whereIn('id', $this->selectedTransactionIds)
-                ->whereNull('invoice_id')
+                ->whereNull('purchasing_id')
                 ->get();
 
             if ($selectedTransactions->isEmpty()) {
@@ -748,8 +745,8 @@ class PurchaseInvoice extends Component
 
             // Update transaksi dengan invoice_id
             Transaction::whereIn('id', $this->selectedTransactionIds)->update([
-                'invoice_id' => $invoice->id,
-                'is_invoiced' => true,
+                'purchasing_id' => $invoice->id,
+                'is_purchasing' => true,
             ]);
             foreach ($selectedTransactions as $transaction) {
                 $invoice->transactions()->attach($transaction->id, [

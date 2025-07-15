@@ -39,12 +39,10 @@ class ViewShipment extends Component
             session()->flash('error', 'Error deleting shipment: ' . $e->getMessage());
         }
     }
-    public function refreshTransaction($id)
+    public function refreshTransaction()
     {
 
         $this->refreshKey = now()->timestamp;
-        $this->loadShipment($id); // cukup panggil method ini, tidak perlu cari ulang shipment ID
-
     }
 
     public function loadShipment($id)

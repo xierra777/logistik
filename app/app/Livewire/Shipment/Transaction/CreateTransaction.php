@@ -190,7 +190,7 @@ class CreateTransaction extends Component
         ]);
 
 
-        $this->createJournalEntries($transaction);
+        // $this->createJournalEntries($transaction);
         $this->reset();
         $this->dispatch('transactionSaved');
         $this->dispatch('close-modal');

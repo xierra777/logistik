@@ -1,4 +1,4 @@
-<div class="max-w-full mx-auto p-6 bg-gradient-to-br from-cyan-50 via-purple-50 to-blue-50 min-h-screen" x-init="reinitSelect2()">
+<div class="max-w-full mx-auto p-6 bg-gradient-to-br from-rose-50 via-purple-50 to-blue-50 min-h-screen" x-init="reinitSelect2()">
     <!-- Header -->
     <div class="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl p-8 mb-8 border border-purple-100">
         <div class="flex items-center justify-between">
@@ -28,28 +28,21 @@
                 <div class="relative">
                     <input type="text"
                         wire:model.live="invoice_number"
-                        class="w-full bg-purple-50 py-1.5 pr-8 pl-3 border-2 border-purple-200 rounded-md focus:border-purple-400 focus:bg-white transition-all duration-300 outline-none placeholder-purple-300"
+                        class="w-full py-1.5 pr-8 pl-3  bg-purple-50 border-2 border-purple-200  rounded-xl focus:border-purple-400 focus:bg-white transition-all duration-300 outline-none placeholder-purple-300"
                         placeholder="INV-2025-001">
                     <i class="fas fa-hashtag absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-400"></i>
                 </div>
             </div>
 
-            <!-- Vendors -->
+            <!-- Client -->
             <div class="flex flex-col space-y-2">
-                <label class="text-purple-700 font-semibold text-sm">Vendors</label>
+                <label class="text-purple-700 font-semibold text-sm">Client</label>
                 <div wire:ignore>
-                    <select name="vendors" id="vendorPurchasingInvoicing" class="w-full py-1.5 pr-8 pl-3 bg-teal-50 border-2 border-teal-200 rounded-xl focus:border-teal-400 focus:bg-white transition-all duration-300 outline-none appearance-none" wire:model.live="selectedVendor">
+                    <select name="clientSellingInvoice" id="clientSellingInvoice" class="w-full py-1.5 pr-8 pl-3 bg-teal-50 border-2 border-teal-200 rounded-xl focus:border-teal-400 focus:bg-white transition-all duration-300 outline-none appearance-none" wire:model.live="selectedClient">
                         <option value=""></option>
-                        @foreach($vendors as $vndr)
-                        <option value="{{$vndr->id}}">
-                            {{$vndr->name}}
-                            ({{$vndr->total_transactions}} transaksi, {{$vndr->uninvoiced_transactions}} belum invoice)
-                            @if($vndr->uninvoiced_transactions > 0)
-                            ⚠️
-                            @endif
-                        </option>
+                        @foreach($client as $cl)
+                        <option value="{{$cl->id}}">{{$cl->name}}</option>
                         @endforeach
-
                     </select>
                 </div>
             </div>
@@ -60,8 +53,9 @@
                 <label class="text-purple-700 font-semibold text-sm">MAWB NO</label>
                 @else
                 <label class="text-purple-700 font-semibold text-sm">MBL NO</label>
-                @endif <div class="bg-amber-50 rounded-xl py-1.5 pr-8 pl-3 border-2 border-amber-200">
-                    <span class="text-amber-700 font-semibold">{{$job->jobBillLadingNo ?? '-'}}</span>
+                @endif
+                <div class=" py-1.5 pr-8 pl-3  bg-amber-50 rounded-xl p-3 border-2 border-amber-200">
+                    <span class="text-amber-700 font-semibold">{{$shipment->job->jobBillLadingNo ?? '-'}}</span>
                 </div>
             </div>
 
@@ -95,13 +89,13 @@
     </div>
 
     <!-- Transaction Summary -->
-    @if($jobId && $selectedVendor && $transactions->isNotEmpty())
+    @if($job && $job->client && $transactions->isNotEmpty())
     <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 mb-8 border border-purple-100 hover:shadow-xl transition-all duration-300">
         <h3 class="text-2xl font-bold text-purple-700 mb-6 flex items-center">
             <i class="fas fa-list-alt mr-3 text-purple-500"></i>
             Uninvoiced Transactions
         </h3>
-        <!-- {{$transactions}} -->
+
         <div class="overflow-x-auto rounded-2xl border-2 border-purple-100">
             <table class="w-full">
                 <thead>
@@ -142,12 +136,12 @@
                         </td>
                         <td class="p-4 text-gray-700 text-center">{{ $transaction->description ?? '' }}</td>
                         <td class="p-4 text-gray-700 text-center">{{ $transaction->quantity ?? '' }}</td>
-                        <td class="p-4 text-gray-700 text-center">{{ $transaction->ccurrency ?? '' }}</td>
-                        <td class="p-4 text-gray-700 text-center">{{ number_format($transaction->camountidr ?? 0, 2, ',', '.') }}</td>
-                        <td class="p-4 text-gray-700 text-center">{{ number_format($transaction->cvatgstamount ?? 0, 2, ',', '.') }}</td>
-                        <td class="p-4 text-gray-700 text-center">{{ number_format($transaction->cwhtaxamount ?? 0, 2, ',', '.') }}</td>
+                        <td class="p-4 text-gray-700 text-center">{{ $transaction->scurrency ?? '' }}</td>
+                        <td class="p-4 text-gray-700 text-center">{{ number_format($transaction->samountidr ?? 0, 2, ',', '.') }}</td>
+                        <td class="p-4 text-gray-700 text-center">{{ number_format($transaction->svatgstamount ?? 0, 2, ',', '.') }}</td>
+                        <td class="p-4 text-gray-700 text-center">{{ number_format($transaction->swhtaxamount ?? 0, 2, ',', '.') }}</td>
                         <td class="p-4 font-bold text-purple-700 text-center">
-                            {{ number_format(($transaction->camountidr ?? 0) + ($transaction->cvatgstamount ?? 0) + ($transaction->cwhtaxamount ?? 0), 2, ',', '.') }}
+                            {{ number_format(($transaction->samountidr ?? 0) + ($transaction->svatgstamount ?? 0) + ($transaction->swhtaxamount ?? 0), 2, ',', '.') }}
                         </td>
                     </tr>
                     @endforeach
@@ -156,11 +150,11 @@
                     <tr class="bg-gradient-to-r from-emerald-100 to-teal-100 font-bold">
                         <td class="p-4 rounded-bl-2xl"></td>
                         <td colspan="3" class="p-4 text-right text-emerald-800">Total</td>
-                        <td class="p-4 text-emerald-800 text-center">{{ number_format($transactions->sum('camountidr') ?? 0, 2, ',', '.') }}</td>
-                        <td class="p-4 text-emerald-800 text-center">{{ number_format($transactions->sum('cvatgstamount') ?? 0, 2, ',', '.') }}</td>
-                        <td class="p-4 text-emerald-800 text-center">{{ number_format($transactions->sum('cwhtaxamount') ?? 0, 2, ',', '.') }}</td>
+                        <td class="p-4 text-emerald-800 text-center">{{ number_format($transactions->sum('samountidr') ?? 0, 2, ',', '.') }}</td>
+                        <td class="p-4 text-emerald-800 text-center">{{ number_format($transactions->sum('svatgstamount') ?? 0, 2, ',', '.') }}</td>
+                        <td class="p-4 text-emerald-800 text-center">{{ number_format($transactions->sum('swhtaxamount') ?? 0, 2, ',', '.') }}</td>
                         <td class="p-4 font-bold text-emerald-800 text-center rounded-br-2xl">
-                            {{ number_format(($transactions->sum('camountidr') ?? 0) + ($transactions->sum('cvatgstamount') ?? 0) + ($transactions->sum('cwhtaxamount') ?? 0), 2, ',', '.') }}
+                            {{ number_format(($transactions->sum('samountidr') ?? 0) + ($transactions->sum('svatgstamount') ?? 0) + ($transactions->sum('swhtaxamount') ?? 0), 2, ',', '.') }}
                         </td>
                     </tr>
                 </tfoot>
@@ -182,7 +176,7 @@
                     <div>
                         <p class="text-blue-600 font-semibold text-sm">Subtotal</p>
                         <p class="text-2xl font-bold text-blue-800">
-                            IDR {{ number_format($transactions->whereIn('id', $selectedTransactionIds)->sum('camountidr') ?? 0, 2, ',', '.') }}
+                            IDR {{ number_format($transactions->whereIn('id', $selectedTransactionIds)->sum('samountidr') ?? 0, 2, ',', '.') }}
                         </p>
                     </div>
                     <i class="fas fa-coins text-3xl text-blue-400"></i>
@@ -194,7 +188,7 @@
                     <div>
                         <p class="text-emerald-600 font-semibold text-sm">VAT</p>
                         <p class="text-2xl font-bold text-emerald-800">
-                            IDR {{ number_format($transactions->whereIn('id', $selectedTransactionIds)->sum('cvatgstamount') ?? 0, 2, ',', '.') }}
+                            IDR {{ number_format($transactions->whereIn('id', $selectedTransactionIds)->sum('svatgstamount') ?? 0, 2, ',', '.') }}
                         </p>
                     </div>
                     <i class="fas fa-percent text-3xl text-emerald-400"></i>
@@ -206,7 +200,7 @@
                     <div>
                         <p class="text-amber-600 font-semibold text-sm">WHT</p>
                         <p class="text-2xl font-bold text-amber-800">
-                            IDR {{ number_format($transactions->whereIn('id', $selectedTransactionIds)->sum('cwhtaxamount') ?? 0, 2, ',', '.') }}
+                            IDR {{ number_format($transactions->whereIn('id', $selectedTransactionIds)->sum('swhtaxamount') ?? 0, 2, ',', '.') }}
                         </p>
                     </div>
                     <i class="fas fa-receipt text-3xl text-amber-400"></i>
@@ -218,7 +212,7 @@
                     <div>
                         <p class="text-purple-600 font-semibold text-sm">Total</p>
                         <p class="text-2xl font-bold text-purple-800">
-                            IDR {{ number_format(($transactions->whereIn('id', $selectedTransactionIds)->sum('camountidr') ?? 0) + ($transactions->whereIn('id', $selectedTransactionIds)->sum('cvatgstamount') ?? 0) + ($transactions->whereIn('id', $selectedTransactionIds)->sum('cwhtaxamount') ?? 0), 2, ',', '.') }}
+                            IDR {{ number_format(($transactions->whereIn('id', $selectedTransactionIds)->sum('samountidr') ?? 0) + ($transactions->whereIn('id', $selectedTransactionIds)->sum('svatgstamount') ?? 0) + ($transactions->whereIn('id', $selectedTransactionIds)->sum('swhtaxamount') ?? 0), 2, ',', '.') }}
                         </p>
                     </div>
                     <i class="fas fa-money-check-alt text-3xl text-purple-400"></i>
@@ -306,7 +300,6 @@
                 <thead>
                     <tr class="bg-gradient-to-r from-purple-100 to-pink-100">
                         <th class="p-4 text-purple-700 font-semibold text-center rounded-tl-2xl">No</th>
-                        <th class="p-4 text-purple-700 font-semibold text-center">Vendor Name</th>
                         <th class="p-4 text-purple-700 font-semibold text-center">Invoice Number</th>
                         <th class="p-4 text-purple-700 font-semibold text-center">Status</th>
                         <th class="p-4 text-purple-700 font-semibold text-center">Due Date</th>
@@ -318,10 +311,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($purchasingInvoice as $invs)
+                    @foreach($invoicesIssued as $invs)
                     <tr class="border-b border-purple-100 hover:bg-purple-50 transition-all duration-200">
                         <td class="p-4 text-center text-gray-700">{{ $loop->iteration }}</td>
-                        <td class="p-4  text-gray-700 font-semibold">{{ $invs->client->name ?? '' }}</td>
                         <td class="p-4 text-center text-gray-700 font-semibold">{{ $invs->invoice_number ?? '' }}</td>
                         <td class="p-4 text-center whitespace-nowrap">
                             @if($invs->status === 'issued')
@@ -361,7 +353,7 @@
                         </td>
                         <td class="p-4 text-center text-gray-700">{{ $invs->invoice_date ?? '' }}</td>
                         <td class="p-4 text-center text-gray-700">
-                            {{ optional($invs->transactions->first())->ccurrency ?? '' }}
+                            {{ optional($invs->transactions->first())->scurrency ?? '' }}
                         </td>
                         <td class="p-4 text-center text-gray-700 font-semibold">{{ number_format($invs->total_amount ?? 0, 2, ',', '.') }}</td>
                         <td class="p-4 text-center text-gray-700">{{$invs->users->name ?? ''}}</td>
@@ -670,10 +662,10 @@
 
     <!-- Back Button -->
     <div class="flex justify-end">
-        <a href="{{ route('viewJob', $jobId) }}"
+        <a href="{{ route('viewShipment', $shipmentId) }}"
             class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center space-x-2">
             <i class="fas fa-arrow-left"></i>
-            <span>Back to Job</span>
+            <span>Back to Shipment</span>
         </a>
     </div>
 </div>
@@ -760,9 +752,9 @@
 <script>
     window.reinitSelect2 = () => {
         [{
-            sel: '#vendorPurchasingInvoicing',
-            model: 'selectedVendor',
-            placeholder: 'Select Vendor  '
+            sel: '#clientSellingInvoice',
+            model: 'selectedClient',
+            placeholder: 'Select Client  '
         }, ].forEach(({
             sel,
             model,

@@ -5,7 +5,7 @@
             <div>
                 <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
                     <i class="fas fa-file-invoice-dollar mr-3 text-purple-500"></i>
-                    Sale Invoice
+                    Purchase Invoice
                 </h1>
             </div>
             <div class="bg-gradient-to-r from-purple-200 to-pink-200 rounded-full p-4 animate-pulse">
@@ -56,7 +56,7 @@
 
             <!-- HAWB -->
             <div class="flex flex-col space-y-2">
-                @if(in_array($job->type_job, ['air_inbound', 'air_outbound', 'domestics_transport']))
+                @if(in_array($shipment->shipmentType_job, ['air_inbound', 'air_outbound', 'domestics_transport']))
                 <label class="text-purple-700 font-semibold text-sm">MAWB NO</label>
                 @else
                 <label class="text-purple-700 font-semibold text-sm">MBL NO</label>
@@ -95,7 +95,7 @@
     </div>
 
     <!-- Transaction Summary -->
-    @if($jobId && $selectedVendor && $transactions->isNotEmpty())
+    @if($shipmentId && $selectedVendor && $transactions->isNotEmpty())
     <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 mb-8 border border-purple-100 hover:shadow-xl transition-all duration-300">
         <h3 class="text-2xl font-bold text-purple-700 mb-6 flex items-center">
             <i class="fas fa-list-alt mr-3 text-purple-500"></i>
@@ -670,7 +670,7 @@
 
     <!-- Back Button -->
     <div class="flex justify-end">
-        <a href="{{ route('viewJob', $jobId) }}"
+        <a href="{{ route('viewShipment', $shipmentId) }}"
             class="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center space-x-2">
             <i class="fas fa-arrow-left"></i>
             <span>Back to Job</span>

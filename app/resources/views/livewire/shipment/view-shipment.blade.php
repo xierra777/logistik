@@ -7,128 +7,128 @@
     <div class="grid grid-cols-1 md:grid-cols-3 shadow-lg">
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Shipment No </p>
-            <p class="text-center px-4 py-2"> {{ $shipments->shipment_id }}</p>
+            <p class="text-center px-4 py-2"> {{ $shipment->shipment_id }}</p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Shipment Date</p>
-            <p class="text-center font-bold px-4 py-2"> {{ $shipments->dataShipments['shipmentBillLadingDate'] ?? '-' }}</p>
+            <p class="text-center font-bold px-4 py-2"> {{ $shipment->dataShipments['shipmentBillLadingDate'] ?? '-' }}</p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Client </p>
-            <p class="text-center px-4 py-2 font-bold"> {{ $shipments->client->name ?? '-' }}</p>
+            <p class="text-center px-4 py-2 font-bold"> {{ $shipment->client->name ?? '-' }}</p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Type Job </p>
-            <p class="text-center px-4 py-2"> {{ strtoupper(str_replace('_', ' ', $shipments->shipmentsTypeJob)) }}</p>
+            <p class="text-center px-4 py-2"> {{ strtoupper(str_replace('_', ' ', $shipment->shipmentsTypeJob)) }}</p>
         </div>
         <div class="flex flex-col"> <!-- Disini Custome  -->
             <p class="text-center bg-gray-300 px-3 py-1">Customer Code Job </p>
-            <p class="text-center font-bold px-4 py-2"> {{ $shipments->dataShipments['customerCodeJob'] ?? '-' }}</p>
+            <p class="text-center font-bold px-4 py-2"> {{ $shipment->dataShipments['customerCodeJob'] ?? '-' }}</p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Freight </p>
-            <p class="text-center px-4 py-2"> {{ strtoupper($shipments->dataShipments['shipmentFreightTypeJob'] ?? '-') }}</p>
+            <p class="text-center px-4 py-2"> {{ strtoupper($shipment->dataShipments['shipmentFreightTypeJob'] ?? '-') }}</p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Shipper </p>
-            <p class="text-center px-4 py-2 font-bold"> {{ $shipments->shipper->name ?? '-' }}</p>
+            <p class="text-center px-4 py-2 font-bold"> {{ $shipment->shipper->name ?? '-' }}</p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Consignee </p>
-            <p class="text-center px-4 py-2 font-bold"> {{ $shipments->consignee->name ?? '-' }}</p>
+            <p class="text-center px-4 py-2 font-bold"> {{ $shipment->consignee->name ?? '-' }}</p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Notify </p>
-            <p class="text-center px-4 py-2 font-bold"> {{ $shipments->notify->name ?? '-' }}</p>
+            <p class="text-center px-4 py-2 font-bold"> {{ $shipment->notify->name ?? '-' }}</p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Carrier </p>
-            <p class="text-center px-4 py-2 font-bold"> {{ $shipments->carrierModel->name ?? '-' }}</p>
+            <p class="text-center px-4 py-2 font-bold"> {{ $shipment->carrierModel->name ?? '-' }}</p>
         </div>
 
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Port of Loading </p>
             <p class="text-center px-4 py-2">
-                {{$shipments->dataShipments['shipmentPort_of_loading'] ?? 'No'}}
+                {{$shipment->dataShipments['shipmentPort_of_loading'] ?? 'No'}}
             </p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Place of Receipt </p>
             <p class="text-center px-4 py-2">
-                {{$shipments->dataShipments['shipmentPlace_of_receipt'] ?? ''}}
+                {{$shipment->dataShipments['shipmentPlace_of_receipt'] ?? ''}}
             </p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Place of delivery </p>
             <p class="text-center px-4 py-2">
-                {{$shipments->dataShipments['shipmentPlace_of_delivery'] ?? ''}}
+                {{$shipment->dataShipments['shipmentPlace_of_delivery'] ?? ''}}
             </p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Port of Receipt </p>
             <p class="text-center px-4 py-2">
-                {{$shipments->dataShipments['shipmentPort_of_loading'] ?? ''}}
+                {{$shipment->dataShipments['shipmentPort_of_loading'] ?? ''}}
             </p>
         </div>
 
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Port of Discharge </p>
             <p class="text-center px-4 py-2">
-                {{$shipments->dataShipments['shipmentPort_of_discharge'] ?? ''}}
+                {{$shipment->dataShipments['shipmentPort_of_discharge'] ?? ''}}
             </p>
         </div>
         <div class=<div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Port of Final </p>
             <p class="text-center px-4 py-2">
-                {{$shipments->dataShipments['shipmentPort_of_final'] ?? ''}}
+                {{$shipment->dataShipments['shipmentPort_of_final'] ?? ''}}
             </p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Remarks </p>
             <p class="text-center text-red-500 px-4 py-2">
-                {{$shipments->dataShipments['shipmentRemarksJobDetailJobs'] ?? ''}}
+                {{$shipment->dataShipments['shipmentRemarksJobDetailJobs'] ?? ''}}
             </p>
         </div>
         <!-- Tentuin Jobnya air apa ocean -->
-        @if($shipments->job)
+        @if($shipment->job)
         <div class="col-span-3 border bg-sky-300 border-gray-300 mt-3">
             <div class="grid grid-cols-1 md:grid-cols-3 ">
                 <div class="flex flex-col">
                     <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">Job No </p>
                     <p class="text-center text-red-500 border font-bold text-md border-gray-900 px-4 py-2">
-                        <a href="{{  $shipments->job ? route('viewJob', ['id' => $shipments->job->id]) : '#' }}"> {{$shipments->job->job_id ?? '-'}} / {{ $shipments->job->created_at->format('d-M-Y') }}
+                        <a href="{{  $shipment->job ? route('viewJob', ['id' => $shipment->job->id]) : '#' }}"> {{$shipment->job->job_id ?? '-'}} / {{ $shipment->job->created_at->format('d-M-Y') }}
                         </a>
                     </p>
                 </div>
                 <div class="flex flex-col">
                     <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">Vessel Code </p>
                     <p class="text-center border border-gray-900 px-4 py-2">
-                        {{$shipments->job->data['flightVesselName'] ?? '-'}} {{$shipments->job->data['flightVesselNo']}}
+                        {{$shipment->job->data['flightVesselName'] ?? '-'}} {{$shipment->job->data['flightVesselNo']}}
                     </p>
                 </div>
                 <div class="flex flex-col">
                     <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">Carrier</p>
                     <p class="text-center border  border-gray-900 px-4 py-2">
-                        {{$shipments->job->carrierModel->name ?? '-'}}
+                        {{$shipment->job->carrierModel->name ?? '-'}}
                     </p>
                 </div>
 
                 <div class="flex flex-col">
                     <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">MBL No</p>
                     <p class="text-center border font-bold text-md border-gray-900 px-4 py-2">
-                        {{$shipments->job->jobBillLadingNo ?? '-'}}
+                        {{$shipment->job->jobBillLadingNo ?? '-'}}
                     </p>
                 </div>
                 <div class="flex flex-col">
                     <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">ETD</p>
                     <p class="text-center border border-gray-900 px-4 py-2">
-                        {{ optional(optional($shipments->job)->data['estimedelivery'] ? \Carbon\Carbon::parse($shipments->job->data['estimedelivery']) : null)->format('d-M-Y') ?? '-' }}
+                        {{ optional(optional($shipment->job)->data['estimedelivery'] ? \Carbon\Carbon::parse($shipment->job->data['estimedelivery']) : null)->format('d-M-Y') ?? '-' }}
                     </p>
                 </div>
                 <div class="flex flex-col">
                     <p class="text-center border border-gray-900 text-gray-900 px-3 py-1">ETA</p>
                     <p class="text-center  border  border-gray-900 px-4 py-2">
-                        {{ optional(optional($shipments->job)->data['estimearrival'] ? \Carbon\Carbon::parse($shipments->job->data['estimearrival']) : null)->format('d-M-Y') ?? '-' }}
+                        {{ optional(optional($shipment->job)->data['estimearrival'] ? \Carbon\Carbon::parse($shipment->job->data['estimearrival']) : null)->format('d-M-Y') ?? '-' }}
                     </p>
                 </div>
             </div>
@@ -148,25 +148,25 @@
         <div class="grid grid-cols-1 md:grid-cols-3 shadow-lg">
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">Vessel Name </p>
-                <p class="text-center px-4 py-2">{{ $shipments->dataShipments['shipmentFlightVesselName'] ?? '-' }}
+                <p class="text-center px-4 py-2">{{ $shipment->dataShipments['shipmentFlightVesselName'] ?? '-' }}
                 </p>
             </div>
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">Voyage </p>
-                <p class="text-center px-4 py-2"> {{ $shipments->dataShipments['shipmentFlightVesselNo'] ?? '-' }}</p>
+                <p class="text-center px-4 py-2"> {{ $shipment->dataShipments['shipmentFlightVesselNo'] ?? '-' }}</p>
             </div>
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">Carrier </p>
-                <p class="text-center px-4 py-2"> {{ $shipments->carrierModel->name ?? '-' }}</p>
+                <p class="text-center px-4 py-2"> {{ $shipment->carrierModel->name ?? '-' }}</p>
             </div>
             <!-- i -->
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">MBL </p>
-                <p class="text-center px-4 py-2"> {{ $shipments->job->data['jobBillLadingNo'] ?? '-' }}</p>
+                <p class="text-center px-4 py-2"> {{ $shipment->job->data['jobBillLadingNo'] ?? '-' }}</p>
             </div>
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">MBL Date </p>
-                <p class="text-center px-4 py-2"> {{ $shipments->job->data['jobBillLadingDate'] ?? '-' }}</p>
+                <p class="text-center px-4 py-2"> {{ $shipment->job->data['jobBillLadingDate'] ?? '-' }}</p>
             </div>
             <div class="flex flex-col">
 
@@ -174,11 +174,11 @@
             <!-- Ini khusus HBL atau HAWB luar  -->
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">HBL </p>
-                <p class="text-center px-4 py-2"> {{ $shipments->job->job_id ?? '-' }}</p>
+                <p class="text-center px-4 py-2"> {{ $shipment->job->job_id ?? '-' }}</p>
             </div>
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">HBL Date </p>
-                <p class="text-center px-4 py-2"> {{ $shipments->job->d ?? '-' }}</p>
+                <p class="text-center px-4 py-2"> {{ $shipment->job->d ?? '-' }}</p>
             </div>
             <div class="flex flex-col w-40">
 
@@ -187,26 +187,26 @@
 
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">ETA / Estimate Time Arrival </p>
-                <p class="text-center px-4 py-2"> {{ isset($shipments->dataShipments['shipmentEstimearrival']) ? \Carbon\Carbon::parse($shipments->dataShipments['shipmentEstimearrival'])->format('l, d F Y H:i'	) : '-' }}</p>
+                <p class="text-center px-4 py-2"> {{ isset($shipment->dataShipments['shipmentEstimearrival']) ? \Carbon\Carbon::parse($shipment->dataShipments['shipmentEstimearrival'])->format('l, d F Y H:i'	) : '-' }}</p>
             </div>
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">ETD / Estimate Time Departure </p>
                 <p class="text-center px-4 py-2">
-                    {{ isset($shipments->dataShipments['shipmentEstimedelivery']) ? \Carbon\Carbon::parse($shipments->dataShipments['shipmentEstimedelivery'])->format('l, d F Y H:i'	) : '-' }}
+                    {{ isset($shipment->dataShipments['shipmentEstimedelivery']) ? \Carbon\Carbon::parse($shipment->dataShipments['shipmentEstimedelivery'])->format('l, d F Y H:i'	) : '-' }}
                 </p>
             </div>
 
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">Services Type </p>
-                <p class="text-center uppercase px-4 py-2"> {{ strtoupper($shipments->dataShipments['shipmentServices_type'] ?? '-') }}</p>
+                <p class="text-center uppercase px-4 py-2"> {{ strtoupper($shipment->dataShipments['shipmentServices_type'] ?? '-') }}</p>
             </div>
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">Cross Trade </p>
-                <p class="text-center px-4 py-2 uppercase"> {{ $shipments->dataShipments['shipmentCross_trade'] }}</p>
+                <p class="text-center px-4 py-2 uppercase"> {{ $shipment->dataShipments['shipmentCross_trade'] }}</p>
             </div>
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">Inco Terms </p>
-                <p class="text-center uppercase px-4 py-2"> {{ strtoupper($shipments->dataShipments['shipmentIncoTerms'] ?? '-') }}</p>
+                <p class="text-center uppercase px-4 py-2"> {{ strtoupper($shipment->dataShipments['shipmentIncoTerms'] ?? '-') }}</p>
             </div>
         </div>
     </div>
@@ -301,8 +301,8 @@
         <div class="bg-blue-600 rounded-t-lg mt-4 ">
             <p class="text-center mt-4 p-3  font-bold">Containers</p>
         </div>
-        <div x-data="{ openContainer: false }"
-            @close-create-container.window="openContainer = false">
+        <div x-data="{ openContainer: false }" x-init="initContainerSelect2()"
+            @close-create-container.window=" openContainer=false">
             <div class="flex justify-end p-3">
                 <button @click="openContainer = true" class="py-3 px-4 bg-green-600 text-white rounded-lg">
                     Add Container
@@ -337,23 +337,28 @@
                     <form wire:submit.prevent="createContainer">
                         <div class="p-3">
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                <!-- Left Column -->
-                                <div class="flex flex-col space-y-2">
-                                    <label>Container Release No.</label>
-                                    <input type="text" placeholder="Enter Container No " wire:model="containerReleaseNo"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                    @error('container_size')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                                @if($shipment->job->TjobContainer->isNotEmpty())
+                                <div class="flex flex-col space-y-2 col-span-2" wire:ignore>
+                                    <label>Container No</label>
+                                    <select id="parentContainer" wire:model="parentContainer" class="rounded-md border-gray-300 shadow-sm">
+                                        <option value=""></option>
+                                        @foreach($shipment->job->TjobContainer as $cont)
+                                        <option value="{{ $cont->id }}">{{ $cont->containers['containerNo'] }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
-                                <div class="flex flex-col space-y-2">
-                                    <label>Release date</label>
-                                    <input type="date" wire:model="containerReleaseDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                    @error('')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                                @else
+                                <div class="flex flex-col space-y-2 col-span-2">
+                                    <label>Container No</label>
+                                    <input type="text" wire:model="parentContainer" class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring focus:ring-blue-200">
                                 </div>
+                                @endif
                                 <div class="col-span-2"></div>
+
                                 <!-- Package Info -->
                                 <div class="flex flex-col space-y-2">
                                     <label>No Of Packages</label>
-                                    <input type="text" wire:model="noOfPackages" placeholder="Enter No Of Packages"
+                                    <input type="text" wire:model="shipmentNoOfPackages" placeholder="Enter No Of Packages"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                 </div>
                                 <div class="flex flex-col space-y-2" wire:ignore>
@@ -374,12 +379,7 @@
                                         <option value="BALES">Bales</option>
                                     </select>
                                 </div>
-                                <div class="flex flex-col space-y-2">
-                                    <label>No of Pallet</label>
-                                    <input type="text" placeholder="Enter No Of Pallet" wire:model="noOfPallet"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                </div>
-                                <div></div>
+
                                 <div class="flex flex-col space-y-2">
                                     <label>Gross Weight</label>
                                     <input type="text" placeholder="Enter Gross weight" wire:model="grossWeight"
@@ -392,18 +392,7 @@
                                         <option value="KGS">KGS</option>
                                     </select>
                                 </div>
-                                <div class="flex flex-col space-y-2">
-                                    <label>Net Of Weight</label>
-                                    <input type="text" placeholder="Enter Net Of Weight" wire:model="netOfWeight"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                </div>
-                                <div class="flex flex-col space-y-2" wire:ignore>
-                                    <label>Type Of Net Of Weight</label>
-                                    <select id="typeNetOfWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
-                                        <option value=""></option>
-                                        <option value="KGS">KGS</option>
-                                    </select>
-                                </div>
+
                                 <!-- Weight Info -->
                                 <div class="flex flex-col space-y-2">
                                     <label>Volume Weight</label>
@@ -418,52 +407,39 @@
                                     </select>
                                 </div>
                                 <div class="flex flex-col space-y-2">
-                                    <label>Total Weight</label>
-                                    <input type="text" placeholder="Enter Net Of Weight" wire:model="totalWeight"
+                                    <label>Volume </label>
+                                    <input type="text" wire:model="volume" placeholder="Enter Gross weight"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                 </div>
                                 <div class="flex flex-col space-y-2" wire:ignore>
-                                    <label>Type Of Weight</label>
-                                    <select id="typeOfTotalWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                    <label>Type Of Volume </label>
+                                    <select id="typeOfVolume" class="block w-full rounded-md border-gray-300 shadow-sm">
                                         <option value=""></option>
                                         <option value="KGS">KGS</option>
                                     </select>
                                 </div>
-
-                                <!-- Volume Weight Info -->
-
-
                                 <!-- Volume Info -->
-                                <div class="flex flex-col space-y-2">
-                                    <label>Volume</label>
-                                    <div class="flex">
-                                        <input type="text" wire:model="volume" placeholder="Enter volume"
-                                            class="block w-full rounded-l-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                        <span class="inline-flex items-center px-3 border border-l-0 border-gray-300 bg-gray-100 text-gray-600 rounded-r-md">
-                                            CBM
-                                        </span>
-                                    </div>
-                                </div>
+
                                 <div class="flex flex-col space-y-2">
                                     <label>Chargeable Weight</label>
-                                    <input type="text" placeholder="Enter Chargeable Weight" wire:model="chargableWeight"
+                                    <input type="text" placeholder="Enter Chargeable Weight" wire:model="shipmentChargableWeight"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                 </div>
 
                                 <div class="flex flex-col space-y-2">
                                     <label>HS Code</label>
-                                    <input type="text" placeholder="Enter HS Code" wire:model="hsCode"
+                                    <input type="text" placeholder="Enter HS Code" wire:model="shipmentHsCode"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                 </div>
                                 <div></div>
                                 <div class="flex flex-col space-y-2 col-span-2">
                                     <label>Remarks</label>
-                                    <textarea placeholder="Enter remarks" rows="3" wire:model="containerRemarks"
+                                    <textarea placeholder="Enter remarks" rows="3" wire:model="shipmentContainerRemarks"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
                                 </div>
                                 <div class="flex flex-col space-y-2 col-span-2">
                                     <label>HS Description</label>
-                                    <textarea placeholder="Enter Hs Description" rows="3" wire:model="hsCodeDesc"
+                                    <textarea placeholder="Enter Hs Description" rows="3" wire:model="shipmentHsCodeDesc"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200"></textarea>
                                 </div>
                             </div>
@@ -505,16 +481,20 @@
                     </tr>
                 </thead>
                 <tbody class="">
-                    @forelse($shipments->container as $c)
+                    @forelse($shipment->container as $c)
                     <tr>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $loop->iteration  * 10 }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            @if($c->jobContainer)
                             {{$c->jobContainer->containers['containerNo'] ?? ''}}
+                            @else
+                            {{$c->containersData['shipmentContainerNo']}}
+                            @endif
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{$c->jobContainer->containers['shipmentNoOfPackages'] ?? ''}} {{$c->jobContainer->containers['shipmentTypeOfPackages'] ?? ''}}
+                            {{$c->containersData['shipmentNoOfPackages']}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$c->containersData['shipmentGrossWeight'] ?? ''}} {{$c->containersData['shipmentTypeOfGrossWeight'] ?? ''}}
@@ -524,7 +504,7 @@
                         </td>
 
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            <a href="{{ url('view-shipment/' . $shipments->id . '/container-shipment/' . $c->id) }}"
+                            <a href="{{ url('view-shipment/' . $shipment->id . '/container-shipment/' . $c->id) }}"
                                 class="inline-block py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg
                                          transition duration-200 ease-in-out hover:bg-cyan-400 hover:scale-110">
                                 <i class="fa-regular fa-file"></i> See Attachment
@@ -567,8 +547,8 @@
                         <div class="flex-1"></div> <!-- Spacer kiri -->
                         <p class="font-bold  text-center">TRANSACTION</p>
                         <div class="flex-1 flex justify-end gap-2">
-                            <a href="{{route('saleInvoice', ['shipmentId' => $shipments->id])}}" class="py-2 px-3 bg-green-600 text-white rounded-lg text-sm">Print Invoice</a>
-                            <a href="{{route('purchaseInvoice', ['shipmentId' => $shipments->id])}}" class="py-2 px-3 bg-red-600 text-white rounded-lg text-sm">Print PI</a>
+                            <a href="{{route('saleInvoice', ['shipmentId' => $shipment->id])}}" class="py-2 px-3 bg-green-600 text-white rounded-lg text-sm">Print Invoice</a>
+                            <a href="{{route('purchaseInvoice', ['shipmentId' => $shipment->id])}}" class="py-2 px-3 bg-red-600 text-white rounded-lg text-sm">Print PI</a>
                             <button @click="open = true; $wire.refreshTransaction()" class="py-2 px-3 bg-blue-600 text-white rounded-lg text-sm">Add Cost</button>
 
                         </div>
@@ -603,8 +583,8 @@
                             </div>
                             <!-- Form -->
                             <livewire:shipment.transaction.create-transaction
-                                :id="$shipments->id"
-                                :key="'transaction' . $shipments->id . '-' . now()->timestamp" />
+                                :id="$shipment->id"
+                                :key="'transaction' . $shipment->id . '-' . now()->timestamp" />
                         </div>
                     </div>
                 </div>
@@ -659,18 +639,34 @@
                     </tr>
                 </thead>
                 <tbody class="">
-                    @forelse($shipments->shipmentTransaction as $transaction)
+                    @forelse($shipment->shipmentTransaction as $transaction)
                     <tr>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $loop->iteration }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            <button
-                                type="button"
-                                @click="$dispatch('confirm-delete', { get_id: {{ $transaction->id }} })"
-                                class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
-                                Delete
-                            </button>
+                            <div x-data>
+                                <button
+                                    class="px-3 py-2 bg-red-600 text-white rounded-full hover:scale-105 hover:bg-red-700 transition-transform"
+                                    @click="
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'You won\'t be able to revert this!',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d8',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!',
+                        cancelButtonText: 'No, Keep it',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $wire.confirmDelete({{ $transaction->id }});
+                        }
+                    })
+                ">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $transaction->description }}
@@ -682,7 +678,7 @@
                             {{$transaction->transactionClient->name ?? ''}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->quantity }} x {{$transaction->samount_qty}}x{{$transaction->srate}}
+                            {{ $transaction->quantity }} x {{number_format($transaction->sfcyamount, 2, ',', '.')}}x{{$transaction->srate}}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ number_format($transaction->samountidr, 2, ',', '.') }}
@@ -695,7 +691,8 @@
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             @if($transaction->camountidr && $transaction->camountidr != 0)
-                            {{ $transaction->quantity }} x {{$transaction->camount_qty}}x{{$transaction->crate}}
+                            {{ $transaction->quantity }} x {{ number_format($transaction->cfcyamount, 2, ',', '.') }}
+                            x {{$transaction->crate}}
                             @else
                             -
                             @endif
@@ -753,3 +750,358 @@
         </a>
     </div>
 </div>
+@push('script')
+@script()
+<script>
+    window.initContainerSelect2 = () => {
+        // Configuration for all select elements
+        const selectConfigs = [{
+                sel: '#containerType',
+                model: 'containerType',
+                placeholder: 'Select Container Type'
+            }, {
+                sel: '#parentContainer',
+                model: 'parentContainer',
+                placeholder: 'Select Parent'
+            }, {
+                sel: '#typeOfPackages',
+                model: 'shipmentTypeOfPackages',
+                placeholder: 'Select Package Type'
+            },
+            {
+                sel: '#typeOfGrossWeight',
+                model: 'shipmentTypeOfGrossWeight',
+                placeholder: 'Select Weight Unit'
+            },
+            {
+                sel: '#typeOfVolume',
+                model: 'shipmentVolume',
+                placeholder: 'Select Volume  Unit'
+            },
+            {
+                sel: '#typeOfVolumeWeight',
+                model: 'shipmentTypeOfVolumeWeight',
+                placeholder: 'Select Volume Weight Unit'
+            }, {
+                sel: '#typeNetOfWeight',
+                model: 'shipmentTypeNetOfWeight',
+                placeholder: 'Select Net Weight Unit'
+            }, {
+                sel: '#typeOfTotalWeight',
+                model: 'shipmentTypeOfTotalWeight',
+                placeholder: 'Select Total Weight Unit'
+            }
+        ];
+
+        selectConfigs.forEach(({
+            sel,
+            model,
+            placeholder
+        }) => {
+            const $el = $(sel);
+            if (!$el.length) return;
+
+            // Destroy existing Select2 if it exists
+            if ($el.hasClass('select2-hidden-accessible')) {
+                $el.select2('destroy');
+            }
+
+            // Initialize Select2 with modal-friendly settings
+            $el.select2({
+                placeholder: placeholder,
+                allowClear: true,
+                width: '100%',
+                theme: 'tailwindcss-3',
+                dropdownParent: $el.closest('.fixed'),
+                dropdownAutoWidth: false,
+                escapeMarkup: function(markup) {
+                    return markup;
+                },
+                // Prevent Select2 from focusing on search input
+                selectOnClose: false,
+                // Prevent dropdown from closing modal
+                closeOnSelect: true
+            });
+
+            // IMPORTANT: Remove all previous event handlers to prevent duplicates
+            $el.off('select2:select.container select2:unselect.container select2:open.container select2:close.container');
+
+            // Handle Select2 events with debouncing to prevent multiple triggers
+            let updateTimeout;
+            $el.on('select2:select.container select2:unselect.container', function(e) {
+                e.stopPropagation(); // Prevent event bubbling
+
+                clearTimeout(updateTimeout);
+                updateTimeout = setTimeout(() => {
+                    const value = $(this).val();
+                    if (typeof $wire !== 'undefined' && $wire[model] !== undefined) {
+                        // Use Livewire's set method without triggering full refresh
+                        $wire.set(model, value, false); // false = don't trigger refresh
+                    }
+                    console.log(`${model} changed to:`, value);
+                }, 100);
+            });
+
+            // Prevent modal from closing when dropdown opens
+            $el.on('select2:open.container', function(e) {
+                e.stopPropagation();
+                // Ensure dropdown is positioned correctly
+                const dropdown = $('.select2-dropdown');
+                // dropdown.css('z-index', '9999');
+            });
+
+            // Handle dropdown close
+            $el.on('select2:close.container', function(e) {
+                e.stopPropagation();
+            });
+
+            // Sync with Livewire property if it exists (without triggering events)
+            if (typeof $wire !== 'undefined' && $wire[model] !== undefined) {
+                $el.val($wire[model]).trigger('change.select2');
+            }
+        });
+    };
+
+    // Initialize when document is ready
+    $(document).ready(function() {
+        // Initialize Select2 when modal opens with proper timing
+        $(document).on('click', '[x-on\\:click="openCreateContainer = true"]', function(e) {
+            e.stopPropagation();
+            // Wait for modal to fully render
+            setTimeout(function() {
+                if ($('.fixed').is(':visible')) {
+                    window.initContainerSelect2();
+                }
+            }, 400); // Increased delay for better reliability
+        });
+
+        // Enhanced Alpine.js integration
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('containerForm', () => ({
+                openCreateContainer: false,
+                init() {
+                    this.$watch('openCreateContainer', (value) => {
+                        if (value) {
+                            // Delay initialization until modal is fully rendered
+                            this.$nextTick(() => {
+                                setTimeout(() => {
+                                    window.initContainerSelect2();
+                                }, 300);
+                            });
+                        } else {
+                            // Clean up Select2 when modal closes
+                            this.$nextTick(() => {
+                                $('.select2-hidden-accessible').each(function() {
+                                    $(this).select2('destroy');
+                                });
+                            });
+                        }
+                    });
+                }
+            }));
+        });
+    });
+
+    // Enhanced Livewire hooks with better error handling
+    if (typeof Livewire !== 'undefined') {
+        // Preserve Select2 state during Livewire updates
+        let preservedValues = {};
+        let isFormReset = false;
+
+        // Before Livewire request (preserve state)
+        Livewire.hook('message.sent', (message, component) => {
+            // Check if this is a form reset/creation request
+            isFormReset = message.updates.some(update =>
+                update.type === 'callMethod' &&
+                (update.payload.method === 'createContainer' ||
+                    update.payload.method === 'resetContainerFields' ||
+                    update.payload.method === 'cancelContainer')
+            );
+
+            if (!isFormReset) {
+                preservedValues = {};
+                ['#containerType', '#typeOfPackages', '#typeOfGrossWeight',
+                    '#typeOfVolumeWeight', '#typeNetOfWeight', '#typeOfTotalWeight'
+                ].forEach(sel => {
+                    const $el = $(sel);
+                    if ($el.length && $el.hasClass('select2-hidden-accessible')) {
+                        preservedValues[sel] = $el.val();
+                    }
+                });
+            }
+        });
+
+        // After Livewire response (restore state or reset)
+        Livewire.hook('message.processed', (message, component) => {
+            setTimeout(() => {
+                // Only reinitialize if modal is still open
+                if ($('.fixed').is(':visible')) {
+                    window.initContainerSelect2();
+
+                    if (isFormReset) {
+                        // Reset all Select2 values to empty
+                        ['#containerType', '#typeOfPackages', '#typeOfGrossWeight',
+                            '#typeOfVolumeWeight', '#typeNetOfWeight', '#typeOfTotalWeight'
+                        ].forEach(sel => {
+                            const $el = $(sel);
+                            if ($el.length && $el.hasClass('select2-hidden-accessible')) {
+                                $el.val(null).trigger('change.select2');
+                            }
+                        });
+                    } else {
+                        // Restore preserved values
+                        Object.keys(preservedValues).forEach(sel => {
+                            const $el = $(sel);
+                            if ($el.length && preservedValues[sel]) {
+                                $el.val(preservedValues[sel]).trigger('change.select2');
+                            }
+                        });
+                    }
+                }
+                preservedValues = {};
+                isFormReset = false;
+            }, 200);
+        });
+
+        // Handle specific element updates
+        Livewire.hook('element.updated', (el, component) => {
+            if (el.matches('select') || el.querySelector('select')) {
+                setTimeout(() => {
+                    if ($('.fixed').is(':visible')) {
+                        window.initContainerSelect2();
+                    }
+                }, 150);
+            }
+        });
+
+        // Listen for close-create-container event to reset Select2
+        Livewire.on('close-create-container', () => {
+            setTimeout(() => {
+                ['#containerType', '#typeOfPackages', '#typeOfGrossWeight',
+                    '#typeOfVolumeWeight', '#typeNetOfWeight', '#typeOfTotalWeight'
+                ].forEach(sel => {
+                    const $el = $(sel);
+                    if ($el.length && $el.hasClass('select2-hidden-accessible')) {
+                        $el.val(null).trigger('change.select2');
+                    }
+                });
+            }, 100);
+        });
+    }
+
+    // Manual initialization function with safety checks
+    window.forceInitContainerSelect2 = () => {
+        setTimeout(() => {
+            if ($('.fixed').is(':visible')) {
+                window.initContainerSelect2();
+            }
+        }, 100);
+    };
+
+    // Global click handler to prevent modal closing
+    $(document).on('click', '.select2-dropdown', function(e) {
+        e.stopPropagation();
+    });
+
+    // Prevent modal background clicks when Select2 is open
+    $(document).on('select2:open', function(e) {
+        $('.fixed.inset-0.bg-gray-500').css('pointer-events', 'none');
+    });
+
+    $(document).on('select2:close', function(e) {
+        $('.fixed.inset-0.bg-gray-500').css('pointer-events', 'auto');
+    });
+</script>
+@endscript
+@endpush
+
+<script>
+    window.addEventListener('swal', event => {
+        let data;
+        // Handle both array and object
+        if (Array.isArray(event.detail)) {
+            data = event.detail[0]; // Ambil element pertama jika array
+        } else {
+            data = event.detail; // Gunakan langsung jika object
+        }
+        // console.log('Processed data:', data);
+        if (data && data.title) {
+            Swal.fire({
+                title: data.title,
+                text: data.text,
+                icon: data.icon,
+                confirmButtonText: data.confirmButtonText || 'OK'
+            });
+        } else {
+            // console.error('Invalid data structure:', data);
+        }
+    });
+    // Fungsi untuk restore scroll position
+    function restoreScrollPosition() {
+        const savedPosition = sessionStorage.getItem('scrollPosition');
+        if (savedPosition) {
+            const scrollTo = parseInt(savedPosition);
+
+            // Cek apakah halaman sudah cukup tinggi untuk di-scroll
+            const checkAndScroll = () => {
+                if (document.body.scrollHeight > scrollTo) {
+                    window.scrollTo({
+                        top: scrollTo,
+                        behavior: 'auto'
+                    });
+                    sessionStorage.removeItem('scrollPosition');
+                    return true;
+                }
+                return false;
+            };
+
+            // Coba scroll langsung
+            if (!checkAndScroll()) {
+                // Kalau belum bisa, tunggu sebentar lagi
+                setTimeout(() => {
+                    if (!checkAndScroll()) {
+                        // Terakhir, tunggu sampai semua image/content load
+                        const images = document.querySelectorAll('img');
+                        let loadedImages = 0;
+
+                        if (images.length === 0) {
+                            checkAndScroll();
+                        } else {
+                            images.forEach(img => {
+                                if (img.complete) {
+                                    loadedImages++;
+                                } else {
+                                    img.onload = () => {
+                                        loadedImages++;
+                                        if (loadedImages === images.length) {
+                                            checkAndScroll();
+                                        }
+                                    };
+                                }
+                            });
+
+                            if (loadedImages === images.length) {
+                                checkAndScroll();
+                            }
+                        }
+                    }
+                }, 200);
+            }
+        }
+    }
+
+    // Jalankan setelah DOM ready
+    document.addEventListener('DOMContentLoaded', restoreScrollPosition);
+
+    // Backup: jalankan juga setelah window load
+    window.addEventListener('load', function() {
+        // Cek lagi kalau belum ter-scroll
+        setTimeout(restoreScrollPosition, 100);
+    });
+
+    // Simpan scroll position sebelum navigasi
+    function saveScrollPosition() {
+        sessionStorage.setItem('scrollPosition', window.scrollY);
+    }
+    // ===== KODE YANG BENAR =====
+</script>

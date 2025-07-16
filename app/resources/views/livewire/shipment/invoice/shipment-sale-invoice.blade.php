@@ -49,7 +49,7 @@
 
             <!-- HAWB -->
             <div class="flex flex-col space-y-2">
-                @if(in_array($job->type_job, ['air_inbound', 'air_outbound', 'domestics_transport']))
+                @if(in_array($shipment->shipmentType_job, ['air_inbound', 'air_outbound', 'domestics_transport']))
                 <label class="text-purple-700 font-semibold text-sm">MAWB NO</label>
                 @else
                 <label class="text-purple-700 font-semibold text-sm">MBL NO</label>
@@ -89,7 +89,7 @@
     </div>
 
     <!-- Transaction Summary -->
-    @if($job && $job->client && $transactions->isNotEmpty())
+    @if($shipment && $shipment->client && $transactions->isNotEmpty())
     <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 mb-8 border border-purple-100 hover:shadow-xl transition-all duration-300">
         <h3 class="text-2xl font-bold text-purple-700 mb-6 flex items-center">
             <i class="fas fa-list-alt mr-3 text-purple-500"></i>

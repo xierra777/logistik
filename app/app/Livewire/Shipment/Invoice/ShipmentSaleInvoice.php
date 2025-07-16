@@ -19,7 +19,7 @@ use Livewire\Attributes\On;
 class ShipmentSaleInvoice extends Component
 {
     public $shipmentId, $invoiceId, $isVoiding;
-    public $job;
+    public $shipment;
     public $customer, $void_reason, $selectedClient;
     public $id_job;
     public $transactions;
@@ -44,7 +44,7 @@ class ShipmentSaleInvoice extends Component
             $this->invoice_number = $this->generateInvoiceNumber();
         }
 
-        $this->job = TShipments::findOrFail($shipmentId);
+        $this->shipment = TShipments::findOrFail($shipmentId);
         $this->client = Customer::select([
             'customers.id',
             'customers.name',
@@ -73,7 +73,7 @@ class ShipmentSaleInvoice extends Component
             $this->purchasingInvoice = collect();
             // session()->flash('error', 'Please select a vendor to view transactions.');
 
-            // Optional: Show all uninvoiced transactions for the job
+            // Optional: Show all uninvoiced transactions for the shipment
             /*
             $this->transactions = Transaction::where('id_job', $this->shipmentId)
                 ->whereNull('invoice_id')
@@ -82,7 +82,7 @@ class ShipmentSaleInvoice extends Component
                 ->where('type_invoice', 'Purchasing')
                 ->get();
             if ($this->transactions->isEmpty()) {
-                session()->flash('error', 'No uninvoiced transactions found for this job.');
+                session()->flash('error', 'No uninvoiced transactions found for this shipment.');
             }
             */
         }
@@ -192,20 +192,20 @@ class ShipmentSaleInvoice extends Component
             $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
 
             // Jurnal Penjualan (Revenue)
-            if ($transaction->camountidr && $saleCoa && $transaction->transactionVendor) {
-                $saleAmount = $transaction->camountidr;
-                $vatAmount  = $transaction->cvatgstamount;
-                $whtAmount  = $transaction->cwhtaxamount;
+            if ($transaction->samountidr && $saleCoa && $transaction->transactionClient) {
+                $saleAmount = $transaction->samountidr;
+                $vatAmount  = $transaction->svatgstamount;
+                $whtAmount  = $transaction->swhtaxamount;
                 $totalSale  = $saleAmount + $vatAmount - $whtAmount;
 
                 // Piutang (A/R) - Debit
                 JournalEntry::create([
                     'transaction_id'      => $transaction->id,
-                    'coa_id'              => $transaction->transactionVendor->coa_id,
+                    'coa_id'              => $transaction->transactionClient->coa_id,
                     'invoice_id'           => $invoice->id,
                     'debit'               => $totalSale,
                     'credit'              => 0,
-                    'description'         => "HUTANG dari transaksi #{$transaction->transactionVendor->name} ({$transaction->job->shipment_id}) - {$transaction->description}",
+                    'description'         => "PIUTANG dari transaksi #{$transaction->transactionClient->name} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
                     'transactionable_type' => get_class($transaction),
                     'transactionable_id'  => $transaction->id,
                     'date'                => now(),
@@ -220,7 +220,7 @@ class ShipmentSaleInvoice extends Component
                         'invoice_id'             => $invoice->id,
                         'debit'               => 0,
                         'credit'              => $vatAmount,
-                        'description'         => "HUTANG PPN dari transaksi #{$transaction->job->shipment_id} - {$transaction->description}",
+                        'description'         => "PIUTANG PPN dari transaksi #{$transaction->shipment->shipment_id} - {$transaction->description}",
                         'transactionable_type' => get_class($transaction),
                         'transactionable_id'  => $transaction->id,
                         'date'                => now(),
@@ -236,7 +236,7 @@ class ShipmentSaleInvoice extends Component
                         'invoice_id'          => $invoice->id,
                         'debit'               => $whtAmount,
                         'credit'              => 0,
-                        'description'         => "HUTANG PPh 23 dari transaksi #{$transaction->job->shipment_id} - {$transaction->description}",
+                        'description'         => "PIUTANG PPh 23 dari transaksi #{$transaction->shipment->shipment_id} - {$transaction->description}",
                         'transactionable_type' => get_class($transaction),
                         'transactionable_id'  => $transaction->id,
                         'date'                => now(),
@@ -251,7 +251,7 @@ class ShipmentSaleInvoice extends Component
                     'invoice_id'             => $invoice->id,
                     'debit'               => 0,
                     'credit'              => $saleAmount,
-                    'description'         => "cost transaction #{$transaction->reference_type} ({$transaction->job->shipment_id}) - {$transaction->description}",
+                    'description'         => "cost transaction #{$transaction->reference_type} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
                     'transactionable_type' => $transaction->reference_type,
                     'transactionable_id'  => $transaction->id,
                     'date'                => now(),
@@ -355,7 +355,7 @@ class ShipmentSaleInvoice extends Component
             $invoice = Invoice::with([
                 'transactions',
                 'client',
-                'shipment.container' // atau 'job.jobContainer' sesuai nama relasi
+                'shipment.container' // atau 'shipment.jobContainer' sesuai nama relasi
             ])->findOrFail($invoiceId);
 
             // Akses langsung dari relasi yang sudah di-load
@@ -421,15 +421,15 @@ class ShipmentSaleInvoice extends Component
 
                     // PERBAIKAN: Pastikan menggunakan field yang benar dari transaction
                     $amount = $currency === 'IDR'
-                        ? (float) $trx->camountidr
+                        ? (float) $trx->samountidr
                         : (float) $trx->cfcyamount;
 
                     $vat = $currency === 'IDR'
-                        ? (float) ($trx->cvatgstamount ?? 0)
+                        ? (float) ($trx->svatgstamount ?? 0)
                         : (float) ($trx->cvatgstusd ?? 0);
 
                     $wht = $currency === 'IDR'
-                        ? (float) ($trx->cwhtaxamount ?? 0)
+                        ? (float) ($trx->swhtaxamount ?? 0)
                         : (float) ($trx->chwtaxrateusd ?? 0);
 
                     // PERBAIKAN: Kalkulasi subtotal berdasarkan qty * rate per unit
@@ -566,15 +566,15 @@ class ShipmentSaleInvoice extends Component
             }
 
             // Hitung subtotal, VAT, WHT, dan grand total
-            $subtotal   = $selectedTransactions->sum('camountidr');
-            $totalVat   = $selectedTransactions->sum('cvatgstamount');
-            $totalWht   = $selectedTransactions->sum('cwhtaxamount');
+            $subtotal   = $selectedTransactions->sum('samountidr');
+            $totalVat   = $selectedTransactions->sum('svatgstamount');
+            $totalWht   = $selectedTransactions->sum('swhtaxamount');
             $grandTotal = $subtotal + $totalVat + $totalWht;
             // dd($this->selectedClient);
             // Buat invoice baru
             $invoice = Invoice::create([
                 'invoice_number' => $this->invoice_number,
-                'shipment_id'         => $this->shipmentId,
+                'shipment_id'    => $this->shipmentId,
                 'customer_id'    => $this->selectedClient,
                 'invoice_date'   => $this->invoice_date ?? now(),
                 'due_date'       => now()->addDays(30),
@@ -589,16 +589,15 @@ class ShipmentSaleInvoice extends Component
             Transaction::whereIn('id', $this->selectedTransactionIds)->update([
                 'invoice_id' => $invoice->id,
                 'is_invoiced' => true,
-
             ]);
             foreach ($selectedTransactions as $transaction) {
                 $invoice->transactions()->attach($transaction->id, [
-                    'amountInvoice' => $transaction->camountidr,
+                    'amountInvoice' => $transaction->samountidr,
                     'amountInvoiceUsd' => $transaction->cfcyamount,
                     'quantityInvoice'   => $transaction->quantity,
-                    'vatInvoice'        => $transaction->cvatgstamount,
+                    'vatInvoice'        => $transaction->svatgstamount,
                     'vatInvoiceUsd'     => $transaction->cvatgstusd,
-                    'whtInvoice'        => $transaction->cwhtaxamount,
+                    'whtInvoice'        => $transaction->swhtaxamount,
                     'whtInvoiceUsd'     => $transaction->chwtaxrateusd,
                     'exchangeRate'      => $transaction->crate,
                     'remarks' => $transaction->description,
@@ -607,23 +606,20 @@ class ShipmentSaleInvoice extends Component
             // Buat jurnal untuk setiap transaksi
             foreach ($selectedTransactions as $transaction) {
                 $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
-                $costCoa = ChartOfAccount::find($transaction->coa_cost_id);
-
-                // Jurnal Penjualan (Revenue)
-                if ($transaction->camountidr && $saleCoa && $transaction->transactionsVendor) {
-                    $saleAmount = $transaction->camountidr;
-                    $vatAmount  = $transaction->cvatgstamount;
-                    $whtAmount  = $transaction->cwhtaxamount;
+                if ($transaction->samountidr && $saleCoa && $transaction->transactionClient) {
+                    $saleAmount = $transaction->samountidr;
+                    $vatAmount  = $transaction->svatgstamount;
+                    $whtAmount  = $transaction->swhtaxamount;
                     $totalSale  = $saleAmount + $vatAmount - $whtAmount;
 
                     // Piutang (A/R) - Debit
                     JournalEntry::create([
                         'transaction_id'      => $transaction->id,
-                        'coa_id'              => $transaction->transactionsVendor->coa_id,
+                        'coa_id'              => $transaction->transactionClient->coa_id,
                         'invoice_id'           => $invoice->id,
                         'debit'               => $totalSale,
                         'credit'              => 0,
-                        'description'         => "Piutang dari transaksi #{$transaction->transactionsVendor->name} ({$transaction->job->shipment_id}) - {$transaction->description}",
+                        'description'         => "Piutang dari transaksi #{$transaction->transactionClient->name} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
                         'transactionable_type' => get_class($transaction),
                         'transactionable_id'  => $transaction->id,
                         'date'                => now(),
@@ -638,7 +634,7 @@ class ShipmentSaleInvoice extends Component
                             'invoice_id'          => $invoice->id,
                             'debit'               => 0,
                             'credit'              => $vatAmount,
-                            'description'         => "PPN dari transaksi #{$transaction->job->shipment_id} - {$transaction->description}",
+                            'description'         => "PPN dari transaksi #{$transaction->shipment->shipment_id} - {$transaction->description}",
                             'transactionable_type' => get_class($transaction),
                             'transactionable_id'  => $transaction->id,
                             'date'                => now(),
@@ -654,7 +650,7 @@ class ShipmentSaleInvoice extends Component
                             'invoice_id'             => $invoice->id,
                             'debit'               => $whtAmount,
                             'credit'              => 0,
-                            'description'         => "PPh 23 dari transaksi #{$transaction->job->shipment_id} - {$transaction->description}",
+                            'description'         => "PPh 23 dari transaksi #{$transaction->shipment->shipment_id} - {$transaction->description}",
                             'transactionable_type' => get_class($transaction),
                             'transactionable_id'  => $transaction->id,
                             'date'                => now(),
@@ -669,7 +665,7 @@ class ShipmentSaleInvoice extends Component
                         'invoice_id'             => $invoice->id,
                         'debit'               => 0,
                         'credit'              => $saleAmount,
-                        'description'         => "Sale transaction #{$transaction->reference_type} ({$transaction->job->shipment_id}) - {$transaction->description}",
+                        'description'         => "Sale transaction #{$transaction->reference_type} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
                         'transactionable_type' => $transaction->reference_type,
                         'transactionable_id'  => $transaction->id,
                         'date'                => now(),
@@ -721,9 +717,9 @@ class ShipmentSaleInvoice extends Component
             }
 
             // Hitung subtotal, VAT, WHT, dan grand total
-            $subtotal   = $selectedTransactions->sum('camountidr');
-            $totalVat   = $selectedTransactions->sum('cvatgstamount');
-            $totalWht   = $selectedTransactions->sum('cwhtaxamount');
+            $subtotal   = $selectedTransactions->sum('samountidr');
+            $totalVat   = $selectedTransactions->sum('svatgstamount');
+            $totalWht   = $selectedTransactions->sum('swhtaxamount');
             $grandTotal = $subtotal + $totalVat + $totalWht;
             // dd($this->shipmentId);
             // Buat invoice baru
@@ -748,12 +744,12 @@ class ShipmentSaleInvoice extends Component
             ]);
             foreach ($selectedTransactions as $transaction) {
                 $invoice->transactions()->attach($transaction->id, [
-                    'amountInvoice' => $transaction->camountidr,
+                    'amountInvoice' => $transaction->samountidr,
                     'amountInvoiceUsd' => $transaction->cfcyamount,
                     'quantityInvoice'   => $transaction->quantity,
-                    'vatInvoice'        => $transaction->cvatgstamount,
+                    'vatInvoice'        => $transaction->svatgstamount,
                     'vatInvoiceUsd'     => $transaction->cvatgstusd,
-                    'whtInvoice'        => $transaction->cvatgstamount,
+                    'whtInvoice'        => $transaction->svatgstamount,
                     'whtInvoiceUsd'     => $transaction->chwtaxrateusd,
                     'remarks' => $transaction->description,
                 ]);

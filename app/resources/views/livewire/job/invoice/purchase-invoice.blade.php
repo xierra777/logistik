@@ -5,7 +5,7 @@
             <div>
                 <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
                     <i class="fas fa-file-invoice-dollar mr-3 text-purple-500"></i>
-                    Sale Invoice
+                    Purcase Invoice
                 </h1>
             </div>
             <div class="bg-gradient-to-r from-purple-200 to-pink-200 rounded-full p-4 animate-pulse">

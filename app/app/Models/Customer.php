@@ -51,8 +51,23 @@ class Customer extends Model
     {
         return $this->hasMany(customerAddress::class, 'customer_id');
     }
-    public function shipments()
+    public function shipmentsAsClient()
     {
-        return $this->hasMany(Shipment::class);
+        return $this->hasMany(TShipments::class, 'shipmentClient_id');
+    }
+
+    public function shipmentsAsShipper()
+    {
+        return $this->hasMany(TShipments::class, 'shipmentShipper_id');
+    }
+
+    public function shipmentsAsConsignee()
+    {
+        return $this->hasMany(TShipments::class, 'shipmentConsignee_id');
+    }
+
+    public function shipmentsAsNotify()
+    {
+        return $this->hasMany(TShipments::class, 'shipmentNotify_id');
     }
 }

@@ -4,7 +4,6 @@
     <!-- Liar -->
     <div class="mb-2 mt-2" wire:ignore>
         <select name="sortJournal" id="sortJournal" wire:model.live="sortJournalEntries">
-            <option value=""></option>
             <option value="all">All</option>
             <option value="true">Reverse</option>
             <option value="false">Sales</option>

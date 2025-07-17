@@ -874,11 +874,11 @@
         </div>
     </div>
     <div class="mt-4 shadow-lg ">
-        <div>
-            <div class="">
+        <div class="bg-gray-400 rounded-t-lg">
+            <div class=" ">
                 <div x-data="{ open: false }" @keydown.escape.window="open = false" @close-transaction-modal.window="open = false"
                     x-ref="modalContent">
-                    <div class="flex items-center justify-between p-3 bg-gray-400 rounded-t-lg border">
+                    <div class="flex items-center justify-between p-3 ">
                         <div class="flex-1"></div> <!-- Spacer kiri -->
                         <p class="font-bold  text-center">TRANSACTION</p>
                         <div class="flex-1 flex justify-end gap-2">
@@ -1135,7 +1135,7 @@
                     <livewire:job.transactions.edit-transactions
                         :id="$job->id"
                         :transactionId="$editingTransactionId"
-                        :key="'transaction-' . $job->id . '-' . $editingTransactionId" wire:debug />
+                        :key="'transaction-' . $job->id . '-' . $editingTransactionId" />
                 </div>
 
             </div>

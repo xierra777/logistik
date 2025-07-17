@@ -48,7 +48,7 @@ class UserList extends Component
         // Refresh data users in table
         session()->flash('message', 'User created successfully.');
         $this->resetForm();
-        $this->dispatch('close-modal');
+        // $this->dispatch('close-modal');
     }
 
     public function resetForm()

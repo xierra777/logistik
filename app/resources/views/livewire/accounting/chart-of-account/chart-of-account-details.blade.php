@@ -11,12 +11,12 @@
     <form wire:submit.prevent="{{ $isEditing ? 'update' : 'save' }}" class="mb-6">
         <div class="mb-4">
             <label class="block font-medium">Account Code</label>
-            <input type="text" wire:model="account_code" class="w-full border rounded p-2" placeholder="Masukkan kode akun">
+            <input type="text" wire:model="account_code" class="w-full border rounded-md p-2 border-gray-300" placeholder="Masukkan kode akun">
             @error('account_code') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
         <div class="mb-4">
             <label class="block font-medium">Account Name</label>
-            <input type="text" wire:model="account_name" class="w-full border rounded p-2" placeholder="Masukkan nama akun">
+            <input type="text" wire:model="account_name" class="w-full border rounded-md p-2 border-gray-300" placeholder="Masukkan nama akun">
             @error('account_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
         <div class="mb-4" wire:ignore>

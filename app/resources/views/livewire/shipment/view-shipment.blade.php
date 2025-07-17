@@ -382,7 +382,7 @@
 
                                 <div class="flex flex-col space-y-2">
                                     <label>Gross Weight</label>
-                                    <input type="text" placeholder="Enter Gross weight" wire:model="grossWeight"
+                                    <input type="text" placeholder="Enter Gross weight" wire:model="shipmentGrossWeight"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                 </div>
                                 <div class="flex flex-col space-y-2" wire:ignore>
@@ -396,7 +396,7 @@
                                 <!-- Weight Info -->
                                 <div class="flex flex-col space-y-2">
                                     <label>Volume Weight</label>
-                                    <input type="text" wire:model="volumeWeight" placeholder="Enter Gross weight"
+                                    <input type="text" wire:model="shipmentVolumeWeight" placeholder="Enter Gross weight"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                 </div>
                                 <div class="flex flex-col space-y-2" wire:ignore>
@@ -408,7 +408,7 @@
                                 </div>
                                 <div class="flex flex-col space-y-2">
                                     <label>Volume </label>
-                                    <input type="text" wire:model="volume" placeholder="Enter Gross weight"
+                                    <input type="text" wire:model="shipmentVolume" placeholder="Enter Gross weight"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                 </div>
                                 <div class="flex flex-col space-y-2" wire:ignore>
@@ -539,8 +539,8 @@
 
     </div>
     <div class="mt-4 shadow-lg ">
-        <div>
-            <div class="bg-gray-400 rounded-t-lg border">
+        <div class="bg-gray-400 rounded-t-lg">
+            <div class="">
                 <div x-data="{ open: false }" @close-modal.window="open = false"
                     x-ref="modalContent">
                     <div class="flex items-center justify-between p-3 ">
@@ -584,7 +584,7 @@
                             <!-- Form -->
                             <livewire:shipment.transaction.create-transaction
                                 :id="$shipment->id"
-                                :key="'transaction' . $shipment->id . '-' . now()->timestamp" />
+                                :key="'transaction' . $shipment->id . '-' . $refreshKey" />
                         </div>
                     </div>
                 </div>
@@ -645,7 +645,7 @@
                             {{ $loop->iteration }}
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            <div x-data>
+                            <div x-data class="gap-2">
                                 <button
                                     class="px-3 py-2 bg-red-600 text-white rounded-full hover:scale-105 hover:bg-red-700 transition-transform"
                                     @click="
@@ -665,6 +665,12 @@
                     })
                 ">
                                     <i class="fa-solid fa-trash"></i>
+                                </button>
+                                <button
+                                    type="button"
+                                    wire:click="editTransaction({{ $shipment->id }}, {{ $transaction->id }})"
+                                    class="px-3 py-2 bg-blue-500 rounded-full text-white hover:bg-blue-600 transition transform hover:scale-105">
+                                    <i class="fa-solid fa-pen-to-square"></i>
                                 </button>
                             </div>
                         </td>
@@ -749,6 +755,59 @@
             Back
         </a>
     </div>
+    @if($isEditing)
+    <div x-data="{ show: false }">
+        <div wire:loading
+            wire:target="saveTransaction,editTransaction"
+            class="fixed inset-0 bg-black bg-opacity-30 z-50 items-center justify-center">
+            <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+            <span class="ml-4 text-white text-lg font-medium">TUNGGU SEBENTAR...</span>
+        </div> {{-- Backdrop --}}
+        <div
+            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
+            x-data="{ show: false }"
+            x-init="setTimeout(() => show = true, 50)"
+            x-show="show"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0" x-cloak>
+
+            <div
+                class="bg-white rounded-2xl w-full  mx-4 shadow-2xl transform"
+                x-show="show"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 scale-95 translate-y-4"
+                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                x-transition:leave-end="opacity-0 scale-95 translate-y-4" x-cloak>
+                {{-- Modal Header --}}
+                <div class="flex justify-between items-center p-4 border-b">
+                    <h2 class="text-lg font-semibold text-gray-800">Costing</h2>
+                    <button wire:click="closeEditTransaction"
+                        class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                {{-- Form --}}
+                <div wire:ignore>
+                    <livewire:shipment.transaction.edit-transaction
+                        :id="$shipment->id"
+                        :transactionId="$editingTransactionId"
+                        :key="'transaction-' . $shipment->id . '-' . $refreshKey" />
+                </div>
+
+            </div>
+        </div>
+    </div>
+    @endif
 </div>
 @push('script')
 @script()
@@ -756,10 +815,6 @@
     window.initContainerSelect2 = () => {
         // Configuration for all select elements
         const selectConfigs = [{
-                sel: '#containerType',
-                model: 'containerType',
-                placeholder: 'Select Container Type'
-            }, {
                 sel: '#parentContainer',
                 model: 'parentContainer',
                 placeholder: 'Select Parent'

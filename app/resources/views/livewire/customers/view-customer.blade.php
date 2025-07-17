@@ -1,3 +1,4 @@
+@section('title', 'View Customer')
 <div class="p-4">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -27,8 +28,10 @@
                     <td class="border px-4 py-2 font-semibold">Web</td>
                     <td class="border px-4 py-2">{{ $customer->web }}</td>
                     <td class="border px-4 py-2 font-semibold">Roles</td>
-                    <td class="border px-4 py-2">
-                        {{ is_array($customer->roles) ? implode(', ', $customer->roles) : $customer->roles }}
+                    <td class="border px-4 py-2 uppercase">
+                        {{ is_array($customer->roles) 
+                            ? implode(', ', array_map(fn($role) => str_replace('_', ' ', $role), $customer->roles)) 
+                            : str_replace('_', ' ', $customer->roles) }}
                     </td>
                 </tr>
             </tbody>
@@ -38,14 +41,14 @@
 
         <div class="mt-3">
             <div class="border border-1 border-gray-300 rounded-md mt-5">
-                <h2 class="text-lg font-semibold  border-collapse border border-1 p-2 border-cyan-300 bg-cyan-400 rounded-t-md">Accounting</h2>
+                <h2 class="text-lg font-semibold border border-1 p-2 border-cyan-300 bg-cyan-400 rounded-t-md">Accounting</h2>
                 <table class="w-full border border-gray-300">
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="border border-gray-300 px-4 py-2">Account Code</th>
                             <th class="border border-gray-300 px-4 py-2">Account Name</th>
                             <th class="border border-gray-300 px-4 py-2">Term Type</th>
-                            <th class="border border-gray-300 px-4 py-2">See More</th>
+                            <th class="border border-gray-300 px-4 py-2">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -54,9 +57,12 @@
                             <td class="border border-gray-300 px-4 py-2">{{ $customer->chartOfAccount->account_name ?? ''}}</td>
                             <td class="border border-gray-300 px-4 py-2">{{ $customer->chartOfAccount->term_type ?? ''}}</td>
                             <td class="border border-gray-300 px-4 py-2">
-                                <a href="{{ route('chartOfAccount')}}">
-                                    See More
+                                <a
+                                    href="{{ route('chartOfAccount') }}"
+                                    class="inline-block px-3 py-2 bg-cyan-400 rounded-md hover:rounded-xl transform hover:scale-105 transition duration-150">
+                                    Chart of Account
                                 </a>
+
                             </td>
 
                         </tr>
@@ -67,15 +73,14 @@
 
         <div class="mt-3">
             <div class="border border-1 border-gray-300 rounded-md mb-2">
-                <h2 class="text-lg font-semibold border-collapse border border-1 p-2 border-cyan-300 bg-cyan-400 rounded-t-md">Address</h2>
+                <div class="flex justify-between border border-1 p-2 border-cyan-300 bg-cyan-400 rounded-t-md">
+                    <h2 class="text-lg font-semibold border-collapse ">Address</h2>
+                    <button @click="openCreateContainer = true" class="py-1 px-2 bg-green-600 text-white rounded-lg">
+                        Add Address
+                    </button>
+                </div>
                 <div x-data="{ openCreateContainer: false }"
                     @close-create-container.window="openCreateContainer = false">
-
-                    <div class="flex justify-end p-3">
-                        <button @click="openCreateContainer = true" class="py-3 px-4 bg-green-600 text-white rounded-lg">
-                            Add Address
-                        </button>
-                    </div>
                     <div x-cloak x-show="openCreateContainer"
                         x-transition:enter="transition ease-out duration-300 delay-150"
                         x-transition:enter-start=" opacity-0"

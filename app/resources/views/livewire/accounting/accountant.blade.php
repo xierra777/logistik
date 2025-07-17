@@ -117,7 +117,7 @@
             </a>
         </div>
         <div class="p-4 bg-white dark:bg-gray-800 border-gray-200 border shadow-md rounded-lg flex flex-col items-center text-center">
-            <a href="{{route('accountant.list')}}">
+            <a href="{{route('paymentTrans')}}">
 
                 <h1 class="text-2xl font-bold mb-4">Payment List</h1>
                 <div class="flex items-center space-x-4 ">

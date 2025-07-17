@@ -16,9 +16,14 @@ class ViewShipment extends Component
     public $organizationFields = [];
     public $refreshKey = null;
     public $shipmentNoOfPackages, $shipmentGrossWeight, $shipmentVolumeWeight, $shipmentVolume, $shipmentChargableWeight, $ShipmentHsCode, $shipmentContainerRemarks, $shipmentHsCodeDesc, $shipmentTypeOfVolumeWeight, $shipmentTypeOfGrossWeight, $shipmentTypeOfPackages, $typeOfShipmentVolume, $shipmentHsCode, $parentContainer;
+    public $isEditing = false;
+    public $editingTransactionId, $editingShipmentId;
+
 
     protected $listeners = [
         'transactionSaved' => 'refreshShipment',
+        'close-modal' => 'closeEditTransaction',
+
     ];
     public function mount($id)
     {
@@ -31,6 +36,16 @@ class ViewShipment extends Component
             'Notify Party' => 'notify.addresses',
 
         ];
+    }
+    public function editTransaction($shipmentId, $transactionId)
+    {
+        $this->isEditing = true;
+        $this->editingTransactionId = $transactionId;
+        $this->editingShipmentId = $shipmentId;
+    }
+    public function closeEditTransaction()
+    {
+        $this->isEditing = false;
     }
     public function confirmDelete($get_id)
     {
@@ -72,7 +87,7 @@ class ViewShipment extends Component
     public function createContainer()
     {
         $container = [
-            'shipmentNoOfPackages'           => $this->shipmentNoOfPackages,
+            'shipmentNoOfPackages'         => $this->shipmentNoOfPackages,
             'shipmentGrossWeight'          => $this->shipmentGrossWeight,
             'shipmentVolumeWeight'         => $this->shipmentVolumeWeight,
             'shipmentVolume'               => $this->shipmentVolume,

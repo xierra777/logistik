@@ -16,6 +16,11 @@ class PaymentTransaction extends Component
     {
         $ransaction = Transaction::with('shipment', 'job');
         $this->customers = Invoice::with('shipment.shipmentTransaction', 'job.jobTransactions')->get();
+        // dd($this->customers->map(fn($c) => [
+        //     'invoice_id' => $c->id,
+        //     'job_id' => $c->id_job,
+        //     'has_job' => $c->job !== null,
+        // ]));
     }
     public function render()
     {

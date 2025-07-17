@@ -45,12 +45,12 @@
                                 <select name="" id="">
                                     <option value=""></option>
                                     @foreach($customers as $customer)
-                                    @foreach($customer->shipment->shipmentTransaction as $tx)
-                                    <option value="{{ $tx->id }}">[Shipment] {{ $tx->transactionClient->name }}</option>
+                                    @foreach($customer->shipment->shipmentTransaction ?? [] as $tx)
+                                    <option value="{{ $tx->id }}">[Shipment] {{ $tx->transactionClient->name }} / {{$customer->shipment->shipment_id}}</option>
                                     @endforeach
 
-                                    @foreach($customer->job->jobTransactions ?? [] as $tx)
-                                    <option value="{{ $tx->id }}">[Job] {{ $tx->sclient }}</option>
+                                    @foreach($customer->job->jobTransactions ?? [] as $trx)
+                                    <option value="{{ $trx->id }}">[Job] {{ $trx->transactionClient->name }} / {{$customer->job->job_id}}</option>
                                     @endforeach
                                     @endforeach
 

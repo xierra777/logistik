@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Livewire\Job\Invoice;
+namespace App\Livewire\Shipment\Invoice;
 
 use App\Models\ChartOfAccount;
 use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\JournalEntry;
-use App\Models\TJob;
 use App\Models\Transaction;
+use App\Models\TShipments;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -16,49 +16,150 @@ use Livewire\Component;
 use Spatie\Browsershot\Browsershot;
 use Livewire\Attributes\On;
 
-class JobSaleInvoice extends Component
+class ShipmentSaleInvoice extends Component
 {
-    public $jobId, $invoiceId, $isVoiding;
-    public $job;
-    public $customer, $void_reason;
+    public $shipmentId, $invoiceId, $isVoiding;
+    public $shipment;
+    public $customer, $void_reason, $selectedClient;
     public $id_job;
     public $transactions;
     public $selected_transactions = [];
     public array $selectedTransactionIds = [];
     public $invoice_number;
-    public $currency, $invoicesIssued;
+    public $currency, $invoicesIssued, $client;
     public $showExchangeRate = false; // Add this property
     public $finalCurrency = 'IDR'; // Add this property
     public $pdfData = '';
     public $selectAll = false;
     public $showModal = false;
     public $isIndeterminate = false, $voidReason_job_sale_invoice = false; // Tambahkan ini
+    public $purchasingInvoice;
 
 
-    public function mount($jobId)
+    public function mount($shipmentId)
     {
-        $this->jobId = $jobId;
+        $this->shipmentId = $shipmentId;
 
         if (empty($this->invoice_number)) {
             $this->invoice_number = $this->generateInvoiceNumber();
         }
 
-        $this->job = TJob::with('client')->findOrFail($jobId);
-
-        // Load job dan relasi customer
-        $this->customer = $this->job->client;
-
-        // Load transactions - this was missing!
+        $this->shipment = TShipments::findOrFail($shipmentId);
+        $this->client = Customer::select([
+            'customers.id',
+            'customers.name',
+            'customers.email'
+        ])
+            ->join('transactions', 'customers.id', '=', 'transactions.sclient')
+            ->where('transactions.id_shipment', $shipmentId)
+            ->whereNotNull('transactions.sclient')
+            ->distinct()
+            ->get();
         $this->loadTransactions();
     }
-
     public function loadTransactions()
     {
-        $this->transactions = Transaction::where('id_job', $this->jobId)
-            ->whereNull('invoice_id')
-            ->where('samountidr', '!=', 0)  // Exclude nilai 0
-            ->get();
-        $this->invoicesIssued = Invoice::where('job_id', $this->jobId)->where('type_invoice', 'SALES')->get();
+        if ($this->selectedClient) {
+            $this->transactions = Transaction::where('id_shipment', $this->shipmentId)
+                ->whereNull('invoice_id')
+                ->where('sclient', $this->selectedClient)
+                ->get();
+
+            if ($this->transactions->isEmpty()) {
+                session()->flash('error', 'No transactions found for the selected vendor.');
+            }
+        } else {
+            $this->transactions = collect();
+            $this->purchasingInvoice = collect();
+            // session()->flash('error', 'Please select a vendor to view transactions.');
+
+            // Optional: Show all uninvoiced transactions for the shipment
+            /*
+            $this->transactions = Transaction::where('id_job', $this->shipmentId)
+                ->whereNull('invoice_id')
+                ->get();
+            $this->purchasingInvoice = Invoice::where('shipment_id', $this->shipmentId)
+                ->where('type_invoice', 'Purchasing')
+                ->get();
+            if ($this->transactions->isEmpty()) {
+                session()->flash('error', 'No uninvoiced transactions found for this shipment.');
+            }
+            */
+        }
+        $this->selectedTransactionIds = [];
+    }
+
+    public function updatedSelectedClient($value)
+    {
+        $this->loadTransactions();
+        $this->updateIndeterminateState();
+    }
+    public function updatedSelectAll($value)
+    {
+
+        if ($value) {
+            $this->selectedTransactionIds = $this->transactions->pluck('id')->toArray();
+        } else {
+            $this->selectedTransactionIds = [];
+        }
+
+        $this->updatedSelectedTransactionIds();
+    }
+
+    public function generateInvoiceNumber()
+    {
+        try {
+            $prefix = "INV/BRN/" . now()->format('ym');
+
+            // Get the highest number for today using raw SQL for better performance
+            $result = DB::select("
+                SELECT invoice_number 
+                FROM invoices 
+                WHERE invoice_number LIKE ? 
+                ORDER BY CAST(SUBSTRING(invoice_number, -3) AS UNSIGNED) DESC 
+                LIMIT 1
+            ", [$prefix . '%']);
+
+            if (!empty($result)) {
+                $lastNumber = (int)substr($result[0]->invoice_number, -3);
+                $nextNumber = $lastNumber + 1;
+            } else {
+                $nextNumber = 1;
+            }
+
+            return $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        } catch (\Exception $e) {
+            // Fallback jika ada error
+            Log::error('Error generating invoice number: ' . $e->getMessage());
+            return $prefix . str_pad(1, 3, '0', STR_PAD_LEFT);
+        }
+    }
+    public function updatedSelectedTransactionIds()
+    {
+        $totalTransactions = $this->transactions->count();
+        $selectedCount = count($this->selectedTransactionIds);
+
+        if ($selectedCount === $totalTransactions && $totalTransactions > 0) {
+            $this->selectAll = true;
+        } else {
+            $this->selectAll = false;
+        }
+
+        $this->updateIndeterminateState();
+    }
+
+    public function updateIndeterminateState()
+    {
+        $selectedCount = count($this->selectedTransactionIds);
+        $totalCount = $this->transactions->count();
+
+        $this->isIndeterminate = $selectedCount > 0 && $selectedCount < $totalCount;
+    }
+
+    public function generatePDF()
+    {
+        // Add your PDF generation logic here
+        session()->flash('message', 'PDF generated successfully!');
     }
     #[On('issueInvoice')]
     public function issueInvoice($id)
@@ -83,7 +184,7 @@ class JobSaleInvoice extends Component
 
         $this->dispatch('showSuccessAlert', [
             'title' => 'Invoice Issued!',
-            'text'  => "Invoice #{$invoice->invoice_number} has been marked as issued.",
+            'text'  => "Purchase Invoice #{$invoice->invoice_number} has been marked as issued.",
             'icon'  => 'success'
         ]);
         $selectedTransactions = $invoice->transactions;
@@ -101,10 +202,10 @@ class JobSaleInvoice extends Component
                 JournalEntry::create([
                     'transaction_id'      => $transaction->id,
                     'coa_id'              => $transaction->transactionClient->coa_id,
-                    'invoice_id'             => $invoice->id,
+                    'invoice_id'           => $invoice->id,
                     'debit'               => $totalSale,
                     'credit'              => 0,
-                    'description'         => "Piutang dari transaksi #{$transaction->transactionClient->name} ({$transaction->job->job_id}) - {$transaction->description}",
+                    'description'         => "PIUTANG dari transaksi #{$transaction->transactionClient->name} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
                     'transactionable_type' => get_class($transaction),
                     'transactionable_id'  => $transaction->id,
                     'date'                => now(),
@@ -119,7 +220,7 @@ class JobSaleInvoice extends Component
                         'invoice_id'             => $invoice->id,
                         'debit'               => 0,
                         'credit'              => $vatAmount,
-                        'description'         => "PPN dari transaksi #{$transaction->job->job_id} - {$transaction->description}",
+                        'description'         => "PIUTANG PPN dari transaksi #{$transaction->shipment->shipment_id} - {$transaction->description}",
                         'transactionable_type' => get_class($transaction),
                         'transactionable_id'  => $transaction->id,
                         'date'                => now(),
@@ -132,10 +233,10 @@ class JobSaleInvoice extends Component
                     JournalEntry::create([
                         'transaction_id'      => $transaction->id,
                         'coa_id'              => $transaction->saleWht->coa_id,
-                        'invoice_id'             => $invoice->id,
+                        'invoice_id'          => $invoice->id,
                         'debit'               => $whtAmount,
                         'credit'              => 0,
-                        'description'         => "PPh 23 dari transaksi #{$transaction->job->job_id} - {$transaction->description}",
+                        'description'         => "PIUTANG PPh 23 dari transaksi #{$transaction->shipment->shipment_id} - {$transaction->description}",
                         'transactionable_type' => get_class($transaction),
                         'transactionable_id'  => $transaction->id,
                         'date'                => now(),
@@ -150,7 +251,7 @@ class JobSaleInvoice extends Component
                     'invoice_id'             => $invoice->id,
                     'debit'               => 0,
                     'credit'              => $saleAmount,
-                    'description'         => "Sale transaction #{$transaction->reference_type} ({$transaction->job->job_id}) - {$transaction->description}",
+                    'description'         => "cost transaction #{$transaction->reference_type} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
                     'transactionable_type' => $transaction->reference_type,
                     'transactionable_id'  => $transaction->id,
                     'date'                => now(),
@@ -222,6 +323,7 @@ class JobSaleInvoice extends Component
         if (Schema::hasColumn('transactions', 'invoice_id')) {
             Transaction::where('invoice_id', $invoice->id)->update([
                 'invoice_id' => null,
+                'is_invoiced' => null,
             ]);
         }
 
@@ -246,73 +348,6 @@ class JobSaleInvoice extends Component
         $this->void_reason = '';
         $this->invoiceId = null;
     }
-    public function generateInvoiceNumber()
-    {
-        try {
-            $prefix = "INV/BRN/" . now()->format('y/m/');
-
-            // Get the highest number for today using raw SQL for better performance
-            $result = DB::select("
-                SELECT invoice_number 
-                FROM invoices 
-                WHERE invoice_number LIKE ? 
-                ORDER BY CAST(SUBSTRING(invoice_number, -3) AS UNSIGNED) DESC 
-                LIMIT 1
-            ", [$prefix . '%']);
-
-            if (!empty($result)) {
-                $lastNumber = (int)substr($result[0]->invoice_number, -3);
-                $nextNumber = $lastNumber + 1;
-            } else {
-                $nextNumber = 1;
-            }
-
-            return $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
-        } catch (\Exception $e) {
-            // Fallback jika ada error
-            Log::error('Error generating invoice number: ' . $e->getMessage());
-            return $prefix . str_pad(1, 3, '0', STR_PAD_LEFT);
-        }
-    }
-
-
-    public function updatedSelectAll($value)
-    {
-        if ($value) {
-            $this->selectedTransactionIds = $this->transactions->pluck('id')->toArray();
-        } else {
-            $this->selectedTransactionIds = [];
-        }
-
-        $this->updateIndeterminateState();
-    }
-
-    public function updatedSelectedTransactionIds()
-    {
-        $totalTransactions = $this->transactions->count();
-        $selectedCount = count($this->selectedTransactionIds);
-
-        if ($selectedCount === $totalTransactions && $totalTransactions > 0) {
-            $this->selectAll = true;
-        } else {
-            $this->selectAll = false;
-        }
-
-        $this->updateIndeterminateState();
-    }
-
-    public function updateIndeterminateState()
-    {
-        $selectedCount = count($this->selectedTransactionIds);
-        $totalCount = $this->transactions->count();
-
-        $this->isIndeterminate = $selectedCount > 0 && $selectedCount < $totalCount;
-    }
-    public function generatePDF()
-    {
-        // Add your PDF generation logic here
-        session()->flash('message', 'PDF generated successfully!');
-    }
     public function previewPDF($invoiceId)
     {
         if ($invoiceId) {
@@ -320,17 +355,17 @@ class JobSaleInvoice extends Component
             $invoice = Invoice::with([
                 'transactions',
                 'client',
-                'job.TjobContainer' // atau 'job.jobContainer' sesuai nama relasi
+                'shipment.container' // atau 'shipment.jobContainer' sesuai nama relasi
             ])->findOrFail($invoiceId);
 
             // Akses langsung dari relasi yang sudah di-load
-            $job = $invoice->job;
+            $shipment = $invoice->shipment;
             $customer = $invoice->client;
 
             // Pastikan relasi ada sebelum mengakses
-            if ($job && $job->TjobContainer) {
-                $totalPcs = $job->TjobContainer->sum('noOfPackages');
-                $totalgw = $job->TjobContainer->sum('grossWeight');
+            if ($shipment && $shipment->container) {
+                $totalPcs = $shipment->container->sum('shipmentNoOfPackages');
+                $totalgw = $shipment->container->sum('shipmentGrossWeight');
             } else {
                 $totalPcs = 0;
                 $totalgw = 0;
@@ -381,21 +416,21 @@ class JobSaleInvoice extends Component
                     $currency = strtoupper(trim($this->finalCurrency));
 
                     $qty = (int) $trx->quantity;
-                    $rate = (float) ($trx->srate ?? 1);
+                    $rate = (float) ($trx->crate ?? 1);
                     // dd('Masuk ke bagian else - invoice normal', $invoice->status, $invoice->transactions->count());
 
                     // PERBAIKAN: Pastikan menggunakan field yang benar dari transaction
                     $amount = $currency === 'IDR'
                         ? (float) $trx->samountidr
-                        : (float) $trx->sfcyamount;
+                        : (float) $trx->cfcyamount;
 
                     $vat = $currency === 'IDR'
                         ? (float) ($trx->svatgstamount ?? 0)
-                        : (float) ($trx->svatgstusd ?? 0);
+                        : (float) ($trx->cvatgstusd ?? 0);
 
                     $wht = $currency === 'IDR'
                         ? (float) ($trx->swhtaxamount ?? 0)
-                        : (float) ($trx->shwtaxrateusd ?? 0);
+                        : (float) ($trx->chwtaxrateusd ?? 0);
 
                     // PERBAIKAN: Kalkulasi subtotal berdasarkan qty * rate per unit
                     // Bukan qty * amount (karena amount sudah total)
@@ -479,8 +514,8 @@ class JobSaleInvoice extends Component
             $data = [
                 'customer'             => $customer,
                 'invoice'              => $invoice,
-                'job'                  => $invoice->job,
-                'container'            => $invoice->job->TjobContainer ?? collect(), // fallback jika null
+                'shipment'             => $invoice->shipment,
+                'container'            => $shipment->container ?? collect(), // fallback jika null
                 'transactions'         => $invoice->transactions,
                 'totalPcs'             => $totalPcs,
                 'totalgw'              => $totalgw,
@@ -489,8 +524,8 @@ class JobSaleInvoice extends Component
                 'invoice_number'       => $invoice->invoice_number,
                 'showExchangeRate'     => $this->showExchangeRate,
             ];
-
-            $html = view('livewire.job.invoice.sale-invoice-pdf', $data)->render();
+            // dd($data);
+            $html = view('livewire.shipment.invoice.shipment-sale-invoice-pdf', $data)->render();
 
             $pdfContent = Browsershot::html($html)
                 ->setChromePath('/usr/bin/google-chrome')
@@ -535,12 +570,12 @@ class JobSaleInvoice extends Component
             $totalVat   = $selectedTransactions->sum('svatgstamount');
             $totalWht   = $selectedTransactions->sum('swhtaxamount');
             $grandTotal = $subtotal + $totalVat + $totalWht;
-            // dd($this->jobId);
+            // dd($this->selectedClient);
             // Buat invoice baru
             $invoice = Invoice::create([
                 'invoice_number' => $this->invoice_number,
-                'job_id'         => $this->jobId,
-                'customer_id'    => $this->customer->id,
+                'shipment_id'    => $this->shipmentId,
+                'customer_id'    => $this->selectedClient,
                 'invoice_date'   => $this->invoice_date ?? now(),
                 'due_date'       => now()->addDays(30),
                 'status'         => 'issued',
@@ -552,27 +587,25 @@ class JobSaleInvoice extends Component
 
             // Update transaksi dengan invoice_id
             Transaction::whereIn('id', $this->selectedTransactionIds)->update([
-                'invoice_id' => $invoice->id
+                'invoice_id' => $invoice->id,
+                'is_invoiced' => true,
             ]);
             foreach ($selectedTransactions as $transaction) {
                 $invoice->transactions()->attach($transaction->id, [
                     'amountInvoice' => $transaction->samountidr,
-                    'amountInvoiceUsd' => $transaction->sfcyamount,
+                    'amountInvoiceUsd' => $transaction->cfcyamount,
                     'quantityInvoice'   => $transaction->quantity,
                     'vatInvoice'        => $transaction->svatgstamount,
-                    'vatInvoiceUsd'     => $transaction->svatgstusd,
+                    'vatInvoiceUsd'     => $transaction->cvatgstusd,
                     'whtInvoice'        => $transaction->swhtaxamount,
-                    'whtInvoiceUsd'     => $transaction->shwtaxrateusd,
-                    'exchangeRate'      => $transaction->srate,
+                    'whtInvoiceUsd'     => $transaction->chwtaxrateusd,
+                    'exchangeRate'      => $transaction->crate,
                     'remarks' => $transaction->description,
                 ]);
             }
             // Buat jurnal untuk setiap transaksi
             foreach ($selectedTransactions as $transaction) {
                 $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
-                $costCoa = ChartOfAccount::find($transaction->coa_cost_id);
-
-                // Jurnal Penjualan (Revenue)
                 if ($transaction->samountidr && $saleCoa && $transaction->transactionClient) {
                     $saleAmount = $transaction->samountidr;
                     $vatAmount  = $transaction->svatgstamount;
@@ -586,7 +619,7 @@ class JobSaleInvoice extends Component
                         'invoice_id'           => $invoice->id,
                         'debit'               => $totalSale,
                         'credit'              => 0,
-                        'description'         => "Piutang dari transaksi #{$transaction->transactionClient->name} ({$transaction->job->job_id}) - {$transaction->description}",
+                        'description'         => "Piutang dari transaksi #{$transaction->transactionClient->name} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
                         'transactionable_type' => get_class($transaction),
                         'transactionable_id'  => $transaction->id,
                         'date'                => now(),
@@ -598,10 +631,10 @@ class JobSaleInvoice extends Component
                         JournalEntry::create([
                             'transaction_id'      => $transaction->id,
                             'coa_id'              => $transaction->saleVat->coa_id,
-                            'invoice_id'             => $invoice->id,
+                            'invoice_id'          => $invoice->id,
                             'debit'               => 0,
                             'credit'              => $vatAmount,
-                            'description'         => "PPN dari transaksi #{$transaction->job->job_id} - {$transaction->description}",
+                            'description'         => "PPN dari transaksi #{$transaction->shipment->shipment_id} - {$transaction->description}",
                             'transactionable_type' => get_class($transaction),
                             'transactionable_id'  => $transaction->id,
                             'date'                => now(),
@@ -617,7 +650,7 @@ class JobSaleInvoice extends Component
                             'invoice_id'             => $invoice->id,
                             'debit'               => $whtAmount,
                             'credit'              => 0,
-                            'description'         => "PPh 23 dari transaksi #{$transaction->job->job_id} - {$transaction->description}",
+                            'description'         => "PPh 23 dari transaksi #{$transaction->shipment->shipment_id} - {$transaction->description}",
                             'transactionable_type' => get_class($transaction),
                             'transactionable_id'  => $transaction->id,
                             'date'                => now(),
@@ -632,7 +665,7 @@ class JobSaleInvoice extends Component
                         'invoice_id'             => $invoice->id,
                         'debit'               => 0,
                         'credit'              => $saleAmount,
-                        'description'         => "Sale transaction #{$transaction->reference_type} ({$transaction->job->job_id}) - {$transaction->description}",
+                        'description'         => "Sale transaction #{$transaction->reference_type} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
                         'transactionable_type' => $transaction->reference_type,
                         'transactionable_id'  => $transaction->id,
                         'date'                => now(),
@@ -645,9 +678,7 @@ class JobSaleInvoice extends Component
                 'title' => 'Invoicing transaction!',
                 'icon'  => 'success',
                 'text'  => "Purchase Invoice #{$invoice->invoice_number} has been successfully invoiced.",
-            ]);
-            // session()->flash('message', 'Invoice created successfully!');
-            // Optionally redirect or reset form here
+            ]);            // Optionally redirect or reset form here
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -656,6 +687,7 @@ class JobSaleInvoice extends Component
         $this->generateInvoiceNumber();
 
         $this->loadTransactions();
+        $this->dispatch('transaction-updated');
     }
     public function saveAsDraft()
     {
@@ -663,6 +695,7 @@ class JobSaleInvoice extends Component
         $this->validate([
             'selectedTransactionIds' => 'required|array|min:1',
             'invoice_number' => 'required|string|max:255',
+            'selectedClient'  => 'required'
         ], [
             'selectedTransactionIds.required' => 'Please select at least one transaction.',
             'selectedTransactionIds.min' => 'Please select at least one transaction.',
@@ -688,12 +721,13 @@ class JobSaleInvoice extends Component
             $totalVat   = $selectedTransactions->sum('svatgstamount');
             $totalWht   = $selectedTransactions->sum('swhtaxamount');
             $grandTotal = $subtotal + $totalVat + $totalWht;
-            // dd($this->jobId);
+            // dd($this->shipmentId);
             // Buat invoice baru
+            // dd($this->selectedClient->id);
             $invoice = Invoice::create([
                 'invoice_number' => $this->invoice_number,
-                'job_id'         => $this->jobId,
-                'customer_id'    => $this->customer->id,
+                'shipment_id'         => $this->shipmentId,
+                'customer_id'    => $this->selectedClient,
                 'invoice_date'   => $this->invoice_date ?? now(),
                 'due_date'       => null,
                 'status'         => 'draft',
@@ -705,24 +739,23 @@ class JobSaleInvoice extends Component
 
             // Update transaksi dengan invoice_id
             Transaction::whereIn('id', $this->selectedTransactionIds)->update([
-                'invoice_id' => $invoice->id
+                'invoice_id' => $invoice->id,
+                'is_invoiced' => true,
             ]);
             foreach ($selectedTransactions as $transaction) {
                 $invoice->transactions()->attach($transaction->id, [
                     'amountInvoice' => $transaction->samountidr,
-                    'amountInvoiceUsd' => $transaction->sfcyamount,
+                    'amountInvoiceUsd' => $transaction->cfcyamount,
                     'quantityInvoice'   => $transaction->quantity,
                     'vatInvoice'        => $transaction->svatgstamount,
-                    'vatInvoiceUsd'     => $transaction->svatgstusd,
+                    'vatInvoiceUsd'     => $transaction->cvatgstusd,
                     'whtInvoice'        => $transaction->svatgstamount,
-                    'whtInvoiceUsd'     => $transaction->shwtaxrateusd,
+                    'whtInvoiceUsd'     => $transaction->chwtaxrateusd,
                     'remarks' => $transaction->description,
                 ]);
             }
             DB::commit();
             session()->flash('message', 'Invoice created successfully!');
-            // Optionally redirect or reset form here
-
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Failed to create invoice: ' . $e->getMessage());
@@ -732,10 +765,7 @@ class JobSaleInvoice extends Component
     }
     public function render()
     {
-        return view('livewire.job.invoice.job-sale-invoice', [
-            'job' => $this->job,
-            'customer' => $this->customer,
-            'transactions' => $this->transactions,
-        ]);
+        $this->invoicesIssued = Invoice::where('shipment_id', $this->shipmentId)->where('type_invoice', 'SALES')->get();
+        return view('livewire.shipment.invoice.shipment-sale-invoice');
     }
 }

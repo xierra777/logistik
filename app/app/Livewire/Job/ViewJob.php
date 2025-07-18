@@ -44,11 +44,6 @@ class ViewJob extends Component
     public function refreshJob()
     {
         $this->loadJob($this->job->id);
-        $this->dispatch('swal', [
-            'title' => 'Success',
-            'text' => 'Success Adding Transactions.',
-            'icon' => 'success',
-        ]);
     }
     public function refreshTransaction($id)
     {
@@ -148,18 +143,12 @@ class ViewJob extends Component
     public function editTransaction($jobId, $transactionId)
     {
         $this->isEditing = true;
-        $this->editingTransactionId = $transactionId; // Store the actual transaction ID
-        $this->editingJobId = $jobId; // You might need this too
+        $this->editingTransactionId = $transactionId;
+        $this->editingJobId = $jobId;
     }
     public function closeEditTransaction()
     {
         $this->isEditing = false;
-        // $this->dispatch('swal', [
-        //     'title' => 'Success',
-        //     'text' => 'Success Updating Transactions.',
-        //     'icon' => 'success',
-        // ]);
-        // $this->reset(['isReadonly' /* add other properties */]);
     }
     public function getAssignedShipmentsProperty()
     {

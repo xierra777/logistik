@@ -174,7 +174,7 @@
                                 {{ $inv->invoice_number }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600 dark:text-neutral-300 hover:underline hover:text-blue-900 text-center">
-                                {{ number_format($inv->total_amount , 2, ',', '.') }}
+                                Rp. {{ number_format($inv->total_amount , 2, ',', '.') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold {{$inv->status === 'issued' ? 'text-green-500' : 'text-dark'}} dark:text-neutral-300 hover:underline hover:text-blue-900 text-center uppercase">
                                 {{ $inv->status }}

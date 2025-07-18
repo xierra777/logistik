@@ -5,10 +5,10 @@
             {{ __('Management Users') }}
         </h2>
     </x-slot>
-    <div x-data="{ open: false }" @close-modal.window="open = false" @keydown.escape.window="open = false">
+    <div x-data="{ open: false }" @keydown.escape.window="open = false">
         <!-- Button to open modal -->
         <div class="flex justify-end gap-2 mb-4 justify-end" @click.away="open = false">
-            <button @click="open = true" class="py-3 px-4 bg-blue-600 text-white rounded-lg">
+            <button @click="open = true" class="py-s3 px-4 bg-blue-600 text-white rounded-lg">
                 Add Users
             </button>
         </div>
@@ -277,7 +277,7 @@
                             <label for="profile_photo" class="cursor-pointer inline-flex items-center gap-x-2 py-2 px-3 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none">
                                 Upload Photo
                             </label>
-                            <input type="file" id="profile_photo"
+                            <input type="file" id="editProfile_photo"
                                 wire:model="profile_photo"
                                 class="hidden"
                                 wire:loading.attr="disabled"
@@ -300,7 +300,7 @@
                     <!-- Name Field -->
                     <div class="mb-4">
                         <label for="name" class="block text-sm font-medium text-gray-700 dark:text-white">Name</label>
-                        <input type="text" id="name" wire:model="name" placeholder="Enter full name"
+                        <input type="text" id="editName" wire:model="name" placeholder="Enter full name"
                             class="mt-1 block w-full px-3 py-2 border rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-700 dark:border-transparent dark:text-neutral-400">
                         @error('name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
@@ -308,7 +308,7 @@
                     <!-- Email Field -->
                     <div class="mb-4">
                         <label for="email" class="block text-sm font-medium text-gray-700 dark:text-white">Email</label>
-                        <input type="email" id="email" wire:model="email" placeholder="Enter email"
+                        <input type="email" id="editEmail" wire:model="email" placeholder="Enter email"
                             class="mt-1 block w-full px-3 py-2 border rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-700 dark:border-transparent dark:text-neutral-400">
                         @error('email') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>
@@ -316,7 +316,7 @@
                     <!-- Password Field -->
                     <div class="mb-4">
                         <label for="current-password" class="block text-sm font-medium text-gray-700 dark:text-white">Password</label>
-                        <input type="password" id="password" wire:model="password" placeholder="Enter password"
+                        <input type="password" id="editPassword" wire:model="password" placeholder="Enter password"
                             class="mt-1 block w-full px-3 py-2 border rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-neutral-700 dark:border-transparent dark:text-neutral-400">
                         @error('password') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                     </div>

@@ -11,12 +11,12 @@
     <form wire:submit.prevent="{{ $isEditing ? 'update' : 'save' }}" class="mb-6">
         <div class="mb-4">
             <label class="block font-medium">Account Code</label>
-            <input type="text" wire:model="account_code" class="w-full border rounded p-2" placeholder="Masukkan kode akun">
+            <input type="text" wire:model="account_code" class="w-full border rounded-md p-2 border-gray-300" placeholder="Masukkan kode akun">
             @error('account_code') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
         <div class="mb-4">
             <label class="block font-medium">Account Name</label>
-            <input type="text" wire:model="account_name" class="w-full border rounded p-2" placeholder="Masukkan nama akun">
+            <input type="text" wire:model="account_name" class="w-full border rounded-md p-2 border-gray-300" placeholder="Masukkan nama akun">
             @error('account_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
         <div class="mb-4" wire:ignore>
@@ -32,7 +32,7 @@
             @error('account_type') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
         <!-- Tambahan Dropdown untuk Term Type (DR/CR) -->
-        <div class="mb-4">
+        <div class="mb-4" wire:ignore>
             <label class="block font-medium">Term Type</label>
             <select wire:model="term_type" id="term_type" class="w-full border rounded p-2">
                 <option value="">-- Pilih Term Type --</option>
@@ -49,6 +49,30 @@
                 <option value="{{ $parent->id }}">{{ $parent->account_code }} - {{ $parent->account_name }}</option>
                 @endforeach
             </select>
+        </div>
+        <div class="mb-4">
+            <label for="is_payment">Is Payment <span class="text-blue-600 cursor-help" title="Ini adalah informasi tambahan."><i class="bi bi-info-circle"></i></span>
+            </label>
+            <div class="flex items-center p-4">
+                <label for="hs-small-switch-with-icons" class="relative inline-block w-11 h-6 cursor-pointer">
+                    <input type="checkbox" id="hs-small-switch-with-icons" class="peer sr-only" wire:model="is_payment">
+                    <span class="absolute inset-0 bg-gray-200 rounded-full transition-colors duration-200 ease-in-out peer-checked:bg-blue-600 dark:bg-neutral-700 dark:peer-checked:bg-blue-500 peer-disabled:opacity-50 peer-disabled:pointer-events-none"></span>
+                    <span class="absolute top-1/2 start-0.5 -translate-y-1/2 size-5 bg-white rounded-full shadow-xs transition-transform duration-200 ease-in-out peer-checked:translate-x-full dark:bg-neutral-400 dark:peer-checked:bg-white"></span>
+                    <!-- Left Icon (Off) -->
+                    <span class="absolute top-1/2 start-0.5 -translate-y-1/2 flex justify-center items-center size-5 text-gray-500 peer-checked:text-white transition-colors duration-200 dark:text-neutral-500">
+                        <svg class="shrink-0 size-3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 6 6 18"></path>
+                            <path d="m6 6 12 12"></path>
+                        </svg>
+                    </span>
+                    <!-- Right Icon (On) -->
+                    <span class="absolute top-1/2 end-0.5 -translate-y-1/2 flex justify-center items-center size-5 text-gray-500 peer-checked:text-blue-600 transition-colors duration-200 dark:text-neutral-500">
+                        <svg class="shrink-0 size-3" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </span>
+                </label>
+            </div>
         </div>
         <div class="p-3 flex justify-between">
             <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">

@@ -1,10 +1,9 @@
-<div class=" p-4" x-init="reinitSelect2">
+<div x-data class=" p-4" x-init="reinitSelect2">
     <h1 class="text-2xl font-bold ">Journal Entries Summary</h1>
 
     <!-- Liar -->
     <div class="mb-2 mt-2" wire:ignore>
         <select name="sortJournal" id="sortJournal" wire:model.live="sortJournalEntries">
-            <option value=""></option>
             <option value="all">All</option>
             <option value="true">Reverse</option>
             <option value="false">Sales</option>
@@ -60,12 +59,11 @@
 @push('script')
 <script>
     window.reinitSelect2 = () => {
-        const selects = [{
-            sel: '#sortJournal',
-            model: 'sortJournalEntries',
-        }, ];
-
-        selects.forEach(({
+        [{
+            sel: '#vendorPurchasingInvoicing',
+            model: 'selectedVendor',
+            placeholder: 'Select Vendor  '
+        }, ].forEach(({
             sel,
             model,
             placeholder
@@ -73,10 +71,7 @@
             const $el = $(sel);
             if (!$el.length) return;
 
-            // Destroy if already initialized
-            if ($el.hasClass('select2-hidden-accessible')) {
-                $el.select2('destroy');
-            }
+            if ($el.hasClass('select2-hidden-accessible')) {}
 
             $el.select2({
                 placeholder,
@@ -85,23 +80,18 @@
                 width: '100%',
             });
 
-            // Sync value from Livewire to Select2
+            // Watch for Livewire updates
             Livewire.hook('message.processed', () => {
                 if ($el.val() !== $wire[model]) {
                     $el.val($wire[model]).trigger('change.select2');
                 }
             });
-
-            // Sync value from Select2 to Livewire
             $el.off('change.lw').on('change.lw', function() {
-                $wire.set(model, $(this).val());
+                const value = $(this).val();
+                $wire.set(model, value);
+                // console.log(value);
             });
         });
     };
-
-    // Run on initial load
-    // document.readyState('livewire:navigated', () => {
-    //     window.reinitSelect2();
-    // });
 </script>
 @endpush

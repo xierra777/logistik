@@ -422,28 +422,25 @@
             <div class="col-span-4 border h-4 bg-orange-400  border-orange-400"></div>
             <div class="col-span-2 p-2 mb-0">
                 <p class="font-bold">Bank Details</p>
-                <div class="grid grid-cols-3">
-                    <div class="grid grid-cols-3 col-span-2">
-                        <p class=" col-span-1">Bank Name</p>
-                        <p class="text-left col-span-2">: Bank Mandiri</p>
-                        <p class=" col-span-1">Company Name</p>
-                        <p class="text-left col-span-2">: PT Berkah Nusantara International</p>
-                        <p class=" col-span-1">Bank Name</p>
-                        <p class="text-left col-span-2">0060012831172(IDR)</p>
-                    </div>
+                <div class="grid grid-cols-4">
+                    <p class=" col-span-1">Bank Name</p>
+                    <p class="text-left col-span-3">: Bank Mandiri</p>
+                    <p class=" col-span-1">Company Name</p>
+                    <p class="text-left col-span-3">: PT Berkah Nusantara International</p>
+                    <p class=" col-span-1">Bank Name</p>
+                    <p class="text-left col-span-3">0060012831172(IDR)</p>
                 </div>
-                <div class="grid grid-cols-3 mt-2">
-                    <div class="grid grid-cols-3 col-span-2">
-                        <p class=" col-span-1">Bank Name</p>
-                        <p class="text-left col-span-2">: Bank Mandiri</p>
-                        <p class=" col-span-1">Company Name</p>
-                        <p class="text-left col-span-2">: PT Berkah Nusantara International</p>
-                        <p class=" col-span-1">Bank Name</p>
-                        <p class="text-left col-span-2">: 0060013100023(USD)</p>
-                        <p class=" col-span-1">Swift Code</p>
-                        <p class="text-left col-span-2">: BMRIIDJAXXX</p>
-                    </div>
+                <div class="grid grid-cols-4 mt-2">
+                    <p class=" col-span-1">Bank Name</p>
+                    <p class="text-left col-span-3">: Bank Mandiri</p>
+                    <p class=" col-span-1">Company Name</p>
+                    <p class="text-left col-span-3">: PT Berkah Nusantara International</p>
+                    <p class=" col-span-1">Bank Name</p>
+                    <p class="text-left col-span-3">: 0060013100023(USD)</p>
+                    <p class=" col-span-1">Swift Code</p>
+                    <p class="text-left col-span-3">: BMRIIDJAXXX</p>
                 </div>
+
                 @if($customer->country == 'ID - Indonesia')
                 <p class="font-semibold text-red-500 italic mt-1">Payment Term 30 Days After Invoice Received</p>
                 @endif

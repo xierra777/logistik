@@ -6,8 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\Accounting\Accountant;
 use App\Livewire\Accounting\ChartOfAccount\ChargeCoaSetting;
 use App\Livewire\Accounting\ChartOfAccount\ChartOfAccountDetails;
-
-
+use App\Livewire\Accounting\Payment\PaymentTransaction;
 use App\Livewire\Accounting\PurchaseInvoice;
 use App\Livewire\Accounting\Tranksaksi;
 use App\Livewire\Accounting\SaleInvoice;
@@ -39,6 +38,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use App\Livewire\Job\Invoice\PurchaseInvoice as jobPurchaseInvoice;
+use App\Livewire\Shipment\Invoice\ShipmentPurchaseInvoice;
+use App\Livewire\Shipment\Invoice\ShipmentSaleInvoice;
 
 Route::redirect('/', '/login');
 Route::get('/dashboard', Dashboard::class)->middleware([
@@ -121,6 +122,15 @@ Route::get('view-shipment/{id}', ViewShipment::class)->middleware([
 Route::get('view-shipment/{id}/container-shipment/{container_id}', ContainerShipment::class)
     ->middleware(['auth', 'verified'])
     ->name('shipment.container');
+
+
+Route::get('/purchase-invoice/{shipmentId}', ShipmentPurchaseInvoice::class)
+    ->middleware(['auth', 'verified'])
+    ->name('purchaseInvoice');
+
+Route::get('/sale-invoice/{shipmentId}', ShipmentSaleInvoice::class)
+    ->middleware(['auth', 'verified'])
+    ->name('saleInvoice');
 // End Shipment Route
 
 // Route Job Route
@@ -222,14 +232,10 @@ Route::get('chart-of-accont', ChartOfAccountDetails::class)
     ->name('chartOfAccount');
 
 
-
-Route::get('/purchase-invoice/{shipmentId}', PurchaseInvoice::class)
+Route::get('paymentTransaction', PaymentTransaction::class)
     ->middleware(['auth', 'verified'])
-    ->name('purchaseInvoice');
+    ->name('paymentTrans');
 
-Route::get('/sale-invoice/{shipmentId}', SaleInvoice::class)
-    ->middleware(['auth', 'verified'])
-    ->name('saleInvoice');
 Route::get('/csrf-token', function (Request $request) {
     return response()->json(['csrf_token' => csrf_token()]);
 })->name('csrf-token');

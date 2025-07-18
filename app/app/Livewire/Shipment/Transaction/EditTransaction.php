@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Shipment\Transaction;
 
-use App\Livewire\Shipment\ContainerShipment;
 use Livewire\Component;
 use App\Models\TShipments;
 use App\Models\Customer;
@@ -12,12 +11,12 @@ use Illuminate\Support\Facades\Log;
 use App\Models\ChargeSetting;
 use App\Models\ChartOfAccount;
 use App\Models\JournalEntry;
-use App\Models\shipmentContainers;
 use App\Models\transaction\tax;
 
-class CreateTransaction extends Component
+class EditTransaction extends Component
 {
     public $chargeCoa;
+    public $isReadonly = false;
 
     public $taxRates = [];
     public $taxData = [];
@@ -28,13 +27,13 @@ class CreateTransaction extends Component
     public $customer_id;
     public $coaSaleId;
     public $coaCostId;
-
+    public $is_invoiced;
     // === Charge Details ===
     public $charge, $description, $freight, $unit = 'CONTAINER', $ofdtype, $remarks;
     public $quantity = 0;
 
     // === Sale Details ===
-    public $sclient, $scurrency, $srate = 0, $samount_qty = 0, $sincludedtax = "No";
+    public $sclient, $scurrency, $srate = 0, $samount_qty = 0, $sincludedtax = "false";
     public $sfcyamount = 0, $samountidr = 0, $sdrcr, $svatgst = 0, $staxableamount = 0;
     public $svatgstamount = 0, $swhtaxrate, $swhtaxamount = 0, $sremarks, $sgrossprofit = 0;
 
@@ -47,53 +46,109 @@ class CreateTransaction extends Component
     public $shwtaxrateusd = 0, $chwtaxrateusd = 0;
     public $vendors, $clients;
     public $shipmentType;
+    public $transactionId, $transaction;
 
-    public function mount($id)
+    public function mount($id = null, $transactionId = null)
     {
         $this->shipmentId = $id;
-        $customers = customer::orderBy('name')->get();
-        $shipment = TShipments::with([
-            'client',
-            'shipper',
-            'consignee',
-            'notify',
-            'carrierModel',
-            'deliveryAgent',
-        ])->find($id);
+        $this->transactionId = $transactionId;
+
+        if ($this->transactionId) {
+            $this->loadTransaction($this->transactionId);
+        }
+        $this->transaction = Transaction::find($transactionId);
+
+        $shipment = TShipments::with(['client'])->find($id);
+
+        if (!$shipment) {
+            session()->flash('error', 'Job not found');
+            return;
+        }
 
         $this->clients = collect([
-            $shipment->client,
-            $shipment->shipper,
-            $shipment->consignee,
-            $shipment->notify,
-            $shipment->carrierModel,
-            $shipment->deliveryAgent,
+            $shipment->client ?? '',
         ])->filter()->unique();
-        $taxes = tax::where('is_active', '1')->get(); // asumsikan ada kolom 'id', 'name', 'rate'
+
+        $taxes = Tax::where('is_active', '1')->get();
+
+        $this->taxRates = $taxes->where('type', 'vat')->pluck('rate', 'id')->toArray();
+        $this->taxRatesWht = $taxes->where('type', 'wht')->pluck('rate', 'id')->toArray();
+        $this->taxData = $taxes->pluck('rate', 'id')->toArray();
 
         $this->chargeCoa = ChargeSetting::get();
-        $this->taxRates = $taxes->where('type', 'vat')->pluck('rate', 'id')->toArray(); // untuk dropdown
-        $this->taxRatesWht = $taxes->where('type', 'wht')->pluck('rate', 'id')->toArray(); // untuk dropdown
-        $this->taxData = $taxes->pluck('rate', 'id')->toArray(); // untuk Alpine.js
-        $customers = Customer::orderBy('name')->get();
-        $this->vendors = customer::where('category', 'creditor')->orderBy('name')->get();
+        $this->vendors = Customer::where('category', 'creditor')->orderBy('name')->get();
+        $this->checkReadonlyStatus();
 
-        // $this->updateQty();
+        $this->updatedUnit($this->unit);
     }
-
-    public function updatedCharge($value)
+    private function checkReadonlyStatus()
     {
-        $charge = ChargeSetting::where('charge_code', $value)->first();
-
-        if ($charge) {
-            $this->coaSaleId = $charge->coa_sale_id;
-            $this->coaCostId = $charge->coa_cost_id;
-            $this->description = $charge->charge_name;
-        } else {
-            $this->coaSaleId = null;
-            $this->coaCostId = null;
+        if ($this->transaction->invs && $this->transaction->invs->status === 'issued') {
+            $this->isReadonly = true;
         }
     }
+
+
+    public function loadTransaction($transactionId)
+    {
+        $transaction = Transaction::find($transactionId);
+
+        if (!$transaction) {
+            session()->flash('error', 'Transaction not found');
+            return;
+        }
+
+        // Sales Details
+        $this->charge = $transaction->charge;
+        $this->description = $transaction->description;
+        $this->freight = $transaction->freight;
+        $this->unit = $transaction->unit;
+        $this->quantity = $transaction->quantity;
+        $this->ofdtype = $transaction->ofdtype;
+        $this->remarks = $transaction->remarks;
+
+        $this->sclient = $transaction->sclient;
+        $this->scurrency = $transaction->scurrency;
+        $this->srate = $transaction->srate;
+        $this->samount_qty = $transaction->samount_qty;
+        $this->sincludedtax = $transaction->sincludedtax;
+        $this->sfcyamount = $transaction->sfcyamount;
+        $this->samountidr = $transaction->samountidr;
+        $this->sdrcr = $transaction->sdrcr;
+        $this->svatgst = $transaction->svatgst;
+        $this->staxableamount = $transaction->staxableamount;
+        $this->svatgstamount = $transaction->svatgstamount;
+        $this->swhtaxrate = $transaction->swhtaxrate;
+        $this->swhtaxamount = $transaction->swhtaxamount;
+        $this->sremarks = $transaction->sremarks;
+        $this->sgrossprofit = $transaction->sgrossprofit;
+
+        // Cost Details
+        $this->cvendor = $transaction->cvendor;
+        $this->creferenceno = $transaction->creferenceno;
+        $this->cdate = $transaction->cdate;
+        $this->cdrcr = $transaction->cdrcr;
+        $this->ccurrency = $transaction->ccurrency;
+        $this->crate = $transaction->crate;
+        $this->camount_qty = $transaction->camount_qty;
+        $this->cincludedtax = $transaction->cincludedtax;
+        $this->cfcyamount = $transaction->cfcyamount;
+        $this->camountidr = $transaction->camountidr;
+        $this->cvatgst = $transaction->cvatgst;
+        $this->cvatgstusd = $transaction->cvatgstusd;
+        $this->cvatgstamount = $transaction->cvatgstamount;
+        $this->chwtaxrateusd = $transaction->chwtaxrateusd;
+        $this->ctaxableamount = $transaction->ctaxableamount;
+        $this->cremarks = $transaction->cremarks;
+        $this->cwhtaxrate = $transaction->cwhtaxrate;
+        $this->cwhtaxamount = $transaction->cwhtaxamount;
+        $this->totalcost = $transaction->totalcost;
+
+        // COA columns
+        $this->coaSaleId = $transaction->coa_sale_id;
+        $this->coaCostId = $transaction->coa_cost_id;
+    }
+
     public function updatedUnit($value)
     {
         if (!$this->shipment) {
@@ -110,7 +165,7 @@ class CreateTransaction extends Component
                 break;
 
             case 'DOCUMENT':
-                $this->quantity =  $this->shipment->job();
+                $this->quantity =  $this->shipment->shipments->count();
                 break;
 
             default:
@@ -118,9 +173,49 @@ class CreateTransaction extends Component
         }
     }
 
-    // === Simpan Data Transaksi Baru ===
+    public function updatedCharge($value)
+    {
+        $charge = ChargeSetting::where('charge_code', $value)->first();
+
+        if ($charge) {
+            $this->coaSaleId = $charge->coa_sale_id;
+            $this->coaCostId = $charge->coa_cost_id;
+            $this->description = $charge->charge_name;
+
+            // dd($this->coaSaleId, $this->coaCostId);
+            // dd($this->description);
+        } else {
+            $this->coaSaleId = null;
+            $this->coaCostId = null;
+            $this->description = null;
+        }
+    }
+    protected function rules()
+    {
+        return [
+            // 'sclient' => Customer::exists('name'),
+            // Add other validation rules as needed, for example:
+            'charge' => 'required',
+            'quantity' => 'required|numeric|min:1',
+            // 'invoice_id' => 'required'
+            // 'scurrency' => 'required',
+            // etc.
+        ];
+    }
+
+    // === Save Transaction ===
     public function save()
     {
+
+        if ($this->transaction->invs && $this->transaction->invs->status === 'issued') {
+            $this->dispatch('swal', [
+                'title' => 'Gagal Update',
+                'text' => 'Transaksi ini sudah masuk ke invoice yang telah issued.',
+                'icon' => 'error', // Diubah dari 'errors' menjadi 'error'
+            ]);
+            $this->isReadonly = true;
+            return;
+        }
         if ($this->getErrorBag()->isNotEmpty()) {
             $this->dispatch('scroll-to-error');
         }
@@ -136,7 +231,7 @@ class CreateTransaction extends Component
         if ($this->cwhtaxrate == 0 || empty($this->cwhtaxrate)) {
             $this->cwhtaxrate = null;
         }
-        $transaction = Transaction::create([
+        $transaction = Transaction::where('id', $this->transactionId)->update([
             'id_shipment' => $this->shipmentId,
             'charge' => $this->charge,
             'description' => $this->description,
@@ -184,30 +279,23 @@ class CreateTransaction extends Component
             'cvatgstusd' => $this->cvatgstusd,
             'shwtaxrateusd' => $this->shwtaxrateusd,
             'chwtaxrateusd' => $this->chwtaxrateusd,
-            'reference_type' => 'SHIPMENT',
+            'reference_type' => 'JOB',
             'created_by' => Auth::id(),
 
         ]);
 
-
         // $this->createJournalEntries($transaction);
-        $this->reset();
+        $this->resetForm();
         $this->dispatch('transactionSaved');
-        $this->dispatch('close-modal');
         $this->chargeCoa = ChargeSetting::get();
         session()->flash('message', 'Transaksi berhasil disimpan!');
         $this->vendors = customer::where('category', 'creditor')->orderBy('name')->get();
+        $this->dispatch('close-modal');
     }
+
     private function createJournalEntries($transaction)
     {
         $transaction->load('shipment');
-
-        // Helper function to convert Indonesian formatted numbers to float
-        $indoStringToFloat = function (string $value): float {
-            $value = str_replace('.', '', $value);
-            $value = str_replace(',', '.', $value);
-            return floatval($value);
-        };
 
         // Get COA for sale and cost
         $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
@@ -216,7 +304,8 @@ class CreateTransaction extends Component
         // Create sale journal entry
         if ($transaction->samountidr && $saleCoa) {
             $saleAmount = $transaction->samountidr;
-            $totalSale = $saleAmount * $transaction->quantity;
+            $vatAmount = $transaction->svatgstamount;
+            $totalSale = $saleAmount + $vatAmount - $transaction->swhtaxamount;
 
             // Jurnal Piutang (A/R) - Debit
             JournalEntry::create([
@@ -230,13 +319,42 @@ class CreateTransaction extends Component
                 'date' => now(),
                 'created_by' => Auth::id(),
             ]);
+            // Jurnal VAT (kalau ada)
+            if ($vatAmount > 0 && $transaction->saleVat && $transaction->saleVat->coa_id) {
+                JournalEntry::create([
+                    'transaction_id' => $transaction->id,
+                    'coa_id' => $transaction->saleVat->coa_id, // VAT Output
+                    'credit' => $vatAmount,
+                    'debit' => 0,
+                    'description' => "PPN dari transaksi #{$transaction->shipment->shipment_id} - {$transaction->description}",
+                    'transactionable_type' => get_class($transaction),
+                    'transactionable_id' => $transaction->id,
+                    'date' => now(),
+                    'created_by' => Auth::id(),
+                ]);
+            }
+
+            $whtAmount = $transaction->swhtaxamount;
+
+            if ($whtAmount > 0 && $transaction->saleWht && $transaction->saleWht->coa_id) {
+                JournalEntry::create([
+                    'transaction_id' => $transaction->id,
+                    'coa_id' => $transaction->saleWht->coa_id, // COA WHT Receivable
+                    'debit' => $whtAmount,
+                    'credit' => 0,
+                    'description' => "PPh 23 dari transaksi #{$transaction->shipment->shipment_id} - {$transaction->description}",
+                    'transactionable_type' => get_class($transaction),
+                    'transactionable_id' => $transaction->id,
+                    'date' => now(),
+                    'created_by' => Auth::id(),
+                ]);
+            }
 
             // Jurnal Pendapatan (Revenue) - Kredit
             JournalEntry::create([
                 'transaction_id' => $transaction->id,
                 'coa_id' => $saleCoa->id,
-                'debit' => $saleCoa->term_type === 'DR' ? $totalSale : 0,
-                'credit' => $saleCoa->term_type === 'CR' ? $totalSale : 0,
+                'credit' =>  $saleAmount,
                 'description' => "Sale transaction #{$transaction->reference_type} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
                 'transactionable_type' => $transaction->reference_type,
                 'transactionable_id' => $transaction->id,
@@ -247,13 +365,12 @@ class CreateTransaction extends Component
 
         if ($transaction->camountidr && $costCoa) {
             $costAmount = $transaction->camountidr;
-            $totalCost = $costAmount * $transaction->quantity;
+            $cvatAmount = $transaction->cvatgstamount;
+            $totalCost = $costAmount + $cvatAmount - $transaction->cwhtaxamount;
 
-            // Jurnal Hutang (A/P) - Kredit
             JournalEntry::create([
                 'transaction_id' => $transaction->id,
-                'coa_id' => $transaction->transactionVendor->coa_id, // COA A/P untuk vendor
-                'debit' => 0,
+                'coa_id' => $transaction->transactionVendor->coa_id, // COA A/R untuk customer
                 'credit' => $totalCost,
                 'description' => "Hutang dari transaksi #{$transaction->transactionVendor->name} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
                 'transactionable_type' => get_class($transaction),
@@ -261,13 +378,40 @@ class CreateTransaction extends Component
                 'date' => now(),
                 'created_by' => Auth::id(),
             ]);
+            // Jurnal VAT (kalau ada)
+            if ($cvatAmount > 0 && $transaction->costVat && $transaction->costVat->coa_id) {
+                JournalEntry::create([
+                    'transaction_id' => $transaction->id,
+                    'coa_id' => $transaction->costVat->coa_id, // VAT Output
+                    'debit' => $cvatAmount,
+                    'description' => "PPN dari transaksi #{$transaction->shipment->shipment_id} - {$transaction->description}",
+                    'transactionable_type' => get_class($transaction),
+                    'transactionable_id' => $transaction->id,
+                    'date' => now(),
+                    'created_by' => Auth::id(),
+                ]);
+            }
 
-            // Jurnal Biaya (Expense) - Debit
+            $cwhtAmount = $transaction->cwhtaxamount;
+
+            if ($cwhtAmount > 0 && $transaction->costWht && $transaction->costWht->coa_id) {
+                JournalEntry::create([
+                    'transaction_id' => $transaction->id,
+                    'coa_id' => $transaction->costWht->coa_id, // COA WHT Receivable
+                    'credit' => $cwhtAmount,
+                    'description' => "PPh 23 dari transaksi #{$transaction->shipment->shipment_id} - {$transaction->description}",
+                    'transactionable_type' => get_class($transaction),
+                    'transactionable_id' => $transaction->id,
+                    'date' => now(),
+                    'created_by' => Auth::id(),
+                ]);
+            }
+
+            // Jurnal Pendapatan (Expenses) - Kredit
             JournalEntry::create([
                 'transaction_id' => $transaction->id,
                 'coa_id' => $costCoa->id,
-                'debit' => $costCoa->term_type === 'DR' ? $totalCost : 0,
-                'credit' => $costCoa->term_type === 'CR' ? $totalCost : 0,
+                'debit' =>  $costAmount,
                 'description' => "Cost transaction #{$transaction->reference_type} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
                 'transactionable_type' => $transaction->reference_type,
                 'transactionable_id' => $transaction->id,
@@ -276,6 +420,7 @@ class CreateTransaction extends Component
             ]);
         }
     }
+
     private function resetForm()
     {
         $this->reset([
@@ -327,18 +472,13 @@ class CreateTransaction extends Component
         $this->chargeCoa = ChargeSetting::get();
         $this->vendors = Customer::where('category', 'creditor')->orderBy('name')->get();
     }
-    // public function loadClients()
-    // {
-    //     $this->clients = customer::where('category', 'DR')->orderBy('name')->get();
-    // }
 
     public function closeModal()
     {
-        // $this->resetFields();
-        $this->dispatch('close-modal'); // untuk Alpine.js tutup modal
+        $this->dispatch('close-modal');
     }
     public function render()
     {
-        return view('livewire.shipment.transaction.create-transaction');
+        return view('livewire.shipment.transaction.edit-transaction');
     }
 }

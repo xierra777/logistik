@@ -14,6 +14,7 @@ class ChartOfAccount extends Model
         'account_name',
         'term_type',
         'account_type',
+        'is_bank',
         'parent_account_id',
         'created_by',
         'updated_by',
@@ -31,5 +32,9 @@ class ChartOfAccount extends Model
     public function children()
     {
         return $this->hasMany(ChartOfAccount::class, 'parent_account_id');
+    }
+    public function childrenRecursive()
+    {
+        return $this->children()->with('childrenRecursive');
     }
 }

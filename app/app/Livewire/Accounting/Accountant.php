@@ -45,7 +45,7 @@ class Accountant extends Component
             ->whereIn('coa_id', $accounts)->where('is_reversal', '0')
             ->orderBy('date')
             ->get()
-            ->groupBy(fn($j) => $j->created_at->format('Y-m-d s')); // group per jam
+            ->groupBy(fn($j) => $j->created_at->format('Y-m-d h')); // group per jam
 
         $categories = [];
         $revenues = [];

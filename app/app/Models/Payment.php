@@ -9,7 +9,7 @@ class Payment extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['customer_id', 'payment_no', 'payment_date', 'amount', 'currency', 'exchange_rate', 'notes'];
+    protected $fillable = ['customerVendor_id', 'payment_no', 'payment_date', 'amount', 'currency', 'exchange_rate', 'notes'];
 
     public function customer()
     {

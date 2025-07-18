@@ -37,34 +37,61 @@
                                 <input type="date" class="w-full rounded-md border-gray-300">
                             </div>
                             <div class="flex flex-col">
-                                <label for="">Payment No</label>
-                                <input type="text" class="w-full rounded-md border-gray-300">
+                                <label for="paymentNo">Payment No</label>
+                                <input type="text" wire:model="payment_no" class="w-full rounded-md border-gray-300">
                             </div>
+
                             <div class="flex flex-col">
-                                <label for="">customer_id / vendor_id </label>
-                                <select name="" id="">
+                                <label for="customerVendor_id">customer_id / vendor_id </label>
+                                <select name="customerVendor_id" id="customerVendor_id" wire:model.live="customerVendor_id" class="border-gray-300 w-full rounded-md">
                                     <option value=""></option>
-                                    @foreach($customers as $customer)
-                                    @foreach($customer->shipment->shipmentTransaction ?? [] as $tx)
-                                    <option value="{{ $tx->id }}">[Shipment] {{ $tx->transactionClient->name }} / {{$customer->shipment->shipment_id}}</option>
+                                    @foreach($invoices as $invoice)
+                                    <option value="{{ $invoice->id }}">
+                                        {{ $invoice->invoice_number }} -
+                                        @if($invoice->job)
+                                        Job: {{ $invoice->job->job_id }}
+                                        @elseif($invoice->shipment)
+                                        Shipment: {{ $invoice->shipment->shipment_id }}
+                                        @endif
+                                        - Rp. {{ number_format($invoice->total_amount, 2, '.', ',') }}
+                                    </option>
                                     @endforeach
+                                </select>
+                            </div>
+                            {{$customerVendor_id}}
+                            <div class="flex flex-col">
+                                <label for="bank_account">Bank Account</label>
+                                <select name="" id="" class="w-full rounded-md border-gray-300 ">
+                                    <option value=""></option>
+                                    @foreach($coa as $c)
+                                    <option value="{{$c->id}}">{{$c->account_code}} - {{$c->account_name}}</option>
 
-                                    @foreach($customer->job->jobTransactions ?? [] as $trx)
-                                    <option value="{{ $trx->id }}">[Job] {{ $trx->transactionClient->name }} / {{$customer->job->job_id}}</option>
                                     @endforeach
-                                    @endforeach
-
-
                                 </select>
                             </div>
                             <div class="flex flex-col">
-                                <label for="">Payment No</label>
+                                <label for="currency">Currency</label>
                                 <input type="text" class="w-full rounded-md border-gray-300">
                             </div>
                             <div class="flex flex-col">
-                                <label for="">Payment No</label>
+                                <label for="exchange_rate">Exchange Rate</label>
                                 <input type="text" class="w-full rounded-md border-gray-300">
                             </div>
+                            <div class="flex flex-col">
+                                <label for="amount">Amount</label>
+                                <input type="text" wire:model="amount" class="w-full rounded-md border-gray-300">
+                            </div>
+                            <div class="flex flex-col">
+                                <label for="remarks">Remarks</label>
+                                <input type="text" class="w-full rounded-md border-gray-300">
+                            </div>
+                            <div class="flex flex-col">
+                                <label for="status">status</label>
+                                <select name="status" id="status" class="border-gray-300 w-full rounded-md">
+                                    <option value=""></option>
+                                </select>
+                            </div>
+
                         </div>
 
                     </form>

@@ -67,7 +67,14 @@ class Transaction extends Model
         'created_by',
         'updated_by',
     ];
-
+    public function scopeHasAmount($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('samountidr', '>', 0)->whereNotNull('sclient');
+        })->orWhere(function ($q) {
+            $q->where('camountidr', '>', 0)->whereNotNull('cvendor');
+        });
+    }
     public function journalEntries()
     {
         return $this->hasMany(JournalEntry::class, 'transaction_id');

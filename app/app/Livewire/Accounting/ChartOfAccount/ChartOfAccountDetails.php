@@ -11,7 +11,7 @@ class ChartOfAccountDetails extends Component
 {
     use WithPagination;
 
-    public $account_code, $account_name, $account_type, $term_type;
+    public $account_code, $account_name, $account_type, $term_type, $is_payment;
     public $parent_account_id;
     public $coa_id, $perPage = 5;
     public $isEditing = false;
@@ -27,13 +27,14 @@ class ChartOfAccountDetails extends Component
     public function save()
     {
         $this->validate();
-
+        // dd($this->is_payment);
         ChartOfAccount::create([
             'account_code'      => $this->account_code,
             'account_name'      => $this->account_name,
             'account_type'      => $this->account_type,
             'term_type'         => $this->term_type,
             'parent_account_id' => $this->parent_account_id,
+            'is_payment'        => $this->is_payment,
             'created_by'        => Auth::user()->id
         ]);
 
@@ -49,6 +50,7 @@ class ChartOfAccountDetails extends Component
         $this->account_name = $coa->account_name;
         $this->account_type = $coa->account_type;
         $this->term_type = $coa->term_type;
+        $this->is_payment = $coa->is_payment;
         $this->parent_account_id = $coa->parent_account_id;
         $this->isEditing = true;
     }
@@ -82,11 +84,11 @@ class ChartOfAccountDetails extends Component
 
     public function resetForm()
     {
-        $this->account_code = '';
-        $this->account_name = '';
-        $this->account_type = '';
-        $this->term_type = '';
-        $this->parent_account_id = '';
+        $this->account_code = null;
+        $this->account_name = null;
+        $this->account_type = null;
+        $this->term_type = null;
+        $this->parent_account_id = null;
         $this->coa_id = null;
         $this->isEditing = false;
     }

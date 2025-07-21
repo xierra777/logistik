@@ -722,7 +722,7 @@
                     </tr>
                     @empty
                     <tr wire:loading.remove>
-                        <td colspan="13" class="py-12 text-center">
+                        <td colspan="14" class="py-12 text-center">
                             <div class="flex flex-col text-center items-center justify-center">
                                 <img src="{{ asset('images/nodata.svg') }}"
                                     alt="No dataShipments illustration"

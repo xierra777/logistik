@@ -1058,7 +1058,6 @@
                                     alt="No dataShipments illustration"
                                     class="w-64 h-48 mb-4 opacity-75  dark:opacity-50">
                                 <p class="text-md font-medium text-gray-600 dark:text-neutral-300">
-                                    Mohon Kesediann Menunggu, Modul Masih dalam Pengerjaan
                                 </p>
                             </div>
                         </td>

@@ -149,19 +149,7 @@
                             @error('jobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                        <div></div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>HBL No</label>
-                            <input type="text" wire:model="houseJobBillLadingNo" placeholder="Enter MBL" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            @error('houseJobBillLadingNo')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                        </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>HBL Date</label>
-                            <input type="date" wire:model="houseJobBillLadingDate" placeholder="Enter HBL DATE" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            @error('houseJobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                        </div>
-                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div class="mb-4" wire:ignore>
                             <label for="carrier">Carrier</label>
@@ -570,19 +558,7 @@
                             @error('jobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                        <div></div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>HBL No</label>
-                            <input type="text" wire:model="houseJobBillLadingNo" placeholder="Enter MBL" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            @error('houseJobBillLadingNo')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                        </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>HBL Date</label>
-                            <input type="date" wire:model="houseJobBillLadingDate" placeholder="Enter HBL DATE" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            @error('houseJobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                        </div>
-                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div class="mb-4" wire:ignore>
                             <label for="carrier">Carrier</label>
@@ -1394,19 +1370,7 @@
                             @error('jobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                        <div></div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>HBL No</label>
-                            <input type="text" wire:model="houseJobBillLadingNo" placeholder="Enter MBL" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            @error('houseJobBillLadingNo')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                        </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>HBL Date</label>
-                            <input type="date" wire:model="houseJobBillLadingDate" placeholder="Enter HBL DATE" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            @error('houseJobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                        </div>
-                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div class="mb-4" wire:ignore>
                             <label for="carrier">Carrier</label>
@@ -1815,19 +1779,7 @@
                             @error('jobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                        <div></div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>HBL No</label>
-                            <input type="text" wire:model="houseJobBillLadingNo" placeholder="Enter MBL" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            @error('houseJobBillLadingNo')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                        </div>
-                        <div class="flex flex-col space-y-3 rounded-md">
-                            <label>HBL Date</label>
-                            <input type="date" wire:model="houseJobBillLadingDate" placeholder="Enter HBL DATE" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                            @error('houseJobBillLadingDate')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
-                        </div>
-                    </div>
+
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div class="mb-4" wire:ignore>
                             <label for="carrier">Carrier</label>

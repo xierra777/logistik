@@ -9,11 +9,11 @@ class Payment extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['customerVendor_id', 'payment_no', 'payment_date', 'amount', 'currency', 'exchange_rate', 'notes'];
+    protected $fillable = ['customerVendor_id', 'status', 'payment_no', 'payment_date', 'bank_coa', 'amount', 'currency', 'exchange_rate', 'remarks', 'refrence_type', 'refrence_id', 'journal_posted_at', 'created_by', 'updated_by'];
 
     public function customer()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class, 'customerVendor_id');
     }
 
     public function allocations()

@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class PaymentJobAllocations extends Model
+class PaymentAllocation extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['payment_id', 'job_id', 'allocated_amount'];
+    protected $fillable = ['payment_id', 'invoice_id', 'amount_allocated', 'job_id', 'shipment_id', 'allocated_amount', 'currency', 'exchange_rate', 'remarks'];
 
     public function payment()
     {

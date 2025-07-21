@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->string('payment_no')->unique(); // PAY-24001
-            $table->date('date');
+            $table->date('payment_date');
 
-            $table->foreignId('customer_id / vendor_id')->nullable()->constrained('customers')->nullOnDelete();
+            $table->foreignId('customerVendor_id')->nullable()->constrained('customers')->nullOnDelete();
 
             $table->foreignId('bank_coa')->nullable()->constrained('chart_of_accounts')->nullOnDelete();
             $table->string('currency', 10)->default('IDR');
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->text('remarks')->nullable();
             $table->string('reference_type')->nullable();
             $table->unsignedBigInteger('reference_id')->nullable();
-            $table->enum('status', ['draft', 'confirmed', 'void']);
+            $table->string('status')->nullable();
             $table->timestamp('journal_posted_at')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
@@ -39,6 +39,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('payments');
     }
 };

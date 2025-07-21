@@ -189,74 +189,79 @@ class ShipmentPurchaseInvoice extends Component
         ]);
         $selectedTransactions = $invoice->transactions;
         foreach ($selectedTransactions as $transaction) {
-            $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
+            $costCoa = ChartOfAccount::find($transaction->coa_sale_id);
 
             // Jurnal Penjualan (Revenue)
-            if ($transaction->camountidr && $saleCoa && $transaction->transactionVendor) {
-                $saleAmount = $transaction->camountidr;
-                $vatAmount  = $transaction->cvatgstamount;
-                $whtAmount  = $transaction->cwhtaxamount;
-                $totalSale  = $saleAmount + $vatAmount - $whtAmount;
+            foreach ($selectedTransactions as $transaction) {
+                $costCoa = ChartOfAccount::find($transaction->coa_cost_id);
 
-                // Piutang (A/R) - Debit
-                JournalEntry::create([
-                    'transaction_id'      => $transaction->id,
-                    'coa_id'              => $transaction->transactionVendor->coa_id,
-                    'invoice_id'           => $invoice->id,
-                    'debit'               => $totalSale,
-                    'credit'              => 0,
-                    'description'         => "HUTANG dari transaksi #{$transaction->transactionVendor->name} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
-                    'transactionable_type' => get_class($transaction),
-                    'transactionable_id'  => $transaction->id,
-                    'date'                => now(),
-                    'created_by'          => Auth::id(),
-                ]);
+                // Jurnal Penjualan (Revenue)
+                if ($transaction->camountidr && $costCoa && $transaction->transactionVendor) {
+                    $costAmount = $transaction->camountidr;
+                    $vatAmount  = $transaction->cvatgstamount;
+                    $whtAmount  = $transaction->cwhtaxamount;
+                    $totalSale  = $costAmount + $vatAmount - $whtAmount;
 
-                // VAT Output - Kredit
-                if ($vatAmount > 0 && $transaction->saleVat && $transaction->saleVat->coa_id) {
+                    // HUTANG (A/R) - Debit
                     JournalEntry::create([
                         'transaction_id'      => $transaction->id,
-                        'coa_id'              => $transaction->saleVat->coa_id,
+                        'coa_id'              => $transaction->transactionVendor->coa_id,
+                        'invoice_id'           => $invoice->id,
+                        'debit'               => $totalSale,
+                        'credit'              => 0,
+                        'description'         => "HUTANG dari transaksi #{$transaction->transactionVendor->name} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
+                        'transactionable_type' => get_class($transaction),
+                        'transactionable_id'  => $transaction->id,
+                        'date'                => now(),
+                        'created_by'          => Auth::id(),
+                    ]);
+
+                    // VAT Output - Kredit
+                    if ($vatAmount > 0 && $transaction->saleVat && $transaction->saleVat->coa_id) {
+                        JournalEntry::create([
+                            'transaction_id'      => $transaction->id,
+                            'coa_id'              => $transaction->saleVat->coa_id,
+                            'invoice_id'          => $invoice->id,
+                            'debit'               => 0,
+                            'credit'              => $vatAmount,
+                            'description'         => "PPN dari transaksi #{$transaction->shipment->shipment_id} - {$transaction->description}",
+                            'transactionable_type' => get_class($transaction),
+                            'transactionable_id'  => $transaction->id,
+                            'date'                => now(),
+                            'created_by'          => Auth::id(),
+                        ]);
+                    }
+
+                    // WHT Receivable - Debit
+                    if ($whtAmount > 0 && $transaction->saleWht && $transaction->saleWht->coa_id) {
+                        JournalEntry::create([
+                            'transaction_id'      => $transaction->id,
+                            'coa_id'              => $transaction->saleWht->coa_id,
+                            'invoice_id'             => $invoice->id,
+                            'debit'               => $whtAmount,
+                            'credit'              => 0,
+                            'description'         => "PPh 23 dari transaksi #{$transaction->shipment->shipment_id} - {$transaction->description}",
+                            'transactionable_type' => get_class($transaction),
+                            'transactionable_id'  => $transaction->id,
+                            'date'                => now(),
+                            'created_by'          => Auth::id(),
+                        ]);
+                    }
+
+                    // Pendapatan (Revenue) - Kredit
+                    JournalEntry::create([
+                        'transaction_id'      => $transaction->id,
+                        'coa_id'              => $costCoa->id,
                         'invoice_id'             => $invoice->id,
                         'debit'               => 0,
-                        'credit'              => $vatAmount,
-                        'description'         => "HUTANG PPN dari transaksi #{$transaction->shipment->shipment_id} - {$transaction->description}",
-                        'transactionable_type' => get_class($transaction),
+                        'credit'              => $costAmount,
+                        'description'         => "Sale transaction #{$transaction->reference_type} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
+                        'transactionable_type' => $transaction->reference_type,
                         'transactionable_id'  => $transaction->id,
                         'date'                => now(),
                         'created_by'          => Auth::id(),
                     ]);
                 }
-
-                // WHT Receivable - Debit
-                if ($whtAmount > 0 && $transaction->saleWht && $transaction->saleWht->coa_id) {
-                    JournalEntry::create([
-                        'transaction_id'      => $transaction->id,
-                        'coa_id'              => $transaction->saleWht->coa_id,
-                        'invoice_id'          => $invoice->id,
-                        'debit'               => $whtAmount,
-                        'credit'              => 0,
-                        'description'         => "HUTANG PPh 23 dari transaksi #{$transaction->shipment->shipment_id} - {$transaction->description}",
-                        'transactionable_type' => get_class($transaction),
-                        'transactionable_id'  => $transaction->id,
-                        'date'                => now(),
-                        'created_by'          => Auth::id(),
-                    ]);
-                }
-
-                // Pendapatan (Revenue) - Kredit
-                JournalEntry::create([
-                    'transaction_id'      => $transaction->id,
-                    'coa_id'              => $saleCoa->id,
-                    'invoice_id'             => $invoice->id,
-                    'debit'               => 0,
-                    'credit'              => $saleAmount,
-                    'description'         => "cost transaction #{$transaction->reference_type} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
-                    'transactionable_type' => $transaction->reference_type,
-                    'transactionable_id'  => $transaction->id,
-                    'date'                => now(),
-                    'created_by'          => Auth::id(),
-                ]);
             }
         }
         $this->loadTransactions();
@@ -606,24 +611,23 @@ class ShipmentPurchaseInvoice extends Component
             }
             // Buat jurnal untuk setiap transaksi
             foreach ($selectedTransactions as $transaction) {
-                $saleCoa = ChartOfAccount::find($transaction->coa_sale_id);
                 $costCoa = ChartOfAccount::find($transaction->coa_cost_id);
 
                 // Jurnal Penjualan (Revenue)
-                if ($transaction->camountidr && $saleCoa && $transaction->transactionsVendor) {
-                    $saleAmount = $transaction->camountidr;
+                if ($transaction->camountidr && $costCoa && $transaction->transactionVendor) {
+                    $costAmount = $transaction->camountidr;
                     $vatAmount  = $transaction->cvatgstamount;
                     $whtAmount  = $transaction->cwhtaxamount;
-                    $totalSale  = $saleAmount + $vatAmount - $whtAmount;
+                    $totalSale  = $costAmount + $vatAmount - $whtAmount;
 
-                    // Piutang (A/R) - Debit
+                    // HUTANG (A/R) - Debit
                     JournalEntry::create([
                         'transaction_id'      => $transaction->id,
-                        'coa_id'              => $transaction->transactionsVendor->coa_id,
+                        'coa_id'              => $transaction->transactionVendor->coa_id,
                         'invoice_id'           => $invoice->id,
                         'debit'               => $totalSale,
                         'credit'              => 0,
-                        'description'         => "Piutang dari transaksi #{$transaction->transactionsVendor->name} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
+                        'description'         => "HUTANG dari transaksi #{$transaction->transactionVendor->name} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
                         'transactionable_type' => get_class($transaction),
                         'transactionable_id'  => $transaction->id,
                         'date'                => now(),
@@ -665,10 +669,10 @@ class ShipmentPurchaseInvoice extends Component
                     // Pendapatan (Revenue) - Kredit
                     JournalEntry::create([
                         'transaction_id'      => $transaction->id,
-                        'coa_id'              => $saleCoa->id,
+                        'coa_id'              => $costCoa->id,
                         'invoice_id'             => $invoice->id,
                         'debit'               => 0,
-                        'credit'              => $saleAmount,
+                        'credit'              => $costAmount,
                         'description'         => "Sale transaction #{$transaction->reference_type} ({$transaction->shipment->shipment_id}) - {$transaction->description}",
                         'transactionable_type' => $transaction->reference_type,
                         'transactionable_id'  => $transaction->id,

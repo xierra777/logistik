@@ -43,6 +43,10 @@ class Customer extends Model
             ? $this->chartOfAccount->term_type
             : 'unknown';
     }
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class, 'customer_id');
+    }
     public function jobs()
     {
         return $this->hasMany(TJob::class, 'client_id');

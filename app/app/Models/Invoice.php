@@ -38,6 +38,11 @@ class Invoice extends Model
     {
         return $this->belongsTo(Customer::class, 'customer_id');
     }
+    public function paymentAllocations()
+    {
+        return $this->hasMany(PaymentAllocation::class, 'invoice_id');
+    }
+
     public function transactions()
     {
         return $this->belongsToMany(Transaction::class, 'invoice_transaction')

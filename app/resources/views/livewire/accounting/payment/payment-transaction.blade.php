@@ -1,6 +1,6 @@
 <div class="p-2">
     <div class="flex justify-end mb-4 gap-4">
-        <button class="px-4 py-2 bg-red-200 rounded-md hover:scale-105 transition-transform duration-400 ease-in-out hover:bg-red-400 hover:text-white">Make a Payment!</button>
+        <a href="{{route('createPay')}}" class="px-4 py-2 bg-red-200 rounded-md hover:scale-105 transition-transform duration-400 ease-in-out hover:bg-red-400 hover:text-white">Make a Payment!</a>
         <div x-data="{ openPayment : false}" @close-modal.window="openPayment = false" @keydown.escape.window="openPayment = false" @click.away="openPayment = false">
             <button @click="openPayment = true" x-init="initContainerSelect2" class="px-4 py-2 bg-blue-200 rounded-md hover:scale-105 transition-transform duration-400 ease-in-out hover:bg-blue-400 hover:text-white">Make a Payment!</button>
 
@@ -43,7 +43,7 @@
 
                             <div class="flex flex-col" wire:ignore>
                                 <label for="customerVendor_id">customer_id / vendor_id </label>
-                                <select name="customerVendor_id" id="customerVendor_id" multiple wire:model.live="selectedInvoice" class="border-gray-300 w-full rounded-md">
+                                <select name="customerVendor_id" id="selectedCustVendor" multiple wire:model.live="selectedInvoice" class="border-gray-300 w-full rounded-md">
                                     <option value=""></option>
                                     @foreach($invoices as $invoice)
                                     <option value="{{ $invoice->id }}">
@@ -149,17 +149,30 @@
             </thead>
             <tbody>
                 @foreach($payment as $pym)
-                <tr>
-                    <td class="text-gray-700 text-center border border-gray-300 whitespace-nowrap">{{$loop->iteration}}</td>
-                    <td class="text-gray-700 text-center border border-gray-300 whitespace-nowrap">{{$pym->payment_no}}</td>
-                    <td class="text-gray-700 text-center border border-gray-300 whitespace-nowrap">{{$pym->payment_date}}</td>
-                    <td class="text-gray-700 text-center border border-gray-300 whitespace-nowrap">{{$pym->customer->name ?? ''}}</td>
-                    <td class="text-gray-700 text-center border border-gray-300 whitespace-nowrap">{{number_format($pym->amount,2,',','.')}}</td>
-                    <td class="text-gray-700 text-center border border-gray-300 whitespace-nowrap">{{$pym->status}}</td>
-                    <td class="text-gray-700 text-center border border-gray-300 whitespace-nowrap"><button class="py-2 px-3 bg-blue-200 rounded-full hover:text-gray-200 hover:bg-blue-400 hover:scale-105 transform">Add</button></td>
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="text-center border border-gray-300 px-2 py-1 text-gray-700">{{ $loop->iteration }}</td>
+                    <td class="text-center border border-gray-300 px-2 py-1 text-gray-700">{{ $pym->payment_no }}</td>
+                    <td class="text-center border border-gray-300 px-2 py-1 text-gray-700">{{ $pym->payment_date }}</td>
+                    <td class="text-center border border-gray-300 px-2 py-1 text-gray-700">{{ $pym->customer->name ?? '-' }}</td>
+                    <td class="text-center border border-gray-300 px-2 py-1 text-gray-700">
+                        {{$pym->currency}} {{ number_format($pym->amount, 2, ',', '.') }}
+                    </td>
+                    <td class="text-center border border-gray-300 px-2 py-1 text-gray-700">
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold 
+                    {{ $pym->status === 'paid' ? 'bg-green-200 text-green-700' : 'bg-yellow-200 text-yellow-700' }}">
+                            {{ $pym->status }}
+                        </span>
+                    </td>
+                    <td class="text-center border border-gray-300 px-2 py-1">
+                        <a href="{{route('viewPay',['payId'=>$pym->id])}}"
+                            class="py-1 px-3 bg-blue-500 text-white text-sm rounded-full hover:bg-blue-600 hover:scale-105 transition-transform">
+                            View
+                        </a>
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
+
         </table>
     </div>
 </div>
@@ -168,7 +181,7 @@
     window.initContainerSelect2 = () => {
         // Configuration for all select elements
         const selectConfigs = [{
-            sel: '#customerVendor_id',
+            sel: '#selectedCustVendor',
             model: 'selectedCustVendor',
             placeholder: 'Select Customer'
         }, ];

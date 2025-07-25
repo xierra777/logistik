@@ -6,10 +6,6 @@
                 <div>
                     <input type="date" wire:model="payment_date" class="w-full rounded-md border-gray-300 cursor-pointer">
                 </div>
-                @error('payment_date')
-                <p class="bg-yellow-200 text-red-400 p-2 rounded-md mt-2"> {{$message}}
-                </p>
-                @enderror
             </div>
 
             <div class="flex flex-col">
@@ -51,7 +47,7 @@
             </div>
             <div class="flex flex-col">
                 <label for="remarks">Remarks</label>
-                <input type="text" class="w-full rounded-md border-gray-300">
+                <input type="text" wire:model="remark" class="w-full rounded-md border-gray-300">
             </div>
             <div class="flex flex-col">
                 <label for="status">status</label>
@@ -79,6 +75,27 @@
                     </thead>
                     <tbody>
                         @forelse($invoiceForeach as $invFrch)
+                        @php
+                        // Perhitungan di blade
+                        $totalAmount = (float) ($invFrch->total_amount ?? 0);
+                        $totalPaid = (float) $invFrch->paymentAllocations->sum('amount_allocated');
+                        $kurang = $totalAmount - $totalPaid;
+
+                        // Logic status pembayaran dengan styling
+                        if ($totalPaid == 0) {
+                        $statusText = 'Belum Bayar';
+                        $statusClass = 'bg-red-100 text-red-800 border-red-200';
+                        $iconClass = 'text-red-500';
+                        } elseif ($totalPaid >= $totalAmount) {
+                        $statusText = 'Lunas';
+                        $statusClass = 'bg-green-100 text-green-800 border-green-200';
+                        $iconClass = 'text-green-500';
+                        } else {
+                        $statusText = 'Belum Lunas';
+                        $statusClass = 'bg-yellow-100 text-yellow-800 border-yellow-200';
+                        $iconClass = 'text-yellow-500';
+                        }
+                        @endphp
 
                         <tr class="border border-gray-500">
                             <td class="px-1 py-1 text-center border">{{$loop->iteration}}</td>
@@ -87,11 +104,16 @@
                                     wire:click="selectedInvoice({{$invFrch->id}})"
                                     class="border-blue-400 rounded-md cursor-pointer">
                             </td>
-                            <td class="px-1 py-1 text-center border">{{$invFrch->invoice_number}} - {{$invFrch->job->job_id ?? ''}} {{$invFrch->shipment->shipment_id ?? ''}}</td>
-                            <td class="px-1 py-1 text-center border">{{$invFrch->client->name ?? ''}}</td>
-                            <td class="px-1 py-1 text-center border">Rp. {{ number_format($invFrch->total_amount, 2, '.', ',') }}
+                            <td class="px-1 py-1 text-center border">
+                                {{$invFrch->invoice_number}} - {{$invFrch->job->job_id ?? ''}} {{$invFrch->shipment->shipment_id ?? ''}}
                             </td>
-                            <td class="px-1 py-1 text-center border">Rp.{{number_format($invFrch->paid ?? '',2,'.',',')}}</td>
+                            <td class="px-1 py-1 text-center border">{{$invFrch->client->name ?? ''}}</td>
+                            <td class="px-1 py-1 text-center border">
+                                Rp. {{ number_format($totalAmount, 2, '.', ',') }}
+                            </td>
+                            <td class="px-1 py-1 text-center border">
+                                Rp. {{ number_format($totalPaid, 2, '.', ',') }}
+                            </td>
                             <td class="px-1 py-1 border">
                                 <div class="relative w-full">
                                     <input type="text"
@@ -101,8 +123,11 @@
                                         min="0">
                                 </div>
                             </td>
-                            <td class="px-1 py-1 text-center border">Rp.{{number_format($invFrch->kurang ?? '',2,'.',',')}}</td>
-                            <td class="px-1 py-1 text-center border"> @if($invFrch->status_text === 'Lunas')
+                            <td class="px-1 py-1 text-center border">
+                                Rp. {{ number_format($kurang, 2, '.', ',') }}
+                            </td>
+                            <td class="px-1 py-1 text-center border">
+                                @if($statusText === 'Lunas')
                                 <span class="text-green-600 font-semibold">Lunas</span>
                                 @else
                                 <span class="text-yellow-600 font-semibold">Belum Lunas</span>
@@ -110,9 +135,33 @@
                             </td>
                         </tr>
                         @empty
+                        <tr>
+                            <td colspan="9" class="text-center py-4">Select Customer</td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
+                @if($errors->any())
+                <div x-data="{ show: true }"
+                    x-show="show"
+                    x-transition
+                    @input.window="show = false"
+                    class="bg-red-50 border-2 border-red-200 rounded-3xl p-6 mb-8 shadow-lg">
+
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-2xl mr-3"></i>
+                        <h4 class="text-xl font-bold text-red-800">Please fix the following errors:</h4>
+                    </div>
+                    <ul class="space-y-2">
+                        @foreach($errors->all() as $error)
+                        <li class="flex items-center text-red-700">
+                            <i class="fas fa-times-circle text-red-500 mr-2"></i>
+                            {{ $error }}
+                        </li>
+                        @endforeach
+                    </ul>
+                </div>
+                @endif
                 @if($selectedInvoiceId)
                 {{ implode(', ', $selectedInvoiceId) }}
                 @else
@@ -165,6 +214,34 @@
             });
         });
     };
+</script>
+@endscript
+@script
+<script>
+    window.addEventListener('swal:alert', event => {
+        let data;
+
+        // Handle both array and object
+        if (Array.isArray(event.detail)) {
+            data = event.detail[0]; // Ambil element pertama jika array
+        } else {
+            data = event.detail; // Gunakan langsung jika object
+        }
+
+        // console.log('Processed data:', data);
+
+        if (data && data.title) {
+            Swal.fire({
+                title: data.title,
+                text: data.text,
+                icon: data.icon,
+                html: data.html,
+                confirmButtonText: data.confirmButtonText || 'OK'
+            });
+        } else {
+            // console.error('Invalid data structure:', data);
+        }
+    });
 </script>
 @endscript
 @endpush

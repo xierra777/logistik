@@ -7,6 +7,8 @@ use App\Models\Customer;
 use App\Models\Invoice;
 use App\Models\Payment;
 use App\Models\PaymentAllocation;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
@@ -56,41 +58,11 @@ class CreatePayment extends Component
     // Kalo yang atas ga jalan, coba ini
     public function updatedSelectedCustVendor($value)
     {
-        $invoices = Invoice::when(is_array($value), function ($query) use ($value) {
+        $this->invoiceForeach = Invoice::when(is_array($value), function ($query) use ($value) {
             return $query->whereIn('customer_id', $value)->where('status', '!=', 'void');
         }, function ($query) use ($value) {
             return $query->where('customer_id', $value)->where('status', '!=', 'void');
         })->with('client', 'job.jobTransactions', 'shipment.shipmentTransaction', 'paymentAllocations')->get();
-        if ($invoices->count() > 0) {
-            $firstInvoice = $invoices->first();
-
-            dd([
-                'model_class' => get_class($firstInvoice),
-                'casts' => $firstInvoice->getCasts(), // Lihat casting yang aktif
-                'total_amount' => $firstInvoice->total_amount,
-                'total_amount_type' => gettype($firstInvoice->total_amount),
-                'raw_attributes' => $firstInvoice->getRawOriginal('total_amount'), // Nilai asli dari DB
-            ]);
-        }
-        $this->invoiceForeach = $invoices->map(function ($inv) {
-            // Convert to float to ensure numeric values
-            $totalAmount = (float) ($inv->total_amount ?? 0);
-            $totalPaid = (float) $inv->paymentAllocations->sum('amount_allocated');
-
-            $inv->kurang = $totalAmount - $totalPaid;
-            $inv->status_text = $totalPaid >= $totalAmount ? 'Lunas' : 'Belum Lunas';
-            $inv->paid = $totalPaid;
-            dump([
-                'total_amount' => $inv->total_amount,
-                'total_amount_type' => gettype($inv->total_amount),
-                'amount_allocated' => gettype($inv->paymentAllocations->sum('amount_allocated')),
-                'sum_result' => $inv->paymentAllocations->sum('amount_allocated'),
-                'sum_type' => gettype($inv->paymentAllocations->sum('amount_allocated'))
-            ]);
-            return $inv;
-        });
-        // Debug the data types
-
     }
     public function selectedInvoice($id)
     {
@@ -100,24 +72,135 @@ class CreatePayment extends Component
             $this->selectedInvoiceId[] = $id;
         }
     }
-
-
-
     public function savePayment()
     {
-        // $selectedIds = $this->selectedInvoiceId;
-        // $invoices = Invoice::whereIn('id', $selectedIds)->get();
-        // $total = $invoices->sum('total_amount');
-        // dd($selectedIds, $invoices, $total);
-
         $this->validate();
+
+        // Validasi input dasar
+        if (empty($this->selectedInvoiceId)) {
+            session()->flash('error', 'Please select at least one invoice.');
+            return;
+        }
+
+        DB::beginTransaction();
+
         try {
-            $invoices = Invoice::whereIn('id', $this->selectedInvoiceId)->get();
-            $this->customerVendor_id = $this->selectedCustVendor;
-            $referenceId = null;
-            $referenceType = null;
+            // Ambil invoices dengan payment allocations
+            $invoices = Invoice::whereIn('id', $this->selectedInvoiceId)
+                ->where('status', '!=', 'void')
+                ->with('paymentAllocations')
+                ->get();
+
+            // Validasi count invoices
+            if ($invoices->count() !== count($this->selectedInvoiceId)) {
+                $this->dispatch('swal:alert', [
+                    'icon' => 'error',
+                    'title' => 'Invalid Selection!',
+                    'text' => 'Some selected invoices are not found or invalid.'
+                ]);
+                return;
+            }
+
+            // Validasi setiap invoice dan allocation
+            $validAllocations = [];
+            $totalAllocationAmount = 0;
+
+            foreach ($invoices as $invoice) {
+                $allocationAmount = $this->allocations[$invoice->id] ?? 0;
+
+                // Skip jika tidak ada allocation untuk invoice ini
+                if (!is_numeric($allocationAmount) || $allocationAmount <= 0) {
+                    continue;
+                }
+
+                $allocationAmount = (float) $allocationAmount;
+
+                // Hitung total yang sudah dibayar sebelumnya
+                $totalPaid = (float) $invoice->paymentAllocations->sum('amount_allocated');
+                $totalAmount = (float) ($invoice->total_amount ?? 0);
+                $outstanding = $totalAmount - $totalPaid;
+
+                // Cek apakah invoice sudah lunas
+                if ($totalPaid >= $totalAmount) {
+                    $this->dispatch('swal:alert', [
+                        'icon' => 'warning',
+                        'title' => 'Invoice Already Paid!',
+                        'html' => "Invoice <strong>{$invoice->invoice_number}</strong> is already fully paid.<br><br>Outstanding amount: <strong>Rp " . number_format($outstanding, 2) . "</strong>",
+                        'confirmButtonText' => 'OK'
+                    ]);
+                    return;
+                }
+
+                // Cek apakah allocation amount melebihi outstanding
+                if ($allocationAmount > $outstanding) {
+                    $this->dispatch('swal:alert', [
+                        'icon' => 'error',
+                        'title' => 'Allocation Exceeds Outstanding!',
+                        'html' => "Allocation amount for invoice <strong>{$invoice->invoice_number}</strong><br><br>" .
+                            "Allocation: <strong>Rp " . number_format($allocationAmount, 2) . "</strong><br>" .
+                            "Outstanding: <strong>Rp " . number_format($outstanding, 2) . "</strong><br><br>" .
+                            "Please adjust the allocation amount.",
+                        'confirmButtonText' => 'OK'
+                    ]);
+                    return;
+                }
+
+                // Simpan allocation yang valid
+                $validAllocations[] = [
+                    'invoice' => $invoice,
+                    'amount' => $allocationAmount
+                ];
+
+                $totalAllocationAmount += $allocationAmount;
+            }
+
+            // Validasi bahwa ada allocation yang valid
+            if (empty($validAllocations)) {
+                $this->dispatch('swal:alert', [
+                    'icon' => 'warning',
+                    'title' => 'No Valid Allocations!',
+                    'text' => 'No valid payment allocations found. Please enter allocation amounts for selected invoices.',
+                    'confirmButtonText' => 'OK'
+                ]);
+                return;
+            }
+
+            // Validasi total allocation tidak melebihi payment amount
+            if ($totalAllocationAmount != $this->amount) {
+                $difference = $totalAllocationAmount - $this->amount;
+
+                if ($difference > 0) {
+                    // Total alokasi lebih besar dari payment
+                    $this->dispatch('swal:alert', [
+                        'icon' => 'error',
+                        'title' => 'Total Allocation Exceeds Payment!',
+                        'html' => "Total allocation amount cannot exceed payment amount.<br><br>" .
+                            "Total Allocation: <strong>Rp " . number_format($totalAllocationAmount, 2) . "</strong><br>" .
+                            "Payment Amount: <strong>Rp " . number_format($this->amount, 2) . "</strong><br>" .
+                            "Excess Amount: <strong>Rp " . number_format($difference, 2) . "</strong><br><br>" .
+                            "Please reduce the allocation amounts.",
+                        'confirmButtonText' => 'OK'
+                    ]);
+                } else {
+                    // Total alokasi kurang dari payment
+                    $shortage = abs($difference);
+                    $this->dispatch('swal:alert', [
+                        'icon' => 'warning',
+                        'title' => 'Incomplete Allocation!',
+                        'html' => "Total allocation amount is less than payment amount.<br><br>" .
+                            "Total Allocation: <strong>Rp " . number_format($totalAllocationAmount, 2) . "</strong><br>" .
+                            "Payment Amount: <strong>Rp " . number_format($this->amount, 2) . "</strong><br>" .
+                            "Remaining Amount: <strong>Rp " . number_format($shortage, 2) . "</strong><br><br>" .
+                            "Please allocate the remaining amount.",
+                        'confirmButtonText' => 'OK'
+                    ]);
+                }
+                return;
+            }
+
+            // Create payment record
             $payment = Payment::create([
-                'customerVendor_id' => $this->customerVendor_id,
+                'customerVendor_id' => $this->selectedCustVendor,
                 'payment_no'        => $this->payment_no,
                 'payment_date'      => $this->payment_date,
                 'bank_coa'          => $this->bank_coa,
@@ -125,38 +208,63 @@ class CreatePayment extends Component
                 'currency'          => $this->currency,
                 'exchange_rate'     => $this->exchange_rate,
                 'remarks'           => $this->remarks,
-                'reference_id'      => $referenceId,
-                'reference_type'    => $referenceType,
+                'reference_id'      => null, // Fix: jangan simpan collection object
+                'reference_type'    => null,
+                'created_by'        => Auth::id(),
             ]);
-            // dd($invoices);
-            foreach ($invoices as $invoice) {
-                $amount = $this->allocations[$invoice->id] ?? 0;
-                if (is_numeric($amount) && $amount > 0) {
-                    PaymentAllocation::create([
-                        'payment_id'        => $payment->id,
-                        'invoice_id'        => $invoice->id,
-                        'job_id'            => $invoice->job_id,
-                        'shipment_id'       => $invoice->shipment_id,
-                        'amount_allocated'  => (float) $amount,
-                        'currency'          => $invoice->currency ?? $this->currency,
-                        'exchange_rate'     => $invoice->exchange_rate ?? $this->exchange_rate,
-                        'remarks'           => null,
-                    ]);
-                }
+
+            // Create payment allocations
+            foreach ($validAllocations as $allocation) {
+                $invoice = $allocation['invoice'];
+                $amount = $allocation['amount'];
+
+                PaymentAllocation::create([
+                    'payment_id'        => $payment->id,
+                    'invoice_id'        => $invoice->id,
+                    'job_id'            => $invoice->job_id,
+                    'shipment_id'       => $invoice->shipment_id,
+                    'amount_allocated'  => $amount,
+                    'currency'          => $invoice->currency ?? $this->currency,
+                    'exchange_rate'     => $invoice->exchange_rate ?? $this->exchange_rate,
+                    'remarks'           => null,
+                    'created_by'        => Auth::id(),
+                ]);
             }
 
-            $this->generateCodeNo();
-            session()->flash('message', 'Payment saved successfully!');
-        } catch (\Exception $e) {
-            session()->flash('error', 'Failed to save payment: ' . $e->getMessage());
-            throw $e;
-        }
-        $this->reset();
-        return redirect()->route('paymentTrans')->with('success', [
-            'icon' => 'success', // Type of alert: 'success', 'error', 'warning', etc.
-            'title' => 'Success!', // Toast title
+            DB::commit();
 
-        ]);
+            $this->generateCodeNo();
+
+            // Reset form fields
+            $this->reset([
+                'selectedInvoiceId',
+                'allocations',
+                'payment_no',
+                'amount',
+                'remarks',
+                'invoiceForeach'
+            ]);
+
+            session()->flash('message', 'Payment saved successfully! ' . count($validAllocations) . ' invoice(s) allocated.');
+
+            return redirect()->route('paymentTrans')->with('success', [
+                'icon' => 'success',
+                'title' => 'Payment Saved!',
+                'message' => "Payment {$payment->payment_no} has been saved successfully."
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            // Log error
+            // \Log::error('Payment save failed: ' . $e->getMessage(), [
+            //     'user_id' => Auth::id(),
+            //     'selected_invoices' => $this->selectedInvoiceId ?? [],
+            //     'allocations' => $this->allocations ?? []
+            // ]);
+
+            session()->flash('error', $e->getMessage());
+            return;
+        }
     }
     public function generateCodeNo()
     {

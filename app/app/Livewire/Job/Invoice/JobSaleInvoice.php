@@ -249,7 +249,7 @@ class JobSaleInvoice extends Component
     public function generateInvoiceNumber()
     {
         try {
-            $prefix = "INV/BRN/" . now()->format('y/m/');
+            $prefix = "INV/BRN/" . now()->format('ym');
 
             // Get the highest number for today using raw SQL for better performance
             $result = DB::select("

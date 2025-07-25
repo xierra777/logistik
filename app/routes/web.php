@@ -6,7 +6,9 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\Accounting\Accountant;
 use App\Livewire\Accounting\ChartOfAccount\ChargeCoaSetting;
 use App\Livewire\Accounting\ChartOfAccount\ChartOfAccountDetails;
+use App\Livewire\Accounting\Payment\CreatePayment;
 use App\Livewire\Accounting\Payment\PaymentTransaction;
+use App\Livewire\Accounting\Payment\ViewPayment;
 use App\Livewire\Accounting\PurchaseInvoice;
 use App\Livewire\Accounting\Tranksaksi;
 use App\Livewire\Accounting\SaleInvoice;
@@ -231,11 +233,21 @@ Route::get('chart-of-accont', ChartOfAccountDetails::class)
     ->middleware(['auth', 'verified'])
     ->name('chartOfAccount');
 
-
+// Payment
 Route::get('paymentTransaction', PaymentTransaction::class)
     ->middleware(['auth', 'verified'])
     ->name('paymentTrans');
 
+Route::get('createPayment', CreatePayment::class)
+    ->middleware(['auth', 'verified'])
+    ->name('createPay');
+
+Route::get('viewPayment/{payId}', ViewPayment::class)
+    ->middleware(['auth', 'verified'])
+    ->name('viewPay');
+
+
+// End Payment
 Route::get('/csrf-token', function (Request $request) {
     return response()->json(['csrf_token' => csrf_token()]);
 })->name('csrf-token');

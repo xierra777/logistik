@@ -18,7 +18,7 @@ class Payment extends Model
 
     public function allocations()
     {
-        return $this->hasMany(PaymentJobAllocations::class);
+        return $this->hasMany(PaymentAllocation::class);
     }
     public function payments()
     {

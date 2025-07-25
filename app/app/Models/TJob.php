@@ -40,12 +40,12 @@ class TJob extends Model
     }
     public function paymentAllocations()
     {
-        return $this->hasMany(PaymentJobAllocations::class, 'job_id');
+        return $this->hasMany(PaymentAllocation::class, 'job_id');
     }
 
     public function payments()
     {
-        return $this->hasManyThrough(Payment::class, PaymentJobAllocations::class, 'job_id', 'id', 'id', 'payment_id');
+        return $this->hasManyThrough(Payment::class, PaymentAllocation::class, 'job_id', 'id', 'id', 'payment_id');
     }
 
 

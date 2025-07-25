@@ -722,13 +722,12 @@
                     </tr>
                     @empty
                     <tr wire:loading.remove>
-                        <td colspan="13" class="py-12 text-center">
+                        <td colspan="14" class="py-12 text-center">
                             <div class="flex flex-col text-center items-center justify-center">
                                 <img src="{{ asset('images/nodata.svg') }}"
                                     alt="No dataShipments illustration"
                                     class="w-64 h-48 mb-4 opacity-75  dark:opacity-50">
                                 <p class="text-md font-medium text-gray-600 dark:text-neutral-300">
-                                    Mohon Kesediann Menunggu, Modul Masih dalam Pengerjaan
                                 </p>
                             </div>
                         </td>

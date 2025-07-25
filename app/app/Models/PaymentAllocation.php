@@ -15,7 +15,10 @@ class PaymentAllocation extends Model
     {
         return $this->belongsTo(Payment::class);
     }
-
+    public function invoices()
+    {
+        return $this->belongsTo(Invoice::class, 'invoice_id');
+    }
     public function job()
     {
         return $this->belongsTo(TJob::class);

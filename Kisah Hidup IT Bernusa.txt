@@ -202,3 +202,6 @@ jadi urutan payment gini
 
 1. Pilih customer * (menampilkan semua customer yang berelasi dengan invoice, )
 
+
+Urgent bagian shipments belum terselesaikan ini bahaya perlu difix  masih ada dua carrier / ganda
+

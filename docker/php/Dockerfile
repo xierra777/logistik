@@ -20,8 +20,15 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
     software-properties-common \
-    && docker-php-ext-install pdo pdo_mysql zip
+    git \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql zip gd mbstring xml
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Install Node.js 18 & NPM
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
@@ -38,6 +45,8 @@ RUN npm install -g puppeteer
 
 # Set working directory
 WORKDIR /var/www
+
+# No need to copy and install here since volume mount will override
 
 # Expose port (jika perlu debugging atau untuk fpm external)
 EXPOSE 9000

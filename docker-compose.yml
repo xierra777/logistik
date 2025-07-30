@@ -7,13 +7,16 @@ services:
     working_dir: /var/www
     volumes:
       - ./app:/var/www
+      - vendor_data:/var/www/vendor  # Persist vendor directory
     ports:
       - "8000:8000"
     depends_on:
       - mysql
     networks:
       - laravel
-    command: php artisan serve --host=0.0.0.0 --port=8000
+    command: >
+      sh -c "composer install --no-interaction &&
+             php artisan serve --host=0.0.0.0 --port=8000"
 
   mysql:
     image: mysql:8.0
@@ -47,6 +50,7 @@ services:
 
 volumes:
   dbdata:
+  vendor_data:  # Named volume for vendor directory
 
 networks:
   laravel:

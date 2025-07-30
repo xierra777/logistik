@@ -20,6 +20,7 @@ class JobCreateShipment extends Component
     public $step = 1;
     public $shipmentType_job = '';
     public $shipment_id = '';
+    public $shipmentHouseBillLadingNo;
 
 
     public $shippers;

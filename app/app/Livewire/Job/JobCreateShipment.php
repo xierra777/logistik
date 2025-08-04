@@ -38,7 +38,7 @@ class JobCreateShipment extends Component
 
 
     // Detail Shipment
-    public $shipmentCustomerCodeJob, $shipmentBillLadingDate, $shipmentPort_of_loading, $shipmentPort_of_final, $shipmentPlace_of_receipt, $shipmentPort_of_receipt, $shipmentPort_of_discharge, $shipmentPlace_of_delivery, $shipmentOcean_vessel_feeder, $shipmentEstimearrival, $shipmentEstimedelivery, $shipmentPayableAtJob, $shipmentServices_type, $shipmentIncoTerms, $shipmentFreightTypeJob = "Prepaid", $shipmentCross_trade, $shipmentRemarksJobDetailJobs;
+    public $shipmentCustomerCodeJob, $shipmentBillLadingDate, $shipmentPort_of_loading, $shipmentPort_of_final, $shipmentPlace_of_receipt, $shipmentPort_of_receipt, $shipmentPort_of_discharge, $shipmentPlace_of_delivery, $shipmentOcean_vessel_feeder, $shipmentEstimearrival, $shipmentEstimedelivery, $shipmentPayableAtJob, $shipmentServices_type, $shipmentCross_trade, $shipmentFreightTypeJob = "Prepaid", $shipmentRemarksJobDetailJobs;
 
     // Container Detail
     public $shipmentFlightVesselName, $shipmentFlightVesselNo, $shipmentNoOfPackages, $shipmentContainerDeliveryAgent, $shipmentGrossWeight, $shipmentVolumeWeight, $shipmentVolume, $shipmentChargableWeight, $ShipmentHsCode, $shipmentContainerRemarks, $shipmentHsCodeDesc, $shipmentTypeOfVolumeWeight, $shipmentTypeOfGrossWeight, $shipmentTypeOfPackages, $typeOfShipmentVolume, $shipmentHsCode;
@@ -73,7 +73,7 @@ class JobCreateShipment extends Component
         $this->shipmentBillLadingDate = $this->job->jobBillLadingDate;
         $this->shipmentCarrierAirline = $this->job->carrierAirline;
         $this->shipmentFreightTypeJob = $this->job->data['freightTypeJob'];
-        $this->shipmentIncoTerms      = $this->job->data['incoTerms'];
+        $this->shipmentCross_trade      = $this->job->data['incoTerms'];
         $this->shipmentServices_type = $this->job->data['servicesType'];
         $this->shipmentEstimearrival = $this->job->data['estimearrival'];
         $this->shipmentEstimedelivery = $this->job->data['estimedelivery'];
@@ -332,7 +332,7 @@ class JobCreateShipment extends Component
             'shipmentEstimedelivery'       => $this->shipmentEstimedelivery,
             'shipmentPayableAtJob'         => $this->shipmentPayableAtJob,
             'shipmentServices_type'        => $this->shipmentServices_type,
-            'shipmentIncoTerms'            => $this->shipmentIncoTerms,
+            'shipmentCross_trade'            => $this->shipmentCross_trade,
             'shipmentFreightTypeJob'       => $this->shipmentFreightTypeJob,
             'shipmentRemarksJobDetailJobs' => $this->shipmentRemarksJobDetailJobs,
         ];
@@ -415,7 +415,7 @@ class JobCreateShipment extends Component
             'shipmentEstimedelivery'       => $this->shipmentEstimedelivery,
             'shipmentPayableAtJob'         => $this->shipmentPayableAtJob,
             'shipmentServices_type'        => $this->shipmentServices_type,
-            'shipmentIncoTerms'            => $this->shipmentIncoTerms,
+            'shipmentCross_trade'            => $this->shipmentCross_trade,
             'shipmentFreightTypeJob'       => $this->shipmentFreightTypeJob,
             'shipmentRemarksJobDetailJobs' => $this->shipmentRemarksJobDetailJobs,
         ];
@@ -499,7 +499,7 @@ class JobCreateShipment extends Component
             'shipmentEstimedelivery'       => $this->shipmentEstimedelivery,
             'shipmentPayableAtJob'         => $this->shipmentPayableAtJob,
             'shipmentServices_type'        => $this->shipmentServices_type,
-            'shipmentIncoTerms'            => $this->shipmentIncoTerms,
+            'shipmentCross_trade'            => $this->shipmentCross_trade,
             'shipmentFreightTypeJob'       => $this->shipmentFreightTypeJob,
             'shipmentRemarksJobDetailJobs' => $this->shipmentRemarksJobDetailJobs,
         ];
@@ -583,7 +583,7 @@ class JobCreateShipment extends Component
             'shipmentEstimedelivery'       => $this->shipmentEstimedelivery,
             'shipmentPayableAtJob'         => $this->shipmentPayableAtJob,
             'shipmentServices_type'        => $this->shipmentServices_type,
-            'shipmentIncoTerms'            => $this->shipmentIncoTerms,
+            'shipmentCross_trade'            => $this->shipmentCross_trade,
             'shipmentFreightTypeJob'       => $this->shipmentFreightTypeJob,
             'shipmentRemarksJobDetailJobs' => $this->shipmentRemarksJobDetailJobs,
         ];
@@ -667,7 +667,7 @@ class JobCreateShipment extends Component
             'shipmentEstimedelivery'       => $this->shipmentEstimedelivery,
             'shipmentPayableAtJob'         => $this->shipmentPayableAtJob,
             'shipmentServices_type'        => $this->shipmentServices_type,
-            'shipmentIncoTerms'            => $this->shipmentIncoTerms,
+            'shipmentCross_trade'            => $this->shipmentCross_trade,
             'shipmentFreightTypeJob'       => $this->shipmentFreightTypeJob,
             'shipmentRemarksJobDetailJobs' => $this->shipmentRemarksJobDetailJobs,
         ];
@@ -751,7 +751,7 @@ class JobCreateShipment extends Component
             'shipmentEstimedelivery'       => $this->shipmentEstimedelivery,
             'shipmentPayableAtJob'         => $this->shipmentPayableAtJob,
             'shipmentServices_type'        => $this->shipmentServices_type,
-            'shipmentIncoTerms'            => $this->shipmentIncoTerms,
+            'shipmentCross_trade'            => $this->shipmentCross_trade,
             'shipmentFreightTypeJob'       => $this->shipmentFreightTypeJob,
             'shipmentRemarksJobDetailJobs' => $this->shipmentRemarksJobDetailJobs,
         ];

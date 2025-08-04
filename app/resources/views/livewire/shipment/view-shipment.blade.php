@@ -19,7 +19,7 @@
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Type Job </p>
-            <p class="text-center px-4 py-2"> {{ strtoupper(str_replace('_', ' ', $shipment->shipmentsTypeJob)) }}</p>
+            <p class="text-center px-4 py-2"> {{ strtoupper(str_replace('_', ' ', $shipment->shipmentsTypeJob)) ?? '' }}</p>
         </div>
         <div class="flex flex-col"> <!-- Disini Custome  -->
             <p class="text-center bg-gray-300 px-3 py-1">Customer Code Job </p>
@@ -202,7 +202,7 @@
             </div>
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">Cross Trade </p>
-                <p class="text-center px-4 py-2 uppercase"> {{ $shipment->dataShipments['shipmentCross_trade'] }}</p>
+                <p class="text-center px-4 py-2 uppercase"> {{ $shipment->dataShipments['shipmentCross_trade'] ?? '-' }}</p>
             </div>
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">Inco Terms </p>

@@ -16,7 +16,7 @@
         @if($type_job === 'ocean_fcl_export' ||$type_job === 'air_outbound' || $type_job === 'ocean_lcl_export')
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">Delivery Agent </p>
-            <p class="text-center  px-4 py-2 font-bold"> {{$job->dagents->name}}</p>
+            <p class="text-center  px-4 py-2 font-bold"> {{$job->dagents->name ?? ''}}</p>
         </div>
         @elseif($type_job === 'ocean_fcl_import'|| $type_job === 'air_inbound' || $type_job === 'ocean_lcl_import')
         <div class="flex flex-col">

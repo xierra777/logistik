@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ChargeSetting extends Model
 {
+    use softDeletes;
     protected $fillable = [
         'charge_code',
         'charge_name',
@@ -21,7 +23,7 @@ class ChargeSetting extends Model
     }
     public function user()
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(user::class, 'created_by');
     }
     public function coaCost()
     {

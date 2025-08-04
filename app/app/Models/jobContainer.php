@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class jobContainer extends Model
 {
     protected $casts = ['containers' => 'array'];
+    use softDeletes;
 
     protected $fillable = [
         'id_job',

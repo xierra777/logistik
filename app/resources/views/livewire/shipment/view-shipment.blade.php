@@ -337,16 +337,16 @@
                     <form wire:submit.prevent="createContainer">
                         <div class="p-3">
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                @if($shipment->job->TjobContainer->isNotEmpty())
-                                <div class="flex flex-col space-y-2 col-span-2" wire:ignore>
-                                    <label>Container No</label>
-                                    <select id="parentContainer" wire:model="parentContainer" class="rounded-md border-gray-300 shadow-sm">
-                                        <option value=""></option>
-                                        @foreach($shipment->job->TjobContainer as $cont)
-                                        <option value="{{ $cont->id }}">{{ $cont->containers['containerNo'] }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                               @if(optional($shipment->job)->TjobContainer && $shipment->job->TjobContainer->isNotEmpty())
+                                    <div class="flex flex-col space-y-2 col-span-2" wire:ignore>
+                                        <label>Container No</label>
+                                        <select id="parentContainer" wire:model="parentContainer" class="rounded-md border-gray-300 shadow-sm">
+                                            <option value=""></option>
+                                            @foreach($shipment->job->TjobContainer as $cont)
+                                                <option value="{{ $cont->id }}">{{ $cont->containers['containerNo'] }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
                                 @else
                                 <div class="flex flex-col space-y-2 col-span-2">
                                     <label>Container No</label>
@@ -490,7 +490,7 @@
                             @if($c->jobContainer)
                             {{$c->jobContainer->containers['containerNo'] ?? ''}}
                             @else
-                            {{$c->containersData['shipmentContainerNo']}}
+                            {{$c->containersData['shipmentContainerNo'] ?? ''}}
                             @endif
                         </td>
                         <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">

@@ -17,6 +17,7 @@ class ViewPayment extends Component
             $allocated = $allocation->amount_allocated ?? 0;
             $allocation->kurang = $invoiceAmount - $allocated; // Tambahkan properti dinamis
         }
+        
     }
     public function render()
     {

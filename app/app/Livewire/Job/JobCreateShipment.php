@@ -58,11 +58,13 @@ class JobCreateShipment extends Component
     public function mount($id)
     {
         $this->job = TJob::with('TjobContainer')->findOrFail($id);
-        // Load basic job data
+        // dd($this->job->dagentsJob);
         $this->id_job = $this->job->$id;
         $this->shipmentClient_id = $this->job->client_id;
+        $this->shipmentShipper_id = $this->job->client_id;
         $this->updatedShipmentClientId($this->shipmentClient_id); // Tambahkan ini!
-        $this->deliveryAgent = $this->job->dagentsJob;
+        $this->shipmentDeliveryAgent = $this->job->dagentsJob;
+        $this->shipmentContainerDeliveryAgent = $this->job->dagentsJob;
         $this->carrierAirline = $this->job->carrierAirline;
         $this->jobEmployee = $this->job->employee_id;
         $this->shipmentType_job = $this->job->type_job;
@@ -70,7 +72,9 @@ class JobCreateShipment extends Component
         $this->shipmentCustomerCodeJob = $this->job->customerCodeJob;
         $this->shipmentBillLadingDate = $this->job->jobBillLadingDate;
         $this->shipmentCarrierAirline = $this->job->carrierAirline;
-
+        $this->shipmentFreightTypeJob = $this->job->data['freightTypeJob'];
+        $this->shipmentIncoTerms      = $this->job->data['incoTerms'];
+        $this->shipmentServices_type = $this->job->data['servicesType'];
         $this->shipmentEstimearrival = $this->job->data['estimearrival'];
         $this->shipmentEstimedelivery = $this->job->data['estimedelivery'];
 
@@ -81,7 +85,8 @@ class JobCreateShipment extends Component
         $this->shipmentPort_of_discharge = $this->job->data['port_of_discharge'];
         $this->shipmentPlace_of_receipt = $this->job->data['place_of_receipt'];
         $this->shipmentPayableAtJob = $this->job->data['payableAtJob'];
-
+        $this->shipmentEmployee_id = $this->job->employee_id;
+        $this->shipmentRemarksJobDetailJobs = $this->job->data['remarksJobDetailJobs'];
         $this->clients = Customer::whereJsonContains('roles', 'client')->get();
         $this->shippers = Customer::whereJsonContains('roles', 'shipper')->get();
         $this->consignees = Customer::whereJsonContains('roles', 'consignee')->get();
@@ -346,6 +351,7 @@ class JobCreateShipment extends Component
 
 
         $shipment = TShipments::create([
+            'id_job'                    => $this->id_job,
             'shipmentsTypeJob'          => $this->shipmentType_job,
             'shipment_id'              => $this->shipment_id,
             'shipmentClient_id'        => $this->shipmentClient_id,
@@ -428,6 +434,7 @@ class JobCreateShipment extends Component
 
 
         $shipment = TShipments::create([
+            'id_job'                    => $this->id_job,
             'shipmentsTypeJob'          => $this->shipmentType_job,
             'shipment_id'              => $this->shipment_id,
             'shipmentClient_id'        => $this->shipmentClient_id,
@@ -444,6 +451,7 @@ class JobCreateShipment extends Component
             'created_by'        => Auth::user()->id
 
         ]);
+
 
         shipmentContainers::create([
             'id_shipments' => $shipment->id,
@@ -510,6 +518,7 @@ class JobCreateShipment extends Component
 
 
         $shipment = TShipments::create([
+            'id_job'                    => $this->id_job,
             'shipmentsTypeJob'          => $this->shipmentType_job,
             'shipment_id'              => $this->shipment_id,
             'shipmentClient_id'        => $this->shipmentClient_id,
@@ -526,6 +535,7 @@ class JobCreateShipment extends Component
             'created_by'        => Auth::user()->id
 
         ]);
+
 
         shipmentContainers::create([
             'id_shipments' => $shipment->id,
@@ -592,6 +602,7 @@ class JobCreateShipment extends Component
 
 
         $shipment = TShipments::create([
+            'id_job'                    => $this->id_job,
             'shipmentsTypeJob'          => $this->shipmentType_job,
             'shipment_id'              => $this->shipment_id,
             'shipmentClient_id'        => $this->shipmentClient_id,
@@ -608,6 +619,7 @@ class JobCreateShipment extends Component
             'created_by'        => Auth::user()->id
 
         ]);
+
 
         shipmentContainers::create([
             'id_shipments' => $shipment->id,
@@ -674,6 +686,7 @@ class JobCreateShipment extends Component
 
 
         $shipment = TShipments::create([
+            'id_job'                    => $this->id_job,
             'shipmentsTypeJob'          => $this->shipmentType_job,
             'shipment_id'              => $this->shipment_id,
             'shipmentClient_id'        => $this->shipmentClient_id,
@@ -690,6 +703,7 @@ class JobCreateShipment extends Component
             'created_by'        => Auth::user()->id
 
         ]);
+
 
         shipmentContainers::create([
             'id_shipments' => $shipment->id,
@@ -756,6 +770,7 @@ class JobCreateShipment extends Component
 
 
         $shipment = TShipments::create([
+            'id_job'                    => $this->id_job,
             'shipmentsTypeJob'          => $this->shipmentType_job,
             'shipment_id'              => $this->shipment_id,
             'shipmentClient_id'        => $this->shipmentClient_id,
@@ -767,11 +782,12 @@ class JobCreateShipment extends Component
             'shipmentContainerDeliveryAgent' => $this->shipmentContainerDeliveryAgent,
             'shipmentCarrierAgent'      => $this->shipmentCarrierAgent,
             'shipmentDeliveryAgent'     => $this->shipmentDeliveryAgent,
-            'employee_id' => $this->shipmentEmployee_id,
+            'employee_id'           => $this->shipmentEmployee_id,
             'dataShipments'              => $payload,
             'created_by'        => Auth::user()->id
 
         ]);
+
 
         shipmentContainers::create([
             'id_shipments' => $shipment->id,

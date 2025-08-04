@@ -357,6 +357,7 @@ class ShipmentSaleInvoice extends Component
                 'client',
                 'shipment.container' // atau 'shipment.jobContainer' sesuai nama relasi
             ])->findOrFail($invoiceId);
+// dd($invoice->currency);
 
             // Akses langsung dari relasi yang sudah di-load
             $shipment = $invoice->shipment;
@@ -380,7 +381,7 @@ class ShipmentSaleInvoice extends Component
 
             if ($invoice->status === 'void') {
                 foreach ($invoice->invtrx as $pivot) {
-                    $currency = strtoupper(trim($this->finalCurrency));
+                    $currency =$invoice->currency;
                     $qty =  $pivot->quantityInvoice;
 
 
@@ -413,8 +414,7 @@ class ShipmentSaleInvoice extends Component
                 }
             } else {
                 foreach ($invoice->transactions as $trx) {
-                    $currency = strtoupper(trim($this->finalCurrency));
-
+                    $currency =$invoice->currency;
                     $qty = (int) $trx->quantity;
                     $rate = (float) ($trx->crate ?? 1);
                     // dd('Masuk ke bagian else - invoice normal', $invoice->status, $invoice->transactions->count());
@@ -579,7 +579,7 @@ class ShipmentSaleInvoice extends Component
                 'invoice_date'   => $this->invoice_date ?? now(),
                 'due_date'       => now()->addDays(30),
                 'status'         => 'issued',
-                'currency'       => $this->currency ?? 'IDR',
+                'currency'       => $this->finalCurrency,
                 'total_amount'   => $grandTotal,
                 'type_invoice'   => 'SALES',
                 'created_by'     => Auth::id(),
@@ -732,7 +732,7 @@ class ShipmentSaleInvoice extends Component
                 'due_date'       => null,
                 'status'         => 'draft',
                 'type_invoice'   => 'SALES',
-                'currency'       => $this->currency ?? 'IDR',
+                'currency'       => $this->finalCurrency,
                 'total_amount'   => $grandTotal,
                 'created_by'     => Auth::id(),
             ]);

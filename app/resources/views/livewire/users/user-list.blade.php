@@ -7,7 +7,7 @@
     </x-slot>
     <div x-data="{ open: false }" @keydown.escape.window="open = false">
         <!-- Button to open modal -->
-        <div class="flex justify-end gap-2 mb-4 justify-end" @click.away="open = false">
+        <div class="flex justify-end gap-2 mb-4 justify-end">
             <button @click="open = true" class="py-s3 px-4 bg-blue-600 text-white rounded-lg">
                 Add Users
             </button>

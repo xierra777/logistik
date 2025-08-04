@@ -80,7 +80,6 @@
                         $totalAmount = (float) ($invFrch->total_amount ?? 0);
                         $totalPaid = (float) $invFrch->paymentAllocations->sum('amount_allocated');
                         $kurang = $totalAmount - $totalPaid;
-
                         // Logic status pembayaran dengan styling
                         if ($totalPaid == 0) {
                         $statusText = 'Belum Bayar';
@@ -95,6 +94,7 @@
                         $statusClass = 'bg-yellow-100 text-yellow-800 border-yellow-200';
                         $iconClass = 'text-yellow-500';
                         }
+                       
                         @endphp
 
                         <tr class="border border-gray-500">
@@ -115,12 +115,20 @@
                                 Rp. {{ number_format($totalPaid, 2, '.', ',') }}
                             </td>
                             <td class="px-1 py-1 border">
-                                <div class="relative w-full">
-                                    <input type="text"
+                                <div class="relative w-full">  
+                                     @if($statusText === 'Lunas')
+                                     <input type="text" readonly
+                                        wire:model="allocations.{{ $invFrch->id }}"
+                                        class=" w-full rounded-md border-green-600 text-center text-green-600"
+                                        placeholder="LUNAS"                               
+                                        min="0">                                    
+                                        @else
+                                     <input type="text"
                                         wire:model="allocations.{{ $invFrch->id }}"
                                         class="pl-8 w-full rounded-md border-gray-400 text-sm"
                                         step="0.01"
-                                        min="0">
+                                        min="0">                                @endif
+                                  
                                 </div>
                             </td>
                             <td class="px-1 py-1 text-center border">

@@ -9,7 +9,7 @@ class Payment extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['customerVendor_id', 'status', 'payment_no', 'payment_date', 'bank_coa', 'amount', 'currency', 'exchange_rate', 'remarks', 'refrence_type', 'refrence_id', 'journal_posted_at', 'created_by', 'updated_by'];
+    protected $fillable = ['customerVendor_id', 'status', 'payment_no', 'date', 'bank_coa', 'amount', 'currency', 'exchange_rate', 'remarks', 'refrence_type', 'refrence_id', 'journal_posted_at', 'created_by', 'updated_by'];
 
     public function customer()
     {
@@ -23,5 +23,9 @@ class Payment extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+    public function invoices()
+    {
+        return $this->belongsTo(Invoice::class, 'refrence_id');
     }
 }

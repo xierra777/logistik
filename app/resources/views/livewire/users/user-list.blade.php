@@ -5,7 +5,7 @@
             {{ __('Management Users') }}
         </h2>
     </x-slot>
-    <div x-data="{ open: false }" @keydown.escape.window="open = false">
+    <div x-data="{ open: false }" @keydown.escape.window="open = false" @close-modal.window="open = false">
         <!-- Button to open modal -->
         <div class="flex justify-end gap-2 mb-4 justify-end">
             <button @click="open = true" class="py-s3 px-4 bg-blue-600 text-white rounded-lg">

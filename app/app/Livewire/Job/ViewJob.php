@@ -235,16 +235,25 @@ class ViewJob extends Component
                     'address' => optional($this->job->client->addresses->first())->address,
                 ] : null,
             ],
-            [
-                'label' => $carrierLabel,
-                'data' => optional($this->job->carrierModel) ? (object)[
-                    'id' => $this->job->carrierModel->id,
-                    'name' => $this->job->carrierModel->name,
-                    'email' => $this->job->carrierModel->email,
-                    'contact' => $this->job->carrierModel->contact,
-                    'address' => optional($this->job->carrierModel->addresses->first())->address,
-                ] : null,
-            ],
+           [
+    'label' => $carrierLabel,
+    'data' => $this->job->carrierModel
+        ? (object)[
+            'id' => $this->job->carrierModel->id,
+            'name' => $this->job->carrierModel->name,
+            'email' => $this->job->carrierModel->email,
+            'contact' => $this->job->carrierModel->contact,
+            'address' => optional($this->job->carrierModel->addresses->first())->address,
+        ]
+        : (object)[
+            'id' => null,
+            'name' => null,
+            'email' => null,
+            'contact' => null,
+            'address' => null,
+        ],
+],
+
         ])->filter(fn($item) => !is_null($item['data']));
     }
 

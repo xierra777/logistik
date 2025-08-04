@@ -383,8 +383,8 @@
                             </select>
                         </div>
                         <div class="mb-4" wire:ignore>
-                            <label for="shipmentIncoTerms">Inco Terms</label>
-                            <select name="shipmentIncoTerms" id="shipmentIncoTerms" wire:model="shipmentIncoTerms" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            <label for="shipmentCross_trade">Inco Terms</label>
+                            <select name="shipmentCross_trade" id="shipmentCross_trade" wire:model="shipmentCross_trade" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                 <option value="">Select Terms</option>
                                 <option value="FOB">FOB</option>
                                 <option value="CFR">CFR</option>
@@ -752,8 +752,8 @@
                             </select>
                         </div>
                         <div class="mb-4" wire:ignore>
-                            <label for="shipmentIncoTerms">Inco Terms</label>
-                            <select name="shipmentIncoTerms" id="shipmentIncoTerms" wire:model="shipmentIncoTerms" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                            <label for="shipmentCross_trade">Inco Terms</label>
+                            <select name="shipmentCross_trade" id="shipmentCross_trade" wire:model="shipmentCross_trade" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                 <option value="">Select Terms</option>
                                 <option value="FOB">FOB</option>
                                 <option value="CFR">CFR</option>
@@ -1333,7 +1333,7 @@
                         </div>
                         <div class="flex flex-items grid grid-cols-3">
                             <p class="col-span-1"><strong>Inco Terms</strong> </p>
-                            <p class="col-span-2 uppercase">: {{ $shipmentIncoTerms ?? ''}} </p>
+                            <p class="col-span-2 uppercase">: {{ $shipmentCross_trade ?? ''}} </p>
                         </div>
                         <div class="flex flex-items grid grid-cols-3">
                             <p class="col-span-1"><strong>Cross Trade</strong> </p>
@@ -1484,8 +1484,8 @@
                 placeholder: 'Select address'
             },
             {
-                sel: '#shipmentIncoTerms',
-                model: 'shipmentIncoTerms',
+                sel: '#shipmentCross_trade',
+                model: 'shipmentCross_trade',
                 placeholder: 'Select Inco Terms'
             },
             {

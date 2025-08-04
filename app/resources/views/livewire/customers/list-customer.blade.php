@@ -100,8 +100,8 @@
                         @endforelse
                     </tbody>
                 </table>
+             <x-confirm-delete />
             </div>
-
 
             <!-- Pagination -->
             @if($customers->hasPages())

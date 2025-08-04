@@ -59,7 +59,7 @@ class JobCreateShipment extends Component
     {
         $this->job = TJob::with('TjobContainer')->findOrFail($id);
         // dd($this->job->dagentsJob);
-        $this->id_job = $this->job->$id;
+        $this->id_job = $this->job->id;
         $this->shipmentClient_id = $this->job->client_id;
         $this->shipmentShipper_id = $this->job->client_id;
         $this->updatedShipmentClientId($this->shipmentClient_id); // Tambahkan ini!
@@ -77,7 +77,6 @@ class JobCreateShipment extends Component
         $this->shipmentServices_type = $this->job->data['servicesType'];
         $this->shipmentEstimearrival = $this->job->data['estimearrival'];
         $this->shipmentEstimedelivery = $this->job->data['estimedelivery'];
-
         $this->shipmentPort_of_loading = $this->job->data['port_of_loading'];
         $this->shipmentPort_of_final = $this->job->data['port_of_final'];
         $this->shipmentPort_of_receipt = $this->job->data['port_of_receipt'];
@@ -189,7 +188,6 @@ class JobCreateShipment extends Component
     {
         $ctry = 'ID';
         $date = now()->format('ym');
-
         // Tentukan suffix berdasarkan type job
         $type = $this->shipmentType_job;
         $map = [
@@ -332,7 +330,7 @@ class JobCreateShipment extends Component
             'shipmentEstimedelivery'       => $this->shipmentEstimedelivery,
             'shipmentPayableAtJob'         => $this->shipmentPayableAtJob,
             'shipmentServices_type'        => $this->shipmentServices_type,
-            'shipmentCross_trade'            => $this->shipmentCross_trade,
+            'shipmentCross_trade'          => $this->shipmentCross_trade,
             'shipmentFreightTypeJob'       => $this->shipmentFreightTypeJob,
             'shipmentRemarksJobDetailJobs' => $this->shipmentRemarksJobDetailJobs,
         ];
@@ -351,21 +349,21 @@ class JobCreateShipment extends Component
 
 
         $shipment = TShipments::create([
-            'id_job'                    => $this->id_job,
-            'shipmentsTypeJob'          => $this->shipmentType_job,
-            'shipment_id'              => $this->shipment_id,
-            'shipmentClient_id'        => $this->shipmentClient_id,
-            'shipmentClient_address'    => $this->shipmentClient_address,
-            'shipmentShipper_id'     => $this->shipmentShipper_id,
-            'shipmentConsignee_id'    => $this->shipmentConsignee_id,
-            'shipmentNotify_id'         => $this->shipmentNotify_id,
-            'shipmentCarrierAirline'      => $this->shipmentCarrierAirline,
-            'shipmentContainerDeliveryAgent' => $this->shipmentContainerDeliveryAgent,
-            'shipmentCarrierAgent'      => $this->shipmentCarrierAgent,
-            'shipmentDeliveryAgent'     => $this->shipmentDeliveryAgent,
-            'employee_id' => $this->shipmentEmployee_id,
-            'dataShipments'              => $payload,
-            'created_by'        => Auth::user()->id
+            'id_job'                        => $this->id_job,
+            'shipmentsTypeJob'              => $this->shipmentType_job,
+            'shipment_id'                   => $this->shipment_id,
+            'shipmentClient_id'             => $this->shipmentClient_id,
+            'shipmentClient_address'        => $this->shipmentClient_address,
+            'shipmentShipper_id'            => $this->shipmentShipper_id,
+            'shipmentConsignee_id'          => $this->shipmentConsignee_id,
+            'shipmentNotify_id'             => $this->shipmentNotify_id,
+            'shipmentCarrierAirline'        => $this->shipmentCarrierAirline,
+            'shipmentContainerDeliveryAgent'=> $this->shipmentContainerDeliveryAgent,
+            'shipmentCarrierAgent'          => $this->shipmentCarrierAgent,
+            'shipmentDeliveryAgent'         => $this->shipmentDeliveryAgent,
+            'employee_id'                   => $this->shipmentEmployee_id,
+            'dataShipments'                 => $payload,
+            'created_by'                    => Auth::user()->id
 
         ]);
 
@@ -376,11 +374,11 @@ class JobCreateShipment extends Component
 
         ]);
 
-        return redirect()->route('listShipment')->with('success', [
-            'icon' => 'success',
-            'title' => 'Success!',
+       return redirect()->route('viewJob', ['id' => $this->job->id])->with('success', [
+    'icon' => 'success',
+    'title' => 'Success!',
+]);
 
-        ]);
     }
     public function ocean_fcl_import()
     {
@@ -460,11 +458,11 @@ class JobCreateShipment extends Component
 
         ]);
 
-        return redirect()->route('listShipment')->with('success', [
-            'icon' => 'success',
-            'title' => 'Success!',
+       return redirect()->route('viewJob', ['id' => $this->job->id])->with('success', [
+    'icon' => 'success',
+    'title' => 'Success!',
+]);
 
-        ]);
     }
     public function ocean_lcl_export()
     {
@@ -544,11 +542,11 @@ class JobCreateShipment extends Component
 
         ]);
 
-        return redirect()->route('listShipment')->with('success', [
-            'icon' => 'success',
-            'title' => 'Success!',
+       return redirect()->route('viewJob', ['id' => $this->job->id])->with('success', [
+    'icon' => 'success',
+    'title' => 'Success!',
+]);
 
-        ]);
     }
     public function ocean_lcl_import()
     {
@@ -628,11 +626,11 @@ class JobCreateShipment extends Component
 
         ]);
 
-        return redirect()->route('listShipment')->with('success', [
-            'icon' => 'success',
-            'title' => 'Success!',
+       return redirect()->route('viewJob', ['id' => $this->job->id])->with('success', [
+    'icon' => 'success',
+    'title' => 'Success!',
+]);
 
-        ]);
     }
     public function air_inbound()
     {
@@ -712,11 +710,11 @@ class JobCreateShipment extends Component
 
         ]);
 
-        return redirect()->route('listShipment')->with('success', [
-            'icon' => 'success',
-            'title' => 'Success!',
+       return redirect()->route('viewJob', ['id' => $this->job->id])->with('success', [
+    'icon' => 'success',
+    'title' => 'Success!',
+]);
 
-        ]);
     }
     public function air_outbound()
     {
@@ -796,11 +794,11 @@ class JobCreateShipment extends Component
 
         ]);
 
-        return redirect()->route('listShipment')->with('success', [
-            'icon' => 'success',
-            'title' => 'Success!',
+       return redirect()->route('viewJob', ['id' => $this->job->id])->with('success', [
+    'icon' => 'success',
+    'title' => 'Success!',
+]);
 
-        ]);
     }
     public function render()
     {

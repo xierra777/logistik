@@ -19,10 +19,11 @@
             </thead>
             <tbody>
                 @foreach($payment as $pym)
+                {{$pym->allocations}}
                 <tr class="hover:bg-gray-50 transition-colors">
                     <td class="text-center border border-gray-300 px-2 py-1 text-gray-700">{{ $loop->iteration }}</td>
                     <td class="text-center border border-gray-300 px-2 py-1 text-gray-700">{{ $pym->payment_no }}</td>
-                    <td class="text-center border border-gray-300 px-2 py-1 text-gray-700">{{ $pym->payment_date }}</td>
+                    <td class="text-center border border-gray-300 px-2 py-1 text-gray-700">{{ $pym->date }}</td>
                     <td class="text-center border border-gray-300 px-2 py-1 text-gray-700">{{ $pym->customer->name ?? '-' }}</td>
                     <td class="text-center border border-gray-300 px-2 py-1 text-gray-700">
                         {{$pym->currency}} {{ number_format($pym->amount, 2, ',', '.') }}

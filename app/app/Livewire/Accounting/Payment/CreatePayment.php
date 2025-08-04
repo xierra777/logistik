@@ -52,7 +52,6 @@ class CreatePayment extends Component
         $this->generateCodeNo();
     }
     protected $rules = [
-        'selectedInvoiceId' => 'required|exists:invoices,id',
         'payment_date' => 'required',
     ];
     // Kalo yang atas ga jalan, coba ini
@@ -63,6 +62,19 @@ class CreatePayment extends Component
         }, function ($query) use ($value) {
             return $query->where('customer_id', $value)->where('status', '!=', 'void');
         })->with('client', 'job.jobTransactions', 'shipment.shipmentTransaction', 'paymentAllocations')->get();
+        $currecies =$this->invoiceForeach->first()->currency ?? null;
+        $this->currency =  $currecies;
+
+//           $invoices = Invoice::when(is_array($value), function ($query) use ($value) {
+//             return $query->whereIn('customer_id', $value)->where('status', '!=', 'void');
+//         }, function ($query) use ($value) {
+//             return $query->where('customer_id', $value)->where('status', '!=', 'void');
+//         })->with('client', 'job.jobTransactions', 'shipment.shipmentTransaction', 'paymentAllocations')->get();
+
+// $this->invoiceForeach = $invoices->filter(function($invoice){        $totalAllocation = $invoice->paymentAllocations->sum('amount_allocated');   
+//          $outstanding = $invoice->total_amount - $totalAllocation;
+//          return $outstanding > 0;
+// })->values();
     }
     public function selectedInvoice($id)
     {
@@ -197,12 +209,11 @@ class CreatePayment extends Component
                 }
                 return;
             }
-
             // Create payment record
             $payment = Payment::create([
                 'customerVendor_id' => $this->selectedCustVendor,
                 'payment_no'        => $this->payment_no,
-                'payment_date'      => $this->payment_date,
+                'date'              => $this->payment_date,
                 'bank_coa'          => $this->bank_coa,
                 'amount'            => $this->amount,
                 'currency'          => $this->currency,
@@ -210,9 +221,10 @@ class CreatePayment extends Component
                 'remarks'           => $this->remarks,
                 'reference_id'      => null, // Fix: jangan simpan collection object
                 'reference_type'    => null,
+                'journal_posted_at' => null,
                 'created_by'        => Auth::id(),
             ]);
-
+// dd($payment);
             // Create payment allocations
             foreach ($validAllocations as $allocation) {
                 $invoice = $allocation['invoice'];

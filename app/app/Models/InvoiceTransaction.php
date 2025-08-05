@@ -3,13 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 class InvoiceTransaction extends Pivot
 {
     protected $table = 'invoice_transaction';
-    use softDeletes;
+    // use softDeletes;
 
     protected $fillable = [
         'amountInvoice',

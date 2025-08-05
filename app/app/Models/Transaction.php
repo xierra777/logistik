@@ -4,10 +4,11 @@ namespace App\Models;
 
 use App\Models\transaction\tax;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Transaction extends Model
-{    use softDeletes;
+{   
+    //  use softDeletes;
 
     protected $table = 'transactions';
 

@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ChargeSetting extends Model
 {
-    use softDeletes;
+    // use softDeletes;
     protected $fillable = [
         'charge_code',
         'charge_name',

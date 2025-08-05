@@ -5,10 +5,11 @@ namespace App\Models;
 use App\Models\transactions\costTransactions;
 use App\Models\transactions\salesTransactions;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TShipments extends Model
-{    use softDeletes;
+{  
+    //   use softDeletes;
 
     protected $casts = [
         'dataShipments' => 'array',

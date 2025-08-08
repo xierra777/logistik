@@ -109,7 +109,7 @@ class ShipmentPurchaseInvoice extends Component
     public function generateInvoiceNumber()
     {
         try {
-            $prefix = "PUR/BRN/" . now()->format('y/m/');
+            $prefix = "PI-BRN-" . now()->format('ym');
 
             // Get the highest number for today using raw SQL for better performance
             $result = DB::select("
@@ -368,9 +368,9 @@ class ShipmentPurchaseInvoice extends Component
             $customer = $invoice->client;
 
             // Pastikan relasi ada sebelum mengakses
-            if ($shipment && $shipment->TjobContainer) {
-                $totalPcs = $shipment->TjobContainer->sum('noOfPackages');
-                $totalgw = $shipment->TjobContainer->sum('grossWeight');
+            if ($shipment && $shipment->container) {
+                $totalPcs = $shipment->container->sum('shipmentNoOfPackages');
+                $totalgw = $shipment->container->sum('shipmentGrossWeight');
             } else {
                 $totalPcs = 0;
                 $totalgw = 0;
@@ -488,39 +488,38 @@ class ShipmentPurchaseInvoice extends Component
             }
 
             // Format summary
-            $formattedSummary = [
-                'subtotal' => number_format(
-                    $summary['subtotal'],
-                    2,
-                    $this->finalCurrency === 'IDR' ? ',' : '.',
-                    $this->finalCurrency === 'IDR' ? '.' : ','
-                ),
-                'vat' => number_format(
-                    $summary['vat'],
-                    2,
-                    $this->finalCurrency === 'IDR' ? ',' : '.',
-                    $this->finalCurrency === 'IDR' ? '.' : ','
-                ),
-                'wht' => number_format(
-                    $summary['wht'],
-                    2,
-                    $this->finalCurrency === 'IDR' ? ',' : '.',
-                    $this->finalCurrency === 'IDR' ? '.' : ','
-                ),
-                'total' => number_format(
-                    $summary['total'],
-                    2,
-                    $this->finalCurrency === 'IDR' ? ',' : '.',
-                    $this->finalCurrency === 'IDR' ? '.' : ','
-                ),
-            ];
-
+         $formattedSummary = [
+            'subtotal' => number_format(
+                $summary['subtotal'],
+                $this->finalCurrency === 'USD' ? 2 : 0,
+                $this->finalCurrency === 'IDR' ? '.' : ',',
+                $this->finalCurrency === 'IDR' ? '.' : ','
+            ),
+            'vat' => number_format(
+                $summary['vat'],
+                $this->finalCurrency === 'USD' ? 2 : 0,
+                $this->finalCurrency === 'IDR' ? '.' : ',',
+                $this->finalCurrency === 'IDR' ? '.' : ','
+            ),
+            'wht' => number_format(
+                $summary['wht'],
+                $this->finalCurrency === 'USD' ? 2 : 0,
+                $this->finalCurrency === 'IDR' ? ',' : '.',
+                $this->finalCurrency === 'IDR' ? '.' : ','
+            ),
+            'total' => number_format(
+                $summary['total'],
+                $this->finalCurrency === 'USD' ? 2 : 0,
+                $this->finalCurrency === 'IDR' ? '.' : ',',
+                $this->finalCurrency === 'IDR' ? '.' : ','
+            ),
+        ];
             // Render view - gunakan data yang konsisten
             $data = [
                 'customer'             => $customer,
                 'invoice'              => $invoice,
-                'shipment'                  => $invoice->shipment,
-                'container'            => $invoice->shipment->TjobContainer ?? collect(), // fallback jika null
+                'shipment'             => $invoice->shipment,
+                'container'            => $shipment->container ?? collect(), // fallback jika null
                 'transactions'         => $invoice->transactions,
                 'totalPcs'             => $totalPcs,
                 'totalgw'              => $totalgw,

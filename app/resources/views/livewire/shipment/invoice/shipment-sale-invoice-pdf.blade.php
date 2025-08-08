@@ -89,7 +89,7 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">MAWB/MBL No.</p>
-                    <p class="col-span-3 text-[10px]">: {{$shipment->shipment->shipmentBillLadingNo ?? ''}}</p>
+                    <p class="col-span-3 text-[10px]">: {{$shipment->job->jobBillLadingNo ?? ''}}</p>
                 </div>
                 <div class="grid grid-cols-4  ">
                     <p class="font-semibold text-xs">Shipper</p>
@@ -139,7 +139,7 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Shipment No.</p>
-                    <p class="col-span-3 text-[10px]">: {{$shipment->shipment_id}}</p>
+                    <p class="col-span-3 text-[10px]">: {{$shipment->job->customerCodeJob ?? ''}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Place Of Receipt</p>
@@ -257,7 +257,7 @@
                             <td class="text-[9px] border border-gray-900 text-center p-1">{{ $finalCurrency }}</td>
                             <td class="text-[9px] border border-gray-900 text-center p-1">
                                 @if($showExchangeRate == 'USD')
-                                {{$inv->exchangeRate}}
+                                     {{$inv->exchangeRate}}
                                 @endif
                             </td>
                             <td class="text-[9px] border border-gray-900 text-center p-1">
@@ -321,7 +321,7 @@
                         <tr class="bg-white dark:bg-neutral-900 align-top">
                             <td class="text-[9px] border border-gray-900 text-center p-1">{{ $transaction->description }}</td>
                             <td class="text-[9px] border border-gray-900 text-center p-1">{{ $transaction->quantity }}</td>
-                            <td class="text-[9px] border border-gray-900 text-center p-1">{{ $finalCurrency }}</td>
+                            <td class="text-[9px] border border-gray-900 text-center p-1">{{ $transaction->scurrency }}</td>
                             <td class="text-[9px] border border-gray-900 text-center p-1">
                                 @if($showExchangeRate == 'USD')
                                 {{ $transaction->srate }}
@@ -329,57 +329,82 @@
                             </td>
                             <td class="text-[9px] border border-gray-900 p-1">
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">{{$transaction->scurrency }}</span>
                                     <span class="text-[9px]">
-                                        {{ $finalCurrency == 'USD'
+                                        {{$transaction->scurrency == 'USD'
                                     ? number_format($transaction->sfcyamount, 2, '.', ',')
                                     : number_format($transaction->samountidr, 2, ',', '.') }}
                                     </span>
                                 </div>
                             </td>
+                           <!-- Kolom Subtotal - gunakan nilai original dengan currency asli -->
                             <td class="text-[9px] border border-gray-900 p-1">
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">{{ $transaction->original_currency ?? $transaction->scurrency }}</span>
                                     <span class="text-[9px]">
-                                        {{ $finalCurrency == 'IDR'
-                                    ? number_format($transaction->subtotal, 2, ',', '.')
-                                    : number_format($transaction->subtotal, 2, '.', ',') }}
+                                        @php
+                                            $originalSubtotal = $transaction->original_subtotal ?? $transaction->subtotal;
+                                            $currency = $transaction->original_currency ?? $transaction->scurrency;
+                                        @endphp
+                                        {{ $currency == 'USD' 
+                                            ? number_format($originalSubtotal, 2, '.', ',') 
+                                            : number_format($originalSubtotal, 2, ',', '.') }}
                                     </span>
                                 </div>
                             </td>
+
+                            <!-- Kolom VAT - juga gunakan nilai original -->
                             <td class="text-[9px] border border-gray-900 text-center p-1">
-                                @if (!is_null($transaction->svatgstamount) || !is_null($transaction->svatgstusd))
+                                @php
+                                    $originalVat = $transaction->original_vat ?? $transaction->vat ?? 0;
+                                    $currency = $transaction->original_currency ?? $transaction->scurrency;
+                                @endphp
+                                @if ($originalVat > 0)
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">{{ $currency }}</span>
                                     <span class="text-[9px]">
-                                        {{ $finalCurrency == 'IDR'
-                                        ? number_format($transaction->svatgstamount, 2, ',', '.')
-                                        : number_format($transaction->svatgstusd, 2, ',', '.') }}
+                                        {{ $currency == 'USD' 
+                                            ? number_format($originalVat, 2, '.', ',') 
+                                            : number_format($originalVat,2, ',', '.') }}
                                     </span>
                                 </div>
                                 @else
                                 &nbsp;
                                 @endif
                             </td>
+
+                            <!-- Kolom WHT - juga gunakan nilai original -->
                             <td class="text-[9px] border border-gray-900 text-center p-1 align-top">
-                                @if (($transaction->swhtaxamount ?? 0) > 0 || ($transaction->shwtaxrateusd ?? 0) > 0)
+                                @php
+                                    $originalWht = $transaction->original_wht ?? $transaction->wht ?? 0;
+                                    $currency = $transaction->original_currency ?? $transaction->scurrency;
+                                @endphp
+                                @if ($originalWht > 0)
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">{{ $currency }}</span>
                                     <span class="text-[9px]">
-                                        {{ $finalCurrency == 'IDR'
-                                        ? number_format($transaction->swhtaxamount, 2, ',', '.')
-                                        : number_format($transaction->shwtaxrateusd, 2, ',', '.') }}
+                                        {{ $currency == 'USD' 
+                                            ? number_format($originalWht, 2, '.', ',') 
+                                            : number_format($originalWht,2, ',', '.') }}
                                     </span>
                                 </div>
                                 @else
                                 &nbsp;
                                 @endif
                             </td>
+
+                            <!-- Kolom Total - gunakan nilai original -->
                             <td class="text-[9px] border border-gray-900 text-center p-1 align-top">
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">{{ $transaction->original_currency ?? $transaction->scurrency }}</span>
                                     <span class="text-[9px]">
-                                        {{ number_format($transaction->total, 2, ',', '.') }}
+                                        @php
+                                            $originalTotal = $transaction->original_total ?? $transaction->total;
+                                            $currency = $transaction->original_currency ?? $transaction->scurrency;
+                                        @endphp
+                                        {{ $currency == 'USD' 
+                                            ? number_format($originalTotal, 2, '.', ',') 
+                                            : number_format($originalTotal, 2, ',', '.') }}
                                     </span>
                                 </div>
                             </td>
@@ -419,6 +444,7 @@
             </div>
 
 
+            
             <div class="col-span-4 border h-4 bg-orange-400  border-orange-400"></div>
             <div class="col-span-2 p-2 mb-0">
                 <p class="font-bold">Bank Details</p>

@@ -91,6 +91,13 @@
                     <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-400"></i>
                 </div>
             </div>
+                 <!-- Currency -->
+            <div class="flex flex-col space-y-2">
+                <label class="text-purple-700 font-semibold text-sm">Bank</label>
+                <div class="relative">
+                        <textarea name="" id=""  wire:model.live="exchangeRate"></textarea>
+                </div>
+            </div>
         </div>
     </div>
 

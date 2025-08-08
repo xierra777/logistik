@@ -89,7 +89,7 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">MAWB/MBL No.</p>
-                    <p class="col-span-3 text-[10px]">: {{$shipment->shipment->shipmentBillLadingNo ?? ''}}</p>
+                    <p class="col-span-3 text-[10px]">: {{$shipment->job->jobBillLadingNo ?? ''}}</p>
                 </div>
                 <div class="grid grid-cols-4  ">
                     <p class="font-semibold text-xs">Shipper</p>
@@ -112,11 +112,11 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Total No. of Pcs</p>
-                    <p class="col-span-3 uppercase font-bold text-[10px]">: {{$totalPcs ?? ''}} {{$shipment->container->first()->containersData['shipmentTypeOfPackages'] ?? '' }}</p>
+                    <p class="col-span-3 uppercase font-bold text-[10px]">: {{$totalPcs ?? ''}} {{$container->first()->containersData['shipmentTypeOfPackages'] ?? '' }}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Total G.Weight</p>
-                    <p class="col-span-3 text-[10px] font-bold uppercase">: {{$totalgw ?? ''}} {{$shipment->container->first()->containersData['shipmentTypeOfGrossWeight'] ?? '' }} </p>
+                    <p class="col-span-3 text-[10px] font-bold uppercase">: {{$totalgw ?? ''}} {{$container->first()->containersData['shipmentTypeOfGrossWeight'] ?? '' }} </p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Total Volume</p>
@@ -139,7 +139,7 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Shipment No.</p>
-                    <p class="col-span-3 text-[10px]">: {{$shipment->shipment_id}}</p>
+                    <p class="col-span-3 text-[10px]">: {{$shipment->job->customerCodeJob ?? ''}}</p>
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Place Of Receipt</p>
@@ -167,7 +167,7 @@
                 </div>
                 <div class="grid grid-cols-4 ">
                     <p class="font-semibold text-xs">Narration</p>
-                    <p class="col-span-3 text-[10px]">: </p>
+                    <p class="col-span-3 text-[10px]">: {{$shipment->carrierModel->name}}</p>
                 </div>
             </div>
             <div class="col-span-4 border h-4 bg-blue-900  border-blue-900"></div>
@@ -189,8 +189,6 @@
                             </tr>
                         </thead>
                         <tbody class="align-center">
-                            {{-- Karena containers adalah array cast, kode ini seharusnya bekerja --}}
-                            @if(isset($shipment) && $shipment->container && $shipment->container->count() > 0)
                             @foreach($container as $c)
                             <tr class="text-center">
                                 <td class="p-1 whitespace-normal text-[9px]  border-r border-l border-gray-900 text-center break-words"> {{ $c->jobContainer->containers['containerNo'] ?? '' }}
@@ -221,12 +219,7 @@
                                 </td>
                             </tr>
                             @endforeach
-                            @else
-                            <tr>
-                                <td colspan="9" class="p-4 text-center text-gray-500">
-                                    - </td>
-                            </tr>
-                            @endif
+                         
                         </tbody>
                     </table>
                 </div>
@@ -324,22 +317,22 @@
                             <td class="text-[9px] border border-gray-900 text-center p-1">{{ $finalCurrency }}</td>
                             <td class="text-[9px] border border-gray-900 text-center p-1">
                                 @if($showExchangeRate == 'USD')
-                                {{ $transaction->srate }}
+                                {{ $transaction->crate }}
                                 @endif
                             </td>
                             <td class="text-[9px] border border-gray-900 p-1">
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ $finalCurrency == 'USD'
-                                    ? number_format($transaction->sfcyamount, 2, '.', ',')
-                                    : number_format($transaction->samountidr, 2, ',', '.') }}
+                                    ? number_format($transaction->cfcyamount, 2, '.', ',')
+                                    : number_format($transaction->camountidr, 2, ',', '.') }}
                                     </span>
                                 </div>
                             </td>
                             <td class="text-[9px] border border-gray-900 p-1">
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ $finalCurrency == 'IDR'
                                     ? number_format($transaction->subtotal, 2, ',', '.')
@@ -348,13 +341,13 @@
                                 </div>
                             </td>
                             <td class="text-[9px] border border-gray-900 text-center p-1">
-                                @if (!is_null($transaction->svatgstamount) || !is_null($transaction->svatgstusd))
+                                @if (!is_null($transaction->cvatgstamount) || !is_null($transaction->cvatgstusd))
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ $finalCurrency == 'IDR'
-                                        ? number_format($transaction->svatgstamount, 2, ',', '.')
-                                        : number_format($transaction->svatgstusd, 2, ',', '.') }}
+                                        ? number_format($transaction->cvatgstamount, 2, ',', '.')
+                                        : number_format($transaction->cvatgstusd, 2, ',', '.') }}
                                     </span>
                                 </div>
                                 @else
@@ -362,13 +355,13 @@
                                 @endif
                             </td>
                             <td class="text-[9px] border border-gray-900 text-center p-1 align-top">
-                                @if (($transaction->swhtaxamount ?? 0) > 0 || ($transaction->shwtaxrateusd ?? 0) > 0)
+                                @if (($transaction->cwhtaxamount ?? 0) > 0 || ($transaction->chwtaxrateusd ?? 0) > 0)
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ $finalCurrency == 'IDR'
-                                        ? number_format($transaction->swhtaxamount, 2, ',', '.')
-                                        : number_format($transaction->shwtaxrateusd, 2, ',', '.') }}
+                                        ? number_format($transaction->cwhtaxamount, 2, ',', '.')
+                                        : number_format($transaction->chwtaxrateusd, 2, ',', '.') }}
                                     </span>
                                 </div>
                                 @else
@@ -377,7 +370,7 @@
                             </td>
                             <td class="text-[9px] border border-gray-900 text-center p-1 align-top">
                                 <div class="flex justify-between w-full">
-                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->scurrency }}</span>
+                                    <span class="text-[9px]">{{ $finalCurrency == 'IDR' ? 'IDR' : $transaction->ccurrency }}</span>
                                     <span class="text-[9px]">
                                         {{ number_format($transaction->total, 2, ',', '.') }}
                                     </span>

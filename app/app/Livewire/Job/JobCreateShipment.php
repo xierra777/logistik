@@ -232,7 +232,11 @@ class JobCreateShipment extends Component
                 switch ($this->shipmentType_job) {
                     case 'ocean_fcl_export':
                         $rules = [
-                            'job_id' => 'required',
+                            'job_id' => 'required',    
+                            'shipmentPort_of_receipt'      =>'required',
+                            'shipmentPort_of_discharge'    => 'required',
+                            'shipmentPlace_of_delivery'    => 'required',
+                            ''
 
                         ];
                         break;
@@ -466,6 +470,7 @@ class JobCreateShipment extends Component
     }
     public function ocean_lcl_export()
     {
+        // dd($this->shipmentPlace_of_delivery)
         $container = [
             'shipmentNoOfPackages'         => $this->shipmentNoOfPackages,
             'shipmentGrossWeight'          => $this->shipmentGrossWeight,

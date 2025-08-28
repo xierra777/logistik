@@ -51,30 +51,23 @@ class CreateCustomer extends Component
 
         $year = Carbon::now()->format('y');
 
-        // 1. Hilangkan PT dan karakter tidak perlu
-        $cleanName = preg_replace([
-            '/PT[\s\.]*/i', // Hapus PT dengan berbagai variasi (pt, Pt, pT, PT., PT , dll)
-            '/[^A-Za-z0-9]/' // Hapus karakter khusus
-        ], ['', ''], $this->name);
-
-        // 2. Hilangkan spasi dan batasi panjang
-        $custPart = strtoupper(
-            substr(
-                str_replace(' ', '', $cleanName) ?: 'CUST',
-                0,
-                5
-            ) // Maksimal 5 karakter
-        );
-
+        // Generate base code
+        $cleanName = preg_replace(['/PT[\s\.]*/i', '/[^A-Za-z0-9]/'], ['', ''], $this->name);
+        $custPart = strtoupper(substr(str_replace(' ', '', $cleanName) ?: 'CUST', 0, 5));
         $baseCode = $this->country_code . $custPart . $year;
 
-        $lastCode = Customer::where('customer_code', 'like', $baseCode . '-%')
-            ->orderBy('customer_code', 'desc')
-            ->first();
+        // Cari nomor terakhir dengan pattern yang lebih spesifik
+        $lastNumber = Customer::where('customer_code', 'like', $baseCode . '-%')
+            ->orderByRaw('CAST(SUBSTRING_INDEX(customer_code, "-", -1) AS UNSIGNED) DESC')
+            ->value('customer_code');
 
-        $number = $lastCode ? (int)explode('-', $lastCode->customer_code)[1] + 1 : 1;
+        $number = 1;
+        if ($lastNumber) {
+            $parts = explode('-', $lastNumber);
+            $number = (int)end($parts) + 1;
+        }
 
-        $this->customer_code = $baseCode . str_pad($number, 3, '0', STR_PAD_LEFT);
+        $this->customer_code = $baseCode . '-' . str_pad($number, 3, '0', STR_PAD_LEFT);
     }
 
     public function save()

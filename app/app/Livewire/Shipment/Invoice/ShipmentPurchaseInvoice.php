@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Shipment\Invoice;
 
+use App\Models\Bank;
+use App\Models\BankAccount;
 use App\Models\ChartOfAccount;
 use App\Models\Customer;
 use App\Models\Invoice;
@@ -19,8 +21,8 @@ use Spatie\Browsershot\Browsershot;
 class ShipmentPurchaseInvoice extends Component
 {
     public $shipmentId, $invoiceId, $isVoiding;
-    public $shipment;
-    public $customer, $void_reason, $selectedVendor;
+    public $shipment, $bank_id;
+    public $customer, $void_reason, $selectedVendor, $bankReturnValue;
     public $id_shipment;
     public $transactions;
     public $selected_transactions = [];
@@ -33,7 +35,7 @@ class ShipmentPurchaseInvoice extends Component
     public $selectAll = false;
     public $showModal = false;
     public $isIndeterminate = false, $voidReason_job_sale_invoice = false; // Tambahkan ini
-    public $purchasingInvoice;
+    public $purchasingInvoice, $banks;
 
 
     public function mount($shipmentId)
@@ -43,7 +45,7 @@ class ShipmentPurchaseInvoice extends Component
         if (empty($this->invoice_number)) {
             $this->invoice_number = $this->generateInvoiceNumber();
         }
-
+        $this->banks = Bank::with('customer', 'accounts')->get();
         $this->shipment = TShipments::findOrFail($shipmentId);
         $this->vendors = Customer::select([
             'customers.id',
@@ -109,7 +111,7 @@ class ShipmentPurchaseInvoice extends Component
     public function generateInvoiceNumber()
     {
         try {
-            $prefix = "PUR/BRN/" . now()->format('y/m/');
+            $prefix = "PI-BRN-" . now()->format('ym');
 
             // Get the highest number for today using raw SQL for better performance
             $result = DB::select("
@@ -147,6 +149,7 @@ class ShipmentPurchaseInvoice extends Component
 
         $this->updateIndeterminateState();
     }
+
 
     public function updateIndeterminateState()
     {
@@ -360,7 +363,8 @@ class ShipmentPurchaseInvoice extends Component
             $invoice = Invoice::with([
                 'transactions',
                 'client',
-                'shipment.container' // atau 'shipment.jobContainer' sesuai nama relasi
+                'shipment.container',
+                'bank' // atau 'shipment.jobContainer' sesuai nama relasi
             ])->findOrFail($invoiceId);
 
             // Akses langsung dari relasi yang sudah di-load
@@ -368,9 +372,9 @@ class ShipmentPurchaseInvoice extends Component
             $customer = $invoice->client;
 
             // Pastikan relasi ada sebelum mengakses
-            if ($shipment && $shipment->TjobContainer) {
-                $totalPcs = $shipment->TjobContainer->sum('noOfPackages');
-                $totalgw = $shipment->TjobContainer->sum('grossWeight');
+            if ($shipment && $shipment->container) {
+                $totalPcs = $shipment->container->sum('shipmentNoOfPackages');
+                $totalgw = $shipment->container->sum('shipmentGrossWeight');
             } else {
                 $totalPcs = 0;
                 $totalgw = 0;
@@ -385,7 +389,7 @@ class ShipmentPurchaseInvoice extends Component
 
             if ($invoice->status === 'void') {
                 foreach ($invoice->invtrx as $pivot) {
-                    $currency = strtoupper(trim($this->finalCurrency));
+                    $currency = strtoupper(trim($invoice->currency));
                     $qty =  $pivot->quantityInvoice;
 
 
@@ -418,7 +422,7 @@ class ShipmentPurchaseInvoice extends Component
                 }
             } else {
                 foreach ($invoice->transactions as $trx) {
-                    $currency = strtoupper(trim($this->finalCurrency));
+                    $currency = strtoupper(trim($invoice->currency));
 
                     $qty = (int) $trx->quantity;
                     $rate = (float) ($trx->crate ?? 1);
@@ -491,41 +495,46 @@ class ShipmentPurchaseInvoice extends Component
             $formattedSummary = [
                 'subtotal' => number_format(
                     $summary['subtotal'],
-                    2,
-                    $this->finalCurrency === 'IDR' ? ',' : '.',
+                    $this->finalCurrency === 'USD' ? 2 : 0,
+                    $this->finalCurrency === 'IDR' ? '.' : ',',
                     $this->finalCurrency === 'IDR' ? '.' : ','
                 ),
                 'vat' => number_format(
                     $summary['vat'],
-                    2,
-                    $this->finalCurrency === 'IDR' ? ',' : '.',
+                    $this->finalCurrency === 'USD' ? 2 : 0,
+                    $this->finalCurrency === 'IDR' ? '.' : ',',
                     $this->finalCurrency === 'IDR' ? '.' : ','
                 ),
                 'wht' => number_format(
                     $summary['wht'],
-                    2,
+                    $this->finalCurrency === 'USD' ? 2 : 0,
                     $this->finalCurrency === 'IDR' ? ',' : '.',
                     $this->finalCurrency === 'IDR' ? '.' : ','
                 ),
                 'total' => number_format(
                     $summary['total'],
-                    2,
-                    $this->finalCurrency === 'IDR' ? ',' : '.',
+                    $this->finalCurrency === 'USD' ? 2 : 0,
+                    $this->finalCurrency === 'IDR' ? '.' : ',',
                     $this->finalCurrency === 'IDR' ? '.' : ','
                 ),
             ];
+            // Livewire / Controller
+            $bank = BankAccount::with('bank.customer')
+                ->where('bank_id', $invoice->bank_id)
+                ->get();
 
-            // Render view - gunakan data yang konsisten
+            // $bankReturnValue = $bank->accounts;
             $data = [
                 'customer'             => $customer,
                 'invoice'              => $invoice,
-                'shipment'                  => $invoice->shipment,
-                'container'            => $invoice->shipment->TjobContainer ?? collect(), // fallback jika null
+                'shipment'             => $invoice->shipment,
+                'container'            => $shipment->container ?? collect(), // fallback jika null
                 'transactions'         => $invoice->transactions,
                 'totalPcs'             => $totalPcs,
                 'totalgw'              => $totalgw,
                 'formattedSummary'     => $formattedSummary,
-                'finalCurrency'        => $this->finalCurrency,
+                'finalCurrency'        => $invoice->currency,
+                'bank'                 => $bank,
                 'invoice_number'       => $invoice->invoice_number,
                 'showExchangeRate'     => $this->showExchangeRate,
             ];
@@ -546,6 +555,12 @@ class ShipmentPurchaseInvoice extends Component
     }
     public function save()
     {
+        if (!$this->bank_id) {
+            DB::rollBack();
+            session()->flash('error', 'Select a bank account to proceed.');
+            return;
+        }
+        // dd($this->bank_id);
         // Validasi minimal ada transaksi yang dipilih
         $this->validate([
             'selectedTransactionIds' => 'required|array|min:1',
@@ -578,16 +593,17 @@ class ShipmentPurchaseInvoice extends Component
             // dd($this->selectedVendor);
             // Buat invoice baru
             $invoice = Invoice::create([
-                'invoice_number' => $this->invoice_number,
+                'invoice_number'      => $this->invoice_number,
                 'shipment_id'         => $this->shipmentId,
-                'customer_id'    => $this->selectedVendor,
-                'invoice_date'   => $this->invoice_date ?? now(),
-                'due_date'       => now()->addDays(30),
-                'status'         => 'issued',
-                'currency'       => $this->currency ?? 'IDR',
-                'total_amount'   => $grandTotal,
-                'type_invoice'   => 'PURCHASING',
-                'created_by'     => Auth::id(),
+                'customer_id'         => $this->selectedVendor,
+                'invoice_date'        => $this->invoice_date ?? now(),
+                'due_date'            => now()->addDays(30),
+                'status'              => 'issued',
+                'currency'            => $this->finalCurrency ?? 'IDR',
+                'total_amount'        => $grandTotal,
+                'bank_id'             => $this->bank_id,
+                'type_invoice'        => 'PURCHASING',
+                'created_by'          => Auth::id(),
             ]);
 
             // Update transaksi dengan invoice_id
@@ -740,7 +756,7 @@ class ShipmentPurchaseInvoice extends Component
                 'due_date'       => null,
                 'status'         => 'draft',
                 'type_invoice'   => 'PURCHASING',
-                'currency'       => $this->currency ?? 'IDR',
+                'currency'       => $this->finalCurrency ?? 'IDR',
                 'total_amount'   => $grandTotal,
                 'created_by'     => Auth::id(),
             ]);

@@ -1,9 +1,11 @@
-<div class="max-w-full mx-auto p-6 bg-gradient-to-br from-cyan-50 via-purple-50 to-blue-50 min-h-screen" x-init="reinitSelect2()">
+<div class="max-w-full mx-auto p-6 bg-gradient-to-br from-cyan-50 via-purple-50 to-blue-50 min-h-screen"
+    x-init="reinitSelect2()">
     <!-- Header -->
     <div class="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl p-8 mb-8 border border-purple-100">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+                <h1
+                    class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
                     <i class="fas fa-file-invoice-dollar mr-3 text-purple-500"></i>
                     Purchase Invoice
                 </h1>
@@ -15,7 +17,8 @@
     </div>
 
     <!-- Invoice Form -->
-    <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 mb-8 border border-purple-100 hover:shadow-xl transition-all duration-300">
+    <div
+        class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 mb-8 border border-purple-100 hover:shadow-xl transition-all duration-300">
         <h2 class="text-2xl font-bold text-purple-700 mb-6 flex items-center">
             <i class="fas fa-edit mr-3 text-purple-500"></i>
             Invoice Details
@@ -26,8 +29,7 @@
             <div class="flex flex-col space-y-2 ">
                 <label class="text-purple-700 font-semibold text-sm">Invoice No</label>
                 <div class="relative">
-                    <input type="text"
-                        wire:model.live="invoice_number"
+                    <input type="text" wire:model.live="invoice_number"
                         class="w-full bg-purple-50 py-1.5 pr-8 pl-3 border-2 border-purple-200 rounded-md focus:border-purple-400 focus:bg-white transition-all duration-300 outline-none placeholder-purple-300"
                         placeholder="INV-2025-001">
                     <i class="fas fa-hashtag absolute right-3 top-1/2 transform -translate-y-1/2 text-purple-400"></i>
@@ -38,7 +40,9 @@
             <div class="flex flex-col space-y-2">
                 <label class="text-purple-700 font-semibold text-sm">Vendors</label>
                 <div wire:ignore>
-                    <select name="vendors" id="vendorPurchasingInvoicing" class="w-full py-1.5 pr-8 pl-3 bg-teal-50 border-2 border-teal-200 rounded-xl focus:border-teal-400 focus:bg-white transition-all duration-300 outline-none appearance-none" wire:model.live="selectedVendor">
+                    <select name="vendors" id="vendorPurchasingInvoicing"
+                        class="w-full py-1.5 pr-8 pl-3 bg-teal-50 border-2 border-teal-200 rounded-xl focus:border-teal-400 focus:bg-white transition-all duration-300 outline-none appearance-none"
+                        wire:model.live="selectedVendor">
                         <option value=""></option>
                         @foreach($vendors as $vndr)
                         <option value="{{$vndr->id}}">
@@ -70,10 +74,10 @@
                 <label class="text-purple-700 font-semibold text-sm">Show Exchange Rate</label>
                 <div class="flex items-center space-x-3">
                     <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox"
-                            wire:model="showExchangeRate"
-                            class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                        <input type="checkbox" wire:model="showExchangeRate" class="sr-only peer">
+                        <div
+                            class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600">
+                        </div>
                         <span class="ml-3 text-purple-700 font-medium">Enable</span>
                     </label>
                 </div>
@@ -83,12 +87,27 @@
             <div class="flex flex-col space-y-2">
                 <label class="text-purple-700 font-semibold text-sm">Currency</label>
                 <div class="relative">
-                    <select wire:model.live="finalCurrency"
-                        class="w-full px-4 py-3 bg-teal-50 border-2 border-teal-200 rounded-xl focus:border-teal-400 focus:bg-white transition-all duration-300 outline-none appearance-none">
+                    <select wire:model.live="finalCurrency" id="finalCurrency"
+                        class="w-full py-1.5 pr-8 pl-3 bg-teal-50 border-2 border-teal-200 rounded-xl focus:border-teal-400 focus:bg-white transition-all duration-300 outline-none appearance-none">
+                        <option value=""></option>
                         <option value="IDR">Total dalam IDR</option>
                         <option value="USD">Total dalam USD</option>
                     </select>
-                    <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-400"></i>
+                    <i
+                        class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-400"></i>
+                </div>
+            </div>
+            <!-- Currency -->
+            <div class="flex flex-col space-y-2" wire:ignore>
+                <label class="text-purple-700 font-semibold text-sm">Bank</label>
+                <div class="relative">
+                    <select name="bank_id" id="bank_id"
+                        class="w-full py-1.5 pr-8 pl-3 bg-teal-50 border-2 border-teal-200 rounded-xl focus:border-teal-400 focus:bg-white transition-all duration-300 outline-none appearance-none">
+                        <option value=""></option>
+                        @foreach($banks as $bank)
+                        <option value="{{$bank->id}}">{{$bank->bank_name}} - {{$bank->customer->name}}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
         </div>
@@ -96,7 +115,8 @@
 
     <!-- Transaction Summary -->
     @if($shipmentId && $selectedVendor && $transactions->isNotEmpty())
-    <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 mb-8 border border-purple-100 hover:shadow-xl transition-all duration-300">
+    <div
+        class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 mb-8 border border-purple-100 hover:shadow-xl transition-all duration-300">
         <h3 class="text-2xl font-bold text-purple-700 mb-6 flex items-center">
             <i class="fas fa-list-alt mr-3 text-purple-500"></i>
             Uninvoiced Transactions
@@ -109,8 +129,7 @@
                         <th class="p-4 text-left rounded-tl-2xl">
                             <div class="flex items-center space-x-3">
                                 <label class="text-purple-700 font-semibold text-sm cursor-pointer">
-                                    <input type="checkbox"
-                                        wire:model.live="selectAll"
+                                    <input type="checkbox" wire:model.live="selectAll"
                                         class="w-5 h-5 text-purple-600 bg-purple-100 border-2 border-purple-300 rounded focus:ring-purple-500 focus:ring-2">
                                     @if($this->selectAll)
                                     All Selected ({{ count($selectedTransactionIds) }})
@@ -135,19 +154,22 @@
                     @foreach($transactions as $transaction)
                     <tr class="border-b border-purple-100 hover:bg-purple-50 transition-all duration-200">
                         <td class="p-4 text-center">
-                            <input type="checkbox"
-                                wire:model.live="selectedTransactionIds"
+                            <input type="checkbox" wire:model.live="selectedTransactionIds"
                                 value="{{ $transaction->id }}"
                                 class="w-5 h-5 text-purple-600 bg-purple-100 border-2 border-purple-300 rounded focus:ring-purple-500 focus:ring-2">
                         </td>
                         <td class="p-4 text-gray-700 text-center">{{ $transaction->description ?? '' }}</td>
                         <td class="p-4 text-gray-700 text-center">{{ $transaction->quantity ?? '' }}</td>
                         <td class="p-4 text-gray-700 text-center">{{ $transaction->ccurrency ?? '' }}</td>
-                        <td class="p-4 text-gray-700 text-center">{{ number_format($transaction->camountidr ?? 0, 2, ',', '.') }}</td>
-                        <td class="p-4 text-gray-700 text-center">{{ number_format($transaction->cvatgstamount ?? 0, 2, ',', '.') }}</td>
-                        <td class="p-4 text-gray-700 text-center">{{ number_format($transaction->cwhtaxamount ?? 0, 2, ',', '.') }}</td>
+                        <td class="p-4 text-gray-700 text-center">{{ number_format($transaction->camountidr ?? 0, 2,
+                            ',', '.') }}</td>
+                        <td class="p-4 text-gray-700 text-center">{{ number_format($transaction->cvatgstamount ?? 0, 2,
+                            ',', '.') }}</td>
+                        <td class="p-4 text-gray-700 text-center">{{ number_format($transaction->cwhtaxamount ?? 0, 2,
+                            ',', '.') }}</td>
                         <td class="p-4 font-bold text-purple-700 text-center">
-                            {{ number_format(($transaction->camountidr ?? 0) + ($transaction->cvatgstamount ?? 0) + ($transaction->cwhtaxamount ?? 0), 2, ',', '.') }}
+                            {{ number_format(($transaction->camountidr ?? 0) + ($transaction->cvatgstamount ?? 0) +
+                            ($transaction->cwhtaxamount ?? 0), 2, ',', '.') }}
                         </td>
                     </tr>
                     @endforeach
@@ -156,11 +178,16 @@
                     <tr class="bg-gradient-to-r from-emerald-100 to-teal-100 font-bold">
                         <td class="p-4 rounded-bl-2xl"></td>
                         <td colspan="3" class="p-4 text-right text-emerald-800">Total</td>
-                        <td class="p-4 text-emerald-800 text-center">{{ number_format($transactions->sum('camountidr') ?? 0, 2, ',', '.') }}</td>
-                        <td class="p-4 text-emerald-800 text-center">{{ number_format($transactions->sum('cvatgstamount') ?? 0, 2, ',', '.') }}</td>
-                        <td class="p-4 text-emerald-800 text-center">{{ number_format($transactions->sum('cwhtaxamount') ?? 0, 2, ',', '.') }}</td>
+                        <td class="p-4 text-emerald-800 text-center">{{ number_format($transactions->sum('camountidr')
+                            ?? 0, 2, ',', '.') }}</td>
+                        <td class="p-4 text-emerald-800 text-center">{{
+                            number_format($transactions->sum('cvatgstamount') ?? 0, 2, ',', '.') }}</td>
+                        <td class="p-4 text-emerald-800 text-center">{{ number_format($transactions->sum('cwhtaxamount')
+                            ?? 0, 2, ',', '.') }}</td>
                         <td class="p-4 font-bold text-emerald-800 text-center rounded-br-2xl">
-                            {{ number_format(($transactions->sum('camountidr') ?? 0) + ($transactions->sum('cvatgstamount') ?? 0) + ($transactions->sum('cwhtaxamount') ?? 0), 2, ',', '.') }}
+                            {{ number_format(($transactions->sum('camountidr') ?? 0) +
+                            ($transactions->sum('cvatgstamount') ?? 0) + ($transactions->sum('cwhtaxamount') ?? 0), 2,
+                            ',', '.') }}
                         </td>
                     </tr>
                 </tfoot>
@@ -171,54 +198,65 @@
 
     <!-- Selected Transactions Summary -->
     @if(!empty($selectedTransactionIds))
-    <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl shadow-lg p-8 mb-8 border-2 border-blue-200 hover:shadow-xl transition-all duration-300">
+    <div
+        class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl shadow-lg p-8 mb-8 border-2 border-blue-200 hover:shadow-xl transition-all duration-300">
         <h4 class="text-2xl font-bold text-blue-800 mb-6 flex items-center">
             <i class="fas fa-calculator mr-3 text-blue-600"></i>
             Selected Transactions Summary
         </h4>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-blue-200 hover:shadow-lg transition-all duration-300">
+            <div
+                class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-blue-200 hover:shadow-lg transition-all duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-blue-600 font-semibold text-sm">Subtotal</p>
                         <p class="text-2xl font-bold text-blue-800">
-                            IDR {{ number_format($transactions->whereIn('id', $selectedTransactionIds)->sum('camountidr') ?? 0, 2, ',', '.') }}
+                            IDR {{ number_format($transactions->whereIn('id',
+                            $selectedTransactionIds)->sum('camountidr') ?? 0, 2, ',', '.') }}
                         </p>
                     </div>
                     <i class="fas fa-coins text-3xl text-blue-400"></i>
                 </div>
             </div>
 
-            <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-emerald-200 hover:shadow-lg transition-all duration-300">
+            <div
+                class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-emerald-200 hover:shadow-lg transition-all duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-emerald-600 font-semibold text-sm">VAT</p>
                         <p class="text-2xl font-bold text-emerald-800">
-                            IDR {{ number_format($transactions->whereIn('id', $selectedTransactionIds)->sum('cvatgstamount') ?? 0, 2, ',', '.') }}
+                            IDR {{ number_format($transactions->whereIn('id',
+                            $selectedTransactionIds)->sum('cvatgstamount') ?? 0, 2, ',', '.') }}
                         </p>
                     </div>
                     <i class="fas fa-percent text-3xl text-emerald-400"></i>
                 </div>
             </div>
 
-            <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-amber-200 hover:shadow-lg transition-all duration-300">
+            <div
+                class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-amber-200 hover:shadow-lg transition-all duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-amber-600 font-semibold text-sm">WHT</p>
                         <p class="text-2xl font-bold text-amber-800">
-                            IDR {{ number_format($transactions->whereIn('id', $selectedTransactionIds)->sum('cwhtaxamount') ?? 0, 2, ',', '.') }}
+                            IDR {{ number_format($transactions->whereIn('id',
+                            $selectedTransactionIds)->sum('cwhtaxamount') ?? 0, 2, ',', '.') }}
                         </p>
                     </div>
                     <i class="fas fa-receipt text-3xl text-amber-400"></i>
                 </div>
             </div>
 
-            <div class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-purple-200 hover:shadow-lg transition-all duration-300">
+            <div
+                class="bg-white/70 backdrop-blur-sm rounded-2xl p-6 border border-purple-200 hover:shadow-lg transition-all duration-300">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-purple-600 font-semibold text-sm">Total</p>
                         <p class="text-2xl font-bold text-purple-800">
-                            IDR {{ number_format(($transactions->whereIn('id', $selectedTransactionIds)->sum('camountidr') ?? 0) + ($transactions->whereIn('id', $selectedTransactionIds)->sum('cvatgstamount') ?? 0) + ($transactions->whereIn('id', $selectedTransactionIds)->sum('cwhtaxamount') ?? 0), 2, ',', '.') }}
+                            IDR {{ number_format(($transactions->whereIn('id',
+                            $selectedTransactionIds)->sum('camountidr') ?? 0) + ($transactions->whereIn('id',
+                            $selectedTransactionIds)->sum('cvatgstamount') ?? 0) + ($transactions->whereIn('id',
+                            $selectedTransactionIds)->sum('cwhtaxamount') ?? 0), 2, ',', '.') }}
                         </p>
                     </div>
                     <i class="fas fa-money-check-alt text-3xl text-purple-400"></i>
@@ -249,9 +287,7 @@
     <!-- Action Buttons -->
     <div class="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 mb-8 border border-purple-100">
         <div class="flex flex-wrap gap-4 justify-center">
-            <button wire:click="save"
-                wire:loading.attr="disabled"
-                wire:target="save"
+            <button wire:click="save" wire:loading.attr="disabled" wire:target="save"
                 class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
                 <i class="fas fa-save"></i>
                 <span wire:loading.remove wire:target="save">Save Invoice</span>
@@ -261,9 +297,7 @@
                 </span>
             </button>
 
-            <button wire:click="saveAsDraft"
-                wire:loading.attr="disabled"
-                wire:target="saveAsDraft"
+            <button wire:click="saveAsDraft" wire:loading.attr="disabled" wire:target="saveAsDraft"
                 class="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
                 <i class="fas fa-file-alt"></i>
                 <span wire:loading.remove wire:target="saveAsDraft">Save as Draft</span>
@@ -345,9 +379,7 @@
                             $status = $invs->status;
                             @endphp
                             <div x-data="countdownTimer('{{ \Carbon\Carbon::parse($invs->due_date)->toIso8601String() }}', '{{ $status }}')"
-                                x-init="start()"
-                                class="font-bold"
-                                :class="{
+                                x-init="start()" class="font-bold" :class="{
             'text-red-600': time === 'EXPIRED',
             'text-yellow-600': time === 'DRAFT',
             'text-blue-600': time !== 'EXPIRED' && time !== 'DRAFT' && time !== '',
@@ -363,30 +395,29 @@
                         <td class="p-4 text-center text-gray-700">
                             {{ optional($invs->transactions->first())->ccurrency ?? '' }}
                         </td>
-                        <td class="p-4 text-center text-gray-700 font-semibold">{{ number_format($invs->total_amount ?? 0, 2, ',', '.') }}</td>
+                        <td class="p-4 text-center text-gray-700 font-semibold">{{ number_format($invs->total_amount ??
+                            0, 2, ',', '.') }}</td>
                         <td class="p-4 text-center text-gray-700">{{$invs->users->name ?? ''}}</td>
                         <td class="p-4">
                             <div class="flex justify-center items-center space-x-2">
                                 @if($invs->status === 'draft')
-                                <button @click="window.dispatchEvent(new CustomEvent('confirm-issue-invoice', { detail: { id: {{ $invs->id }} } }))"
-                                    wire:loading.attr="disabled"
-                                    wire:target="issueInvoice"
+                                <button
+                                    @click="window.dispatchEvent(new CustomEvent('confirm-issue-invoice', { detail: { id: {{ $invs->id }} } }))"
+                                    wire:loading.attr="disabled" wire:target="issueInvoice"
                                     class="w-10 h-10 bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
                                     title="Issue Invoice">
                                     <i class="fas fa-check text-sm"></i>
                                 </button>
                                 @endif
 
-                                <button wire:click="previewPDF({{ $invs->id }})"
-                                    wire:loading.attr="disabled"
+                                <button wire:click="previewPDF({{ $invs->id }})" wire:loading.attr="disabled"
                                     wire:target="previewPDF"
                                     class="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
                                     title="Preview Invoice">
                                     <i class="fas fa-eye text-sm"></i>
                                 </button>
 
-                                <button wire:click="generatePDF({{ $invs->id }})"
-                                    wire:loading.attr="disabled"
+                                <button wire:click="generatePDF({{ $invs->id }})" wire:loading.attr="disabled"
                                     wire:target="generatePDF"
                                     class="w-10 h-10 bg-gradient-to-r from-blue-400 to-purple-500 hover:from-blue-500 hover:to-purple-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
                                     title="Print Invoice">
@@ -394,27 +425,28 @@
                                 </button>
                                 @if($invs->status === 'issued')
                                 <!-- Tombol Void dengan Animasi -->
-                                <button
-                                    wire:click="confirmVoid({{ $invs->id }})"
-                                    wire:loading.attr="disabled"
+                                <button wire:click="confirmVoid({{ $invs->id }})" wire:loading.attr="disabled"
                                     class="group relative w-10 h-10 bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-110 transition-all duration-300 active:scale-95"
                                     title="Void Invoice">
-                                    <i class="fas fa-ban text-sm group-hover:rotate-12 transition-transform duration-300"></i>
+                                    <i
+                                        class="fas fa-ban text-sm group-hover:rotate-12 transition-transform duration-300"></i>
 
                                     <!-- Ripple Effect -->
-                                    <div class="absolute inset-0 rounded-full bg-white opacity-0 group-active:opacity-20 transition-opacity duration-150"></div>
+                                    <div
+                                        class="absolute inset-0 rounded-full bg-white opacity-0 group-active:opacity-20 transition-opacity duration-150">
+                                    </div>
                                 </button>
                                 @endif
                                 @if($invs->status === 'void')
                                 <!-- Tombol Void dengan Animasi -->
-                                <button
-                                    wire:click="reasonVoidingJobSaleInvoice({{ $invs->id }})"
-                                    wire:loading.attr="disabled"
-                                    title="Reason Voiding"
+                                <button wire:click="reasonVoidingJobSaleInvoice({{ $invs->id }})"
+                                    wire:loading.attr="disabled" title="Reason Voiding"
                                     class="group relative w-10 h-10 bg-gradient-to-l from-red-400 to-pink-300 hover:from-red-500 hover:to-pink-600 text-white rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-110 transition-all duration-300 active:scale-95">
                                     <i class="fa-solid fa-info"></i>
                                     <!-- Ripple Effect -->
-                                    <div class="absolute inset-0 rounded-full bg-white opacity-0 group-active:opacity-20 transition-opacity duration-150"></div>
+                                    <div
+                                        class="absolute inset-0 rounded-full bg-white opacity-0 group-active:opacity-20 transition-opacity duration-150">
+                                    </div>
                                 </button>
                                 @endif
 
@@ -476,21 +508,13 @@
         </div>
     </div>
     @if($voidReason_job_sale_invoice)
-    <div
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
-        x-data="{ show: false }"
-        x-init="setTimeout(() => show = true, 50)"
-        x-show="show"
-        x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0"
-        x-transition:enter-end="opacity-100"
-        x-transition:leave="transition ease-in duration-200"
-        x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0" x-cloak>
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
+        x-data="{ show: false }" x-init="setTimeout(() => show = true, 50)" x-show="show"
+        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-cloak>
 
-        <div
-            class="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl transform"
-            x-show="show"
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl transform" x-show="show"
             x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
@@ -500,7 +524,8 @@
 
             <!-- Header -->
             <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                <div
+                    class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
                     <i class="fas fa-info text-red-500 text-2xl"></i>
                 </div>
                 <h3 class="text-xl font-bold text-gray-800 mb-2">Reason Voiding Invoice</h3>
@@ -510,18 +535,14 @@
 
             <!-- Reason Input -->
             <div class="mb-6">
-                <textarea
-                    wire:model="void_reason"
-                    rows="3"
+                <textarea wire:model="void_reason" rows="3"
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200 resize-none"></textarea>
 
             </div>
 
             <!-- Action Buttons -->
             <div class="flex justify-center space-x-3">
-                <button
-                    type="button"
-                    wire:click="cancelReasonVoidingJobSaleInvoice"
+                <button type="button" wire:click="cancelReasonVoidingJobSaleInvoice"
                     class="px-6 py-3 bg-red-100 text-gray-700 rounded-lg hover:bg-red-200 transition-colors duration-200 font-medium disabled:opacity-50">
                     Ok
                 </button>
@@ -530,21 +551,13 @@
     </div>
     @endif
     @if($showModal)
-    <div
-        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
-        x-data="{ show: false }"
-        x-init="setTimeout(() => show = true, 50)"
-        x-show="show"
-        x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0"
-        x-transition:enter-end="opacity-100"
-        x-transition:leave="transition ease-in duration-200"
-        x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0" x-cloak>
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
+        x-data="{ show: false }" x-init="setTimeout(() => show = true, 50)" x-show="show"
+        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-cloak>
 
-        <div
-            class="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl transform"
-            x-show="show"
+        <div class="bg-white rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl transform" x-show="show"
             x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 scale-95 translate-y-4"
             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
@@ -554,7 +567,8 @@
 
             <!-- Header -->
             <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                <div
+                    class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
                     <i class="fas fa-ban text-red-500 text-2xl"></i>
                 </div>
                 <h3 class="text-xl font-bold text-gray-800 mb-2">Void Invoice</h3>
@@ -567,12 +581,10 @@
                     <label class="block text-gray-700 font-medium mb-2">
                         <i class="fas fa-edit mr-2"></i>Alasan Void
                     </label>
-                    <textarea
-                        wire:model="void_reason"
-                        rows="3"
+                    <textarea wire:model="void_reason" rows="3"
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors duration-200 resize-none"
-                        placeholder="Masukkan alasan kenapa invoice ini di-void..."
-                        {{ $isVoiding ? 'disabled' : '' }}></textarea>
+                        placeholder="Masukkan alasan kenapa invoice ini di-void..." {{ $isVoiding ? 'disabled' : ''
+                        }}></textarea>
                     @error('void_reason')
                     <span class="text-red-500 text-sm flex items-center mt-1">
                         <i class="fas fa-exclamation-triangle mr-1"></i>{{ $message }}
@@ -582,18 +594,13 @@
 
                 <!-- Action Buttons -->
                 <div class="flex justify-end space-x-3">
-                    <button
-                        type="button"
-                        wire:click="cancelVoid"
-                        {{ $isVoiding ? 'disabled' : '' }}
+                    <button type="button" wire:click="cancelVoid" {{ $isVoiding ? 'disabled' : '' }}
                         class="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-medium disabled:opacity-50">
                         <i class="fas fa-times mr-2"></i>Batal
                     </button>
 
                     <div x-data>
-                        <button
-                            type="button"
-                            wire:loading.attr="disabled"
+                        <button type="button" wire:loading.attr="disabled"
                             class="px-6 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-lg hover:from-red-600 hover:to-pink-700 transition-all duration-200 font-medium disabled:opacity-50 transform hover:scale-105 active:scale-95 min-w-[140px]"
                             @click="
             Swal.fire({
@@ -618,8 +625,11 @@
 
                             <span wire:loading wire:target="voidInvoice" class="flex items-center justify-center">
                                 <svg class="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                    </path>
                                 </svg>
                                 Memproses...
                             </span>
@@ -631,25 +641,20 @@
     </div>
     @endif
     <!-- PDF Preview Modal -->
-    <div x-cloak x-data="{ open: false, pdfSrc: '', loading: false }"
-        x-cloak
-        @open-pdf-preview.window="
+    <div x-cloak x-data="{ open: false, pdfSrc: '', loading: false }" x-cloak @open-pdf-preview.window="
             loading = true;
             open = true;
             pdfSrc = $event.detail.pdf;
             console.log('PDF Loaded:', pdfSrc);
             setTimeout(() => loading = false, 800);
          ">
-        <div x-show="open"
-            class="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-4"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0">
+        <div x-show="open" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 p-4"
+            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
             <div class="bg-white rounded-3xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
-                <div class="flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-purple-100 to-pink-100">
+                <div
+                    class="flex justify-between items-center p-6 border-b border-gray-200 bg-gradient-to-r from-purple-100 to-pink-100">
                     <h2 class="text-2xl font-bold text-purple-700 flex items-center">
                         <i class="fas fa-file-pdf mr-3 text-purple-500"></i>
                         Invoice Preview
@@ -763,7 +768,14 @@
             sel: '#vendorPurchasingInvoicing',
             model: 'selectedVendor',
             placeholder: 'Select Vendor  '
-        }, ].forEach(({
+        }, {
+        sel: '#bank_id',
+        model: 'bank_id',
+        placeholder: 'Select Bank '
+        },{sel: '#finalCurrency',
+        model: 'finalCurrency',
+        placeholder: 'Select Currency '
+        },].forEach(({
             sel,
             model,
             placeholder

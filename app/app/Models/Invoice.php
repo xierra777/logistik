@@ -16,6 +16,7 @@ class Invoice extends Model
         'shipment_id',
         'job_id',
         'customer_id',
+        'bank_id',
         'invoice_date',
         'due_date',
         'currency',
@@ -27,6 +28,10 @@ class Invoice extends Model
         'updated_by',
     ];
 
+    public function bank()
+    {
+        return $this->belongsTo(Bank::class, 'bank_id');
+    }
     public function shipment()
     {
         return $this->belongsTo(TShipments::class);

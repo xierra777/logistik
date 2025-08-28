@@ -14,6 +14,9 @@ use App\Livewire\Accounting\Tranksaksi;
 use App\Livewire\Accounting\SaleInvoice;
 use App\Livewire\Accounting\Tax\CreateTax;
 use App\Livewire\Accounting\Tax\ListTax;
+use App\Livewire\Bank\CreateBank;
+use App\Livewire\Bank\ListBank;
+use App\Livewire\Bank\ViewBank;
 use App\Livewire\JournalEntries;
 use App\Livewire\Customers\CreateCustomer;
 use App\Livewire\Customers\EditCustomer;
@@ -245,9 +248,19 @@ Route::get('createPayment', CreatePayment::class)
 Route::get('viewPayment/{payId}', ViewPayment::class)
     ->middleware(['auth', 'verified'])
     ->name('viewPay');
-
-
 // End Payment
+
+Route::get('list-bank', ListBank::class)
+    ->middleware(['auth', 'verified'])
+    ->name('listBank');
+Route::get('create-bank', CreateBank::class)
+    ->middleware(['auth', 'verified'])
+    ->name('createBank');
+Route::get('view-bank/{id}', ViewBank::class)
+    ->middleware(['auth', 'verified'])
+    ->name('viewBank');
+
+
 Route::get('/csrf-token', function (Request $request) {
     return response()->json(['csrf_token' => csrf_token()]);
 })->name('csrf-token');

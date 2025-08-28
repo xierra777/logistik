@@ -249,7 +249,7 @@ class JobSaleInvoice extends Component
     public function generateInvoiceNumber()
     {
         try {
-            $prefix = "INV/BRN/" . now()->format('ym');
+            $prefix = "INV-BRN-" . now()->format('ym');
 
             // Get the highest number for today using raw SQL for better performance
             $result = DB::select("
@@ -448,32 +448,32 @@ class JobSaleInvoice extends Component
             }
 
             // Format summary
-            $formattedSummary = [
-                'subtotal' => number_format(
-                    $summary['subtotal'],
-                    2,
-                    $this->finalCurrency === 'IDR' ? ',' : '.',
-                    $this->finalCurrency === 'IDR' ? '.' : ','
-                ),
-                'vat' => number_format(
-                    $summary['vat'],
-                    2,
-                    $this->finalCurrency === 'IDR' ? ',' : '.',
-                    $this->finalCurrency === 'IDR' ? '.' : ','
-                ),
-                'wht' => number_format(
-                    $summary['wht'],
-                    2,
-                    $this->finalCurrency === 'IDR' ? ',' : '.',
-                    $this->finalCurrency === 'IDR' ? '.' : ','
-                ),
-                'total' => number_format(
-                    $summary['total'],
-                    2,
-                    $this->finalCurrency === 'IDR' ? ',' : '.',
-                    $this->finalCurrency === 'IDR' ? '.' : ','
-                ),
-            ];
+               $formattedSummary = [
+                    'subtotal' => number_format(
+                        $summary['subtotal'],
+                        $this->finalCurrency === 'USD' ? 2 : 0,
+                $this->finalCurrency === 'IDR' ? '.' : ',',
+                        $this->finalCurrency === 'IDR' ? '.' : ','
+                    ),
+                    'vat' => number_format(
+                        $summary['vat'],
+                        $this->finalCurrency === 'USD' ? 2 : 0,
+                $this->finalCurrency === 'IDR' ? '.' : ',',
+                        $this->finalCurrency === 'IDR' ? '.' : ','
+                    ),
+                    'wht' => number_format(
+                        $summary['wht'],
+                        $this->finalCurrency === 'USD' ? 2 : 0,
+                $this->finalCurrency === 'IDR' ? '.' : ',',
+                        $this->finalCurrency === 'IDR' ? '.' : ','
+                    ),
+                    'total' => number_format(
+                        $summary['total'],
+                        $this->finalCurrency === 'USD' ? 2 : 0,
+                $this->finalCurrency === 'IDR' ? '.' : ',',
+                        $this->finalCurrency === 'IDR' ? '.' : ','
+                    ),
+                ];
 
             // Render view - gunakan data yang konsisten
             $data = [

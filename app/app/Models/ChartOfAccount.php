@@ -16,7 +16,7 @@ class ChartOfAccount extends Model
         'account_name',
         'term_type',
         'account_type',
-        'is_bank',
+        'is_payment',
         'parent_account_id',
         'created_by',
         'updated_by',

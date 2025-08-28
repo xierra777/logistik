@@ -7,11 +7,7 @@
         <label for="name" class="block text-sm font-medium text-gray-700">
           Nama Perusahaan <span class="text-red-500">*</span>
         </label>
-        <input
-          wire:model="name"
-          type="text"
-          id="name"
-          name="name"
+        <input wire:model="name" type="text" id="name" name="name"
           class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
         @error('name')
         <span class="text-sm text-red-500">{{ $message }}</span>
@@ -21,12 +17,7 @@
         <label for="email" class="block text-sm font-medium text-gray-700">
           Email <span class="text-red-500">*</span>
         </label>
-        <input
-          wire:model="email"
-          type="text"
-          id="email"
-          name="email"
-          required
+        <input wire:model="email" type="text" id="email" name="email" required
           class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
         @error('email')
         <span class="text-sm text-red-500">{{ $message }}</span>
@@ -36,11 +27,7 @@
         <label for="contact" class="block text-sm font-medium text-gray-700">
           Kontak <span class="text-red-500">*</span>
         </label>
-        <input
-          wire:model="contact"
-          type="text"
-          id="contact"
-          name="contact"
+        <input wire:model="contact" type="text" id="contact" name="contact"
           class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
         @error('contact')
         <span class="text-sm text-red-500">{{ $message }}</span>
@@ -51,7 +38,8 @@
         <label for="countrySelect" class="block text-sm font-medium text-gray-700">
           Country <span class="text-red-500">*</span></label>
         <div wire:ignore>
-          <select id="countrySelect" class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"></select>
+          <select id="countrySelect"
+            class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"></select>
         </div>
 
         @error('country_code') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
@@ -101,11 +89,7 @@
         <label for="web" class="block text-sm font-medium text-gray-700">
           Web
         </label>
-        <input
-          wire:model="web"
-          type="text"
-          id="web"
-          name="web"
+        <input wire:model="web" type="text" id="web" name="web"
           class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
         @error('web')
         <span class="text-sm text-red-500">{{ $message }}</span>
@@ -116,25 +100,26 @@
         <label for="address" class="block text-sm font-medium text-gray-700">
           Alamat <span class="text-red-500">*</span>
         </label>
-        <textarea class="py-2 px-3 mt-2 sm:py-3 sm:px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600" rows="3" placeholder="This is a textarea placeholder" wire:model="address"
-          type="text"
-          id="address"
-          name="address"
-          required></textarea>
+        <textarea
+          class="py-2 px-3 mt-2 sm:py-3 sm:px-4 block w-full border-gray-200 rounded-lg sm:text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
+          rows="3" placeholder="This is a textarea placeholder" wire:model="address" type="text" id="address"
+          name="address" required></textarea>
         @error('address')
         <span class="text-sm text-red-500">{{ $message }}</span>
         @enderror
       </div>
     </div>
   </div>
-
+  <input type="text" wire:model="customer_code" name="" id="">
   <!-- Buttons -->
   <div class="mt-6 flex items-center justify-end gap-x-6">
-    <a wire:navigate href="{{route ('listCust')}}" class="text-sm/6 font-semibold text-gray-900 bg-gray-200 px-4 py-3 rounded-md hover:bg-gray-300">
+    <a wire:navigate href="{{route ('listCust')}}"
+      class="text-sm/6 font-semibold text-gray-900 bg-gray-200 px-4 py-3 rounded-md hover:bg-gray-300">
       Back
     </a>
 
-    <button type="submit" class="rounded-md bg-indigo-600 px-4 py-3 itext-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 bg-cyan-500 shadow-lg shadow-cyan-500/50">
+    <button type="submit"
+      class="rounded-md bg-indigo-600 px-4 py-3 itext-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 bg-cyan-500 shadow-lg shadow-cyan-500/50">
       Save
     </button>
   </div>

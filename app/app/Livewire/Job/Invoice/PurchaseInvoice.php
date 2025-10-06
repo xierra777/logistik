@@ -337,7 +337,7 @@ class PurchaseInvoice extends Component
             $html = view('livewire.job.invoice.purchase-invoice-pdf', $data)->render();
 
             $pdfContent = Browsershot::html($html)
-                ->setChromePath('/usr/bin/google-chrome')
+                ->setChromePath('/usr/bin/chromium')
                 ->format('A4')
                 ->showBackground()
                 ->margins(1, 1, 1, 1)
@@ -720,7 +720,7 @@ class PurchaseInvoice extends Component
             $html = view('livewire.job.invoice.purchase-invoice-pdf', $data)->render();
 
             $pdfContent = Browsershot::html($html)
-                ->setChromePath('/usr/bin/google-chrome')
+                ->setChromePath('/usr/bin/chromium')
                 ->format('A4')
                 ->showBackground()
                 ->margins(1, 1, 1, 1)

@@ -488,7 +488,7 @@ class JobSaleInvoice extends Component
             $html = view('livewire.job.invoice.sale-invoice-pdf', $data)->render();
 
             $pdfContent = Browsershot::html($html)
-                ->setChromePath('/usr/bin/google-chrome')
+                ->setChromePath('/usr/bin/chromium')
                 ->format('A4')
                 ->showBackground()
                 ->margins(1, 1, 1, 1)
@@ -684,7 +684,7 @@ class JobSaleInvoice extends Component
             $html = view('livewire.job.invoice.sale-invoice-pdf', $data)->render();
 
             $pdfContent = Browsershot::html($html)
-                ->setChromePath('/usr/bin/google-chrome')
+                ->setChromePath('/usr/bin/chromium')
                 ->format('A4')
                 ->showBackground()
                 ->margins(1, 1, 1, 1)

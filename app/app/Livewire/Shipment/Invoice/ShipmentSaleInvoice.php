@@ -156,10 +156,200 @@ class ShipmentSaleInvoice extends Component
         $this->isIndeterminate = $selectedCount > 0 && $selectedCount < $totalCount;
     }
 
-    public function generatePDF()
+    public function generatePDF($invoiceId)
     {
-        // Add your PDF generation logic here
-        session()->flash('message', 'PDF generated successfully!');
+        if ($invoiceId) {
+            // Gunakan eager loading yang konsisten
+            $invoice = Invoice::with([
+                'transactions',
+                'client',
+                'shipment.container' // atau 'shipment.jobContainer' sesuai nama relasi
+            ])->findOrFail($invoiceId);
+
+            // Akses langsung dari relasi yang sudah di-load
+            $shipment = $invoice->shipment;
+            $customer = $invoice->client;
+
+            // Pastikan relasi ada sebelum mengakses
+            if ($shipment && $shipment->container) {
+                $totalPcs = $shipment->container->sum('shipmentNoOfPackages');
+                $totalgw = $shipment->container->sum('shipmentGrossWeight');
+            } else {
+                $totalPcs = 0;
+                $totalgw = 0;
+            }
+
+            $summary = [
+                'subtotal' => 0,
+                'vat'      => 0,
+                'wht'      => 0,
+                'total'    => 0,
+            ];
+
+            if ($invoice->status === 'void') {
+                foreach ($invoice->invtrx as $pivot) {
+                    $currency = $invoice->currency;
+                    $qty =  $pivot->quantityInvoice;
+
+                    // Ambil amount dari pivot (snapshot)
+                    $amount = $currency === 'IDR'
+                        ?  $pivot->amountInvoice
+                        :  $pivot->amountInvoiceUsd;
+
+                    // VAT dan WHT seharusnya dari field yang sesuai di pivot
+                    $vat = $currency === 'IDR'
+                        ?  $pivot->vatInvoice
+                        :  $pivot->vatInvoiceUsd;
+                    $wht = $currency === 'IDR'
+                        ?  $pivot->whtInvoice
+                        :  $pivot->whtInvoiceUsd;
+
+                    $subtotal = $qty * $amount;
+                    $total = $subtotal + $vat + $wht;
+
+                    $pivot->subtotal = $subtotal;
+                    $pivot->vat = $vat;
+                    $pivot->wht = $wht;
+                    $pivot->total = $total;
+
+                    // Akumulasi untuk summary
+                    $summary['subtotal'] += $subtotal;
+                    $summary['vat'] += $vat;
+                    $summary['wht'] += $wht;
+                    $summary['total'] += $total;
+                }
+            } else {
+                foreach ($invoice->transactions as $trx) {
+                    $currency = $trx->scurrency;
+                    $qty = (int) $trx->quantity;
+                    $rate = (float) ($trx->srate ?? 1);
+
+                    // Ambil amount original
+                    $amount = $currency === 'IDR'
+                        ? (float) $trx->samountidr
+                        : (float) $trx->sfcyamount;
+
+                    $vat = $currency === 'IDR'
+                        ? (float) ($trx->svatgstamount ?? 0)
+                        : (float) ($trx->svatgstusd ?? 0);
+
+                    $wht = $currency === 'IDR'
+                        ? (float) ($trx->swhtaxamount ?? 0)
+                        : (float) ($trx->shwtaxrateusd ?? 0);
+
+                    // Hitung subtotal dalam mata uang asli
+                    $subtotal = $qty * $amount;
+                    $total = $subtotal + $vat + $wht;
+
+                    // TAMBAHKAN: Simpan nilai original untuk ditampilkan di view
+                    $trx->original_subtotal = $subtotal;
+                    $trx->original_vat = $vat;
+                    $trx->original_wht = $wht;
+                    $trx->original_total = $total;
+                    $trx->original_currency = $currency;
+
+                    // Konversi untuk summary (jika diperlukan)
+                    if ($currency !== $this->finalCurrency) {
+                        if ($currency === 'IDR' && $this->finalCurrency === 'USD') {
+                            $cSub = $subtotal / $rate;
+                            $cVat = $vat / $rate;
+                            $cWht = $wht / $rate;
+                        } elseif ($currency === 'USD' && $this->finalCurrency === 'IDR') {
+                            $cSub = $subtotal * $rate;
+                            $cVat = $vat * $rate;
+                            $cWht = $wht * $rate;
+                        } else {
+                            $cSub = $subtotal;
+                            $cVat = $vat;
+                            $cWht = $wht;
+                        }
+
+                        // Nilai yang sudah dikonversi untuk summary
+                        $trx->subtotal = $cSub;
+                        $trx->vat = $cVat;
+                        $trx->wht = $cWht;
+                        $trx->total = $cSub + $cVat + $cWht;
+                    } else {
+                        // Jika mata uang sama, gunakan nilai original
+                        $trx->subtotal = $subtotal;
+                        $trx->vat = $vat;
+                        $trx->wht = $wht;
+                        $trx->total = $total;
+
+                        $cSub = $subtotal;
+                        $cVat = $vat;
+                        $cWht = $wht;
+                    }
+
+                    // Akumulasi untuk summary dalam final currency
+                    $summary['subtotal'] += $cSub;
+                    $summary['vat'] += $cVat;
+                    $summary['wht'] += $cWht;
+                    $summary['total'] += ($cSub + $cVat + $cWht);
+                }
+            }
+
+            // Format summary
+            $formattedSummary = [
+                'subtotal' => number_format(
+                    $summary['subtotal'],
+                    $this->finalCurrency === 'USD' ? 2 : 0,
+                    $this->finalCurrency === 'IDR' ? ',' : '.',
+                    $this->finalCurrency === 'IDR' ? ',' : '.',
+                ),
+                'vat' => number_format(
+                    $summary['vat'],
+                    $this->finalCurrency === 'USD' ? 2 : 0,
+                    $this->finalCurrency === 'IDR' ? ',' : '.',
+                    $this->finalCurrency === 'IDR' ? ',' : '.',
+                ),
+                'wht' => number_format(
+                    $summary['wht'],
+                    $this->finalCurrency === 'USD' ? 2 : 0,
+                    $this->finalCurrency === 'IDR' ? ',' : '.',
+                    $this->finalCurrency === 'IDR' ? '.' : ','
+                ),
+                'total' => number_format(
+                    $summary['total'],
+                    $this->finalCurrency === 'USD' ? 2 : 0,
+                    $this->finalCurrency === 'IDR' ? ',' : '.',
+                    $this->finalCurrency === 'IDR' ? ',' : '.',
+                ),
+            ];
+
+            // Render view - gunakan data yang konsisten
+            $data = [
+                'customer'             => $customer,
+                'invoice'              => $invoice,
+                'shipment'             => $invoice->shipment,
+                'container'            => $shipment->container ?? collect(), // fallback jika null
+                'transactions'         => $invoice->transactions,
+                'totalPcs'             => $totalPcs,
+                'totalgw'              => $totalgw,
+                'formattedSummary'     => $formattedSummary,
+                'finalCurrency'        => $this->finalCurrency,
+                'invoice_number'       => $invoice->invoice_number,
+                'showExchangeRate'     => $this->showExchangeRate,
+            ];
+            // dd($data);
+            $html = view('livewire.shipment.invoice.shipment-sale-invoice-pdf', $data)->render();
+
+            $pdfContent = Browsershot::html($html)
+                ->setChromePath('/usr/bin/google-chrome')
+                ->format('A4')
+                ->showBackground()
+                ->margins(1, 1, 1, 1)
+                ->setOption('args', ['--no-sandbox'])
+                ->pdf();
+
+            $filename = 'Invoice_' . $data['invoice']->invoice_number . '_' . date('YmdHis') . '.pdf';
+
+            return response()->streamDownload(function () use ($pdfContent) {
+                echo $pdfContent;
+            }, $filename, [
+                'Content-Type' => 'application/pdf',
+            ]);
+        }
     }
     #[On('issueInvoice')]
     public function issueInvoice($id)
@@ -380,7 +570,7 @@ class ShipmentSaleInvoice extends Component
 
             if ($invoice->status === 'void') {
                 foreach ($invoice->invtrx as $pivot) {
-                    $currency =$invoice->currency;
+                    $currency = $invoice->currency;
                     $qty =  $pivot->quantityInvoice;
 
                     // Ambil amount dari pivot (snapshot)
@@ -411,78 +601,78 @@ class ShipmentSaleInvoice extends Component
                     $summary['total'] += $total;
                 }
             } else {
-             foreach ($invoice->transactions as $trx) {
-    $currency = $trx->scurrency;
-    $qty = (int) $trx->quantity;
-    $rate = (float) ($trx->srate ?? 1);
+                foreach ($invoice->transactions as $trx) {
+                    $currency = $trx->scurrency;
+                    $qty = (int) $trx->quantity;
+                    $rate = (float) ($trx->srate ?? 1);
 
-    // Ambil amount original
-    $amount = $currency === 'IDR'
-        ? (float) $trx->samountidr
-        : (float) $trx->sfcyamount;
+                    // Ambil amount original
+                    $amount = $currency === 'IDR'
+                        ? (float) $trx->samountidr
+                        : (float) $trx->sfcyamount;
 
-    $vat = $currency === 'IDR'
-        ? (float) ($trx->svatgstamount ?? 0)
-        : (float) ($trx->svatgstusd ?? 0);
+                    $vat = $currency === 'IDR'
+                        ? (float) ($trx->svatgstamount ?? 0)
+                        : (float) ($trx->svatgstusd ?? 0);
 
-    $wht = $currency === 'IDR'
-        ? (float) ($trx->swhtaxamount ?? 0)
-        : (float) ($trx->shwtaxrateusd ?? 0);
+                    $wht = $currency === 'IDR'
+                        ? (float) ($trx->swhtaxamount ?? 0)
+                        : (float) ($trx->shwtaxrateusd ?? 0);
 
-    // Hitung subtotal dalam mata uang asli
-    $subtotal = $qty * $amount;
-    $total = $subtotal + $vat + $wht;
+                    // Hitung subtotal dalam mata uang asli
+                    $subtotal = $qty * $amount;
+                    $total = $subtotal + $vat + $wht;
 
-    // TAMBAHKAN: Simpan nilai original untuk ditampilkan di view
-    $trx->original_subtotal = $subtotal;
-    $trx->original_vat = $vat;
-    $trx->original_wht = $wht;
-    $trx->original_total = $total;
-    $trx->original_currency = $currency;
+                    // TAMBAHKAN: Simpan nilai original untuk ditampilkan di view
+                    $trx->original_subtotal = $subtotal;
+                    $trx->original_vat = $vat;
+                    $trx->original_wht = $wht;
+                    $trx->original_total = $total;
+                    $trx->original_currency = $currency;
 
-    // Konversi untuk summary (jika diperlukan)
-    if ($currency !== $this->finalCurrency) {
-        if ($currency === 'IDR' && $this->finalCurrency === 'USD') {
-            $cSub = $subtotal / $rate;
-            $cVat = $vat / $rate;
-            $cWht = $wht / $rate;
-        } elseif ($currency === 'USD' && $this->finalCurrency === 'IDR') {
-            $cSub = $subtotal * $rate;
-            $cVat = $vat * $rate;
-            $cWht = $wht * $rate;
-        } else {
-            $cSub = $subtotal;
-            $cVat = $vat;
-            $cWht = $wht;
-        }
+                    // Konversi untuk summary (jika diperlukan)
+                    if ($currency !== $this->finalCurrency) {
+                        if ($currency === 'IDR' && $this->finalCurrency === 'USD') {
+                            $cSub = $subtotal / $rate;
+                            $cVat = $vat / $rate;
+                            $cWht = $wht / $rate;
+                        } elseif ($currency === 'USD' && $this->finalCurrency === 'IDR') {
+                            $cSub = $subtotal * $rate;
+                            $cVat = $vat * $rate;
+                            $cWht = $wht * $rate;
+                        } else {
+                            $cSub = $subtotal;
+                            $cVat = $vat;
+                            $cWht = $wht;
+                        }
 
-        // Nilai yang sudah dikonversi untuk summary
-        $trx->subtotal = $cSub;
-        $trx->vat = $cVat;
-        $trx->wht = $cWht;
-        $trx->total = $cSub + $cVat + $cWht;
-    } else {
-        // Jika mata uang sama, gunakan nilai original
-        $trx->subtotal = $subtotal;
-        $trx->vat = $vat;
-        $trx->wht = $wht;
-        $trx->total = $total;
-        
-        $cSub = $subtotal;
-        $cVat = $vat;
-        $cWht = $wht;
-    }
+                        // Nilai yang sudah dikonversi untuk summary
+                        $trx->subtotal = $cSub;
+                        $trx->vat = $cVat;
+                        $trx->wht = $cWht;
+                        $trx->total = $cSub + $cVat + $cWht;
+                    } else {
+                        // Jika mata uang sama, gunakan nilai original
+                        $trx->subtotal = $subtotal;
+                        $trx->vat = $vat;
+                        $trx->wht = $wht;
+                        $trx->total = $total;
 
-    // Akumulasi untuk summary dalam final currency
-    $summary['subtotal'] += $cSub;
-    $summary['vat'] += $cVat;
-    $summary['wht'] += $cWht;
-    $summary['total'] += ($cSub + $cVat + $cWht);
-}
+                        $cSub = $subtotal;
+                        $cVat = $vat;
+                        $cWht = $wht;
+                    }
+
+                    // Akumulasi untuk summary dalam final currency
+                    $summary['subtotal'] += $cSub;
+                    $summary['vat'] += $cVat;
+                    $summary['wht'] += $cWht;
+                    $summary['total'] += ($cSub + $cVat + $cWht);
+                }
             }
 
             // Format summary
-             $formattedSummary = [
+            $formattedSummary = [
                 'subtotal' => number_format(
                     $summary['subtotal'],
                     $this->finalCurrency === 'USD' ? 2 : 0,

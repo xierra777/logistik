@@ -159,10 +159,207 @@ class ShipmentPurchaseInvoice extends Component
         $this->isIndeterminate = $selectedCount > 0 && $selectedCount < $totalCount;
     }
 
-    public function generatePDF()
+    public function generatePDF($invoiceId)
     {
-        // Add your PDF generation logic here
-        session()->flash('message', 'PDF generated successfully!');
+        if ($invoiceId) {
+            // Gunakan eager loading yang konsisten
+            $invoice = Invoice::with([
+                'transactions',
+                'client',
+                'shipment.container',
+                'bank' // atau 'shipment.jobContainer' sesuai nama relasi
+            ])->findOrFail($invoiceId);
+
+            // Akses langsung dari relasi yang sudah di-load
+            $shipment = $invoice->shipment;
+            $customer = $invoice->client;
+
+            // Pastikan relasi ada sebelum mengakses
+            if ($shipment && $shipment->container) {
+                $totalPcs = $shipment->container->sum('shipmentNoOfPackages');
+                $totalgw = $shipment->container->sum('shipmentGrossWeight');
+            } else {
+                $totalPcs = 0;
+                $totalgw = 0;
+            }
+
+            $summary = [
+                'subtotal' => 0,
+                'vat'      => 0,
+                'wht'      => 0,
+                'total'    => 0,
+            ];
+
+            if ($invoice->status === 'void') {
+                foreach ($invoice->invtrx as $pivot) {
+                    $currency = strtoupper(trim($invoice->currency));
+                    $qty =  $pivot->quantityInvoice;
+
+
+                    // Ambil amount dari pivot (snapshot)
+                    $amount = $currency === 'IDR'
+                        ?  $pivot->amountInvoice
+                        :  $pivot->amountInvoiceUsd;
+
+                    // VAT dan WHT seharusnya dari field yang sesuai di pivot
+                    $vat = $currency === 'IDR'
+                        ?  $pivot->vatInvoice
+                        :  $pivot->vatInvoiceUsd;
+                    $wht = $currency === 'IDR'
+                        ?  $pivot->whtInvoice
+                        :  $pivot->whtInvoiceUsd;
+
+                    $subtotal = $qty * $amount;
+                    $total = $subtotal + $vat + $wht;
+
+                    $pivot->subtotal = $subtotal;
+                    $pivot->vat = $vat;
+                    $pivot->wht = $wht;
+                    $pivot->total = $total;
+
+                    // Akumulasi untuk summary
+                    $summary['subtotal'] += $subtotal;
+                    $summary['vat'] += $vat;
+                    $summary['wht'] += $wht;
+                    $summary['total'] += $total;
+                }
+            } else {
+                foreach ($invoice->transactions as $trx) {
+                    $currency = strtoupper(trim($invoice->currency));
+
+                    $qty = (int) $trx->quantity;
+                    $rate = (float) ($trx->crate ?? 1);
+                    // dd('Masuk ke bagian else - invoice normal', $invoice->status, $invoice->transactions->count());
+
+                    // PERBAIKAN: Pastikan menggunakan field yang benar dari transaction
+                    $amount = $currency === 'IDR'
+                        ? (float) $trx->camountidr
+                        : (float) $trx->cfcyamount;
+
+                    $vat = $currency === 'IDR'
+                        ? (float) ($trx->cvatgstamount ?? 0)
+                        : (float) ($trx->cvatgstusd ?? 0);
+
+                    $wht = $currency === 'IDR'
+                        ? (float) ($trx->cwhtaxamount ?? 0)
+                        : (float) ($trx->chwtaxrateusd ?? 0);
+
+                    // PERBAIKAN: Kalkulasi subtotal berdasarkan qty * rate per unit
+                    // Bukan qty * amount (karena amount sudah total)
+                    $unitPrice = $amount / $qty; // Hitung unit price
+                    $subtotal = $qty * $unitPrice;
+
+                    // Atau jika amount sudah merupakan subtotal:
+                    // $subtotal = $amount;
+
+                    $total = $subtotal + $vat + $wht;
+
+                    // PERBAIKAN: Assign nilai ke transaction object agar bisa diakses di view
+                    $trx->subtotal = $subtotal;
+                    $trx->vat = $vat;
+                    $trx->wht = $wht;
+                    $trx->total = $total;
+
+                    // Currency conversion jika diperlukan
+                    if ($currency !== $this->finalCurrency) {
+                        if ($currency === 'IDR' && $this->finalCurrency === 'USD') {
+                            $cSub = $subtotal / $rate;
+                            $cVat = $vat / $rate;
+                            $cWht = $wht / $rate;
+                        } elseif ($currency === 'USD' && $this->finalCurrency === 'IDR') {
+                            $cSub = $subtotal * $rate;
+                            $cVat = $vat * $rate;
+                            $cWht = $wht * $rate;
+                        } else {
+                            $cSub = $subtotal;
+                            $cVat = $vat;
+                            $cWht = $wht;
+                        }
+
+                        // Update transaction object dengan nilai yang sudah dikonversi
+                        $trx->subtotal = $cSub;
+                        $trx->vat = $cVat;
+                        $trx->wht = $cWht;
+                        $trx->total = $cSub + $cVat + $cWht;
+                    } else {
+                        $cSub = $subtotal;
+                        $cVat = $vat;
+                        $cWht = $wht;
+                    }
+
+                    $summary['subtotal'] += $cSub;
+                    $summary['vat'] += $cVat;
+                    $summary['wht'] += $cWht;
+                    $summary['total'] += ($cSub + $cVat + $cWht);
+                }
+            }
+
+            // Format summary
+            $formattedSummary = [
+                'subtotal' => number_format(
+                    $summary['subtotal'],
+                    $this->finalCurrency === 'USD' ? 2 : 0,
+                    $this->finalCurrency === 'IDR' ? '.' : ',',
+                    $this->finalCurrency === 'IDR' ? '.' : ','
+                ),
+                'vat' => number_format(
+                    $summary['vat'],
+                    $this->finalCurrency === 'USD' ? 2 : 0,
+                    $this->finalCurrency === 'IDR' ? '.' : ',',
+                    $this->finalCurrency === 'IDR' ? '.' : ','
+                ),
+                'wht' => number_format(
+                    $summary['wht'],
+                    $this->finalCurrency === 'USD' ? 2 : 0,
+                    $this->finalCurrency === 'IDR' ? ',' : '.',
+                    $this->finalCurrency === 'IDR' ? '.' : ','
+                ),
+                'total' => number_format(
+                    $summary['total'],
+                    $this->finalCurrency === 'USD' ? 2 : 0,
+                    $this->finalCurrency === 'IDR' ? '.' : ',',
+                    $this->finalCurrency === 'IDR' ? '.' : ','
+                ),
+            ];
+            // Livewire / Controller
+            $bank = BankAccount::with('bank.customer')
+                ->where('bank_id', $invoice->bank_id)
+                ->get();
+
+            // $bankReturnValue = $bank->accounts;
+            $data = [
+                'customer'             => $customer,
+                'invoice'              => $invoice,
+                'shipment'             => $invoice->shipment,
+                'container'            => $shipment->container ?? collect(), // fallback jika null
+                'transactions'         => $invoice->transactions,
+                'totalPcs'             => $totalPcs,
+                'totalgw'              => $totalgw,
+                'formattedSummary'     => $formattedSummary,
+                'finalCurrency'        => $invoice->currency,
+                'bank'                 => $bank,
+                'invoice_number'       => $invoice->invoice_number,
+                'showExchangeRate'     => $this->showExchangeRate,
+            ];
+
+            $html = view('livewire.shipment.invoice.shipment-purchase-invoice-pdf', $data)->render();
+
+            $pdfContent = Browsershot::html($html)
+                ->setChromePath('/usr/bin/google-chrome')
+                ->format('A4')
+                ->showBackground()
+                ->margins(1, 1, 1, 1)
+                ->setOption('args', ['--no-sandbox'])
+                ->pdf();
+
+            $filename = '' . $data['invoice']->invoice_number . '_' . date('YmdHis') . '.pdf';
+
+            return response()->streamDownload(function () use ($pdfContent) {
+                echo $pdfContent;
+            }, $filename, [
+                'Content-Type' => 'application/pdf',
+            ]);
+        }
     }
     #[On('issueInvoice')]
     public function issueInvoice($id)

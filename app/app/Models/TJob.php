@@ -6,8 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 // use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TJob extends Model
-{   
-    
+{
+
     // use softDeletes;
 
     protected $casts = ['data' => 'array'];
@@ -29,6 +29,7 @@ class TJob extends Model
         'created_by',
         'updated_by',
     ];
+
 
     public function shipments()
     {

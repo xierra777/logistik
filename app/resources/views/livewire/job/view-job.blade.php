@@ -34,14 +34,16 @@
             <p class="text-center bg-gray-300 px-3 py-1">Client </p>
             <p class="text-center px-4 py-2 font-bold"> {{ $job->client->name ?? '-' }}</p>
         </div>
-        <div class="flex flex-col"> <!-- Disini Custome  -->
+        <div class="flex flex-col">
+            <!-- Disini Custome  -->
             <p class="text-center bg-gray-300 px-3 py-1">Customer Code Job </p>
             <p class="text-center font-bold px-4 py-2"> {{ $job->customerCodeJob }}</p>
         </div>
-        @if($type_job === 'ocean_fcl_export' || $type_job === 'ocean_fcl_import' || $type_job === 'ocean_lcl_import' || $type_job === 'ocean_lcl_export')
+        @if($type_job === 'ocean_fcl_export' || $type_job === 'ocean_fcl_import' || $type_job === 'ocean_lcl_import' ||
+        $type_job === 'ocean_lcl_export')
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">MBL No </p>
-            <p class="text-center font-bold px-4 py-2"> {{ $job->jobBillLadingNo  ?? '-'}}</p>
+            <p class="text-center font-bold px-4 py-2"> {{ $job->jobBillLadingNo ?? '-'}}</p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">MBL Date </p>
@@ -53,7 +55,7 @@
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">HBL Date </p>
-            <p class="text-center px-4 py-2"> {{ $job->houseJobBillLadingDate  ?? '-'}}</p>
+            <p class="text-center px-4 py-2"> {{ $job->houseJobBillLadingDate ?? '-'}}</p>
         </div>
         @elseif($type_job === 'air_outbound' || $type_job === 'air_inbound')
         <div class="flex flex-col">
@@ -62,7 +64,7 @@
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">MAWB Date </p>
-            <p class="text-center px-4 py-2"> {{ $job->jobBillLadingDate  ?? '-'}}</p>
+            <p class="text-center px-4 py-2"> {{ $job->jobBillLadingDate ?? '-'}}</p>
         </div>
         <div class="flex flex-col">
             <p class="text-center bg-gray-300 px-3 py-1">HAWB No </p>
@@ -133,12 +135,14 @@
 
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">ETA / Estimate Time Arrival </p>
-                <p class="text-center px-4 py-2"> {{ isset($job->data['estimedelivery']) ? \Carbon\Carbon::parse($job->data['estimearrival'])->format('l, d F Y H:i'	) : '-' }}</p>
+                <p class="text-center px-4 py-2"> {{ isset($job->data['estimedelivery']) ?
+                    \Carbon\Carbon::parse($job->data['estimearrival'])->format('l, d F Y H:i' ) : '-' }}</p>
             </div>
             <div class="flex flex-col">
                 <p class="text-center bg-gray-300 px-3 py-1">ETD / Estimate Time Departure </p>
                 <p class="text-center px-4 py-2">
-                    {{ isset($job->data['estimedelivery']) ? \Carbon\Carbon::parse($job->data['estimedelivery'])->format('l, d F Y H:i'	) : '-' }}
+                    {{ isset($job->data['estimedelivery']) ?
+                    \Carbon\Carbon::parse($job->data['estimedelivery'])->format('l, d F Y H:i' ) : '-' }}
                 </p>
             </div>
             <div class="flex flex-col">
@@ -199,25 +203,32 @@
             <table class="table-hover min-w-full divide-y divide-gray-200 dark:divide-neutral-700 text-center">
                 <thead>
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             No
                         </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Group
                         </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Name
                         </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Addres
                         </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Email
                         </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Contact
                         </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             See Attach
                         </th>
                     </tr>
@@ -226,10 +237,10 @@
                     @forelse($this->organizations as $org)
                     <tr>
                         <td scope="col" class="px-6 py-4  text-xs font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $loop->iteration   }}
+                            {{ $loop->iteration }}
                         </td>
                         <td scope="col" class="px-6 py-4  text-xs font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $org['label']  }}
+                            {{ $org['label'] }}
                         </td>
                         <td scope="col" class="px-6 py-4  text-xs font-medium text-gray-800 dark:text-neutral-200">
                             {{$org['data']->name ?? '-'}}
@@ -243,7 +254,8 @@
                         <td scope="col" class="px-6 py-4  text-xs font-medium text-gray-800 dark:text-neutral-200">
                             {{$org['data']->contact ?? '-'}}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             <button href="" class="py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg
                             transform transition duration-200 ease-in-out shadow:hover-cyan-200
                             hover:bg-cyan-400 hover:scale-110 ">
@@ -255,8 +267,7 @@
                     <tr wire:loading.remove>
                         <td colspan=" 7" class="py-12 text-center">
                             <div class="flex flex-col items-center justify-center">
-                                <img src="{{ asset('images/nodata.svg') }}"
-                                    alt="No data illustration"
+                                <img src="{{ asset('images/nodata.svg') }}" alt="No data illustration"
                                     class="w-64 h-48 mb-4 opacity-75 dark:opacity-50">
                                 <p class="text-lg font-medium text-gray-600 dark:text-neutral-300">
                                     No Contaner found!
@@ -286,31 +297,22 @@
             @close-create-container.window="openCreateContainer = false">
 
             <div class="flex justify-end p-3">
-                <button
-                    wire:click="refreshJob"
-                    @click="openCreateContainer = true"
+                <button wire:click="refreshJob" @click="openCreateContainer = true"
                     class="py-3 px-4 bg-blue-600 text-white rounded-lg">
                     Add Container
                 </button>
             </div>
-            <div x-cloak x-show="openCreateContainer"
-                x-transition:enter="transition ease-out duration-300 delay-150"
-                x-transition:enter-start=" opacity-0"
-                x-transition:enter-end="scale-100 opacity-100"
+            <div x-cloak x-show="openCreateContainer" x-transition:enter="transition ease-out duration-300 delay-150"
+                x-transition:enter-start=" opacity-0" x-transition:enter-end="scale-100 opacity-100"
                 x-transition:leave="transition ease-in duration-200"
                 x-transition:leave-start="transition ease-in duration-100 scale-100 opacity-100"
                 x-transition:leave-end="opacity-0"
-
                 class="fixed inset-0 bg-gray-500 bg-opacity-50 pointer-events-none z-40">
             </div>
-            <div x-cloak x-show="openCreateContainer"
-                x-transition:enter="transition ease-out duration-300"
-                x-transition:enter-start="scale-90 opacity-0"
-                x-transition:enter-end="scale-100 opacity-100"
-                x-transition:leave="transition ease-in duration-200"
-                x-transition:leave-start="scale-100 opacity-100"
-                x-transition:leave-end="scale-90 opacity-0"
-                class="fixed inset-0 flex items-center justify-center z-50">
+            <div x-cloak x-show="openCreateContainer" x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="scale-90 opacity-0" x-transition:enter-end="scale-100 opacity-100"
+                x-transition:leave="transition ease-in duration-200" x-transition:leave-start="scale-100 opacity-100"
+                x-transition:leave-end="scale-90 opacity-0" class="fixed inset-0 flex items-center justify-center z-50">
                 <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-5xl">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-semibold">Create Container</h2>
@@ -324,7 +326,8 @@
                                 <!-- Left Column -->
                                 <div class="flex flex-col space-y-2 col-span-2" wire:ignore>
                                     <label>Container Type</label>
-                                    <select name="" id="containerType" wire:model="containerType" class="w-full block rounded-md border border-gray-300">
+                                    <select name="" id="containerType" wire:model="containerType"
+                                        class="w-full block rounded-md border border-gray-300">
                                         <option value=""></option>
                                         <option value="20'DC">20'DC - 20 ft Dry Container</option>
                                         <option value="20'HC">20'HC - 20 ft High Cube</option>
@@ -348,7 +351,8 @@
                                         <option value="FCL">FCL - Full Container Load</option>
                                         <option value="LCL">LCL - Less than Container Load</option>
                                     </select>
-                                    @error('container_type')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                                    @error('container_type')<div class="text-red-500 text-sm">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="flex flex-col space-y-2">
                                     <label>Container No.</label>
@@ -364,11 +368,13 @@
                                     <label>Container Release No.</label>
                                     <input type="text" placeholder="Enter Container No " wire:model="containerReleaseNo"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                    @error('container_size')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
+                                    @error('container_size')<div class="text-red-500 text-sm">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="flex flex-col space-y-2">
                                     <label>Release date</label>
-                                    <input type="date" wire:model="containerReleaseDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
+                                    <input type="date" wire:model="containerReleaseDate"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                     @error('')<div class="text-red-500 text-sm">{{ $message }}</div>@enderror
                                 </div>
                                 <div class="col-span-2"></div>
@@ -380,7 +386,8 @@
                                 </div>
                                 <div class="flex flex-col space-y-2" wire:ignore>
                                     <label>Type Of Packages</label>
-                                    <select id="typeOfPackages" wire:model="typeOfPackages" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                    <select id="typeOfPackages" wire:model="typeOfPackages"
+                                        class="block w-full rounded-md border-gray-300 shadow-sm">
                                         <option value=""></option>
                                         <option value="PACKAGES">Packages</option>
                                         <option value="CARTONS">Cartons</option>
@@ -409,7 +416,8 @@
                                 </div>
                                 <div class="flex flex-col space-y-2" wire:ignore>
                                     <label>Type Of Gross Weight</label>
-                                    <select id="typeOfGrossWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                    <select id="typeOfGrossWeight"
+                                        class="block w-full rounded-md border-gray-300 shadow-sm">
                                         <option value=""></option>
                                         <option value="KGS">KGS</option>
                                     </select>
@@ -421,7 +429,8 @@
                                 </div>
                                 <div class="flex flex-col space-y-2" wire:ignore>
                                     <label>Type Of Net Of Weight</label>
-                                    <select id="typeNetOfWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                    <select id="typeNetOfWeight"
+                                        class="block w-full rounded-md border-gray-300 shadow-sm">
                                         <option value=""></option>
                                         <option value="KGS">KGS</option>
                                     </select>
@@ -434,7 +443,8 @@
                                 </div>
                                 <div class="flex flex-col space-y-2" wire:ignore>
                                     <label>Type Of Volume Weight</label>
-                                    <select id="typeOfVolumeWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                    <select id="typeOfVolumeWeight"
+                                        class="block w-full rounded-md border-gray-300 shadow-sm">
                                         <option value=""></option>
                                         <option value="KGS">KGS</option>
                                     </select>
@@ -446,7 +456,8 @@
                                 </div>
                                 <div class="flex flex-col space-y-2" wire:ignore>
                                     <label>Type Of Weight</label>
-                                    <select id="typeOfTotalWeight" class="block w-full rounded-md border-gray-300 shadow-sm">
+                                    <select id="typeOfTotalWeight"
+                                        class="block w-full rounded-md border-gray-300 shadow-sm">
                                         <option value=""></option>
                                         <option value="KGS">KGS</option>
                                     </select>
@@ -461,14 +472,16 @@
                                     <div class="flex">
                                         <input type="text" wire:model="volume" placeholder="Enter volume"
                                             class="block w-full rounded-l-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                                        <span class="inline-flex items-center px-3 border border-l-0 border-gray-300 bg-gray-100 text-gray-600 rounded-r-md">
+                                        <span
+                                            class="inline-flex items-center px-3 border border-l-0 border-gray-300 bg-gray-100 text-gray-600 rounded-r-md">
                                             CBM
                                         </span>
                                     </div>
                                 </div>
                                 <div class="flex flex-col space-y-2">
                                     <label>Chargeable Weight</label>
-                                    <input type="text" placeholder="Enter Chargeable Weight" wire:model="chargableWeight"
+                                    <input type="text" placeholder="Enter Chargeable Weight"
+                                        wire:model="chargableWeight"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
                                 </div>
 
@@ -491,7 +504,8 @@
                             </div>
                         </div>
                         <div class="mt-4 flex justify-end gap-2">
-                            <button type="button" @click="openCreateContainer = false" class="px-4 py-2 bg-gray-300 text-gray-800 rounded">
+                            <button type="button" @click="openCreateContainer = false"
+                                class="px-4 py-2 bg-gray-300 text-gray-800 rounded">
                                 Cancel
                             </button>
                             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">
@@ -507,22 +521,28 @@
             <table class="table-hover min-w-full divide-y divide-gray-200 dark:divide-neutral-700 text-center">
                 <thead>
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             No
                         </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             No Activity / No Container
                         </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Type Container
                         </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Gross Weight
                         </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Volume
                         </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             See Attach
                         </th>
                     </tr>
@@ -530,26 +550,32 @@
                 <tbody class="">
                     @forelse($job->TjobContainer as $c)
                     <tr>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $loop->iteration  * 10 }}
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $loop->iteration * 10 }}
                         </td>
-                        <td scope=" col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope=" col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$c->containers['containerNo'] ?? ''}}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$c->containers['containerType'] ?? ''}}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$c->containers['grossWeight'] ?? ''}} {{$c->containers['typeOfGrossWeight'] ?? ''}}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$c->containers['volume'] ?? ''}}
                             @if($c->containers['volume'])
                             CBM
                             @else
                             @endif
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             <a href="{{ url('view-job/' . $job->id . '/container-job/' . $c->id) }}" class="py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg
                             transform transition duration-200 ease-in-out shadow:hover-cyan-200
                             hover:bg-cyan-400 hover:scale-110 ">
@@ -561,8 +587,7 @@
                     <tr wire:loading.remove>
                         <td colspan=" 7" class="py-12 text-center">
                             <div class="flex flex-col items-center justify-center">
-                                <img src="{{ asset('images/nodata.svg') }}"
-                                    alt="No data illustration"
+                                <img src="{{ asset('images/nodata.svg') }}" alt="No data illustration"
                                     class="w-64 h-48 mb-4 opacity-75 dark:opacity-50">
                                 <p class="text-lg font-medium text-gray-600 dark:text-neutral-300">
                                     No Contaner found!
@@ -587,19 +612,24 @@
             <table class="table-hover min-w-full divide-y divide-gray-200 dark:divide-neutral-700 text-center">
                 <thead>
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             No
                         </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Gross Weight
                         </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Net Weight
                         </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Volume
                         </th>
-                        <th scope="col" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-sm font-bold text-gray-700 uppercase dark:text-neutral-400">
                             See Attach
                         </th>
                     </tr>
@@ -607,23 +637,28 @@
                 <tbody class="">
                     @forelse($job->TjobContainer as $c)
                     <tr>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $loop->iteration  * 10 }}
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                            {{ $loop->iteration * 10 }}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$c->containers['grossWeight'] ?? ''}}{{$c->containers['typeOfGrossWeight'] ?? ''}}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$c->containers['netOfWeight'] ?? ''}} {{$c->containers['typeNetOfWeight'] ?? ''}}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$c->containers['volume'] ?? ''}}
                             @if($c->containers['volume'])
                             CBM
                             @else
                             @endif
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             <a href="{{ url('view-job/' . $job->id . '/container-job/' . $c->id) }}" class="py-2 px-4 bg-cyan-500 text-white font-semibold rounded-md hover:shadow-lg
                             transform transition duration-200 ease-in-out shadow:hover-cyan-200
                             hover:bg-cyan-400 hover:scale-110 ">
@@ -635,8 +670,7 @@
                     <tr wire:loading.remove>
                         <td colspan=" 7" class="py-12 text-center">
                             <div class="flex flex-col items-center justify-center">
-                                <img src="{{ asset('images/nodata.svg') }}"
-                                    alt="No data illustration"
+                                <img src="{{ asset('images/nodata.svg') }}" alt="No data illustration"
                                     class="w-64 h-48 mb-4 opacity-75 dark:opacity-50">
                                 <p class="text-lg font-medium text-gray-600 dark:text-neutral-300">
                                     No Contaner found!
@@ -670,7 +704,8 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-2 p-3">
             @forelse ($this->assignedShipments as $s)
 
-            <div class="bg-gradient-to-br from-emerald-500 via-teal-400 to-cyan-300 rounded-xl shadow-xl w-full max-w p-6 text-white space-y-4 hover:scale-[1.03] transition-transform duration-300 ease-in-out">
+            <div
+                class="bg-gradient-to-br from-emerald-500 via-teal-400 to-cyan-300 rounded-xl shadow-xl w-full max-w p-6 text-white space-y-4 hover:scale-[1.03] transition-transform duration-300 ease-in-out">
                 <a href="{{ url('view-shipment/' . $s->id) }}" class="block space-y-1">
                     <div class="flex justify-center">
 
@@ -688,7 +723,8 @@
                         $iconClass = $icons[$type] ?? $icons['default'];
                         @endphp
 
-                        <p class="mb-2 text-xs bg-purple-500 text-white rounded-full px-4 py-1 font-semibold shadow flex items-center gap-2">
+                        <p
+                            class="mb-2 text-xs bg-purple-500 text-white rounded-full px-4 py-1 font-semibold shadow flex items-center gap-2">
                             <i class="fas {{ $iconClass }}"></i>
                             {{ strtoupper(str_replace('_', ' ', $type)) }}
                         </p>
@@ -708,23 +744,22 @@
 
         <div class="mt-3 p-1 gap-2 flex flex-col sm:flex-row">
             <a href="{{route('viewJobCreateShipment', ['id' => $job->id])}}" onclick="saveScrollPosition()"
-                class="bg-blue-600 text-white rounded-lg py-2 px-5 hover:scale-105 text-center sm:text-left"> Add Shipments From Job</a>
+                class="bg-blue-600 text-white rounded-lg py-2 px-5 hover:scale-105 text-center sm:text-left"> Add
+                Shipments From Job</a>
             <div x-data="{ openDetachAssigned: false }" @close-detach-assigned.window="openDetachAssigned = false">
                 <button @click="openDetachAssigned = true"
                     class="bg-red-600 text-white rounded-lg py-2 px-5 hover:scale-105 transition-transform w-full sm:w-auto">
                     <i class="fa-solid fa-file-export"></i> Detach Shipment
                 </button>
 
-                <div x-cloak x-show="openDetachAssigned"
-                    x-transition:enter="transition ease-out duration-300 delay-150"
-                    x-transition:enter-start="opacity-0"
-                    x-transition:enter-end="scale-100 opacity-100"
+                <div x-cloak x-show="openDetachAssigned" x-transition:enter="transition ease-out duration-300 delay-150"
+                    x-transition:enter-start="opacity-0" x-transition:enter-end="scale-100 opacity-100"
                     x-transition:leave="transition ease-in duration-200"
-                    x-transition:leave-start="scale-100 opacity-100"
-                    x-transition:leave-end="opacity-0"
+                    x-transition:leave-start="scale-100 opacity-100" x-transition:leave-end="opacity-0"
                     class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
 
-                    <div class="bg-white rounded-xl shadow-xl w-full max-w-7xl p-6 space-y-4 relative z-50 max-h-[80vh] flex flex-col">
+                    <div
+                        class="bg-white rounded-xl shadow-xl w-full max-w-7xl p-6 space-y-4 relative z-50 max-h-[80vh] flex flex-col">
                         <div class="p-3 flex items-center">
                             <button @click="openDetachAssigned = false"
                                 class="absolute top-3 right-3 text-gray-500 bg-gray-200 border border-gray-200 rounded-full py-1 px-5 hover:text-gray-800 text-2xl font-bold leading-none">
@@ -738,14 +773,22 @@
                             <table class="w-full table-auto text-center min-w-[700px]">
                                 <thead class="bg-gray-100 sticky top-0">
                                     <tr>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">No</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left"></th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Shipment Id</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Type Job</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">POL</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">POD</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">ETA</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">ETD</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">No
+                                        </th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">
+                                        </th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">
+                                            Shipment Id</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">
+                                            Type Job</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">
+                                            POL</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">
+                                            POD</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">
+                                            ETA</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">
+                                            ETD</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -753,24 +796,32 @@
                                     <tr class="border-b last:border-b-0 hover:bg-gray-50">
                                         <td class="px-4 py-2 text-left">{{ $loop->iteration }}</td>
                                         <td class="px-4 py-2 text-left">
-                                            <input type="checkbox" wire:model="selectedAssignedShipments" value="{{ $s->id }}"
-                                                class="form-checkbox text-red-600 rounded-md">
+                                            <input type="checkbox" wire:model="selectedAssignedShipments"
+                                                value="{{ $s->id }}" class="form-checkbox text-red-600 rounded-md">
                                         </td>
                                         <td class="px-4 py-2 text-left">{{ $s->shipment_id }}</td>
-                                        <td class="px-4 py-2 text-left whitespace-nowrap"> {{ strtoupper(str_replace('_', ' ', $s->shipmentsTypeJob)) }}
+                                        <td class="px-4 py-2 text-left whitespace-nowrap"> {{
+                                            strtoupper(str_replace('_', ' ', $s->shipmentsTypeJob)) }}
                                         </td>
-                                        <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_loading'] ?? '-' }}</td>
-                                        <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_discharge'] ?? '-' }}</td>
+                                        <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_loading']
+                                            ?? '-' }}</td>
+                                        <td class="px-4 py-2 text-left">{{
+                                            $s->dataShipments['shipmentPort_of_discharge'] ?? '-' }}</td>
                                         <td class="px-4 py-2 text-left">
-                                            {{ isset($s->dataShipments['shipmentEstimearrival']) ? \Carbon\Carbon::parse($s->dataShipments['shipmentEstimearrival'])->format('d F Y') : '-' }}
+                                            {{ isset($s->dataShipments['shipmentEstimearrival']) ?
+                                            \Carbon\Carbon::parse($s->dataShipments['shipmentEstimearrival'])->format('d
+                                            F Y') : '-' }}
                                         </td>
                                         <td class="px-4 py-2 text-left">
-                                            {{ isset($s->dataShipments['shipmentEstimedelivery']) ? \Carbon\Carbon::parse($s->dataShipments['shipmentEstimedelivery'])->format('d F Y') : '-' }}
+                                            {{ isset($s->dataShipments['shipmentEstimedelivery']) ?
+                                            \Carbon\Carbon::parse($s->dataShipments['shipmentEstimedelivery'])->format('d
+                                            F Y') : '-' }}
                                         </td>
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="7" class="text-center py-4 text-gray-500">Tidak ada shipment yang terhubung.</td>
+                                        <td colspan="7" class="text-center py-4 text-gray-500">Tidak ada shipment yang
+                                            terhubung.</td>
                                     </tr>
                                     @endforelse
                                 </tbody>
@@ -798,13 +849,10 @@
                     <i class="fa-solid fa-file-import"></i> Attach Shipment
                 </button>
 
-                <div x-cloak x-show="openDetachShipment"
-                    x-transition:enter="transition ease-out duration-300 delay-150"
-                    x-transition:enter-start="opacity-0"
-                    x-transition:enter-end="scale-100 opacity-100"
+                <div x-cloak x-show="openDetachShipment" x-transition:enter="transition ease-out duration-300 delay-150"
+                    x-transition:enter-start="opacity-0" x-transition:enter-end="scale-100 opacity-100"
                     x-transition:leave="transition ease-in duration-200"
-                    x-transition:leave-start="scale-100 opacity-100"
-                    x-transition:leave-end="opacity-0"
+                    x-transition:leave-start="scale-100 opacity-100" x-transition:leave-end="opacity-0"
                     class="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4">
 
                     <div class="bg-white rounded-xl shadow-xl w-full max-w-7xl p-6 space-y-4 relative z-50
@@ -823,13 +871,20 @@
                             <table class="w-full table-auto text-center min-w-[700px]">
                                 <thead class="bg-gray-100 sticky top-0">
                                     <tr>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">No</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left"></th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">Shipment Id</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">POL</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">POD</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">ETA</th>
-                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">ETD</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">No
+                                        </th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">
+                                        </th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">
+                                            Shipment Id</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">
+                                            POL</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">
+                                            POD</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">
+                                            ETA</th>
+                                        <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase text-left">
+                                            ETD</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -837,21 +892,29 @@
                                     <tr class="border-b last:border-b-0 hover:bg-gray-50">
                                         <td class="px-4 py-2 text-left">{{ $loop->iteration }}</td>
                                         <td class="px-4 py-2 text-left">
-                                            <input type="checkbox" wire:model="selectedShipments" value="{{ $s->id }}" class="form-checkbox text-blue-600 rounded-md">
+                                            <input type="checkbox" wire:model="selectedShipments" value="{{ $s->id }}"
+                                                class="form-checkbox text-blue-600 rounded-md">
                                         </td>
                                         <td class="px-4 py-2 text-left">{{ $s->shipment_id }}</td>
-                                        <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_loading'] ?? '-' }}</td>
-                                        <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_discharge'] ?? '-' }}</td>
+                                        <td class="px-4 py-2 text-left">{{ $s->dataShipments['shipmentPort_of_loading']
+                                            ?? '-' }}</td>
+                                        <td class="px-4 py-2 text-left">{{
+                                            $s->dataShipments['shipmentPort_of_discharge'] ?? '-' }}</td>
                                         <td class="px-4 py-2 text-left">
-                                            {{ isset($s->dataShipments['shipmentEstimearrival']) ? \Carbon\Carbon::parse($s->dataShipments['shipmentEstimearrival'])->format('d F Y') : '-' }}
+                                            {{ isset($s->dataShipments['shipmentEstimearrival']) ?
+                                            \Carbon\Carbon::parse($s->dataShipments['shipmentEstimearrival'])->format('d
+                                            F Y') : '-' }}
                                         </td>
                                         <td class="px-4 py-2 text-left">
-                                            {{ isset($s->dataShipments['shipmentEstimedelivery']) ? \Carbon\Carbon::parse($s->dataShipments['shipmentEstimedelivery'])->format('d F Y') : '-' }}
+                                            {{ isset($s->dataShipments['shipmentEstimedelivery']) ?
+                                            \Carbon\Carbon::parse($s->dataShipments['shipmentEstimedelivery'])->format('d
+                                            F Y') : '-' }}
                                         </td>
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="7" class="text-center py-4 text-gray-500">Tidak ada shipment yatim.</td>
+                                        <td colspan="7" class="text-center py-4 text-gray-500">Tidak ada shipment yatim.
+                                        </td>
                                     </tr>
                                     @endforelse
                                 </tbody>
@@ -859,10 +922,12 @@
                         </div>
 
                         <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-4">
-                            <button @click="openDetachShipment = false" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition">
+                            <button @click="openDetachShipment = false"
+                                class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 transition">
                                 Batal
                             </button>
-                            <button wire:click="assignSelectedShipments" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">
+                            <button wire:click="assignSelectedShipments"
+                                class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition">
                                 Assign ke Job
                             </button>
                         </div>
@@ -876,39 +941,39 @@
     <div class="mt-4 shadow-lg ">
         <div class="bg-gray-400 rounded-t-lg">
             <div class=" ">
-                <div x-data="{ open: false }" @keydown.escape.window="open = false" @close-transaction-modal.window="open = false"
-                    x-ref="modalContent">
+                <div x-data="{ open: false }" @keydown.escape.window="open = false"
+                    @close-transaction-modal.window="open = false" x-ref="modalContent">
                     <div class="flex items-center justify-between p-3 ">
                         <div class="flex-1"></div> <!-- Spacer kiri -->
                         <p class="font-bold  text-center">TRANSACTION</p>
                         <div class="flex-1 flex justify-end gap-2">
-                            <a href="{{route('jobSaleInvoice', ['jobId' => $job->id])}}" class="py-2 px-3 bg-green-600 text-white rounded-lg text-sm">Print Invoice</a>
-                            <a href="{{route('jobPurchaseInvoice', ['jobId' => $job->id])}}" class="py-2 px-3 bg-red-600 text-white rounded-lg text-sm">Print PI</a>
-                            <button @click="open = true; $wire.trancsationsDispatchclear()" class="py-2 px-3 bg-blue-600 text-white rounded-lg text-sm">Add Cost</button>
+                            <a href="{{route('jobSaleInvoice', ['jobId' => $job->id])}}"
+                                class="py-2 px-3 bg-green-600 text-white rounded-lg text-sm">Print Invoice</a>
+                            <a href="{{route('jobPurchaseInvoice', ['jobId' => $job->id])}}"
+                                class="py-2 px-3 bg-red-600 text-white rounded-lg text-sm">Print PI</a>
+                            <button @click="open = true; $wire.trancsationsDispatchclear()"
+                                class="py-2 px-3 bg-blue-600 text-white rounded-lg text-sm">Add Cost</button>
 
                         </div>
                     </div>
                     <!-- Background Overlay -->
-                    <div x-cloak x-show="open"
-                        x-transition:enter="transition ease-out duration-300 delay-150"
+                    <div x-cloak x-show="open" x-transition:enter="transition ease-out duration-300 delay-150"
                         x-transition:leave="transition ease-in duration-200"
                         class="fixed inset-0 bg-gray-500 bg-opacity-50 z-40">
                     </div>
 
                     <!-- Modal Container -->
-                    <div x-cloak x-show="open"
-                        x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="scale-90 opacity-0"
-                        x-transition:enter-end="scale-100 opacity-100"
+                    <div x-cloak x-show="open" x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="scale-90 opacity-0" x-transition:enter-end="scale-100 opacity-100"
                         x-transition:leave="transition ease-in duration-200"
-                        x-transition:leave-start="scale-100 opacity-100"
-                        x-transition:leave-end="scale-90 opacity-0"
+                        x-transition:leave-start="scale-100 opacity-100" x-transition:leave-end="scale-90 opacity-0"
                         class="fixed inset-0 flex items-center justify-center z-50 px-4">
                         <div class="bg-white rounded-2xl shadow-md w-full max-w-7.5xl">
                             <!-- Modal Header -->
                             <div class="flex justify-between items-center p-4 border-b">
                                 <h2 class="text-lg font-semibold text-gray-800">Costing</h2>
-                                <button @click="open = false" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                <button @click="open = false"
+                                    class="text-gray-400 hover:text-gray-600 focus:outline-none">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M6 18L18 6M6 6l12 12" />
@@ -916,8 +981,7 @@
                                 </button>
                             </div>
                             <!-- Form -->
-                            <livewire:job.transactions.create-transactions
-                                :id="$job->id"
+                            <livewire:job.transactions.create-transactions :id="$job->id"
                                 :key="'transaction' . $job->id. '-' . $refreshKey" />
                         </div>
                     </div>
@@ -928,45 +992,59 @@
             <table class="table-hover min-w-full divide-y divide-gray-200 dark:divide-neutral-700 text-center">
                 <thead>
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             No
                         </th>
-                        <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                         </th>
-                        <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Description
                         </th>
-                        <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Unit
                         </th>
-                        <th scope="col" class="px-6 py-3 bg-orange-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 bg-orange-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Client
                         </th>
-                        <th scope="col" class="px-6 py-3 bg-orange-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 bg-orange-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Sale
                         </th>
-                        <th scope="col" class="px-6 py-3 bg-orange-500 text-xs whitespace-nowrap font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 bg-orange-500 text-xs whitespace-nowrap font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Amount (IDR)
                         </th>
-                        <th scope="col" class="px-6 py-3 bg-orange-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 bg-orange-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Dr/Cr
                         </th>
-                        <th scope="col" class="px-6 py-3 bg-blue-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 bg-blue-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Vendor
                         </th>
-                        <th scope="col" class="px-6 py-3 bg-blue-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 bg-blue-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Cost
                         </th>
-                        <th scope="col" class="px-6 py-3 bg-blue-500 text-xs whitespace-nowrap font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 bg-blue-500 text-xs whitespace-nowrap font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Amount (IDR)
                         </th>
-                        <th scope="col" class="px-6 py-3 bg-blue-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 bg-blue-500 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Dr/Cr
                         </th>
-                        <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Freight
                         </th>
-                        <th scope="col" class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
+                        <th scope="col"
+                            class="px-6 py-3 text-xs font-bold text-gray-700 uppercase dark:text-neutral-400">
                             Gross Profit
                         </th>
                     </tr>
@@ -974,10 +1052,12 @@
                 <tbody class="">
                     @forelse($transactions as $transaction)
                     <tr>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $loop->iteration }}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             <div class="flex items-center space-x-3">
                                 <!-- Delete Button -->
                                 <div x-data>
@@ -1004,49 +1084,59 @@
                                 </div>
 
                                 <!-- Update Button -->
-                                <button
-                                    type="button"
+                                <button type="button"
                                     wire:click="editTransaction({{ $job->id }}, {{ $transaction->id }})"
                                     class="px-3 py-2 bg-blue-500 rounded-full text-white hover:bg-blue-600 transition transform hover:scale-105">
                                     <i class="fa-solid fa-pen-to-square"></i> </button>
                             </div>
                         </td>
 
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $transaction->description }}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $transaction->unit }}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->transactionClient->name ?? ''}}
                         </td>
                         <td scope="col" class="px-6 py-4  text-sm font-medium text-gray-800 dark:text-neutral-200">
-                            {{ $transaction->quantity }} x {{number_format($transaction->sfcyamount, 2, ',', '.')}} x {{$transaction->srate}}
+                            {{ $transaction->quantity }} x {{number_format($transaction->sfcyamount, 2, ',', '.')}} x
+                            {{$transaction->srate}}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ number_format($transaction->samountidr, 2, ',', '.') }}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->sdrcr}}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->transactionVendor->name ?? ''}}
                         </td>
                         <td scope="col" class="px-6 py-4  text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{ $transaction->quantity }} x {{number_format($transaction->cfcyamount, 2, ',', '.')}}
                             x {{$transaction->crate}}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{number_format($transaction->camountidr, 2, ',', '.')}}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->cdrcr}}
                         </td>
-                        <td scope="col" class="px-6 py-4 uppercase whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
+                        <td scope="col"
+                            class="px-6 py-4 uppercase whitespace-nowrap text-sm font-medium text-gray-800 dark:text-neutral-200">
                             {{$transaction->freight}}
                         </td>
-                        <td scope="col" class="px-6 py-4 whitespace-nowrap text-sm font-medium font-bold {{ $transaction->SamountgpFormatted < 0 ? 'text-red-500' : 'text-green-700' }}">
+                        <td scope="col"
+                            class="px-6 py-4 whitespace-nowrap text-sm font-medium font-bold {{ $transaction->SamountgpFormatted < 0 ? 'text-red-500' : 'text-green-700' }}">
                             {{$transaction->SamountgpFormatted}}
                         </td>
                     </tr>
@@ -1054,8 +1144,7 @@
                     <tr wire:loading.remove>
                         <td colspan="13" class="py-12 text-center">
                             <div class="flex flex-col text-center items-center justify-center">
-                                <img src="{{ asset('images/nodata.svg') }}"
-                                    alt="No dataShipments illustration"
+                                <img src="{{ asset('images/nodata.svg') }}" alt="No dataShipments illustration"
                                     class="w-64 h-48 mb-4 opacity-75  dark:opacity-50">
                                 <p class="text-md font-medium text-gray-600 dark:text-neutral-300">
                                 </p>
@@ -1070,8 +1159,7 @@
                     @endforelse
                 </tbody>
             </table>
-            <x-confirm-delete
-                :message="'Are you sure you want to delete this transaction?'"
+            <x-confirm-delete :message="'Are you sure you want to delete this transaction?'"
                 :key="'confirm-delete-job-transaction-' . now()->timestamp" />
         </div>
     </div>
@@ -1090,27 +1178,18 @@
     </div>
     @if($isEditing)
     <div x-data="{ show: false }">
-        <div wire:loading
-            wire:target="saveTransaction,editTransaction"
+        <div wire:loading wire:target="saveTransaction,editTransaction"
             class="fixed inset-0 bg-black bg-opacity-30 z-50 items-center justify-center">
             <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
             <span class="ml-4 text-white text-lg font-medium">TUNGGU SEBENTAR...</span>
         </div> {{-- Backdrop --}}
-        <div
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
-            x-data="{ show: false }"
-            x-init="setTimeout(() => show = true, 50)"
-            x-show="show"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0" x-cloak>
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn"
+            x-data="{ show: false }" x-init="setTimeout(() => show = true, 50)" x-show="show"
+            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-cloak>
 
-            <div
-                class="bg-white rounded-2xl w-full  mx-4 shadow-2xl transform"
-                x-show="show"
+            <div class="bg-white rounded-2xl w-full  mx-4 shadow-2xl transform" x-show="show"
                 x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0 scale-95 translate-y-4"
                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
@@ -1131,9 +1210,7 @@
 
                 {{-- Form --}}
                 <div wire:ignore>
-                    <livewire:job.transactions.edit-transactions
-                        :id="$job->id"
-                        :transactionId="$editingTransactionId"
+                    <livewire:job.transactions.edit-transactions :id="$job->id" :transactionId="$editingTransactionId"
                         :key="'transaction-' . $job->id . '-' . $editingTransactionId" />
                 </div>
 

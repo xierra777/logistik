@@ -43,6 +43,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use App\Livewire\Job\Invoice\PurchaseInvoice as jobPurchaseInvoice;
+use App\Livewire\Quotation\Quotation;
 use App\Livewire\Shipment\Invoice\ShipmentPurchaseInvoice;
 use App\Livewire\Shipment\Invoice\ShipmentSaleInvoice;
 
@@ -260,7 +261,9 @@ Route::get('view-bank/{id}', ViewBank::class)
     ->middleware(['auth', 'verified'])
     ->name('viewBank');
 
-
+Route::get('quotation', Quotation::class)
+    ->middleware(['auth', 'verified'])
+    ->name('quotation');
 Route::get('/csrf-token', function (Request $request) {
     return response()->json(['csrf_token' => csrf_token()]);
 })->name('csrf-token');

@@ -13,6 +13,8 @@ class ListCustomer extends Component
     public $start_date, $end_date;
     public $searchField   = 'name';  // default column
     public $searchTerm    = '';
+    public $sortField = 'created_at';
+    public $sortDirection = 'desc';
 
     public function confirmDelete($get_id)
     {
@@ -23,7 +25,15 @@ class ListCustomer extends Component
             session()->flash('error', 'Error deleting shipment: ' . $e->getMessage());
         }
     }
-
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+    }
     public function render()
     {
         $query = Customer::query()->latest();

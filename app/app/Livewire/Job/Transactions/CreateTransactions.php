@@ -148,7 +148,7 @@ class CreateTransactions extends Component
             'coa_sale_id' => $this->coaSaleId,
             'coa_cost_id' => $this->coaCostId,
             // Sale
-            'sclient' => $this->sclient,
+            'sclient' => $this->sclient ?: null,
             'scurrency' => $this->scurrency,
             'srate' => $this->srate,
             'samount_qty' => $this->samount_qty,
